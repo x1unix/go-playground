@@ -1,5 +1,6 @@
 import React from 'react';
 import { Header } from './Header';
+import { CodeEditor } from './CodeEditor'
 // import { loadTheme } from '@uifabric/styling';
 import './App.css';
 
@@ -11,6 +12,7 @@ function App() {
   return (
     <div className="App">
         <Header/>
+        <CodeEditor/>
     </div>
   );
 }

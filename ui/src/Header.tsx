@@ -49,7 +49,7 @@ export const Header = () => {
             className="header__commandBar"
             items={menuItems}
             farItems={asideItems}
-            ariaLabel="Editor menu"
+            ariaLabel="CodeEditor menu"
         />
     </header>;
 };
