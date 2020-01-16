@@ -1,0 +1,11 @@
+version: "1.0"
+vars:
+  ui_dir: '{{PROJECT}}/ui'
+
+imports:
+  - ./ui/gilbert.yaml
+
+tasks:
+  build:
+    - description: Build project
+      action: build

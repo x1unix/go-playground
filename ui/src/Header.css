@@ -1,0 +1,15 @@
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header__logo {
+    height: 1.5em;
+    margin-left: 10px;
+}
+
+.header__commandBar {
+    flex: 1 1 auto;
+}
