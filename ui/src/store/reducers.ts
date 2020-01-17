@@ -10,7 +10,8 @@ type Reducer<T> = (s: State, a: Action<T>) => State;
 
 const reducers: {[k in ActionType]: Reducer<any>} = {
     [ActionType.FILE_CHANGE]: (s, a: Action<string>) => {
-        return {code: a.payload};
+        s.code = a.payload;
+        return s;
     },
     [ActionType.IMPORT_FILE]: (s, a: Action<string>) => {
         return s;
@@ -19,10 +20,11 @@ const reducers: {[k in ActionType]: Reducer<any>} = {
 
 export function rootReducer(state = initialState, action: Action) {
     console.log('reducer', {state, action});
+    const newState = Object.assign({}, state);
     const r = reducers[action.type];
     if (!r) {
-        return state;
+        return newState;
     }
 
-    return reducers[action.type](state, action);
+    return reducers[action.type](newState, action);
 }
