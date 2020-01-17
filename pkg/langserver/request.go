@@ -31,16 +31,9 @@ func NewErrorResponse(err error) ErrorResponse {
 }
 
 func (r ErrorResponse) Write(w http.ResponseWriter) http.ResponseWriter {
-	data, err := json.Marshal(r)
 	w.Header().Add("Content-Type", "application/json")
-
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(r)
-		return w
-	}
-
-	if _, err = w.Write(data); err != nil {
+	w.WriteHeader(http.StatusInternalServerError)
+	if err := json.NewEncoder(w).Encode(r); err != nil {
 		zap.S().Error(err)
 	}
 	return w
