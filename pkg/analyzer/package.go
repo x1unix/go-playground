@@ -54,8 +54,8 @@ func (p *Package) GetCompletionItem() *CompletionItem {
 	return &CompletionItem{
 		Label:         p.Name,
 		Kind:          Module,
-		Detail:        p.Synopsis,
-		Documentation: p.URL,
+		Detail:        p.Name,
+		Documentation: p.Synopsis,
 		InsertText:    p.Name,
 	}
 }

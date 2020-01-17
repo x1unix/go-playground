@@ -18,7 +18,7 @@ func main() {
 	var addr string
 	var debug bool
 	flag.StringVar(&packagesFile, "f", "packages.json", "Path to packages index JSON file")
-	flag.StringVar(&addr, "-addr", ":8080", "TCP Listen address")
+	flag.StringVar(&addr, "addr", ":8080", "TCP Listen address")
 	flag.BoolVar(&debug, "debug", false, "Enable debug mode")
 
 	goRoot, ok := os.LookupEnv("GOROOT")
@@ -30,7 +30,7 @@ func main() {
 	flag.Parse()
 	l := getLogger(debug)
 	defer l.Sync()
-	if err := start(packagesFile, addr, goRoot); err != nil {
+	if err := start(packagesFile, addr, goRoot, debug); err != nil {
 		l.Sugar().Fatal(err)
 	}
 }
@@ -52,7 +52,7 @@ func getLogger(debug bool) (l *zap.Logger) {
 	return l
 }
 
-func start(packagesFile, addr, goRoot string) error {
+func start(packagesFile, addr, goRoot string, debug bool) error {
 	zap.S().Infof("GOROOT is %q", goRoot)
 	zap.S().Infof("Packages file is %q", packagesFile)
 	analyzer.SetRoot(goRoot)
@@ -61,10 +61,9 @@ func start(packagesFile, addr, goRoot string) error {
 		return fmt.Errorf("failed to read packages file %q: %s", packagesFile, err)
 	}
 
-	docServer := langserver.New(packages, websocket.Upgrader{})
+	docServer := langserver.New(packages, websocket.Upgrader{}, debug)
 	r := mux.NewRouter()
-	r.Path("/langserver").Handler(docServer)
-	r.Path("/test").HandlerFunc(docServer.HandlePlainRequest)
+	r.Path("/suggest").Handler(docServer)
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./public")))
 
 	zap.S().Infof("Listening on %q", addr)

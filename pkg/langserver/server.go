@@ -16,13 +16,15 @@ type Service struct {
 	log   *zap.SugaredLogger
 	index analyzer.PackageIndex
 	upg   websocket.Upgrader
+	debug bool
 }
 
-func New(packages []*analyzer.Package, upg websocket.Upgrader) *Service {
+func New(packages []*analyzer.Package, upg websocket.Upgrader, debug bool) *Service {
 	return &Service{
 		log:   zap.S().Named("langserver"),
 		upg:   upg,
 		index: analyzer.BuildPackageIndex(packages),
+		debug: debug,
 	}
 }
 
@@ -70,11 +72,14 @@ func (s *Service) provideSuggestion(req SuggestionRequest) (*SuggestionsResponse
 	return s.lookupBuiltin(req.Value)
 }
 
-func (s *Service) HandlePlainRequest(w http.ResponseWriter, r *http.Request) {
+func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	value := q.Get("value")
 	pkgName := q.Get("packageName")
 
+	if s.debug {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+	}
 	resp, err := s.provideSuggestion(SuggestionRequest{PackageName: pkgName, Value: value})
 	if err != nil {
 		NewErrorResponse(err).Write(w)
@@ -82,40 +87,4 @@ func (s *Service) HandlePlainRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp.Write(w)
-}
-
-func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	c, err := s.upg.Upgrade(w, r, defaultHeaders)
-	if err != nil {
-		s.log.Error("upgrade:", err)
-		return
-	}
-	defer c.Close()
-	for {
-		req := SuggestionRequest{}
-		if err := c.ReadJSON(&req); err != nil {
-			s.log.Error("ReadJSON:", err)
-			s.sendError(c, err)
-			break
-		}
-
-		s.log.Debugw("received request", req)
-		resp, err := s.provideSuggestion(req)
-		if err != nil {
-			s.log.Error(err)
-			s.sendError(c, err)
-			continue
-		}
-
-		if err = c.WriteJSON(resp); err != nil {
-			s.log.Error("WriteJSON:", err)
-			break
-		}
-	}
-}
-
-func (s *Service) sendError(conn *websocket.Conn, err error) {
-	if e := conn.WriteJSON(NewErrorResponse(err)); e != nil {
-		s.log.Errorf("failed to send error %q - %s", err.Error(), e)
-	}
 }

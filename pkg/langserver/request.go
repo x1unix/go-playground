@@ -2,9 +2,10 @@ package langserver
 
 import (
 	"encoding/json"
-	"go.uber.org/zap"
 	"net/http"
 	"strings"
+
+	"go.uber.org/zap"
 
 	"github.com/x1unix/go-playground/pkg/analyzer"
 )
@@ -29,6 +30,10 @@ func NewErrorResponse(err error) ErrorResponse {
 	return ErrorResponse{Error: err.Error()}
 }
 
+func NewErrorResponseWithID(err error, id string) ErrorResponse {
+	return ErrorResponse{Error: err.Error(), ID: id}
+}
+
 func (r ErrorResponse) Write(w http.ResponseWriter) http.ResponseWriter {
 	data, err := json.Marshal(r)
 	w.Header().Add("Content-Type", "application/json")
@@ -46,6 +51,7 @@ func (r ErrorResponse) Write(w http.ResponseWriter) http.ResponseWriter {
 }
 
 type SuggestionsResponse struct {
+	ID          string                     `json:"id"`
 	Suggestions []*analyzer.CompletionItem `json:"suggestions"`
 }
 
@@ -57,10 +63,9 @@ func (r SuggestionsResponse) Write(w http.ResponseWriter) http.ResponseWriter {
 	if err != nil {
 		NewErrorResponse(err).Write(w)
 		return w
-	} else {
-		w.WriteHeader(http.StatusInternalServerError)
 	}
 
+	w.WriteHeader(http.StatusOK)
 	w.Write(data)
 	return w
 }
