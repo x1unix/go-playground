@@ -87,11 +87,11 @@ func (s *Service) GetSuggestion(w http.ResponseWriter, r *http.Request) {
 	resp.Write(w)
 }
 
-func (s *Service) goImportsCode(w http.ResponseWriter, r *http.Request) ([]byte, error) {
+func (s *Service) goImportsCode(w http.ResponseWriter, r *http.Request) ([]byte, error, bool) {
 	src, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		Errorf(http.StatusBadGateway, "failed to read request: %s", err).Write(w)
-		return nil, err
+		return nil, err, false
 	}
 
 	defer r.Body.Close()
@@ -99,23 +99,24 @@ func (s *Service) goImportsCode(w http.ResponseWriter, r *http.Request) ([]byte,
 	if err != nil {
 		if err == goplay.ErrSnippetTooLarge {
 			Errorf(http.StatusRequestEntityTooLarge, err.Error()).Write(w)
-			return nil, err
+			return nil, err, false
 		}
 
 		NewErrorResponse(err).Write(w)
-		return nil, err
+		return nil, err, false
 	}
 
 	if err = resp.HasError(); err != nil {
 		Errorf(http.StatusBadRequest, err.Error())
-		return nil, err
+		return nil, err, false
 	}
 
-	return []byte(resp.Body), nil
+	changed := resp.Body != string(src)
+	return []byte(resp.Body), nil, changed
 }
 
 func (s *Service) FormatCode(w http.ResponseWriter, r *http.Request) {
-	code, err := s.goImportsCode(w, r)
+	code, err, _ := s.goImportsCode(w, r)
 	if err != nil {
 		s.log.Error(err)
 		return
@@ -125,7 +126,7 @@ func (s *Service) FormatCode(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) Compile(w http.ResponseWriter, r *http.Request) {
-	src, err := s.goImportsCode(w, r)
+	src, err, changed := s.goImportsCode(w, r)
 	if err != nil {
 		s.log.Error(err)
 		return
@@ -142,6 +143,12 @@ func (s *Service) Compile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	result := CompilerResponse{Events: res.Events}
+	if changed {
+		// Return formatted code if goimports had any effect
+		result.Formatted = string(src)
+	}
+
 	s.log.Debugw("resp from compiler", "res", res)
-	WriteJSON(w, CompilerResponse{Formatted: res.GetBody(), Events: res.Events})
+	WriteJSON(w, result)
 }
