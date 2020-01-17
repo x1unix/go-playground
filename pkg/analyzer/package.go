@@ -26,11 +26,11 @@ func (pkgs Packages) GetCompletionItems() []*CompletionItem {
 }
 
 type Package struct {
-	Name     string    `json:"name"`
-	Synopsis string    `json:"synopsis"`
-	URL      string    `json:"url"`
-	Path     string    `json:"path"`
-	Children []Package `json:"children"`
+	Name     string     `json:"name"`
+	Synopsis string     `json:"synopsis"`
+	URL      string     `json:"url"`
+	Path     string     `json:"path"`
+	Children []*Package `json:"children"`
 	PackageSummary
 
 	scanOnce sync.Once

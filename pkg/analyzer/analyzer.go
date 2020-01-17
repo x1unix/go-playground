@@ -23,6 +23,10 @@ func (pi PackageIndex) Match(char string) []*CompletionItem {
 	return pi.charMap[char]
 }
 
+func (pi PackageIndex) Len() int {
+	return len(pi.Packages)
+}
+
 func BuildPackageIndex(pkgs []*Package) PackageIndex {
 	idx := PackageIndex{
 		Packages: pkgs,
@@ -31,12 +35,22 @@ func BuildPackageIndex(pkgs []*Package) PackageIndex {
 	}
 
 	for _, pkg := range pkgs {
-		firstChar := pkg.Name[:1]
-		idx.nameMap[pkg.Name] = pkg
-		idx.charMap[firstChar] = append(idx.charMap[firstChar], pkg.GetCompletionItem())
+		addPackageToIndex(pkg, &idx)
 	}
 
 	return idx
+}
+
+func addPackageToIndex(pkg *Package, idx *PackageIndex) {
+	firstChar := pkg.Name[:1]
+	idx.nameMap[pkg.Name] = pkg
+	idx.charMap[firstChar] = append(idx.charMap[firstChar], pkg.GetCompletionItem())
+
+	if len(pkg.Children) > 0 {
+		for _, child := range pkg.Children {
+			addPackageToIndex(child, idx)
+		}
+	}
 }
 
 func SetRoot(root string) {
