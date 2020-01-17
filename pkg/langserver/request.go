@@ -30,10 +30,6 @@ func NewErrorResponse(err error) ErrorResponse {
 	return ErrorResponse{Error: err.Error()}
 }
 
-func NewErrorResponseWithID(err error, id string) ErrorResponse {
-	return ErrorResponse{Error: err.Error(), ID: id}
-}
-
 func (r ErrorResponse) Write(w http.ResponseWriter) http.ResponseWriter {
 	data, err := json.Marshal(r)
 	w.Header().Add("Content-Type", "application/json")
