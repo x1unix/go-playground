@@ -9,9 +9,12 @@ const parseRowMetadata = row => {
 
     const tr = row.querySelector('.pkg-name');
     const name = tr.textContent.trim();
-    const path = tr.querySelector('a').href;
-    const url = `${GODOC_URL}/${path}`;
-    const synopsis = row.querySelector('.pkg-synopsis').textContent.trim();
+    const path = tr.querySelector('a').href.slice(0, -1);   // Trim "/" suffix
+    const url = `${GODOC_URL}/${path}/`;
+    let synopsis = row.querySelector('.pkg-synopsis').textContent.trim();
+
+    // Add GoDoc link
+    synopsis += `\n\n["${path}" on godoc.org](${url})`;
 
     // sub-packages have "padding-left: Npx" style attribute
     const depth = parseInt(tr.style.paddingLeft, 10);

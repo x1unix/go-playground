@@ -1,9 +1,7 @@
 package analyzer
 
 import (
-	"fmt"
 	"path"
-	"strings"
 	"sync"
 
 	"go.uber.org/zap"
@@ -64,7 +62,7 @@ func (p *Package) GetCompletionItem() *CompletionItem {
 
 func (p *Package) documentation() MarkdownString {
 	return MarkdownString{
-		Value: p.Synopsis + fmt.Sprintf("\n\n[\"%s\" on godoc.org](%s)", strings.TrimRight(p.Path, "/"), p.URL),
+		Value: p.Synopsis,
 	}
 }
 
