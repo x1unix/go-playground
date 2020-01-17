@@ -1,8 +1,14 @@
 .header {
+    position:relative;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    min-height: 44px;
+}
+
+.header__preloader {
+    margin-right: 15px;
 }
 
 .header__logo {

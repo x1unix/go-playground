@@ -1,0 +1,32 @@
+.evalEvent__delay {
+    color: #666;
+    margin-right: 5px;
+}
+
+.evalEvent__kind {
+    color: #999;
+    margin-right: 10px;
+}
+
+.evalEvent__msg {
+    color: #fff;
+}
+.evalEvent {
+    display: table;
+    width: 100%;
+}
+
+.evalEvent__msg {
+    font: inherit;
+    border: none;
+    margin: 0;
+    float: left;
+}
+
+.evalEvent__msg--stderr {
+    color: #e22;
+}
+
+.evalEvent__delay {
+    float: right;
+}

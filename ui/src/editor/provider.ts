@@ -1,5 +1,5 @@
 import * as monaco from 'monaco-editor';
-import * as axios from 'axios';
+import {IAPIClient} from '../services/api';
 
 // Import aliases
 type CompletionList = monaco.languages.CompletionList;
@@ -16,7 +16,7 @@ const R_GROUP_PKG = 1;
 const R_GROUP_METHOD = 3;
 
 class GoCompletionItemProvider implements monaco.languages.CompletionItemProvider {
-    constructor(private serverAddress: string) {}
+    constructor(private client: IAPIClient) {}
 
     private parseExpression(expr: string) {
         COMPL_REGEXP.lastIndex = 0; // Reset regex state
@@ -52,25 +52,21 @@ class GoCompletionItemProvider implements monaco.languages.CompletionItemProvide
         }
 
         try {
-            const queryParams = Object.keys(query).map(k => `${k}=${query[k]}`).join('&');
-            const resp = await axios.default.get<CompletionList>(`/suggest?${queryParams}`, {
-                baseURL: this.serverAddress
-            });
-
-            return Promise.resolve(resp.data);
+            const resp = await this.client.getSuggestions(query);
+            return Promise.resolve(resp);
         } catch (err) {
-            console.error(`Failed to get code completion from server: ${err?.response?.data?.error ?? err.message}`);
+            console.error(`Failed to get code completion from server: ${err.message}`);
             return Promise.resolve({suggestions: []});
         }
     }
 }
 
-export const registerGoLanguageProvider = (serverAddress: string) => {
+export const registerGoLanguageProvider = (client: IAPIClient) => {
     if (alreadyRegistered) {
         console.warn('Go Language provider was already registered');
         return;
     }
 
     alreadyRegistered = true;
-    return monaco.languages.registerCompletionItemProvider('go', new GoCompletionItemProvider(serverAddress));
+    return monaco.languages.registerCompletionItemProvider('go', new GoCompletionItemProvider(client));
 };

@@ -1,13 +1,22 @@
 import React from 'react';
 import './Header.css'
 import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/CommandBar';
-import { loadFile, saveEditorContents } from './editor/actions';
+import { loadFile, saveEditorContents, buildAndRun } from './editor/actions';
+import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 
-// import { IButtonProps } from 'office-ui-fabric-react/lib/Button';
+interface HeaderState {
+    loading: boolean
+}
 
-export class Header extends React.Component {
+export class Header extends React.Component<any, HeaderState> {
     private fileInput?: HTMLInputElement;
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            loading: false
+        };
+    }
     componentDidMount(): void {
         const fileElement = document.createElement('input') as HTMLInputElement;
         fileElement.type = 'file';
@@ -33,44 +42,59 @@ export class Header extends React.Component {
         saveEditorContents().catch(err => console.error('failed to save file: %s', err))
     }
 
-    menuItems: ICommandBarItemProps[] = [
-        {
-            key: 'openFile',
-            text: 'Open',
-            iconProps: {iconName: 'OpenFile'},
-            onClick: () => this.fileInput?.click(),
-        },
-        {
-            key: 'share',
-            text: 'Share',
-            iconProps: {iconName: 'Share'},
-        },
-        {
-            key: 'download',
-            text: 'Download',
-            iconProps: {iconName: 'Download'},
-            onClick: () => {
-                this.onFileSave();
+    get menuItems(): ICommandBarItemProps[] {
+        return [
+            {
+                key: 'openFile',
+                text: 'Open',
+                iconProps: {iconName: 'OpenFile'},
+                onClick: () => this.fileInput?.click(),
             },
-        }
-    ];
+            {
+                key: 'share',
+                text: 'Share',
+                iconProps: {iconName: 'Share'},
+            },
+            {
+                key: 'download',
+                text: 'Download',
+                iconProps: {iconName: 'Download'},
+                onClick: () => {
+                    this.onFileSave();
+                },
+            }
+        ];
+    }
 
-    asideItems: ICommandBarItemProps[] = [
-        {
-            key: 'run',
-            text: 'Run',
-            ariaLabel: 'Run',
-            iconOnly: true,
-            iconProps: {iconName: 'Play'},
-        },
-        {
-            key: 'format',
-            text: 'Format',
-            ariaLabel: 'Format',
-            iconOnly: true,
-            iconProps: {iconName: 'Code'},
-        }
-    ];
+    get asideItems(): ICommandBarItemProps[] {
+        return [
+            {
+                key: 'run',
+                text: 'Run',
+                ariaLabel: 'Run',
+                iconOnly: true,
+                iconProps: {iconName: 'Play'},
+                disabled: this.state.loading,
+                onClick: () => {
+                    this.setState({loading: true});
+                    buildAndRun()
+                        .finally(() => this.setState({loading: false}));
+                }
+            },
+            {
+                key: 'format',
+                text: 'Format',
+                ariaLabel: 'Format',
+                iconOnly: true,
+                disabled: this.state.loading,
+                iconProps: {iconName: 'Code'},
+                onClick: () => {
+                    this.setState({loading: true});
+                    setTimeout(_ => this.setState({loading: false}), 3000);
+                }
+            }
+        ];
+    }
 
     render() {
         return <header className='header'>
@@ -79,12 +103,16 @@ export class Header extends React.Component {
                 className='header__logo'
                 alt='Golang Logo'
             />
-            <CommandBar
-                className='header__commandBar'
-                items={this.menuItems}
-                farItems={this.asideItems}
-                ariaLabel='CodeEditor menu'
-            />
+            {this.state.loading ? (
+                <Spinner size={SpinnerSize.large} className="header__preloader" />
+            ) : (
+                <CommandBar
+                    className='header__commandBar'
+                    items={this.menuItems}
+                    farItems={this.asideItems}
+                    ariaLabel='CodeEditor menu'
+                />
+            )}
         </header>;
     }
 }

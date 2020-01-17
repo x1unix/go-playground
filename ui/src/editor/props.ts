@@ -6,7 +6,7 @@ export const DEMO_CODE = [
     'package main\n',
     'import "fmt"\n',
     'func main() {',
-    '\tfmt.Println("Hello World");',
+    '\tfmt.Println("Hello World")',
     '}\n'
 ].join('\n');
 

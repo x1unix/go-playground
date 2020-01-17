@@ -1,4 +1,5 @@
-import { store } from './state';
+import {store} from './state';
+import {CompilerResponse} from '../services/api';
 import {Action, ActionType, FileImportArgs} from './actions';
 
 export function dispatchImportFile(fileName: string, contents: string) {
@@ -13,4 +14,18 @@ export function dispatchFileChange(contents: string) {
         type: ActionType.FILE_CHANGE,
         payload: contents,
     });
+}
+
+export function dispatchBuildResult(resp: CompilerResponse) {
+    store.dispatch<Action<CompilerResponse>>({
+        type: ActionType.COMPILE_RESULT,
+        payload: resp,
+    })
+}
+
+export function dispatchBuildError(err: string) {
+    store.dispatch<Action<string>>({
+        type: ActionType.COMPILE_FAIL,
+        payload: err,
+    })
 }

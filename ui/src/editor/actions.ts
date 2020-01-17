@@ -1,4 +1,10 @@
-import { dispatchImportFile, store } from '../store';
+import {
+    store,
+    dispatchImportFile,
+    dispatchBuildError,
+    dispatchBuildResult
+} from '../store';
+import client from '../services/api';
 import { saveAs } from 'file-saver';
 
 export const loadFile = (f: File) => {
@@ -30,4 +36,18 @@ export const saveEditorContents = () => {
         }
     })
 };
+
+export const buildAndRun = async () => {
+    try {
+        const {code} = store.getState();
+        const res = await client.evaluateCode(code);
+
+        dispatchBuildResult(res);
+    } catch (err) {
+        console.log('compile error', {err});
+        dispatchBuildError(err.message);
+    }
+};
+
+export const runFile = () => {};
 

@@ -3,10 +3,13 @@ import { connect } from 'react-redux';
 
 import { Action } from './actions';
 import { rootReducer } from './reducers';
+import { EvalEvent } from '../services/api';
 
 export interface State {
     fileName: string
     code: string
+    lastError?: string | null
+    events?: EvalEvent[]
 }
 
 const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;

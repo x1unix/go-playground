@@ -7,3 +7,13 @@
     padding: 15px;
     font-size: 10pt;
 }
+
+.app-preview__error {
+    color: white;
+    background: #cc0000;
+}
+
+.app-preview__epilogue {
+    color: #999;
+    margin-top: 15px;
+}

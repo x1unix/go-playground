@@ -1,6 +1,8 @@
 export enum ActionType {
     IMPORT_FILE = 'IMPORT_FILE',
     FILE_CHANGE = 'FILE_CHANGE',
+    COMPILE_RESULT = 'COMPILE_RESULT',
+    COMPILE_FAIL = 'COMPILE_FAIL'
 }
 
 export interface Action<T = any> {
