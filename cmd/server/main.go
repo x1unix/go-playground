@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
 	"github.com/x1unix/go-playground/pkg/analyzer"
 	"github.com/x1unix/go-playground/pkg/langserver"
 	"go.uber.org/zap"
@@ -61,9 +60,8 @@ func start(packagesFile, addr, goRoot string, debug bool) error {
 		return fmt.Errorf("failed to read packages file %q: %s", packagesFile, err)
 	}
 
-	docServer := langserver.New(packages, websocket.Upgrader{})
 	r := mux.NewRouter()
-	r.Path("/suggest").Handler(docServer)
+	langserver.New(packages).Mount(r.PathPrefix("/api").Subrouter())
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./public")))
 
 	zap.S().Infof("Listening on %q", addr)

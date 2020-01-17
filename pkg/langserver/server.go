@@ -2,24 +2,31 @@ package langserver
 
 import (
 	"fmt"
-	"github.com/gorilla/websocket"
+	"github.com/gorilla/mux"
 	"github.com/x1unix/go-playground/pkg/analyzer"
+	"github.com/x1unix/go-playground/pkg/goplay"
 	"go.uber.org/zap"
+	"io/ioutil"
 	"net/http"
 )
 
 type Service struct {
 	log   *zap.SugaredLogger
 	index analyzer.PackageIndex
-	upg   websocket.Upgrader
 }
 
-func New(packages []*analyzer.Package, upg websocket.Upgrader) *Service {
+func New(packages []*analyzer.Package) *Service {
 	return &Service{
 		log:   zap.S().Named("langserver"),
-		upg:   upg,
 		index: analyzer.BuildPackageIndex(packages),
 	}
+}
+
+// Mount mounts service on route
+func (s *Service) Mount(r *mux.Router) {
+	r.Path("/suggest").HandlerFunc(s.GetSuggestion)
+	r.Path("/compile").Methods(http.MethodPost).HandlerFunc(s.Compile)
+	r.Path("/format").Methods(http.MethodPost).HandlerFunc(s.FormatCode)
 }
 
 func (s *Service) lookupBuiltin(val string) (*SuggestionsResponse, error) {
@@ -66,7 +73,7 @@ func (s *Service) provideSuggestion(req SuggestionRequest) (*SuggestionsResponse
 	return s.lookupBuiltin(req.Value)
 }
 
-func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *Service) GetSuggestion(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	value := q.Get("value")
 	pkgName := q.Get("packageName")
@@ -78,4 +85,63 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp.Write(w)
+}
+
+func (s *Service) goImportsCode(w http.ResponseWriter, r *http.Request) ([]byte, error) {
+	src, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		Errorf(http.StatusBadGateway, "failed to read request: %s", err).Write(w)
+		return nil, err
+	}
+
+	defer r.Body.Close()
+	resp, err := goplay.GoImports(r.Context(), src)
+	if err != nil {
+		if err == goplay.ErrSnippetTooLarge {
+			Errorf(http.StatusRequestEntityTooLarge, err.Error()).Write(w)
+			return nil, err
+		}
+
+		NewErrorResponse(err).Write(w)
+		return nil, err
+	}
+
+	if err = resp.HasError(); err != nil {
+		Errorf(http.StatusBadRequest, err.Error())
+		return nil, err
+	}
+
+	return []byte(resp.Body), nil
+}
+
+func (s *Service) FormatCode(w http.ResponseWriter, r *http.Request) {
+	code, err := s.goImportsCode(w, r)
+	if err != nil {
+		s.log.Error(err)
+		return
+	}
+
+	WriteJSON(w, CompilerResponse{Formatted: string(code)})
+}
+
+func (s *Service) Compile(w http.ResponseWriter, r *http.Request) {
+	src, err := s.goImportsCode(w, r)
+	if err != nil {
+		s.log.Error(err)
+		return
+	}
+
+	res, err := goplay.Compile(r.Context(), src)
+	if err != nil {
+		NewErrorResponse(err).Write(w)
+		return
+	}
+
+	if err := res.HasError(); err != nil {
+		Errorf(http.StatusBadRequest, err.Error()).Write(w)
+		return
+	}
+
+	s.log.Debugw("resp from compiler", "res", res)
+	WriteJSON(w, CompilerResponse{Formatted: res.GetBody(), Events: res.Events})
 }
