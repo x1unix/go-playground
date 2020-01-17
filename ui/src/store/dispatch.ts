@@ -1,10 +1,10 @@
 import { store } from './state';
-import {Action, ActionType} from './actions';
+import {Action, ActionType, FileImportArgs} from './actions';
 
-export function dispatchImportFile(contents: string) {
-    store.dispatch<Action<string>>({
+export function dispatchImportFile(fileName: string, contents: string) {
+    store.dispatch<Action<FileImportArgs>>({
         type: ActionType.IMPORT_FILE,
-        payload: contents,
+        payload: {fileName, contents},
     });
 }
 

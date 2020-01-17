@@ -1,8 +1,9 @@
-import {Action, ActionType} from './actions';
+import {Action, ActionType, FileImportArgs} from './actions';
 import {DEMO_CODE} from "../editor/props";
 import {State} from "./state";
 
 const initialState = {
+    fileName: 'main.go',
     code: DEMO_CODE,
 };
 
@@ -13,8 +14,10 @@ const reducers: {[k in ActionType]: Reducer<any>} = {
         s.code = a.payload;
         return s;
     },
-    [ActionType.IMPORT_FILE]: (s, a: Action<string>) => {
-        s.code = a.payload;
+    [ActionType.IMPORT_FILE]: (s, a: Action<FileImportArgs>) => {
+        console.log('Loaded file "%s"', a.payload.fileName);
+        s.code = a.payload.contents;
+        s.fileName = a.payload.fileName;
         return s;
     }
 };

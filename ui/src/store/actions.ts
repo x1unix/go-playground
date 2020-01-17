@@ -8,6 +8,11 @@ export interface Action<T = any> {
     payload: T
 }
 
+export interface FileImportArgs {
+    fileName: string
+    contents: string
+}
+
 export type ActionTypes = keyof typeof ActionType;
 
 

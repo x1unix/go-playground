@@ -5,6 +5,7 @@ import { Action } from './actions';
 import { rootReducer } from './reducers';
 
 export interface State {
+    fileName: string
     code: string
 }
 
