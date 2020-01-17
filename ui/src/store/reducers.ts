@@ -19,6 +19,10 @@ const reducers: {[k in ActionType]: Reducer<any>} = {
 
 export function rootReducer(state = initialState, action: Action) {
     console.log('reducer', {state, action});
-    reducers[action.type](state, action);
-    return state;
+    const r = reducers[action.type];
+    if (!r) {
+        return state;
+    }
+
+    return reducers[action.type](state, action);
 }

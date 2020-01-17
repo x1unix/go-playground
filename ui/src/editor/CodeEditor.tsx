@@ -2,7 +2,7 @@ import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import {editor} from 'monaco-editor';
 import { Connect } from '../store/state';
-import { dispatchFileChange } from '../store/actions';
+import { dispatchFileChange } from '../store';
 // import { connect } from 'react-redux';
 
 import { DEFAULT_EDITOR_OPTIONS, LANGUAGE_GOLANG } from './props';
