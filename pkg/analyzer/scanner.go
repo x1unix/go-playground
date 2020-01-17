@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"strings"
 )
 
 type PackageSummary struct {
@@ -49,7 +50,15 @@ func (p *PackageScanner) appendGen(g *ast.GenDecl, dest *PackageSummary) {
 	}
 }
 
+func isTestFunction(name string) bool {
+	return strings.HasPrefix(name, "Test") || strings.HasPrefix(name, "Benchmark")
+}
+
 func (p *PackageScanner) appendFunc(fn *ast.FuncDecl, dest *SymbolIndex) {
+	if isTestFunction(fn.Name.String()) {
+		return
+	}
+
 	if !fn.Name.IsExported() {
 		if !p.scanPrivate {
 			return
@@ -63,7 +72,7 @@ func (p *PackageScanner) appendFunc(fn *ast.FuncDecl, dest *SymbolIndex) {
 	}
 
 	item := funcToItem(fn)
-	log.Debugf("found function '%s.%s' - %s'", p.name, item.InsertText, item.Detail)
+	log.Debugf("found function '%s.%s'", p.name, item.InsertText)
 	dest.Append(item)
 }
 
