@@ -8,10 +8,6 @@ import (
 	"net/http"
 )
 
-var defaultHeaders = http.Header{
-	"Access-Control-Allow-Origin": {"*"},
-}
-
 type Service struct {
 	log   *zap.SugaredLogger
 	index analyzer.PackageIndex
