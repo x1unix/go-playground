@@ -4,18 +4,23 @@ import { EDITOR_FONTS } from './editor/props';
 import { Connect } from './store/state';
 import {EvalEvent} from './services/api';
 import EvalEventView from './EvalEventView';
-
-const styles = {
-    fontFamily: EDITOR_FONTS
-};
+import { getTheme } from '@uifabric/styling';
 
 interface PreviewProps {
     lastError?:string | null;
     events?: EvalEvent[]
 }
 
-@Connect(s => ({lastError: s.lastError, events: s.events}))
+@Connect(s => ({lastError: s.lastError, events: s.events, darkMode: s.darkMode}))
 export default class Preview extends React.Component<PreviewProps> {
+    get styles() {
+        const { palette } = getTheme();
+        return {
+            backgroundColor: palette.neutralLight,
+            color: palette.neutralDark,
+            fontFamily: EDITOR_FONTS
+        }
+    }
     render() {
         let content;
         if (this.props.lastError) {
@@ -33,7 +38,7 @@ export default class Preview extends React.Component<PreviewProps> {
             content = <span>Press "Run" to compile program.</span>;
         }
 
-        return <div className="app-preview" style={styles}>
+        return <div className="app-preview" style={this.styles}>
             {content}
         </div>;
     }

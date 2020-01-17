@@ -9,7 +9,7 @@
 }
 
 .evalEvent__msg {
-    color: #fff;
+    color: currentColor;
 }
 .evalEvent {
     display: table;

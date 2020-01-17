@@ -1,6 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { loadTheme } from '@uifabric/styling';
+import {Fabric} from 'office-ui-fabric-react/lib/Fabric'
 
 import { store } from './store';
 import { Header } from './Header';
@@ -19,11 +20,11 @@ changeFabricTheme();
 function App() {
   return (
     <Provider store={store}>
-        <div className="App">
+        <Fabric className="App">
             <Header/>
             <CodeEditor />
             <Preview />
-        </div>
+        </Fabric>
     </Provider>
   );
 }

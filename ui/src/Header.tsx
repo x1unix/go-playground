@@ -4,6 +4,7 @@ import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/Com
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import * as actions from './editor/actions';
 import { Connect, dispatchToggleTheme } from './store';
+import { getTheme } from '@uifabric/styling';
 
 
 interface HeaderState {
@@ -111,8 +112,16 @@ export class Header extends React.Component<{darkMode?: boolean}, HeaderState> {
         ];
     }
 
+    get styles() {
+        // Apply the same colors as rest of Fabric components
+        const theme = getTheme();
+        return {
+            backgroundColor: theme.palette.white
+        }
+    }
+
     render() {
-        return <header className='header'>
+        return <header className='header' style={this.styles}>
             <img
                 src='go-logo-blue.svg'
                 className='header__logo'
