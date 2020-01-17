@@ -14,12 +14,12 @@ const reducers: {[k in ActionType]: Reducer<any>} = {
         return s;
     },
     [ActionType.IMPORT_FILE]: (s, a: Action<string>) => {
+        s.code = a.payload;
         return s;
     }
 };
 
 export function rootReducer(state = initialState, action: Action) {
-    console.log('reducer', {state, action});
     const newState = Object.assign({}, state);
     const r = reducers[action.type];
     if (!r) {

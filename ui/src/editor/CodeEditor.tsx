@@ -18,14 +18,13 @@ export default class CodeEditor extends React.Component<CodeEditorState, CodeEdi
     // }
 
     editorDidMount(editor: editor.IStandaloneCodeEditor, monaco: any) {
-        console.log('editorDidMount', editor);
+        // console.log('editorDidMount', editor);
         editor.focus();
     }
 
     onChange(newValue: string, e: editor.IModelContentChangedEvent) {
-       console.log('onChange', newValue);
+       // console.log('onChange', newValue);
         dispatchFileChange(newValue);
-
     }
 
     render() {
