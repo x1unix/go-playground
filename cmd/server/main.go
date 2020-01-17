@@ -61,13 +61,22 @@ func start(packagesFile, addr, goRoot string, debug bool) error {
 		return fmt.Errorf("failed to read packages file %q: %s", packagesFile, err)
 	}
 
-	docServer := langserver.New(packages, websocket.Upgrader{}, debug)
+	docServer := langserver.New(packages, websocket.Upgrader{})
 	r := mux.NewRouter()
 	r.Path("/suggest").Handler(docServer)
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./public")))
 
 	zap.S().Infof("Listening on %q", addr)
-	if err := http.ListenAndServe(addr, r); err != nil {
+
+	var handler http.Handler
+	if debug {
+		zap.S().Warn("Debug mode enabled, CORS disabled")
+		handler = langserver.NewCORSDisablerWrapper(r)
+	} else {
+		handler = r
+	}
+
+	if err := http.ListenAndServe(addr, handler); err != nil {
 		log.Fatal(err)
 	}
 

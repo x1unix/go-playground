@@ -16,15 +16,13 @@ type Service struct {
 	log   *zap.SugaredLogger
 	index analyzer.PackageIndex
 	upg   websocket.Upgrader
-	debug bool
 }
 
-func New(packages []*analyzer.Package, upg websocket.Upgrader, debug bool) *Service {
+func New(packages []*analyzer.Package, upg websocket.Upgrader) *Service {
 	return &Service{
 		log:   zap.S().Named("langserver"),
 		upg:   upg,
 		index: analyzer.BuildPackageIndex(packages),
-		debug: debug,
 	}
 }
 
@@ -77,9 +75,6 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	value := q.Get("value")
 	pkgName := q.Get("packageName")
 
-	if s.debug {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-	}
 	resp, err := s.provideSuggestion(SuggestionRequest{PackageName: pkgName, Value: value})
 	if err != nil {
 		NewErrorResponse(err).Write(w)
