@@ -10,7 +10,7 @@ export const DEMO_CODE = [
     '}\n'
 ].join('\n');
 
-const EDITOR_FONTS = [
+export const EDITOR_FONTS = [
     'Fira Code',
     'Menlo',
     'Monaco',

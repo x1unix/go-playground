@@ -1,0 +1,9 @@
+.app-preview {
+    background: #222;
+    color: #ccc;
+    max-height: 640px;
+    height: 50%;
+    box-sizing: border-box;
+    padding: 15px;
+    font-size: 10pt;
+}
