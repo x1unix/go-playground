@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 
 import { store } from './store';
 import { Header } from './Header';
-import { CodeEditor } from './editor';
+import CodeEditor from './editor/CodeEditor';
 import './App.css';
 import Preview from './Preview';
 
@@ -18,7 +18,7 @@ function App() {
     <Provider store={store}>
         <div className="App">
             <Header/>
-            <CodeEditor/>
+            <CodeEditor />
             <Preview />
         </div>
     </Provider>

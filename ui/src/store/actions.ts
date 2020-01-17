@@ -1,18 +1,28 @@
-import { store } from './store';
-
+import { store } from './state';
 
 export enum ActionType {
     IMPORT_FILE = 'IMPORT_FILE',
+    FILE_CHANGE = 'FILE_CHANGE',
 }
 
-type ActionTypes = keyof typeof ActionType;
+export interface Action<T = any> {
+    type: ActionType
+    payload: T
+}
 
-export const getActionTypeKey = (k: ActionType): string => ActionType[k];
+export type ActionTypes = keyof typeof ActionType;
 
-export function importFile(contents: string) {
-    return {
+export function dispatchImportFile(contents: string) {
+    store.dispatch<Action<string>>({
         type: ActionType.IMPORT_FILE,
-        contents
-    }
+        payload: contents,
+    });
+}
+
+export function dispatchFileChange(contents: string) {
+    store.dispatch<Action<string>>({
+        type: ActionType.FILE_CHANGE,
+        payload: contents,
+    });
 }
 
