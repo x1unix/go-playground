@@ -1,9 +1,13 @@
 import React from 'react';
+import { Provider } from 'react-redux';
+
+import { store } from './store';
 import { Header } from './Header';
 import { CodeEditor } from './editor';
-// import { loadTheme } from '@uifabric/styling';
 import './App.css';
 import Preview from './Preview';
+
+// import { loadTheme } from '@uifabric/styling';
 
 // loadTheme({
 //     palette:
@@ -11,11 +15,13 @@ import Preview from './Preview';
 
 function App() {
   return (
-    <div className="App">
-        <Header/>
-        <CodeEditor/>
-        <Preview />
-    </div>
+    <Provider store={store}>
+        <div className="App">
+            <Header/>
+            <CodeEditor/>
+            <Preview />
+        </div>
+    </Provider>
   );
 }
 

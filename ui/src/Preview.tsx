@@ -2,6 +2,7 @@ import React from 'react';
 import './Preview.css';
 import { EDITOR_FONTS } from './editor/props';
 
+
 const styles = {
     fontFamily: EDITOR_FONTS
 };
