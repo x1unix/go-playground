@@ -35,6 +35,10 @@ type CompletionItem struct {
 	Label         string             `json:"label"`
 	Kind          CompletionItemKind `json:"kind"`
 	Detail        string             `json:"detail"`
-	Documentation string             `json:"documentation"`
+	Documentation interface{}        `json:"documentation"`
 	InsertText    string             `json:"insertText"`
+}
+
+type MarkdownString struct {
+	Value string `json:"value"`
 }
