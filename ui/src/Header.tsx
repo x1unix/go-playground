@@ -59,6 +59,7 @@ export class Header extends React.Component<{darkMode?: boolean}, HeaderState> {
                 key: 'share',
                 text: 'Share',
                 iconProps: {iconName: 'Share'},
+                onClick: () => alert('Work in progress 🐨')
             },
             {
                 key: 'download',
