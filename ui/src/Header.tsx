@@ -1,7 +1,7 @@
 import React from 'react';
 import './Header.css'
 import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/CommandBar';
-import { loadFile } from './editor/actions';
+import { loadFile, saveEditorContents } from './editor/actions';
 
 // import { IButtonProps } from 'office-ui-fabric-react/lib/Button';
 
@@ -29,14 +29,16 @@ export class Header extends React.Component {
         }
     }
 
+    onFileSave() {
+        saveEditorContents().catch(err => console.error('failed to save file: %s', err))
+    }
+
     menuItems: ICommandBarItemProps[] = [
         {
             key: 'openFile',
             text: 'Open',
             iconProps: {iconName: 'OpenFile'},
-            onClick: (ev: any) => {
-                this.fileInput?.click();
-            },
+            onClick: () => this.fileInput?.click(),
         },
         {
             key: 'share',
@@ -47,6 +49,9 @@ export class Header extends React.Component {
             key: 'download',
             text: 'Download',
             iconProps: {iconName: 'Download'},
+            onClick: () => {
+                this.onFileSave();
+            },
         }
     ];
 
