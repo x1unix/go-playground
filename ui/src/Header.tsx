@@ -1,7 +1,7 @@
 import React from 'react';
 import './Header.css'
 import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/CommandBar';
-import { loadFile, saveEditorContents, buildAndRun } from './editor/actions';
+import * as actions from './editor/actions';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 
 interface HeaderState {
@@ -32,14 +32,15 @@ export class Header extends React.Component<any, HeaderState> {
         }
 
         try {
-            await loadFile(file);
+            await actions.loadFile(file);
         } catch (err) {
             console.error(err);
         }
     }
 
     onFileSave() {
-        saveEditorContents().catch(err => console.error('failed to save file: %s', err))
+        actions.saveEditorContents()
+            .catch(err => console.error('failed to save file: %s', err))
     }
 
     get menuItems(): ICommandBarItemProps[] {
@@ -77,7 +78,7 @@ export class Header extends React.Component<any, HeaderState> {
                 disabled: this.state.loading,
                 onClick: () => {
                     this.setState({loading: true});
-                    buildAndRun()
+                    actions.buildAndRun()
                         .finally(() => this.setState({loading: false}));
                 }
             },
@@ -90,7 +91,8 @@ export class Header extends React.Component<any, HeaderState> {
                 iconProps: {iconName: 'Code'},
                 onClick: () => {
                     this.setState({loading: true});
-                    setTimeout(_ => this.setState({loading: false}), 3000);
+                    actions.reformatCode()
+                        .finally(() => this.setState({loading: false}));
                 }
             }
         ];

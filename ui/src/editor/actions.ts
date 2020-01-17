@@ -2,7 +2,7 @@ import {
     store,
     dispatchImportFile,
     dispatchBuildError,
-    dispatchBuildResult
+    dispatchBuildResult, dispatchFileChange
 } from '../store';
 import client from '../services/api';
 import { saveAs } from 'file-saver';
@@ -45,6 +45,18 @@ export const buildAndRun = async () => {
         dispatchBuildResult(res);
     } catch (err) {
         console.log('compile error', {err});
+        dispatchBuildError(err.message);
+    }
+};
+
+export const reformatCode = async() => {
+    try {
+        const {code} = store.getState();
+        const res = await client.formatCode(code);
+
+        dispatchFileChange(res.formatted ?? code)
+    } catch (err) {
+        console.log('GoImports error', {err});
         dispatchBuildError(err.message);
     }
 };
