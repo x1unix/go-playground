@@ -1,7 +1,8 @@
 import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import {editor} from 'monaco-editor';
-import { DEFAULT_EDITOR_OPTIONS, DEMO_CODE } from './props/editor';
+
+import { DEFAULT_EDITOR_OPTIONS, DEMO_CODE, LANGUAGE_GOLANG } from './props';
 
 interface CodeEditorState {
     code: string
@@ -21,13 +22,13 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
     }
 
     onChange(newValue: string, e: editor.IModelContentChangedEvent) {
-        console.log('onChange', newValue, e);
+       // console.log('onChange', newValue, e);
     }
 
     render() {
         return <MonacoEditor
-            language='go'
-            theme='vs-dark'
+            language={LANGUAGE_GOLANG}
+            theme='vs-light'
             value={this.state.code}
             options={DEFAULT_EDITOR_OPTIONS}
             onChange={(newVal, e) => this.onChange(newVal, e)}

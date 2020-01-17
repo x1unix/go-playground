@@ -1,6 +1,6 @@
 import React from 'react';
 import { Header } from './Header';
-import { CodeEditor } from './CodeEditor'
+import { CodeEditor } from './editor';
 // import { loadTheme } from '@uifabric/styling';
 import './App.css';
 

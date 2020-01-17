@@ -6,6 +6,7 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "axios": "^0.19.1",
     "monaco-editor": "^0.19.3",
     "monaco-editor-webpack-plugin": "^1.8.2",
     "office-ui-fabric-react": "^7.82.1",
@@ -20,7 +21,8 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
-    "eject": "react-app-rewired eject"
+    "eject": "react-app-rewired eject",
+    "gen:suggestions": "node ./src/editor/internal/genpkgcache.js"
   },
   "eslintConfig": {
     "extends": "react-app"

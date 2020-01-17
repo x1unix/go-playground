@@ -4,8 +4,12 @@ import './index.css';
 import App from './App';
 import { initializeIcons } from '@uifabric/icons';
 import * as serviceWorker from './serviceWorker';
+import {registerGoLanguageProvider} from "./editor";
 
+
+const langServerAddr = process.env['REACT_APP_LANG_SERVER'] ?? window.location.origin;
 initializeIcons();
+registerGoLanguageProvider(langServerAddr);
 
 ReactDOM.render(<App />, document.getElementById('root'));
 

@@ -1,4 +1,6 @@
-import { editor } from "monaco-editor";
+import * as monaco from 'monaco-editor';
+
+export const LANGUAGE_GOLANG = 'go';
 
 export const DEMO_CODE = [
     'package main\n',
@@ -18,11 +20,12 @@ const EDITOR_FONTS = [
     'Droid Sans',
     'Courier New',
     'monospace'
-];
+].join(', ');
 
-export const DEFAULT_EDITOR_OPTIONS: editor.IEditorOptions = {
+export const DEFAULT_EDITOR_OPTIONS: monaco.editor.IEditorOptions = {
     selectOnLineNumbers: true,
     mouseWheelZoom: true,
     automaticLayout: true,
-    fontFamily: EDITOR_FONTS.join(', ')
+    fontFamily: EDITOR_FONTS,
+    showUnused: true
 };
