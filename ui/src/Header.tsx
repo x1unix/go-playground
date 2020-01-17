@@ -1,14 +1,17 @@
 import React from 'react';
 import './Header.css'
 import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/CommandBar';
-import * as actions from './editor/actions';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
+import * as actions from './editor/actions';
+import { Connect, dispatchToggleTheme } from './store';
+
 
 interface HeaderState {
     loading: boolean
 }
 
-export class Header extends React.Component<any, HeaderState> {
+@Connect(s => ({darkMode: s.darkMode}))
+export class Header extends React.Component<{darkMode?: boolean}, HeaderState> {
     private fileInput?: HTMLInputElement;
 
     constructor(props) {
@@ -94,6 +97,16 @@ export class Header extends React.Component<any, HeaderState> {
                     actions.reformatCode()
                         .finally(() => this.setState({loading: false}));
                 }
+            },
+            {
+                key: 'toggleTheme',
+                text: 'Toggle Dark Mode',
+                ariaLabel: 'Toggle Dark Mode',
+                iconOnly: true,
+                iconProps: {iconName: this.props.darkMode ? 'Brightness' : 'ClearNight'},
+                onClick: () => {
+                    dispatchToggleTheme();
+                },
             }
         ];
     }

@@ -20,12 +20,19 @@ export function dispatchBuildResult(resp: CompilerResponse) {
     store.dispatch<Action<CompilerResponse>>({
         type: ActionType.COMPILE_RESULT,
         payload: resp,
-    })
+    });
 }
 
 export function dispatchBuildError(err: string) {
     store.dispatch<Action<string>>({
         type: ActionType.COMPILE_FAIL,
         payload: err,
-    })
+    });
+}
+
+export function dispatchToggleTheme() {
+    store.dispatch<Action>({
+        type: ActionType.TOGGLE_THEME,
+        payload: null,
+    });
 }

@@ -11,26 +11,20 @@ interface CodeEditorState {
     code?: string
 }
 
-@Connect(s => ({code: s.code}))
-export default class CodeEditor extends React.Component<CodeEditorState, CodeEditorState> {
-    // constructor(props: any) {
-    //     super(props);
-    // }
-
+@Connect(s => ({code: s.code, darkMode: s.darkMode}))
+export default class CodeEditor extends React.Component<{code?: string, darkMode?: boolean}, CodeEditorState> {
     editorDidMount(editor: editor.IStandaloneCodeEditor, monaco: any) {
-        // console.log('editorDidMount', editor);
         editor.focus();
     }
 
     onChange(newValue: string, e: editor.IModelContentChangedEvent) {
-       // console.log('onChange', newValue);
         dispatchFileChange(newValue);
     }
 
     render() {
         return <MonacoEditor
             language={LANGUAGE_GOLANG}
-            theme='vs-light'
+            theme={this.props.darkMode ? 'vs-dark' : 'vs-light'}
             value={this.props.code}
             options={DEFAULT_EDITOR_OPTIONS}
             onChange={(newVal, e) => this.onChange(newVal, e)}
@@ -38,5 +32,3 @@ export default class CodeEditor extends React.Component<CodeEditorState, CodeEdi
         />;
     }
 }
-
-// export default connect(s => ({code: s.code}))(CodeEditor);

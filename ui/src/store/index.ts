@@ -1,3 +1,3 @@
 export { ActionType } from './actions';
-export { store } from './state';
+export { store, Connect } from './state';
 export * from './dispatch';

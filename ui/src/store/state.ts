@@ -10,6 +10,7 @@ export interface State {
     code: string
     lastError?: string | null
     events?: EvalEvent[]
+    darkMode: boolean
 }
 
 const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
