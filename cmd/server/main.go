@@ -64,6 +64,7 @@ func start(packagesFile, addr, goRoot string) error {
 	docServer := langserver.New(packages, websocket.Upgrader{})
 	r := mux.NewRouter()
 	r.Path("/langserver").Handler(docServer)
+	r.Path("/test").HandlerFunc(docServer.HandlePlainRequest)
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./public")))
 
 	zap.S().Infof("Listening on %q", addr)

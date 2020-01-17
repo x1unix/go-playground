@@ -70,6 +70,20 @@ func (s *Service) provideSuggestion(req SuggestionRequest) (*SuggestionsResponse
 	return s.lookupBuiltin(req.Value)
 }
 
+func (s *Service) HandlePlainRequest(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	value := q.Get("value")
+	pkgName := q.Get("packageName")
+
+	resp, err := s.provideSuggestion(SuggestionRequest{PackageName: pkgName, Value: value})
+	if err != nil {
+		NewErrorResponse(err).Write(w)
+		return
+	}
+
+	resp.Write(w)
+}
+
 func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	c, err := s.upg.Upgrade(w, r, defaultHeaders)
 	if err != nil {
@@ -101,7 +115,7 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) sendError(conn *websocket.Conn, err error) {
-	if e := conn.WriteJSON(ErrorResponse{Error: err}); e != nil {
+	if e := conn.WriteJSON(NewErrorResponse(err)); e != nil {
 		s.log.Errorf("failed to send error %q - %s", err.Error(), e)
 	}
 }
