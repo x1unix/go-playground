@@ -1,0 +1,1274 @@
+[
+	{
+		"name": "archive",
+		"synopsis": "",
+		"url": "https://golang.org/pkg/archive/",
+		"path": "archive/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "tar",
+				"synopsis": "Package tar implements access to tar archives.",
+				"url": "https://golang.org/pkg/archive/tar/",
+				"path": "archive/tar/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "zip",
+				"synopsis": "Package zip provides support for reading and writing ZIP archives.",
+				"url": "https://golang.org/pkg/archive/zip/",
+				"path": "archive/zip/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "bufio",
+		"synopsis": "Package bufio implements buffered I/O. It wraps an io.Reader or io.Writer object, creating another object (Reader or Writer) that also implements the interface but provides buffering and some help for textual I/O.",
+		"url": "https://golang.org/pkg/bufio/",
+		"path": "bufio/",
+		"depth": 0,
+		"children": []
+	},
+	{
+		"name": "builtin",
+		"synopsis": "Package builtin provides documentation for Go's predeclared identifiers.",
+		"url": "https://golang.org/pkg/builtin/",
+		"path": "builtin/",
+		"depth": 0,
+		"children": []
+	},
+	{
+		"name": "bytes",
+		"synopsis": "Package bytes implements functions for the manipulation of byte slices.",
+		"url": "https://golang.org/pkg/bytes/",
+		"path": "bytes/",
+		"depth": 0,
+		"children": []
+	},
+	{
+		"name": "compress",
+		"synopsis": "",
+		"url": "https://golang.org/pkg/compress/",
+		"path": "compress/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "bzip2",
+				"synopsis": "Package bzip2 implements bzip2 decompression.",
+				"url": "https://golang.org/pkg/compress/bzip2/",
+				"path": "compress/bzip2/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "flate",
+				"synopsis": "Package flate implements the DEFLATE compressed data format, described in RFC 1951.",
+				"url": "https://golang.org/pkg/compress/flate/",
+				"path": "compress/flate/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "gzip",
+				"synopsis": "Package gzip implements reading and writing of gzip format compressed files, as specified in RFC 1952.",
+				"url": "https://golang.org/pkg/compress/gzip/",
+				"path": "compress/gzip/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "lzw",
+				"synopsis": "Package lzw implements the Lempel-Ziv-Welch compressed data format, described in T. A. Welch, “A Technique for High-Performance Data Compression”, Computer, 17(6) (June 1984), pp 8-19.",
+				"url": "https://golang.org/pkg/compress/lzw/",
+				"path": "compress/lzw/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "zlib",
+				"synopsis": "Package zlib implements reading and writing of zlib format compressed data, as specified in RFC 1950.",
+				"url": "https://golang.org/pkg/compress/zlib/",
+				"path": "compress/zlib/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "container",
+		"synopsis": "",
+		"url": "https://golang.org/pkg/container/",
+		"path": "container/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "heap",
+				"synopsis": "Package heap provides heap operations for any type that implements heap.Interface.",
+				"url": "https://golang.org/pkg/container/heap/",
+				"path": "container/heap/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "list",
+				"synopsis": "Package list implements a doubly linked list.",
+				"url": "https://golang.org/pkg/container/list/",
+				"path": "container/list/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "ring",
+				"synopsis": "Package ring implements operations on circular lists.",
+				"url": "https://golang.org/pkg/container/ring/",
+				"path": "container/ring/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "context",
+		"synopsis": "Package context defines the Context type, which carries deadlines, cancellation signals, and other request-scoped values across API boundaries and between processes.",
+		"url": "https://golang.org/pkg/context/",
+		"path": "context/",
+		"depth": 0,
+		"children": []
+	},
+	{
+		"name": "crypto",
+		"synopsis": "Package crypto collects common cryptographic constants.",
+		"url": "https://golang.org/pkg/crypto/",
+		"path": "crypto/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "aes",
+				"synopsis": "Package aes implements AES encryption (formerly Rijndael), as defined in U.S. Federal Information Processing Standards Publication 197.",
+				"url": "https://golang.org/pkg/crypto/aes/",
+				"path": "crypto/aes/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "cipher",
+				"synopsis": "Package cipher implements standard block cipher modes that can be wrapped around low-level block cipher implementations.",
+				"url": "https://golang.org/pkg/crypto/cipher/",
+				"path": "crypto/cipher/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "des",
+				"synopsis": "Package des implements the Data Encryption Standard (DES) and the Triple Data Encryption Algorithm (TDEA) as defined in U.S. Federal Information Processing Standards Publication 46-3.",
+				"url": "https://golang.org/pkg/crypto/des/",
+				"path": "crypto/des/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "dsa",
+				"synopsis": "Package dsa implements the Digital Signature Algorithm, as defined in FIPS 186-3.",
+				"url": "https://golang.org/pkg/crypto/dsa/",
+				"path": "crypto/dsa/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "ecdsa",
+				"synopsis": "Package ecdsa implements the Elliptic Curve Digital Signature Algorithm, as defined in FIPS 186-3.",
+				"url": "https://golang.org/pkg/crypto/ecdsa/",
+				"path": "crypto/ecdsa/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "ed25519",
+				"synopsis": "Package ed25519 implements the Ed25519 signature algorithm.",
+				"url": "https://golang.org/pkg/crypto/ed25519/",
+				"path": "crypto/ed25519/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "elliptic",
+				"synopsis": "Package elliptic implements several standard elliptic curves over prime fields.",
+				"url": "https://golang.org/pkg/crypto/elliptic/",
+				"path": "crypto/elliptic/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "hmac",
+				"synopsis": "Package hmac implements the Keyed-Hash Message Authentication Code (HMAC) as defined in U.S. Federal Information Processing Standards Publication 198.",
+				"url": "https://golang.org/pkg/crypto/hmac/",
+				"path": "crypto/hmac/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "md5",
+				"synopsis": "Package md5 implements the MD5 hash algorithm as defined in RFC 1321.",
+				"url": "https://golang.org/pkg/crypto/md5/",
+				"path": "crypto/md5/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "rand",
+				"synopsis": "Package rand implements a cryptographically secure random number generator.",
+				"url": "https://golang.org/pkg/crypto/rand/",
+				"path": "crypto/rand/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "rc4",
+				"synopsis": "Package rc4 implements RC4 encryption, as defined in Bruce Schneier's Applied Cryptography.",
+				"url": "https://golang.org/pkg/crypto/rc4/",
+				"path": "crypto/rc4/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "rsa",
+				"synopsis": "Package rsa implements RSA encryption as specified in PKCS#1.",
+				"url": "https://golang.org/pkg/crypto/rsa/",
+				"path": "crypto/rsa/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "sha1",
+				"synopsis": "Package sha1 implements the SHA-1 hash algorithm as defined in RFC 3174.",
+				"url": "https://golang.org/pkg/crypto/sha1/",
+				"path": "crypto/sha1/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "sha256",
+				"synopsis": "Package sha256 implements the SHA224 and SHA256 hash algorithms as defined in FIPS 180-4.",
+				"url": "https://golang.org/pkg/crypto/sha256/",
+				"path": "crypto/sha256/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "sha512",
+				"synopsis": "Package sha512 implements the SHA-384, SHA-512, SHA-512/224, and SHA-512/256 hash algorithms as defined in FIPS 180-4.",
+				"url": "https://golang.org/pkg/crypto/sha512/",
+				"path": "crypto/sha512/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "subtle",
+				"synopsis": "Package subtle implements functions that are often useful in cryptographic code but require careful thought to use correctly.",
+				"url": "https://golang.org/pkg/crypto/subtle/",
+				"path": "crypto/subtle/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "tls",
+				"synopsis": "Package tls partially implements TLS 1.2, as specified in RFC 5246, and TLS 1.3, as specified in RFC 8446.",
+				"url": "https://golang.org/pkg/crypto/tls/",
+				"path": "crypto/tls/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "x509",
+				"synopsis": "Package x509 parses X.509-encoded keys and certificates.",
+				"url": "https://golang.org/pkg/crypto/x509/",
+				"path": "crypto/x509/",
+				"depth": 20,
+				"children": [
+					{
+						"name": "pkix",
+						"synopsis": "Package pkix contains shared, low level structures used for ASN.1 parsing and serialization of X.509 certificates, CRL and OCSP.",
+						"url": "https://golang.org/pkg/crypto/x509/pkix/",
+						"path": "crypto/x509/pkix/",
+						"depth": 40,
+						"children": []
+					}
+				]
+			}
+		]
+	},
+	{
+		"name": "database",
+		"synopsis": "",
+		"url": "https://golang.org/pkg/database/",
+		"path": "database/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "sql",
+				"synopsis": "Package sql provides a generic interface around SQL (or SQL-like) databases.",
+				"url": "https://golang.org/pkg/database/sql/",
+				"path": "database/sql/",
+				"depth": 20,
+				"children": [
+					{
+						"name": "driver",
+						"synopsis": "Package driver defines interfaces to be implemented by database drivers as used by package sql.",
+						"url": "https://golang.org/pkg/database/sql/driver/",
+						"path": "database/sql/driver/",
+						"depth": 40,
+						"children": []
+					}
+				]
+			}
+		]
+	},
+	{
+		"name": "debug",
+		"synopsis": "",
+		"url": "https://golang.org/pkg/debug/",
+		"path": "debug/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "dwarf",
+				"synopsis": "Package dwarf provides access to DWARF debugging information loaded from executable files, as defined in the DWARF 2.0 Standard at http://dwarfstd.org/doc/dwarf-2.0.0.pdf",
+				"url": "https://golang.org/pkg/debug/dwarf/",
+				"path": "debug/dwarf/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "elf",
+				"synopsis": "Package elf implements access to ELF object files.",
+				"url": "https://golang.org/pkg/debug/elf/",
+				"path": "debug/elf/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "gosym",
+				"synopsis": "Package gosym implements access to the Go symbol and line number tables embedded in Go binaries generated by the gc compilers.",
+				"url": "https://golang.org/pkg/debug/gosym/",
+				"path": "debug/gosym/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "macho",
+				"synopsis": "Package macho implements access to Mach-O object files.",
+				"url": "https://golang.org/pkg/debug/macho/",
+				"path": "debug/macho/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "pe",
+				"synopsis": "Package pe implements access to PE (Microsoft Windows Portable Executable) files.",
+				"url": "https://golang.org/pkg/debug/pe/",
+				"path": "debug/pe/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "plan9obj",
+				"synopsis": "Package plan9obj implements access to Plan 9 a.out object files.",
+				"url": "https://golang.org/pkg/debug/plan9obj/",
+				"path": "debug/plan9obj/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "encoding",
+		"synopsis": "Package encoding defines interfaces shared by other packages that convert data to and from byte-level and textual representations.",
+		"url": "https://golang.org/pkg/encoding/",
+		"path": "encoding/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "ascii85",
+				"synopsis": "Package ascii85 implements the ascii85 data encoding as used in the btoa tool and Adobe's PostScript and PDF document formats.",
+				"url": "https://golang.org/pkg/encoding/ascii85/",
+				"path": "encoding/ascii85/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "asn1",
+				"synopsis": "Package asn1 implements parsing of DER-encoded ASN.1 data structures, as defined in ITU-T Rec X.690.",
+				"url": "https://golang.org/pkg/encoding/asn1/",
+				"path": "encoding/asn1/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "base32",
+				"synopsis": "Package base32 implements base32 encoding as specified by RFC 4648.",
+				"url": "https://golang.org/pkg/encoding/base32/",
+				"path": "encoding/base32/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "base64",
+				"synopsis": "Package base64 implements base64 encoding as specified by RFC 4648.",
+				"url": "https://golang.org/pkg/encoding/base64/",
+				"path": "encoding/base64/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "binary",
+				"synopsis": "Package binary implements simple translation between numbers and byte sequences and encoding and decoding of varints.",
+				"url": "https://golang.org/pkg/encoding/binary/",
+				"path": "encoding/binary/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "csv",
+				"synopsis": "Package csv reads and writes comma-separated values (CSV) files.",
+				"url": "https://golang.org/pkg/encoding/csv/",
+				"path": "encoding/csv/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "gob",
+				"synopsis": "Package gob manages streams of gobs - binary values exchanged between an Encoder (transmitter) and a Decoder (receiver).",
+				"url": "https://golang.org/pkg/encoding/gob/",
+				"path": "encoding/gob/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "hex",
+				"synopsis": "Package hex implements hexadecimal encoding and decoding.",
+				"url": "https://golang.org/pkg/encoding/hex/",
+				"path": "encoding/hex/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "json",
+				"synopsis": "Package json implements encoding and decoding of JSON as defined in RFC 7159.",
+				"url": "https://golang.org/pkg/encoding/json/",
+				"path": "encoding/json/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "pem",
+				"synopsis": "Package pem implements the PEM data encoding, which originated in Privacy Enhanced Mail.",
+				"url": "https://golang.org/pkg/encoding/pem/",
+				"path": "encoding/pem/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "xml",
+				"synopsis": "Package xml implements a simple XML 1.0 parser that understands XML name spaces.",
+				"url": "https://golang.org/pkg/encoding/xml/",
+				"path": "encoding/xml/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "errors",
+		"synopsis": "Package errors implements functions to manipulate errors.",
+		"url": "https://golang.org/pkg/errors/",
+		"path": "errors/",
+		"depth": 0,
+		"children": []
+	},
+	{
+		"name": "expvar",
+		"synopsis": "Package expvar provides a standardized interface to public variables, such as operation counters in servers.",
+		"url": "https://golang.org/pkg/expvar/",
+		"path": "expvar/",
+		"depth": 0,
+		"children": []
+	},
+	{
+		"name": "flag",
+		"synopsis": "Package flag implements command-line flag parsing.",
+		"url": "https://golang.org/pkg/flag/",
+		"path": "flag/",
+		"depth": 0,
+		"children": []
+	},
+	{
+		"name": "fmt",
+		"synopsis": "Package fmt implements formatted I/O with functions analogous to C's printf and scanf.",
+		"url": "https://golang.org/pkg/fmt/",
+		"path": "fmt/",
+		"depth": 0,
+		"children": []
+	},
+	{
+		"name": "go",
+		"synopsis": "",
+		"url": "https://golang.org/pkg/go/",
+		"path": "go/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "ast",
+				"synopsis": "Package ast declares the types used to represent syntax trees for Go packages.",
+				"url": "https://golang.org/pkg/go/ast/",
+				"path": "go/ast/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "build",
+				"synopsis": "Package build gathers information about Go packages.",
+				"url": "https://golang.org/pkg/go/build/",
+				"path": "go/build/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "constant",
+				"synopsis": "Package constant implements Values representing untyped Go constants and their corresponding operations.",
+				"url": "https://golang.org/pkg/go/constant/",
+				"path": "go/constant/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "doc",
+				"synopsis": "Package doc extracts source code documentation from a Go AST.",
+				"url": "https://golang.org/pkg/go/doc/",
+				"path": "go/doc/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "format",
+				"synopsis": "Package format implements standard formatting of Go source.",
+				"url": "https://golang.org/pkg/go/format/",
+				"path": "go/format/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "importer",
+				"synopsis": "Package importer provides access to export data importers.",
+				"url": "https://golang.org/pkg/go/importer/",
+				"path": "go/importer/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "parser",
+				"synopsis": "Package parser implements a parser for Go source files.",
+				"url": "https://golang.org/pkg/go/parser/",
+				"path": "go/parser/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "printer",
+				"synopsis": "Package printer implements printing of AST nodes.",
+				"url": "https://golang.org/pkg/go/printer/",
+				"path": "go/printer/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "scanner",
+				"synopsis": "Package scanner implements a scanner for Go source text.",
+				"url": "https://golang.org/pkg/go/scanner/",
+				"path": "go/scanner/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "token",
+				"synopsis": "Package token defines constants representing the lexical tokens of the Go programming language and basic operations on tokens (printing, predicates).",
+				"url": "https://golang.org/pkg/go/token/",
+				"path": "go/token/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "types",
+				"synopsis": "Package types declares the data types and implements the algorithms for type-checking of Go packages.",
+				"url": "https://golang.org/pkg/go/types/",
+				"path": "go/types/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "hash",
+		"synopsis": "Package hash provides interfaces for hash functions.",
+		"url": "https://golang.org/pkg/hash/",
+		"path": "hash/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "adler32",
+				"synopsis": "Package adler32 implements the Adler-32 checksum.",
+				"url": "https://golang.org/pkg/hash/adler32/",
+				"path": "hash/adler32/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "crc32",
+				"synopsis": "Package crc32 implements the 32-bit cyclic redundancy check, or CRC-32, checksum.",
+				"url": "https://golang.org/pkg/hash/crc32/",
+				"path": "hash/crc32/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "crc64",
+				"synopsis": "Package crc64 implements the 64-bit cyclic redundancy check, or CRC-64, checksum.",
+				"url": "https://golang.org/pkg/hash/crc64/",
+				"path": "hash/crc64/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "fnv",
+				"synopsis": "Package fnv implements FNV-1 and FNV-1a, non-cryptographic hash functions created by Glenn Fowler, Landon Curt Noll, and Phong Vo.",
+				"url": "https://golang.org/pkg/hash/fnv/",
+				"path": "hash/fnv/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "html",
+		"synopsis": "Package html provides functions for escaping and unescaping HTML text.",
+		"url": "https://golang.org/pkg/html/",
+		"path": "html/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "template",
+				"synopsis": "Package template (html/template) implements data-driven templates for generating HTML output safe against code injection.",
+				"url": "https://golang.org/pkg/html/template/",
+				"path": "html/template/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "image",
+		"synopsis": "Package image implements a basic 2-D image library.",
+		"url": "https://golang.org/pkg/image/",
+		"path": "image/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "color",
+				"synopsis": "Package color implements a basic color library.",
+				"url": "https://golang.org/pkg/image/color/",
+				"path": "image/color/",
+				"depth": 20,
+				"children": [
+					{
+						"name": "palette",
+						"synopsis": "Package palette provides standard color palettes.",
+						"url": "https://golang.org/pkg/image/color/palette/",
+						"path": "image/color/palette/",
+						"depth": 40,
+						"children": []
+					}
+				]
+			},
+			{
+				"name": "draw",
+				"synopsis": "Package draw provides image composition functions.",
+				"url": "https://golang.org/pkg/image/draw/",
+				"path": "image/draw/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "gif",
+				"synopsis": "Package gif implements a GIF image decoder and encoder.",
+				"url": "https://golang.org/pkg/image/gif/",
+				"path": "image/gif/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "jpeg",
+				"synopsis": "Package jpeg implements a JPEG image decoder and encoder.",
+				"url": "https://golang.org/pkg/image/jpeg/",
+				"path": "image/jpeg/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "png",
+				"synopsis": "Package png implements a PNG image decoder and encoder.",
+				"url": "https://golang.org/pkg/image/png/",
+				"path": "image/png/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "index",
+		"synopsis": "",
+		"url": "https://golang.org/pkg/index/",
+		"path": "index/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "suffixarray",
+				"synopsis": "Package suffixarray implements substring search in logarithmic time using an in-memory suffix array.",
+				"url": "https://golang.org/pkg/index/suffixarray/",
+				"path": "index/suffixarray/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "io",
+		"synopsis": "Package io provides basic interfaces to I/O primitives.",
+		"url": "https://golang.org/pkg/io/",
+		"path": "io/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "ioutil",
+				"synopsis": "Package ioutil implements some I/O utility functions.",
+				"url": "https://golang.org/pkg/io/ioutil/",
+				"path": "io/ioutil/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "log",
+		"synopsis": "Package log implements a simple logging package.",
+		"url": "https://golang.org/pkg/log/",
+		"path": "log/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "syslog",
+				"synopsis": "Package syslog provides a simple interface to the system log service.",
+				"url": "https://golang.org/pkg/log/syslog/",
+				"path": "log/syslog/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "math",
+		"synopsis": "Package math provides basic constants and mathematical functions.",
+		"url": "https://golang.org/pkg/math/",
+		"path": "math/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "big",
+				"synopsis": "Package big implements arbitrary-precision arithmetic (big numbers).",
+				"url": "https://golang.org/pkg/math/big/",
+				"path": "math/big/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "bits",
+				"synopsis": "Package bits implements bit counting and manipulation functions for the predeclared unsigned integer types.",
+				"url": "https://golang.org/pkg/math/bits/",
+				"path": "math/bits/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "cmplx",
+				"synopsis": "Package cmplx provides basic constants and mathematical functions for complex numbers.",
+				"url": "https://golang.org/pkg/math/cmplx/",
+				"path": "math/cmplx/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "rand",
+				"synopsis": "Package rand implements pseudo-random number generators.",
+				"url": "https://golang.org/pkg/math/rand/",
+				"path": "math/rand/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "mime",
+		"synopsis": "Package mime implements parts of the MIME spec.",
+		"url": "https://golang.org/pkg/mime/",
+		"path": "mime/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "multipart",
+				"synopsis": "Package multipart implements MIME multipart parsing, as defined in RFC 2046.",
+				"url": "https://golang.org/pkg/mime/multipart/",
+				"path": "mime/multipart/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "quotedprintable",
+				"synopsis": "Package quotedprintable implements quoted-printable encoding as specified by RFC 2045.",
+				"url": "https://golang.org/pkg/mime/quotedprintable/",
+				"path": "mime/quotedprintable/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "net",
+		"synopsis": "Package net provides a portable interface for network I/O, including TCP/IP, UDP, domain name resolution, and Unix domain sockets.",
+		"url": "https://golang.org/pkg/net/",
+		"path": "net/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "http",
+				"synopsis": "Package http provides HTTP client and server implementations.",
+				"url": "https://golang.org/pkg/net/http/",
+				"path": "net/http/",
+				"depth": 20,
+				"children": [
+					{
+						"name": "cgi",
+						"synopsis": "Package cgi implements CGI (Common Gateway Interface) as specified in RFC 3875.",
+						"url": "https://golang.org/pkg/net/http/cgi/",
+						"path": "net/http/cgi/",
+						"depth": 40,
+						"children": []
+					},
+					{
+						"name": "cookiejar",
+						"synopsis": "Package cookiejar implements an in-memory RFC 6265-compliant http.CookieJar.",
+						"url": "https://golang.org/pkg/net/http/cookiejar/",
+						"path": "net/http/cookiejar/",
+						"depth": 40,
+						"children": []
+					},
+					{
+						"name": "fcgi",
+						"synopsis": "Package fcgi implements the FastCGI protocol.",
+						"url": "https://golang.org/pkg/net/http/fcgi/",
+						"path": "net/http/fcgi/",
+						"depth": 40,
+						"children": []
+					},
+					{
+						"name": "httptest",
+						"synopsis": "Package httptest provides utilities for HTTP testing.",
+						"url": "https://golang.org/pkg/net/http/httptest/",
+						"path": "net/http/httptest/",
+						"depth": 40,
+						"children": []
+					},
+					{
+						"name": "httptrace",
+						"synopsis": "Package httptrace provides mechanisms to trace the events within HTTP client requests.",
+						"url": "https://golang.org/pkg/net/http/httptrace/",
+						"path": "net/http/httptrace/",
+						"depth": 40,
+						"children": []
+					},
+					{
+						"name": "httputil",
+						"synopsis": "Package httputil provides HTTP utility functions, complementing the more common ones in the net/http package.",
+						"url": "https://golang.org/pkg/net/http/httputil/",
+						"path": "net/http/httputil/",
+						"depth": 40,
+						"children": []
+					},
+					{
+						"name": "pprof",
+						"synopsis": "Package pprof serves via its HTTP server runtime profiling data in the format expected by the pprof visualization tool.",
+						"url": "https://golang.org/pkg/net/http/pprof/",
+						"path": "net/http/pprof/",
+						"depth": 40,
+						"children": []
+					}
+				]
+			},
+			{
+				"name": "mail",
+				"synopsis": "Package mail implements parsing of mail messages.",
+				"url": "https://golang.org/pkg/net/mail/",
+				"path": "net/mail/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "rpc",
+				"synopsis": "Package rpc provides access to the exported methods of an object across a network or other I/O connection.",
+				"url": "https://golang.org/pkg/net/rpc/",
+				"path": "net/rpc/",
+				"depth": 20,
+				"children": [
+					{
+						"name": "jsonrpc",
+						"synopsis": "Package jsonrpc implements a JSON-RPC 1.0 ClientCodec and ServerCodec for the rpc package.",
+						"url": "https://golang.org/pkg/net/rpc/jsonrpc/",
+						"path": "net/rpc/jsonrpc/",
+						"depth": 40,
+						"children": []
+					}
+				]
+			},
+			{
+				"name": "smtp",
+				"synopsis": "Package smtp implements the Simple Mail Transfer Protocol as defined in RFC 5321.",
+				"url": "https://golang.org/pkg/net/smtp/",
+				"path": "net/smtp/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "textproto",
+				"synopsis": "Package textproto implements generic support for text-based request/response protocols in the style of HTTP, NNTP, and SMTP.",
+				"url": "https://golang.org/pkg/net/textproto/",
+				"path": "net/textproto/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "url",
+				"synopsis": "Package url parses URLs and implements query escaping.",
+				"url": "https://golang.org/pkg/net/url/",
+				"path": "net/url/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "os",
+		"synopsis": "Package os provides a platform-independent interface to operating system functionality.",
+		"url": "https://golang.org/pkg/os/",
+		"path": "os/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "exec",
+				"synopsis": "Package exec runs external commands.",
+				"url": "https://golang.org/pkg/os/exec/",
+				"path": "os/exec/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "signal",
+				"synopsis": "Package signal implements access to incoming signals.",
+				"url": "https://golang.org/pkg/os/signal/",
+				"path": "os/signal/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "user",
+				"synopsis": "Package user allows user account lookups by name or id.",
+				"url": "https://golang.org/pkg/os/user/",
+				"path": "os/user/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "path",
+		"synopsis": "Package path implements utility routines for manipulating slash-separated paths.",
+		"url": "https://golang.org/pkg/path/",
+		"path": "path/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "filepath",
+				"synopsis": "Package filepath implements utility routines for manipulating filename paths in a way compatible with the target operating system-defined file paths.",
+				"url": "https://golang.org/pkg/path/filepath/",
+				"path": "path/filepath/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "plugin",
+		"synopsis": "Package plugin implements loading and symbol resolution of Go plugins.",
+		"url": "https://golang.org/pkg/plugin/",
+		"path": "plugin/",
+		"depth": 0,
+		"children": []
+	},
+	{
+		"name": "reflect",
+		"synopsis": "Package reflect implements run-time reflection, allowing a program to manipulate objects with arbitrary types.",
+		"url": "https://golang.org/pkg/reflect/",
+		"path": "reflect/",
+		"depth": 0,
+		"children": []
+	},
+	{
+		"name": "regexp",
+		"synopsis": "Package regexp implements regular expression search.",
+		"url": "https://golang.org/pkg/regexp/",
+		"path": "regexp/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "syntax",
+				"synopsis": "Package syntax parses regular expressions into parse trees and compiles parse trees into programs.",
+				"url": "https://golang.org/pkg/regexp/syntax/",
+				"path": "regexp/syntax/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "runtime",
+		"synopsis": "Package runtime contains operations that interact with Go's runtime system, such as functions to control goroutines.",
+		"url": "https://golang.org/pkg/runtime/",
+		"path": "runtime/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "cgo",
+				"synopsis": "Package cgo contains runtime support for code generated by the cgo tool.",
+				"url": "https://golang.org/pkg/runtime/cgo/",
+				"path": "runtime/cgo/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "debug",
+				"synopsis": "Package debug contains facilities for programs to debug themselves while they are running.",
+				"url": "https://golang.org/pkg/runtime/debug/",
+				"path": "runtime/debug/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "msan",
+				"synopsis": "",
+				"url": "https://golang.org/pkg/runtime/msan/",
+				"path": "runtime/msan/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "pprof",
+				"synopsis": "Package pprof writes runtime profiling data in the format expected by the pprof visualization tool.",
+				"url": "https://golang.org/pkg/runtime/pprof/",
+				"path": "runtime/pprof/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "race",
+				"synopsis": "Package race implements data race detection logic.",
+				"url": "https://golang.org/pkg/runtime/race/",
+				"path": "runtime/race/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "trace",
+				"synopsis": "Package trace contains facilities for programs to generate traces for the Go execution tracer.",
+				"url": "https://golang.org/pkg/runtime/trace/",
+				"path": "runtime/trace/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "sort",
+		"synopsis": "Package sort provides primitives for sorting slices and user-defined collections.",
+		"url": "https://golang.org/pkg/sort/",
+		"path": "sort/",
+		"depth": 0,
+		"children": []
+	},
+	{
+		"name": "strconv",
+		"synopsis": "Package strconv implements conversions to and from string representations of basic data types.",
+		"url": "https://golang.org/pkg/strconv/",
+		"path": "strconv/",
+		"depth": 0,
+		"children": []
+	},
+	{
+		"name": "strings",
+		"synopsis": "Package strings implements simple functions to manipulate UTF-8 encoded strings.",
+		"url": "https://golang.org/pkg/strings/",
+		"path": "strings/",
+		"depth": 0,
+		"children": []
+	},
+	{
+		"name": "sync",
+		"synopsis": "Package sync provides basic synchronization primitives such as mutual exclusion locks.",
+		"url": "https://golang.org/pkg/sync/",
+		"path": "sync/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "atomic",
+				"synopsis": "Package atomic provides low-level atomic memory primitives useful for implementing synchronization algorithms.",
+				"url": "https://golang.org/pkg/sync/atomic/",
+				"path": "sync/atomic/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "syscall",
+		"synopsis": "Package syscall contains an interface to the low-level operating system primitives.",
+		"url": "https://golang.org/pkg/syscall/",
+		"path": "syscall/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "js",
+				"synopsis": "Package js gives access to the WebAssembly host environment when using the js/wasm architecture.",
+				"url": "https://golang.org/pkg/syscall/js/",
+				"path": "syscall/js/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "testing",
+		"synopsis": "Package testing provides support for automated testing of Go packages.",
+		"url": "https://golang.org/pkg/testing/",
+		"path": "testing/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "iotest",
+				"synopsis": "Package iotest implements Readers and Writers useful mainly for testing.",
+				"url": "https://golang.org/pkg/testing/iotest/",
+				"path": "testing/iotest/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "quick",
+				"synopsis": "Package quick implements utility functions to help with black box testing.",
+				"url": "https://golang.org/pkg/testing/quick/",
+				"path": "testing/quick/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "text",
+		"synopsis": "",
+		"url": "https://golang.org/pkg/text/",
+		"path": "text/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "scanner",
+				"synopsis": "Package scanner provides a scanner and tokenizer for UTF-8-encoded text.",
+				"url": "https://golang.org/pkg/text/scanner/",
+				"path": "text/scanner/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "tabwriter",
+				"synopsis": "Package tabwriter implements a write filter (tabwriter.Writer) that translates tabbed columns in input into properly aligned text.",
+				"url": "https://golang.org/pkg/text/tabwriter/",
+				"path": "text/tabwriter/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "template",
+				"synopsis": "Package template implements data-driven templates for generating textual output.",
+				"url": "https://golang.org/pkg/text/template/",
+				"path": "text/template/",
+				"depth": 20,
+				"children": [
+					{
+						"name": "parse",
+						"synopsis": "Package parse builds parse trees for templates as defined by text/template and html/template.",
+						"url": "https://golang.org/pkg/text/template/parse/",
+						"path": "text/template/parse/",
+						"depth": 40,
+						"children": []
+					}
+				]
+			}
+		]
+	},
+	{
+		"name": "time",
+		"synopsis": "Package time provides functionality for measuring and displaying time.",
+		"url": "https://golang.org/pkg/time/",
+		"path": "time/",
+		"depth": 0,
+		"children": []
+	},
+	{
+		"name": "unicode",
+		"synopsis": "Package unicode provides data and functions to test some properties of Unicode code points.",
+		"url": "https://golang.org/pkg/unicode/",
+		"path": "unicode/",
+		"depth": 0,
+		"children": [
+			{
+				"name": "utf16",
+				"synopsis": "Package utf16 implements encoding and decoding of UTF-16 sequences.",
+				"url": "https://golang.org/pkg/unicode/utf16/",
+				"path": "unicode/utf16/",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "utf8",
+				"synopsis": "Package utf8 implements functions and constants to support text encoded in UTF-8.",
+				"url": "https://golang.org/pkg/unicode/utf8/",
+				"path": "unicode/utf8/",
+				"depth": 20,
+				"children": []
+			}
+		]
+	},
+	{
+		"name": "unsafe",
+		"synopsis": "Package unsafe contains operations that step around the type safety of Go programs.",
+		"url": "https://golang.org/pkg/unsafe/",
+		"path": "unsafe/",
+		"depth": 0,
+		"children": []
+	}
+]
