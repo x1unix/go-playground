@@ -8,6 +8,7 @@ DEBUG ?= true
 all: build
 
 include build.mk
+include docker.mk
 
 .PHONY:run
 run:
