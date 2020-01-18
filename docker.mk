@@ -4,7 +4,7 @@ TAG ?= 1.0.0
 
 .PHONY: docker
 docker: docker-login docker-make-image
-	@echo "- Pushing $(IMG_NAME):$(TAG) (as latest)...'
+	@echo "- Pushing $(IMG_NAME):$(TAG) (as latest)..."
 	docker push $(IMG_NAME):$(TAG)
 	docker push $(IMG_NAME):latest
 
