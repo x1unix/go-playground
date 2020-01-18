@@ -18,4 +18,4 @@ COPY data ./data
 COPY --from=ui-build /tmp/web/build ./public
 COPY --from=build /tmp/playground/server .
 EXPOSE 8000
-ENTRYPOINT ["/opt/playground/server", "-f=/opt/playground/data/packages.json"]
+ENTRYPOINT ["/opt/playground/server", "-f=/opt/playground/data/packages.json", "-addr=:8000"]
