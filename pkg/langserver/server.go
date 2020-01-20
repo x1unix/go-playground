@@ -28,6 +28,7 @@ func (s *Service) Mount(r *mux.Router) {
 	r.Path("/compile").Methods(http.MethodPost).HandlerFunc(s.Compile)
 	r.Path("/format").Methods(http.MethodPost).HandlerFunc(s.FormatCode)
 	r.Path("/share").Methods(http.MethodPost).HandlerFunc(s.Share)
+	r.Path("/snippet/{id}").Methods(http.MethodGet).HandlerFunc(s.GetSnippet)
 }
 
 func (s *Service) lookupBuiltin(val string) (*SuggestionsResponse, error) {
@@ -144,6 +145,27 @@ func (s *Service) Share(w http.ResponseWriter, r *http.Request) {
 	}
 
 	WriteJSON(w, ShareResponse{SnippetID: shareID})
+}
+
+func (s *Service) GetSnippet(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	snippetID := vars["id"]
+	snippet, err := goplay.GetSnippet(r.Context(), snippetID)
+	if err != nil {
+		if err == goplay.ErrSnippetNotFound {
+			Errorf(http.StatusNotFound, "snippet %q not found", snippetID).Write(w)
+			return
+		}
+
+		s.log.Errorw("failed to get snippet",
+			"snippetID", snippetID,
+			"err", err,
+		)
+		NewErrorResponse(err).Write(w)
+		return
+	}
+
+	w.Write(snippet)
 }
 
 func (s *Service) Compile(w http.ResponseWriter, r *http.Request) {

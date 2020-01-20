@@ -1,5 +1,9 @@
 package goplay
 
+import "errors"
+
+var ErrSnippetNotFound = errors.New("snippet not found")
+
 type CompileFailedError struct {
 	msg string
 }

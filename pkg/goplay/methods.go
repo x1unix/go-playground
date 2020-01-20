@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 )
@@ -20,6 +21,28 @@ func ValidateContentLength(r lener) error {
 	}
 
 	return nil
+}
+
+func GetSnippet(ctx context.Context, snippetID string) ([]byte, error) {
+	resp, err := getRequest(ctx, "p/"+snippetID+".go")
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	switch resp.StatusCode {
+	case http.StatusOK:
+		snippet, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		return snippet, nil
+	case http.StatusNotFound:
+		return nil, ErrSnippetNotFound
+	default:
+		return nil, fmt.Errorf("error from Go Playground server - %d %s", resp.StatusCode, resp.Status)
+	}
 }
 
 func Share(ctx context.Context, src io.Reader) (string, error) {

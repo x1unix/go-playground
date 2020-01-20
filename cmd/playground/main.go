@@ -68,7 +68,7 @@ func start(packagesFile, addr, goRoot string, debug bool) error {
 
 	var handler http.Handler
 	if debug {
-		zap.S().Warn("Debug mode enabled, CORS disabled")
+		zap.S().Info("Debug mode enabled, CORS disabled")
 		handler = langserver.NewCORSDisablerWrapper(r)
 	} else {
 		handler = r
