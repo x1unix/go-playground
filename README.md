@@ -31,8 +31,9 @@ $ make
 
 To run the playground, go to `target` directory and start the server:
 
+```bash
+$ cd target
+$ ./playground -f ./data/packages.json -debug
 ```
-cd target
 
-./playground -f ./data/packages.json
-```
+Use `-help` to get information about command params
