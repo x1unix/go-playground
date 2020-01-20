@@ -107,7 +107,7 @@ func (s *Service) goImportsCode(w http.ResponseWriter, r *http.Request) ([]byte,
 	}
 
 	if err = resp.HasError(); err != nil {
-		Errorf(http.StatusBadRequest, err.Error())
+		Errorf(http.StatusBadRequest, err.Error()).Write(w)
 		return nil, err, false
 	}
 
@@ -118,6 +118,10 @@ func (s *Service) goImportsCode(w http.ResponseWriter, r *http.Request) ([]byte,
 func (s *Service) FormatCode(w http.ResponseWriter, r *http.Request) {
 	code, err, _ := s.goImportsCode(w, r)
 	if err != nil {
+		if goplay.IsCompileError(err) {
+			return
+		}
+
 		s.log.Error(err)
 		return
 	}
@@ -128,6 +132,10 @@ func (s *Service) FormatCode(w http.ResponseWriter, r *http.Request) {
 func (s *Service) Compile(w http.ResponseWriter, r *http.Request) {
 	src, err, changed := s.goImportsCode(w, r)
 	if err != nil {
+		if goplay.IsCompileError(err) {
+			return
+		}
+
 		s.log.Error(err)
 		return
 	}

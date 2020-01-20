@@ -17,7 +17,7 @@ func (r *FmtResponse) HasError() error {
 		return nil
 	}
 
-	return errors.New(r.Error)
+	return CompileFailedError{msg: r.Error}
 }
 
 // CompileEvent represents individual
