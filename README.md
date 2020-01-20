@@ -29,7 +29,10 @@ $ cd go-playground
 $ make
 ```
 
-Output package will be at `target` directory.
+To run the playground, go to `target` directory and start the server:
 
+```
+cd target
 
-
+./playground -f ./data/packages.json
+```
