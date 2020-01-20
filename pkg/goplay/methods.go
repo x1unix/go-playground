@@ -5,8 +5,32 @@ import (
 	"encoding/json"
 	"fmt"
 	"go.uber.org/zap"
+	"io"
+	"net/http"
 	"net/url"
 )
+
+type lener interface {
+	Len() int
+}
+
+func ValidateContentLength(r lener) error {
+	if r.Len() > maxSnippetSize {
+		return ErrSnippetTooLarge
+	}
+
+	return nil
+}
+
+func Share(ctx context.Context, src io.Reader) (string, error) {
+	resp, err := doRequest(ctx, http.MethodPost, "share", "text/plain", src)
+	if err != nil {
+		return "", err
+	}
+
+	shareID := string(resp)
+	return shareID, nil
+}
 
 func GoImports(ctx context.Context, src []byte) (*FmtResponse, error) {
 	form := url.Values{}

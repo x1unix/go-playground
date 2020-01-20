@@ -13,6 +13,10 @@ import (
 	"github.com/x1unix/go-playground/pkg/analyzer"
 )
 
+type ShareResponse struct {
+	SnippetID string `json:"snippetID"`
+}
+
 type SuggestionRequest struct {
 	PackageName string `json:"packageName"`
 	Value       string `json:"value"`

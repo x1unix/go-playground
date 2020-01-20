@@ -34,15 +34,16 @@ func doRequest(ctx context.Context, method, url, contentType string, body io.Rea
 		return nil, err
 	}
 
-	var bodyBytes bytes.Buffer
-	_, err = io.Copy(&bodyBytes, io.LimitReader(response.Body, maxSnippetSize+1))
+	bodyBytes := &bytes.Buffer{}
+	_, err = io.Copy(bodyBytes, io.LimitReader(response.Body, maxSnippetSize+1))
 	defer response.Body.Close()
 	if err != nil {
 		return nil, err
 	}
-	if bodyBytes.Len() > maxSnippetSize {
-		return nil, ErrSnippetTooLarge
+	if err = ValidateContentLength(bodyBytes); err != nil {
+		return nil, err
 	}
+
 	return bodyBytes.Bytes(), nil
 }
 

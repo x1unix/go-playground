@@ -27,6 +27,7 @@ func (s *Service) Mount(r *mux.Router) {
 	r.Path("/suggest").HandlerFunc(s.GetSuggestion)
 	r.Path("/compile").Methods(http.MethodPost).HandlerFunc(s.Compile)
 	r.Path("/format").Methods(http.MethodPost).HandlerFunc(s.FormatCode)
+	r.Path("/share").Methods(http.MethodPost).HandlerFunc(s.Share)
 }
 
 func (s *Service) lookupBuiltin(val string) (*SuggestionsResponse, error) {
@@ -127,6 +128,22 @@ func (s *Service) FormatCode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	WriteJSON(w, CompilerResponse{Formatted: string(code)})
+}
+
+func (s *Service) Share(w http.ResponseWriter, r *http.Request) {
+	shareID, err := goplay.Share(r.Context(), r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		if err == goplay.ErrSnippetTooLarge {
+			Errorf(http.StatusRequestEntityTooLarge, err.Error()).Write(w)
+			return
+		}
+
+		s.log.Error("failed to share code: ", err)
+		NewErrorResponse(err).Write(w)
+	}
+
+	WriteJSON(w, ShareResponse{SnippetID: shareID})
 }
 
 func (s *Service) Compile(w http.ResponseWriter, r *http.Request) {
