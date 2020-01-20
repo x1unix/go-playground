@@ -157,6 +157,6 @@ func (s *Service) Compile(w http.ResponseWriter, r *http.Request) {
 		result.Formatted = string(src)
 	}
 
-	s.log.Debugw("resp from compiler", "res", res)
+	s.log.Debugw("response from compiler", "res", res)
 	WriteJSON(w, result)
 }

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"go.uber.org/zap"
 	"io"
 	"net/http"
 	"net/url"
@@ -24,7 +23,6 @@ var ErrSnippetTooLarge = fmt.Errorf("code snippet too large (max %d bytes)", max
 
 func doRequest(ctx context.Context, method, url, contentType string, body io.Reader) ([]byte, error) {
 	url = goPlayURL + "/" + url
-	zap.S().Debug("doRequest ", url)
 	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
 		return nil, err
