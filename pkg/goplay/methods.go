@@ -23,8 +23,9 @@ func ValidateContentLength(r lener) error {
 	return nil
 }
 
-func GetSnippet(ctx context.Context, snippetID string) ([]byte, error) {
-	resp, err := getRequest(ctx, "p/"+snippetID+".go")
+func GetSnippet(ctx context.Context, snippetID string) (*Snippet, error) {
+	fileName := snippetID + ".go"
+	resp, err := getRequest(ctx, "p/"+fileName)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +38,10 @@ func GetSnippet(ctx context.Context, snippetID string) ([]byte, error) {
 			return nil, err
 		}
 
-		return snippet, nil
+		return &Snippet{
+			FileName: fileName,
+			Contents: string(snippet),
+		}, nil
 	case http.StatusNotFound:
 		return nil, ErrSnippetNotFound
 	default:

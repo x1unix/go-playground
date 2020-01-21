@@ -5,6 +5,12 @@ import (
 	"time"
 )
 
+// Snippet represents shared snippet
+type Snippet struct {
+	FileName string
+	Contents string
+}
+
 // FmtResponse is the response returned from
 // upstream play.golang.org/fmt request
 type FmtResponse struct {

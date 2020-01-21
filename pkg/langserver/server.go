@@ -165,7 +165,10 @@ func (s *Service) GetSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(snippet)
+	WriteJSON(w, SnippetResponse{
+		FileName: snippet.FileName,
+		Code:     snippet.Contents,
+	})
 }
 
 func (s *Service) Compile(w http.ResponseWriter, r *http.Request) {
