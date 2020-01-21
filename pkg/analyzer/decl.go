@@ -81,7 +81,7 @@ func funcToItem(fn *ast.FuncDecl) *CompletionItem {
 	ci := &CompletionItem{
 		Label:         fn.Name.String(),
 		Kind:          Function,
-		Documentation: fn.Doc.Text(),
+		Documentation: formatDoc(fn.Doc.Text()),
 	}
 
 	ci.Detail = funcToString(fn.Type)
