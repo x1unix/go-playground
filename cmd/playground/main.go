@@ -62,7 +62,7 @@ func start(packagesFile, addr, goRoot string, debug bool) error {
 
 	r := mux.NewRouter()
 	langserver.New(packages).Mount(r.PathPrefix("/api").Subrouter())
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./public")))
+	r.PathPrefix("/").Handler(langserver.SpaFileServer("./public"))
 
 	zap.S().Infof("Listening on %q", addr)
 
