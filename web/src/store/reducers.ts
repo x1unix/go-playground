@@ -56,10 +56,10 @@ const reducers = {
 
 export const getInitialState = (): State => ({
     status: {
-        loading: false,
+        loading: false
     },
     editor: {
-        fileName: 'main.go',
+        fileName: 'prog.go',
         code: DEMO_CODE
     },
     settings: {
