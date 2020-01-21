@@ -5,6 +5,8 @@ import { Connect } from './store';
 import {EvalEvent} from './services/api';
 import EvalEventView from './EvalEventView';
 import { getTheme } from '@uifabric/styling';
+import { MessageBar, MessageBarType } from 'office-ui-fabric-react';
+
 
 interface PreviewProps {
     lastError?:string | null;
@@ -24,7 +26,9 @@ export default class Preview extends React.Component<PreviewProps> {
     render() {
         let content;
         if (this.props.lastError) {
-            content = <span className="app-preview__error">{this.props.lastError}</span>;
+            content = <MessageBar messageBarType={MessageBarType.error} isMultiline={false}>
+                <b>Build failed:</b> {this.props.lastError}
+            </MessageBar>
         } else if (this.props.events) {
             content = this.props.events.map((e, k) => <EvalEventView
                 key={k}
