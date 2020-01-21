@@ -9,9 +9,8 @@ import { connect } from 'react-redux';
 
 const Playground = connect()(function (props) {
     const {snippetID} = useParams();
-    if (snippetID) {
-        props.dispatch(newSnippetLoadDispatcher(snippetID));
-    }
+    props.dispatch(newSnippetLoadDispatcher(snippetID));
+
     return <div className="playground">
         <Header />
         <CodeEditor />

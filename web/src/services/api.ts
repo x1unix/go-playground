@@ -6,6 +6,10 @@ const apiAddress = process.env['REACT_APP_LANG_SERVER'] ?? window.location.origi
 
 let axiosClient = axios.default.create({baseURL: `${apiAddress}/api`});
 
+export interface ShareResponse {
+    snippetID: string
+}
+
 export interface Snippet {
     fileName: string
     code: string
@@ -28,6 +32,7 @@ export interface IAPIClient {
     evaluateCode(code: string): Promise<CompilerResponse>
     formatCode(code: string): Promise<CompilerResponse>
     getSnippet(id: string): Promise<Snippet>
+    shareSnippet(code: string): Promise<ShareResponse>
 }
 
 class Client implements IAPIClient {
@@ -52,6 +57,10 @@ class Client implements IAPIClient {
 
     async getSnippet(id: string): Promise<Snippet> {
         return this.get<Snippet>(`/snippet/${id}`);
+    }
+
+    async shareSnippet(code: string): Promise<ShareResponse> {
+        return this.post<ShareResponse>('/share', code);
     }
 
     private async get<T>(uri: string): Promise<T> {

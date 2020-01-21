@@ -1,6 +1,7 @@
 import { saveAs } from 'file-saver';
+import { push } from 'connected-react-router';
 import {
-    newBuildErrorAction,
+    newErrorAction,
     newBuildResultAction,
     newImportFileAction,
     newLoadingAction,
@@ -37,22 +38,34 @@ export function newImportFileDispatcher(f: File): Dispatcher {
 }
 
 export function newSnippetLoadDispatcher(snippetID: string): Dispatcher {
-    return async(dispatch: DispatchFn, getState: StateProvider) => {
-        console.log('load snippet %s', snippetID);
+    return async(dispatch: DispatchFn, _: StateProvider) => {
         if (!snippetID) {
             dispatch(newImportFileAction('prog.go', DEMO_CODE));
             return;
         }
 
         try {
+            console.log('loading snippet %s', snippetID);
             const resp = await client.getSnippet(snippetID);
             const { fileName, code } = resp;
             dispatch(newImportFileAction(fileName, code));
         } catch(err) {
-            dispatch(newBuildErrorAction(err.message));
+            dispatch(newErrorAction(err.message));
         }
     }
 }
+
+export const shareSnippetDispatcher: Dispatcher =
+    async (dispatch: DispatchFn, getState: StateProvider) => {
+        dispatch(newLoadingAction());
+        try {
+            const {code} = getState().editor;
+            const res = await client.shareSnippet(code);
+            dispatch(push(`/snippet/${res.snippetID}`));
+        } catch (err) {
+            dispatch(newErrorAction(err.message));
+        }
+    };
 
 export const saveFileDispatcher: Dispatcher =
     (_: DispatchFn, getState: StateProvider) => {
@@ -74,7 +87,7 @@ export const runFileDispatcher: Dispatcher =
             const res = await client.evaluateCode(code);
             dispatch(newBuildResultAction(res));
         } catch (err) {
-            dispatch(newBuildErrorAction(err.message));
+            dispatch(newErrorAction(err.message));
         }
     };
 
@@ -89,7 +102,7 @@ export const formatFileDispatcher: Dispatcher =
                 dispatch(newBuildResultAction(res));
             }
         } catch (err) {
-            dispatch(newBuildErrorAction(err.message));
+            dispatch(newErrorAction(err.message));
         }
     };
 

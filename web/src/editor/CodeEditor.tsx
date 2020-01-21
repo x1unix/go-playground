@@ -8,9 +8,10 @@ import { DEFAULT_EDITOR_OPTIONS, LANGUAGE_GOLANG } from './props';
 
 interface CodeEditorState {
     code?: string
+    loading?:boolean
 }
 
-@Connect(s => ({code: s.editor.code, darkMode: s.settings.darkMode}))
+@Connect(s => ({code: s.editor.code, darkMode: s.settings.darkMode, loading: s.status?.loading}))
 export default class CodeEditor extends React.Component<any, CodeEditorState> {
     editorDidMount(editor: editor.IStandaloneCodeEditor, monaco: any) {
         editor.focus();

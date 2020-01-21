@@ -38,9 +38,9 @@ const reducers = {
             }
         },
         [ActionType.IMPORT_FILE]: (s: StatusState, a: Action<string>) => {
-            return {...s, loading: false}
+            return {...s, loading: false, lastError: null}
         },
-        [ActionType.COMPILE_FAIL]: (s: StatusState, a: Action<string>) => {
+        [ActionType.ERROR]: (s: StatusState, a: Action<string>) => {
             return {...s, loading: false, lastError: a.payload}
         },
         [ActionType.LOADING]: (s: StatusState, a: Action<string>) => {

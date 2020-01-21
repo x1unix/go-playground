@@ -8,7 +8,7 @@ import {
     formatFileDispatcher,
     runFileDispatcher,
     saveFileDispatcher,
-    dispatchToggleTheme
+    dispatchToggleTheme, shareSnippetDispatcher
 } from './store';
 
 @Connect(s => ({darkMode: s.settings.darkMode, loading: s.status?.loading}))
@@ -62,7 +62,9 @@ export class Header extends React.Component<any> {
                 text: 'Share',
                 iconProps: {iconName: 'Share'},
                 disabled: this.props.loading,
-                onClick: () => alert('Work in progress 🐨')
+                onClick: () => {
+                    this.props.dispatch(shareSnippetDispatcher);
+                }
             },
             {
                 key: 'download',

@@ -4,8 +4,8 @@ export enum ActionType {
     IMPORT_FILE     = 'IMPORT_FILE',
     FILE_CHANGE     = 'FILE_CHANGE',
     LOADING         = 'LOADING',
+    ERROR           = 'ERROR',
     COMPILE_RESULT  = 'COMPILE_RESULT',
-    COMPILE_FAIL    = 'COMPILE_FAIL',
     TOGGLE_THEME    = 'TOGGLE_THEME'
 }
 
@@ -37,9 +37,9 @@ export const newBuildResultAction = (resp: CompilerResponse) =>
         payload: resp,
     });
 
-export const newBuildErrorAction = (err: string) =>
+export const newErrorAction = (err: string) =>
     ({
-        type: ActionType.COMPILE_FAIL,
+        type: ActionType.ERROR,
         payload: err,
     });
 
