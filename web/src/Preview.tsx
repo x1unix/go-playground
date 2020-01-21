@@ -1,7 +1,7 @@
 import React from 'react';
 import './Preview.css';
 import { EDITOR_FONTS } from './editor/props';
-import { Connect } from './store/state';
+import { Connect } from './store';
 import {EvalEvent} from './services/api';
 import EvalEventView from './EvalEventView';
 import { getTheme } from '@uifabric/styling';
@@ -11,7 +11,7 @@ interface PreviewProps {
     events?: EvalEvent[]
 }
 
-@Connect(s => ({lastError: s.lastError, events: s.events, darkMode: s.darkMode}))
+@Connect(s => ({darkMode: s.settings.darkMode, ...s.status}))
 export default class Preview extends React.Component<PreviewProps> {
     get styles() {
         const { palette } = getTheme();

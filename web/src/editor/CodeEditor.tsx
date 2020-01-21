@@ -1,8 +1,7 @@
 import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import {editor} from 'monaco-editor';
-import { Connect } from '../store/state';
-import { dispatchFileChange } from '../store';
+import { Connect, newFileChangeAction } from '../store';
 // import { connect } from 'react-redux';
 
 import { DEFAULT_EDITOR_OPTIONS, LANGUAGE_GOLANG } from './props';
@@ -11,14 +10,14 @@ interface CodeEditorState {
     code?: string
 }
 
-@Connect(s => ({code: s.code, darkMode: s.darkMode}))
-export default class CodeEditor extends React.Component<{code?: string, darkMode?: boolean}, CodeEditorState> {
+@Connect(s => ({code: s.editor.code, darkMode: s.settings.darkMode}))
+export default class CodeEditor extends React.Component<any, CodeEditorState> {
     editorDidMount(editor: editor.IStandaloneCodeEditor, monaco: any) {
         editor.focus();
     }
 
     onChange(newValue: string, e: editor.IModelContentChangedEvent) {
-        dispatchFileChange(newValue);
+        this.props.dispatch(newFileChangeAction(newValue));
     }
 
     render() {

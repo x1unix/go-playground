@@ -1,30 +1,30 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { loadTheme } from '@uifabric/styling';
-import {Fabric} from 'office-ui-fabric-react/lib/Fabric'
+import {Fabric} from 'office-ui-fabric-react/lib/Fabric';
+import { ConnectedRouter } from 'connected-react-router';
+import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 
-import { store } from './store';
-import { Header } from './Header';
-import { LightTheme, DarkTheme } from './services/colors';
-import CodeEditor from './editor/CodeEditor';
+import { configureStore } from './store';
+import { history } from './store/configure';
+import Playground from './Playground';
 import './App.css';
-import Preview from './Preview';
+import config from './services/config'
 
-const changeFabricTheme = () => {
-    const { darkMode } = store.getState();
-    loadTheme(darkMode ? DarkTheme : LightTheme);
-};
-store.subscribe(changeFabricTheme);
-changeFabricTheme();
+const store = configureStore();
+config.sync();
 
 function App() {
   return (
     <Provider store={store}>
-        <Fabric className="App">
-            <Header/>
-            <CodeEditor />
-            <Preview />
-        </Fabric>
+        <ConnectedRouter history={history}>
+            <Fabric className="App">
+                <Router>
+                    <Switch>
+                        <Route path="/" component={Playground} />
+                    </Switch>
+                </Router>
+            </Fabric>
+        </ConnectedRouter>
     </Provider>
   );
 }
