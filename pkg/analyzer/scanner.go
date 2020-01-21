@@ -79,7 +79,7 @@ func (p *PackageScanner) appendFunc(fn *ast.FuncDecl, dest *SymbolIndex) {
 func (p *PackageScanner) Scan() (PackageSummary, error) {
 	sum := NewPackageSummary()
 	set := token.NewFileSet()
-	packs, err := parser.ParseDir(set, p.path, nil, 0)
+	packs, err := parser.ParseDir(set, p.path, nil, parser.ParseComments)
 	if err != nil {
 		return sum, err
 	}
