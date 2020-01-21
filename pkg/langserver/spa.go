@@ -42,7 +42,7 @@ func (fs *spaFileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	f, err := os.Open(name)
 	if err != nil {
 		if os.IsNotExist(err) {
-			Errorf(http.StatusNotFound, "Not Found").Write(w)
+			http.ServeFile(w, r, string(fs.root)+"/index.html")
 			return
 		}
 	}
