@@ -10,7 +10,7 @@ func formatFieldAndType(t ast.Expr, id *ast.Ident) string {
 	return id.String() + " " + typeStr
 }
 
-func formatFuncParams(params *ast.FieldList) (string, int) {
+func formatFieldsList(params *ast.FieldList, joinChar string) (string, int) {
 	if params == nil {
 		return "", 0
 	}
@@ -30,7 +30,7 @@ func formatFuncParams(params *ast.FieldList) (string, int) {
 		}
 	}
 
-	return strings.Join(fieldTypePair, ", "), paramsLen
+	return strings.Join(fieldTypePair, joinChar), paramsLen
 }
 
 func valSpecToItem(isConst bool, v *ast.ValueSpec, withPrivate bool) []*CompletionItem {
@@ -61,6 +61,22 @@ func valSpecToItem(isConst bool, v *ast.ValueSpec, withPrivate bool) []*Completi
 	return items
 }
 
+func funcToString(fn *ast.FuncType) string {
+	params, _ := formatFieldsList(fn.Params, ", ")
+	str := "func(" + params + ")"
+	returns, retCount := formatFieldsList(fn.Results, ", ")
+	switch retCount {
+	case 0:
+		break
+	case 1:
+		str += " " + returns
+	default:
+		str += " (" + returns + ")"
+	}
+
+	return str
+}
+
 func funcToItem(fn *ast.FuncDecl) *CompletionItem {
 	ci := &CompletionItem{
 		Label:         fn.Name.String(),
@@ -68,19 +84,7 @@ func funcToItem(fn *ast.FuncDecl) *CompletionItem {
 		Documentation: fn.Doc.Text(),
 	}
 
-	params, _ := formatFuncParams(fn.Type.Params)
-	ci.Detail = "func(" + params + ")"
-	ci.InsertText = ci.Label + "(" + params + ")"
-
-	returns, retCount := formatFuncParams(fn.Type.Results)
-	switch retCount {
-	case 0:
-		break
-	case 1:
-		ci.Detail += " " + returns
-	default:
-		ci.Detail += " (" + returns + ")"
-	}
-
+	ci.Detail = funcToString(fn.Type)
+	ci.InsertText = ci.Label + "()"
 	return ci
 }
