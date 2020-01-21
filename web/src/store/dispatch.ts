@@ -9,6 +9,7 @@ import {
 import {State} from "./state";
 import client from '../services/api';
 import config from '../services/config';
+import {DEMO_CODE} from '../editor/props';
 
 type StateProvider = () => State
 type DispatchFn = (Action) => any
@@ -33,6 +34,24 @@ export function newImportFileDispatcher(f: File): Dispatcher {
 
         reader.readAsText(f, 'UTF-8');
     };
+}
+
+export function newSnippetLoadDispatcher(snippetID: string): Dispatcher {
+    return async(dispatch: DispatchFn, getState: StateProvider) => {
+        console.log('load snippet %s', snippetID);
+        if (!snippetID) {
+            dispatch(newImportFileAction('prog.go', DEMO_CODE));
+            return;
+        }
+
+        try {
+            const resp = await client.getSnippet(snippetID);
+            const { fileName, code } = resp;
+            dispatch(newImportFileAction(fileName, code));
+        } catch(err) {
+            dispatch(newBuildErrorAction(err.message));
+        }
+    }
 }
 
 export const saveFileDispatcher: Dispatcher =

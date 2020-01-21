@@ -26,20 +26,15 @@ export default class Preview extends React.Component<PreviewProps> {
         }
     }
 
-    get progressStyles() {
+    get progressClass() {
         return this.props.loading ? 'app-preview__progress' : 'app-preview__progress--hidden';
-        // return {
-        //     display: this.props.loading ? 'block' : 'none',
-        //     position: 'relative',
-        //     bottom: '8px',
-        // }
     }
 
     render() {
         let content;
         if (this.props.lastError) {
             content = <MessageBar messageBarType={MessageBarType.error} isMultiline={true}>
-                <b className='app-preview__label'>Build failed</b>
+                <b className='app-preview__label'>Error</b>
                 <pre className='app-preview__errors'>
                     {this.props.lastError}
                 </pre>
@@ -58,7 +53,7 @@ export default class Preview extends React.Component<PreviewProps> {
         }
 
         return <div className="app-preview" style={this.styles}>
-            <ProgressIndicator className={this.progressStyles}/>
+            <ProgressIndicator className={this.progressClass}/>
             <div className='app-preview__content'>
                 {content}
             </div>

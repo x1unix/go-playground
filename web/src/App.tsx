@@ -20,7 +20,10 @@ function App() {
             <Fabric className="App">
                 <Router>
                     <Switch>
-                        <Route path="/" component={Playground} />
+                        <Route
+                            path="/(snippet)?/:snippetID?"
+                            component={Playground}
+                        />
                     </Switch>
                 </Router>
             </Fabric>

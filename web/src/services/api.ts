@@ -6,6 +6,11 @@ const apiAddress = process.env['REACT_APP_LANG_SERVER'] ?? window.location.origi
 
 let axiosClient = axios.default.create({baseURL: `${apiAddress}/api`});
 
+export interface Snippet {
+    fileName: string
+    code: string
+}
+
 export interface EvalEvent {
     Message: string
     Kind: string
@@ -22,6 +27,7 @@ export interface IAPIClient {
     getSuggestions(query: {packageName?: string, value?:string}): Promise<monaco.languages.CompletionList>
     evaluateCode(code: string): Promise<CompilerResponse>
     formatCode(code: string): Promise<CompilerResponse>
+    getSnippet(id: string): Promise<Snippet>
 }
 
 class Client implements IAPIClient {
@@ -42,6 +48,10 @@ class Client implements IAPIClient {
 
     async formatCode(code: string): Promise<CompilerResponse> {
         return this.post<CompilerResponse>('/format', code);
+    }
+
+    async getSnippet(id: string): Promise<Snippet> {
+        return this.get<Snippet>(`/snippet/${id}`);
     }
 
     private async get<T>(uri: string): Promise<T> {

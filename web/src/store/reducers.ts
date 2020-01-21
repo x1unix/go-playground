@@ -2,7 +2,6 @@ import { connectRouter } from 'connected-react-router';
 import { combineReducers } from 'redux';
 
 import {Action, ActionType, FileImportArgs} from './actions';
-import {DEMO_CODE} from '../editor/props';
 import {EditorState, SettingsState, State, StatusState} from './state';
 import { CompilerResponse } from '../services/api';
 import localConfig from '../services/config'
@@ -29,7 +28,7 @@ const reducers = {
 
             return s;
         },
-    }, {fileName: 'main.go', code: DEMO_CODE}),
+    }, {fileName: 'main.go', code: ''}),
     status: mapByAction<StatusState>({
         [ActionType.COMPILE_RESULT]: (s: StatusState, a: Action<CompilerResponse>) => {
             return {
@@ -37,6 +36,9 @@ const reducers = {
                 lastError: null,
                 events: a.payload.events,
             }
+        },
+        [ActionType.IMPORT_FILE]: (s: StatusState, a: Action<string>) => {
+            return {...s, loading: false}
         },
         [ActionType.COMPILE_FAIL]: (s: StatusState, a: Action<string>) => {
             return {...s, loading: false, lastError: a.payload}
@@ -56,11 +58,11 @@ const reducers = {
 
 export const getInitialState = (): State => ({
     status: {
-        loading: false
+        loading: true
     },
     editor: {
         fileName: 'prog.go',
-        code: DEMO_CODE
+        code: ''
     },
     settings: {
         darkMode: localConfig.darkThemeEnabled
