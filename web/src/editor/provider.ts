@@ -15,28 +15,28 @@ const COMPL_REGEXP = /([a-zA-Z0-9_]+)(\.([A-Za-z0-9_]+))?$/;
 const R_GROUP_PKG = 1;
 const R_GROUP_METHOD = 3;
 
+const parseExpression = (expr: string) => {
+    COMPL_REGEXP.lastIndex = 0; // Reset regex state
+    const m = COMPL_REGEXP.exec(expr);
+    if (!m) {
+        return null;
+    }
+
+    const varName = m[R_GROUP_PKG];
+    const propValue = m[R_GROUP_METHOD];
+
+    if (!propValue) {
+        return {value: varName};
+    }
+
+    return {
+        packageName: varName,
+        value: propValue
+    };
+};
+
 class GoCompletionItemProvider implements monaco.languages.CompletionItemProvider {
     constructor(private client: IAPIClient) {}
-
-    private parseExpression(expr: string) {
-        COMPL_REGEXP.lastIndex = 0; // Reset regex state
-        const m = COMPL_REGEXP.exec(expr);
-        if (!m) {
-            return null;
-        }
-
-        const varName = m[R_GROUP_PKG];
-        const propValue = m[R_GROUP_METHOD];
-
-        if (!propValue) {
-            return {value: varName};
-        }
-
-        return {
-            packageName: varName,
-            value: propValue
-        };
-    }
 
     async provideCompletionItems(model: ITextModel, position: Position, context: CompletionContext, token: CancellationToken): Promise<CompletionList> {
         const val = model.getValueInRange({
@@ -46,7 +46,7 @@ class GoCompletionItemProvider implements monaco.languages.CompletionItemProvide
             endColumn: position.column,
         }).trim();
 
-        const query = this.parseExpression(val);
+        const query = parseExpression(val);
         if (!query) {
             return Promise.resolve({suggestions: []});
         }
