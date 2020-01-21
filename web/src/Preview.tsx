@@ -26,8 +26,11 @@ export default class Preview extends React.Component<PreviewProps> {
     render() {
         let content;
         if (this.props.lastError) {
-            content = <MessageBar messageBarType={MessageBarType.error} isMultiline={false}>
-                <b>Build failed:</b> {this.props.lastError}
+            content = <MessageBar messageBarType={MessageBarType.error} isMultiline={true}>
+                <b className='app-preview__label'>Build failed</b>
+                <pre className='app-preview__errors'>
+                    {this.props.lastError}
+                </pre>
             </MessageBar>
         } else if (this.props.events) {
             content = this.props.events.map((e, k) => <EvalEventView
