@@ -1,6 +1,5 @@
 DOCKERFILE ?= ./build/Dockerfile
 IMG_NAME ?= x1unix/go-playground
-TAG ?= 1.0.0
 
 .PHONY: docker
 docker: docker-login docker-make-image
@@ -20,5 +19,8 @@ docker-login:
 
 .PHONY: docker-make-image
 docker-make-image:
+	@if [ -z "$(TAG)" ]; then\
+		echo "required parameter TAG is undefined" && exit 1; \
+	fi;
 	@echo "- Building '$(IMG_NAME):latest' $(TAG)..."
 	docker image build -t $(IMG_NAME):latest -t $(IMG_NAME):$(TAG) -f $(DOCKERFILE) .

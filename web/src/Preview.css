@@ -4,6 +4,9 @@
     max-height: 640px;
     height: 50%;
     box-sizing: border-box;
+}
+
+.app-preview__content {
     padding: 15px;
     font-size: 10pt;
 }
@@ -16,4 +19,29 @@
 .app-preview__epilogue {
     color: #999;
     margin-top: 15px;
+}
+
+.app-preview__build-error {
+    margin: 0 0 5px;
+}
+
+.app-preview__label {
+    display: block;
+    margin-bottom: 2px;
+}
+
+.app-preview__errors {
+    margin: 0;
+    padding: 0;
+    font: inherit;
+}
+
+.app-preview__progress {
+    position: relative;
+    bottom: 8px;
+    margin-bottom: -18px;
+}
+
+.app-preview__progress--hidden {
+    display: none;
 }

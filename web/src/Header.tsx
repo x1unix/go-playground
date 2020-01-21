@@ -1,18 +1,18 @@
 import React from 'react';
 import './Header.css'
 import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/CommandBar';
-import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
-import * as actions from './editor/actions';
-import { Connect, dispatchToggleTheme } from './store';
 import { getTheme } from '@uifabric/styling';
+import {
+    Connect,
+    newImportFileDispatcher,
+    formatFileDispatcher,
+    runFileDispatcher,
+    saveFileDispatcher,
+    dispatchToggleTheme, shareSnippetDispatcher
+} from './store';
 
-
-interface HeaderState {
-    loading: boolean
-}
-
-@Connect(s => ({darkMode: s.darkMode}))
-export class Header extends React.Component<{darkMode?: boolean}, HeaderState> {
+@Connect(s => ({darkMode: s.settings.darkMode, loading: s.status?.loading}))
+export class Header extends React.Component<any> {
     private fileInput?: HTMLInputElement;
 
     constructor(props) {
@@ -29,22 +29,13 @@ export class Header extends React.Component<{darkMode?: boolean}, HeaderState> {
         this.fileInput = fileElement;
     }
 
-    async onItemSelect() {
+    onItemSelect() {
         const file = this.fileInput?.files?.item(0);
         if (!file) {
             return;
         }
 
-        try {
-            await actions.loadFile(file);
-        } catch (err) {
-            console.error(err);
-        }
-    }
-
-    onFileSave() {
-        actions.saveEditorContents()
-            .catch(err => console.error('failed to save file: %s', err))
+        this.props.dispatch(newImportFileDispatcher(file));
     }
 
     get menuItems(): ICommandBarItemProps[] {
@@ -53,20 +44,35 @@ export class Header extends React.Component<{darkMode?: boolean}, HeaderState> {
                 key: 'openFile',
                 text: 'Open',
                 iconProps: {iconName: 'OpenFile'},
+                disabled: this.props.loading,
                 onClick: () => this.fileInput?.click(),
+            },
+            {
+                key: 'run',
+                text: 'Run',
+                ariaLabel: 'Run',
+                iconProps: {iconName: 'Play'},
+                disabled: this.props.loading,
+                onClick: () => {
+                    this.props.dispatch(runFileDispatcher);
+                }
             },
             {
                 key: 'share',
                 text: 'Share',
                 iconProps: {iconName: 'Share'},
-                onClick: () => alert('Work in progress 🐨')
+                disabled: this.props.loading,
+                onClick: () => {
+                    this.props.dispatch(shareSnippetDispatcher);
+                }
             },
             {
                 key: 'download',
                 text: 'Download',
                 iconProps: {iconName: 'Download'},
+                disabled: this.props.loading,
                 onClick: () => {
-                    this.onFileSave();
+                    this.props.dispatch(saveFileDispatcher);
                 },
             }
         ];
@@ -75,29 +81,14 @@ export class Header extends React.Component<{darkMode?: boolean}, HeaderState> {
     get asideItems(): ICommandBarItemProps[] {
         return [
             {
-                key: 'run',
-                text: 'Run',
-                ariaLabel: 'Run',
-                iconOnly: true,
-                iconProps: {iconName: 'Play'},
-                disabled: this.state.loading,
-                onClick: () => {
-                    this.setState({loading: true});
-                    actions.buildAndRun()
-                        .finally(() => this.setState({loading: false}));
-                }
-            },
-            {
                 key: 'format',
                 text: 'Format',
                 ariaLabel: 'Format',
                 iconOnly: true,
-                disabled: this.state.loading,
+                disabled: this.props.loading,
                 iconProps: {iconName: 'Code'},
                 onClick: () => {
-                    this.setState({loading: true});
-                    actions.reformatCode()
-                        .finally(() => this.setState({loading: false}));
+                    this.props.dispatch(formatFileDispatcher);
                 }
             },
             {
@@ -107,7 +98,7 @@ export class Header extends React.Component<{darkMode?: boolean}, HeaderState> {
                 iconOnly: true,
                 iconProps: {iconName: this.props.darkMode ? 'Brightness' : 'ClearNight'},
                 onClick: () => {
-                    dispatchToggleTheme();
+                    this.props.dispatch(dispatchToggleTheme)
                 },
             }
         ];
@@ -124,20 +115,16 @@ export class Header extends React.Component<{darkMode?: boolean}, HeaderState> {
     render() {
         return <header className='header' style={this.styles}>
             <img
-                src='go-logo-blue.svg'
+                src='/go-logo-blue.svg'
                 className='header__logo'
                 alt='Golang Logo'
             />
-            {this.state.loading ? (
-                <Spinner size={SpinnerSize.large} className="header__preloader" />
-            ) : (
-                <CommandBar
-                    className='header__commandBar'
-                    items={this.menuItems}
-                    farItems={this.asideItems}
-                    ariaLabel='CodeEditor menu'
-                />
-            )}
+            <CommandBar
+                className='header__commandBar'
+                items={this.menuItems}
+                farItems={this.asideItems}
+                ariaLabel='CodeEditor menu'
+            />
         </header>;
     }
 }

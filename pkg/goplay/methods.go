@@ -5,8 +5,59 @@ import (
 	"encoding/json"
 	"fmt"
 	"go.uber.org/zap"
+	"io"
+	"io/ioutil"
+	"net/http"
 	"net/url"
 )
+
+type lener interface {
+	Len() int
+}
+
+func ValidateContentLength(r lener) error {
+	if r.Len() > maxSnippetSize {
+		return ErrSnippetTooLarge
+	}
+
+	return nil
+}
+
+func GetSnippet(ctx context.Context, snippetID string) (*Snippet, error) {
+	fileName := snippetID + ".go"
+	resp, err := getRequest(ctx, "p/"+fileName)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	switch resp.StatusCode {
+	case http.StatusOK:
+		snippet, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		return &Snippet{
+			FileName: fileName,
+			Contents: string(snippet),
+		}, nil
+	case http.StatusNotFound:
+		return nil, ErrSnippetNotFound
+	default:
+		return nil, fmt.Errorf("error from Go Playground server - %d %s", resp.StatusCode, resp.Status)
+	}
+}
+
+func Share(ctx context.Context, src io.Reader) (string, error) {
+	resp, err := doRequest(ctx, http.MethodPost, "share", "text/plain", src)
+	if err != nil {
+		return "", err
+	}
+
+	shareID := string(resp)
+	return shareID, nil
+}
 
 func GoImports(ctx context.Context, src []byte) (*FmtResponse, error) {
 	form := url.Values{}

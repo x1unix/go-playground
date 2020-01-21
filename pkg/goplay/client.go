@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"go.uber.org/zap"
 	"io"
 	"net/http"
 	"net/url"
@@ -22,29 +21,47 @@ const (
 
 var ErrSnippetTooLarge = fmt.Errorf("code snippet too large (max %d bytes)", maxSnippetSize)
 
+func newRequest(ctx context.Context, method, queryPath string, body io.Reader) (*http.Request, error) {
+	uri := goPlayURL + "/" + queryPath
+	req, err := http.NewRequestWithContext(ctx, method, uri, body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("User-Agent", userAgent)
+	return req, nil
+}
+
+func getRequest(ctx context.Context, queryPath string) (*http.Response, error) {
+	req, err := newRequest(ctx, http.MethodGet, queryPath, nil)
+	if err != nil {
+		return nil, nil
+	}
+
+	return http.DefaultClient.Do(req)
+}
+
 func doRequest(ctx context.Context, method, url, contentType string, body io.Reader) ([]byte, error) {
-	url = goPlayURL + "/" + url
-	zap.S().Debug("doRequest ", url)
-	req, err := http.NewRequestWithContext(ctx, method, url, body)
+	req, err := newRequest(ctx, method, url, body)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Add("Content-Type", contentType)
-	req.Header.Add("User-Agent", userAgent)
 	response, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
-	var bodyBytes bytes.Buffer
-	_, err = io.Copy(&bodyBytes, io.LimitReader(response.Body, maxSnippetSize+1))
+	bodyBytes := &bytes.Buffer{}
+	_, err = io.Copy(bodyBytes, io.LimitReader(response.Body, maxSnippetSize+1))
 	defer response.Body.Close()
 	if err != nil {
 		return nil, err
 	}
-	if bodyBytes.Len() > maxSnippetSize {
-		return nil, ErrSnippetTooLarge
+	if err = ValidateContentLength(bodyBytes); err != nil {
+		return nil, err
 	}
+
 	return bodyBytes.Bytes(), nil
 }
 

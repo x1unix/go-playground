@@ -1,4 +1,11 @@
+import {loadTheme} from '@uifabric/styling';
+import {DarkTheme, LightTheme} from "./colors";
+
 const DARK_THEME_KEY = 'ui.darkTheme.enabled';
+
+function setThemeStyles(isDark: boolean) {
+    loadTheme(isDark ? DarkTheme : LightTheme);
+}
 
 export default {
     get darkThemeEnabled(): boolean {
@@ -6,7 +13,11 @@ export default {
         return v === 'true';
     },
 
-    set darkThemeEnabled(val: boolean) {
-      localStorage.setItem(DARK_THEME_KEY, val ? 'true' : 'false');
+    set darkThemeEnabled(enable: boolean) {
+        setThemeStyles(enable);
+        localStorage.setItem(DARK_THEME_KEY, enable ? 'true' : 'false');
+    },
+    sync() {
+        setThemeStyles(this.darkThemeEnabled);
     }
 };

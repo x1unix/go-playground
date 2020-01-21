@@ -1,55 +1,75 @@
+import { connectRouter } from 'connected-react-router';
+import { combineReducers } from 'redux';
+
 import {Action, ActionType, FileImportArgs} from './actions';
-import {DEMO_CODE} from "../editor/props";
-import {State} from "./state";
+import {EditorState, SettingsState, State, StatusState} from './state';
 import { CompilerResponse } from '../services/api';
 import localConfig from '../services/config'
+import {mapByAction} from './helpers';
 
-const initialState = {
-    fileName: 'main.go',
-    code: DEMO_CODE,
-    darkMode: localConfig.darkThemeEnabled
-};
+const reducers = {
+    editor: mapByAction<EditorState>({
+        [ActionType.FILE_CHANGE]: (s: EditorState, a: Action<string>) => {
+            s.code = a.payload;
+            return s;
+        },
+        [ActionType.IMPORT_FILE]: (s: EditorState, a: Action<FileImportArgs>) => {
+            const {contents, fileName} = a.payload;
+            console.log('Loaded file "%s"', fileName);
+            return {
+                code: contents,
+                fileName,
+            };
+        },
+        [ActionType.COMPILE_RESULT]: (s: EditorState, a: Action<CompilerResponse>) => {
+            if (a.payload.formatted) {
+                s.code = a.payload.formatted;
+            }
 
-type Reducer<T> = (s: State, a: Action<T>) => State;
-
-const reducers: {[k in ActionType]: Reducer<any>} = {
-    [ActionType.FILE_CHANGE]: (s: State, a: Action<string>) => {
-        s.code = a.payload;
-        return s;
-    },
-    [ActionType.IMPORT_FILE]: (s: State, a: Action<FileImportArgs>) => {
-        console.log('Loaded file "%s"', a.payload.fileName);
-        s.code = a.payload.contents;
-        s.fileName = a.payload.fileName;
-        return s;
-    },
-    [ActionType.COMPILE_RESULT]: (s: State, a: Action<CompilerResponse>) => {
-        s.lastError = null;
-        s.events = a.payload.events;
-
-        if (a.payload.formatted) {
-            s.code = a.payload.formatted;
+            return s;
+        },
+    }, {fileName: 'main.go', code: ''}),
+    status: mapByAction<StatusState>({
+        [ActionType.COMPILE_RESULT]: (s: StatusState, a: Action<CompilerResponse>) => {
+            return {
+                loading: false,
+                lastError: null,
+                events: a.payload.events,
+            }
+        },
+        [ActionType.IMPORT_FILE]: (s: StatusState, a: Action<string>) => {
+            return {...s, loading: false, lastError: null}
+        },
+        [ActionType.ERROR]: (s: StatusState, a: Action<string>) => {
+            return {...s, loading: false, lastError: a.payload}
+        },
+        [ActionType.LOADING]: (s: StatusState, a: Action<string>) => {
+            return {...s, loading: true}
+        },
+    }, {loading: false}),
+    settings: mapByAction<SettingsState>({
+        [ActionType.TOGGLE_THEME]: (s: SettingsState, a: Action) => {
+            s.darkMode = !s.darkMode;
+            localConfig.darkThemeEnabled = s.darkMode;
+            return s;
         }
-
-        return s;
-    },
-    [ActionType.COMPILE_FAIL]: (s: State, a: Action<string>) => {
-        s.lastError = a.payload;
-        return s
-    },
-    [ActionType.TOGGLE_THEME]: (s: State, a: Action) => {
-        s.darkMode = !s.darkMode;
-        localConfig.darkThemeEnabled = s.darkMode;
-        return s;
-    },
+    }, {darkMode: localConfig.darkThemeEnabled})
 };
 
-export function rootReducer(state = initialState, action: Action) {
-    const newState = Object.assign({}, state) as State;
-    const r = reducers[action.type];
-    if (!r) {
-        return newState;
-    }
+export const getInitialState = (): State => ({
+    status: {
+        loading: true
+    },
+    editor: {
+        fileName: 'prog.go',
+        code: ''
+    },
+    settings: {
+        darkMode: localConfig.darkThemeEnabled
+    },
+});
 
-    return reducers[action.type](newState, action);
-}
+export const createRootReducer = history => combineReducers({
+    router: connectRouter(history),
+    ...reducers,
+});

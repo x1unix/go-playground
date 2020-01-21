@@ -27,6 +27,8 @@ func (s *Service) Mount(r *mux.Router) {
 	r.Path("/suggest").HandlerFunc(s.GetSuggestion)
 	r.Path("/compile").Methods(http.MethodPost).HandlerFunc(s.Compile)
 	r.Path("/format").Methods(http.MethodPost).HandlerFunc(s.FormatCode)
+	r.Path("/share").Methods(http.MethodPost).HandlerFunc(s.Share)
+	r.Path("/snippet/{id}").Methods(http.MethodGet).HandlerFunc(s.GetSnippet)
 }
 
 func (s *Service) lookupBuiltin(val string) (*SuggestionsResponse, error) {
@@ -107,7 +109,7 @@ func (s *Service) goImportsCode(w http.ResponseWriter, r *http.Request) ([]byte,
 	}
 
 	if err = resp.HasError(); err != nil {
-		Errorf(http.StatusBadRequest, err.Error())
+		Errorf(http.StatusBadRequest, err.Error()).Write(w)
 		return nil, err, false
 	}
 
@@ -118,6 +120,10 @@ func (s *Service) goImportsCode(w http.ResponseWriter, r *http.Request) ([]byte,
 func (s *Service) FormatCode(w http.ResponseWriter, r *http.Request) {
 	code, err, _ := s.goImportsCode(w, r)
 	if err != nil {
+		if goplay.IsCompileError(err) {
+			return
+		}
+
 		s.log.Error(err)
 		return
 	}
@@ -125,9 +131,53 @@ func (s *Service) FormatCode(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, CompilerResponse{Formatted: string(code)})
 }
 
+func (s *Service) Share(w http.ResponseWriter, r *http.Request) {
+	shareID, err := goplay.Share(r.Context(), r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		if err == goplay.ErrSnippetTooLarge {
+			Errorf(http.StatusRequestEntityTooLarge, err.Error()).Write(w)
+			return
+		}
+
+		s.log.Error("failed to share code: ", err)
+		NewErrorResponse(err).Write(w)
+	}
+
+	WriteJSON(w, ShareResponse{SnippetID: shareID})
+}
+
+func (s *Service) GetSnippet(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	snippetID := vars["id"]
+	snippet, err := goplay.GetSnippet(r.Context(), snippetID)
+	if err != nil {
+		if err == goplay.ErrSnippetNotFound {
+			Errorf(http.StatusNotFound, "snippet %q not found", snippetID).Write(w)
+			return
+		}
+
+		s.log.Errorw("failed to get snippet",
+			"snippetID", snippetID,
+			"err", err,
+		)
+		NewErrorResponse(err).Write(w)
+		return
+	}
+
+	WriteJSON(w, SnippetResponse{
+		FileName: snippet.FileName,
+		Code:     snippet.Contents,
+	})
+}
+
 func (s *Service) Compile(w http.ResponseWriter, r *http.Request) {
 	src, err, changed := s.goImportsCode(w, r)
 	if err != nil {
+		if goplay.IsCompileError(err) {
+			return
+		}
+
 		s.log.Error(err)
 		return
 	}
@@ -149,6 +199,6 @@ func (s *Service) Compile(w http.ResponseWriter, r *http.Request) {
 		result.Formatted = string(src)
 	}
 
-	s.log.Debugw("resp from compiler", "res", res)
+	s.log.Debugw("response from compiler", "res", res)
 	WriteJSON(w, result)
 }

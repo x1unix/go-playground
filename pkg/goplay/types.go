@@ -5,6 +5,12 @@ import (
 	"time"
 )
 
+// Snippet represents shared snippet
+type Snippet struct {
+	FileName string
+	Contents string
+}
+
 // FmtResponse is the response returned from
 // upstream play.golang.org/fmt request
 type FmtResponse struct {
@@ -17,7 +23,7 @@ func (r *FmtResponse) HasError() error {
 		return nil
 	}
 
-	return errors.New(r.Error)
+	return CompileFailedError{msg: r.Error}
 }
 
 // CompileEvent represents individual

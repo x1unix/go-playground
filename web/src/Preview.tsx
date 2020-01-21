@@ -1,17 +1,21 @@
 import React from 'react';
 import './Preview.css';
 import { EDITOR_FONTS } from './editor/props';
-import { Connect } from './store/state';
+import { Connect } from './store';
 import {EvalEvent} from './services/api';
 import EvalEventView from './EvalEventView';
 import { getTheme } from '@uifabric/styling';
+import { MessageBar, MessageBarType } from 'office-ui-fabric-react';
+import {ProgressIndicator} from "office-ui-fabric-react/lib/ProgressIndicator";
+
 
 interface PreviewProps {
     lastError?:string | null;
     events?: EvalEvent[]
+    loading?: boolean
 }
 
-@Connect(s => ({lastError: s.lastError, events: s.events, darkMode: s.darkMode}))
+@Connect(s => ({darkMode: s.settings.darkMode, ...s.status}))
 export default class Preview extends React.Component<PreviewProps> {
     get styles() {
         const { palette } = getTheme();
@@ -21,10 +25,20 @@ export default class Preview extends React.Component<PreviewProps> {
             fontFamily: EDITOR_FONTS
         }
     }
+
+    get progressClass() {
+        return this.props.loading ? 'app-preview__progress' : 'app-preview__progress--hidden';
+    }
+
     render() {
         let content;
         if (this.props.lastError) {
-            content = <span className="app-preview__error">{this.props.lastError}</span>;
+            content = <MessageBar messageBarType={MessageBarType.error} isMultiline={true}>
+                <b className='app-preview__label'>Error</b>
+                <pre className='app-preview__errors'>
+                    {this.props.lastError}
+                </pre>
+            </MessageBar>
         } else if (this.props.events) {
             content = this.props.events.map((e, k) => <EvalEventView
                 key={k}
@@ -39,7 +53,10 @@ export default class Preview extends React.Component<PreviewProps> {
         }
 
         return <div className="app-preview" style={this.styles}>
-            {content}
+            <ProgressIndicator className={this.progressClass}/>
+            <div className='app-preview__content'>
+                {content}
+            </div>
         </div>;
     }
 }
