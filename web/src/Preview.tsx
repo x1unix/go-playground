@@ -6,11 +6,13 @@ import {EvalEvent} from './services/api';
 import EvalEventView from './EvalEventView';
 import { getTheme } from '@uifabric/styling';
 import { MessageBar, MessageBarType } from 'office-ui-fabric-react';
+import {ProgressIndicator} from "office-ui-fabric-react/lib/ProgressIndicator";
 
 
 interface PreviewProps {
     lastError?:string | null;
     events?: EvalEvent[]
+    loading?: boolean
 }
 
 @Connect(s => ({darkMode: s.settings.darkMode, ...s.status}))
@@ -23,6 +25,16 @@ export default class Preview extends React.Component<PreviewProps> {
             fontFamily: EDITOR_FONTS
         }
     }
+
+    get progressStyles() {
+        return this.props.loading ? 'app-preview__progress' : 'app-preview__progress--hidden';
+        // return {
+        //     display: this.props.loading ? 'block' : 'none',
+        //     position: 'relative',
+        //     bottom: '8px',
+        // }
+    }
+
     render() {
         let content;
         if (this.props.lastError) {
@@ -46,7 +58,10 @@ export default class Preview extends React.Component<PreviewProps> {
         }
 
         return <div className="app-preview" style={this.styles}>
-            {content}
+            <ProgressIndicator className={this.progressStyles}/>
+            <div className='app-preview__content'>
+                {content}
+            </div>
         </div>;
     }
 }

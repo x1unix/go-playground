@@ -1,7 +1,6 @@
 import React from 'react';
 import './Header.css'
 import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/CommandBar';
-import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { getTheme } from '@uifabric/styling';
 import {
     Connect,
@@ -45,6 +44,7 @@ export class Header extends React.Component<any> {
                 key: 'openFile',
                 text: 'Open',
                 iconProps: {iconName: 'OpenFile'},
+                disabled: this.props.loading,
                 onClick: () => this.fileInput?.click(),
             },
             {
@@ -61,12 +61,14 @@ export class Header extends React.Component<any> {
                 key: 'share',
                 text: 'Share',
                 iconProps: {iconName: 'Share'},
+                disabled: this.props.loading,
                 onClick: () => alert('Work in progress 🐨')
             },
             {
                 key: 'download',
                 text: 'Download',
                 iconProps: {iconName: 'Download'},
+                disabled: this.props.loading,
                 onClick: () => {
                     this.props.dispatch(saveFileDispatcher);
                 },
@@ -115,16 +117,12 @@ export class Header extends React.Component<any> {
                 className='header__logo'
                 alt='Golang Logo'
             />
-            {this.props.loading ? (
-                <Spinner size={SpinnerSize.large} className="header__preloader" />
-            ) : (
-                <CommandBar
-                    className='header__commandBar'
-                    items={this.menuItems}
-                    farItems={this.asideItems}
-                    ariaLabel='CodeEditor menu'
-                />
-            )}
+            <CommandBar
+                className='header__commandBar'
+                items={this.menuItems}
+                farItems={this.asideItems}
+                ariaLabel='CodeEditor menu'
+            />
         </header>;
     }
 }
