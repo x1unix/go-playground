@@ -205,9 +205,6 @@ export default class SettingsModal extends React.Component<SettingsProps, {isOpe
                                     label="Auto format code before build"
                                     defaultChecked={this.props.settings?.autoFormat}
                                     onChange={(_, val) => {
-                                        if (!val) {
-                                            return;
-                                        }
                                         this.changes.args = {
                                             autoFormat: val ?? false,
                                             runtime: this.props.settings?.runtime ?? RuntimeType.GoPlayground,
