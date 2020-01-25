@@ -2,19 +2,18 @@
  * Client-side environment for Go WASM programs
  */
 
-import { encoder, decoder } from './foundation';
-import {FileDescriptor, IWriter} from './fs';
-import {DispatchFn} from '../../store/dispatch';
-import {newProgramWriteAction} from '../../store/actions';
+import {decoder} from './foundation';
+import {IWriter} from './fs';
 import {EvalEventKind} from "../api";
 
-export class ConsoleWriter {
-    outputBuf = '';
-    private dispatchFn?: DispatchFn;
+export interface ConsoleLogger {
+    log(eventType: EvalEventKind, message: string)
+}
 
-    setDispatchHook(fn: DispatchFn) {
-        this.dispatchFn = fn;
-    }
+export class StdioWrapper {
+    outputBuf = '';
+
+    constructor(private logger: ConsoleLogger) {}
 
     private getWriter(kind: EvalEventKind) {
         return {
@@ -23,10 +22,7 @@ export class ConsoleWriter {
                 const nl = this.outputBuf.lastIndexOf('\n');
                 if (nl != -1) {
                     const message = this.outputBuf.substr(0, nl);
-                    console.log(message);
-                    if (this.dispatchFn) {
-                        this.dispatchFn(newProgramWriteAction({Message: message, Kind: kind, Delay: 0}));
-                    }
+                    this.logger.log(kind, message);
                     this.outputBuf = this.outputBuf.substr(nl + 1);
                 }
                 return data.length;

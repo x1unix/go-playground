@@ -1,18 +1,19 @@
-import { FileSystem } from "./fs";
-import { ConsoleWriter } from "./stdio";
-import { encoder, decoder } from './foundation';
+import {IFileSystem} from "./fs";
+import {encoder, decoder} from './foundation';
 
 const MAX_UINT32 = 4294967296;
 const NAN_HEAD = 0x7FF80000;
 const MS_IN_NANO = 1000000;
+
+export interface Global extends Window {
+    fs: IFileSystem
+}
 
 export class Go {
     argv = ['js'];
     env: {[k: string]: string} = {};
     timeOrigin = Date.now() - performance.now();
     exited = false;
-    global: any;
-
     private pendingEvent: any = null;
     private scheduledTimeouts = new Map<number, any>();
     private nextCallbackTimeoutID = 1;
@@ -25,10 +26,7 @@ export class Go {
     private values: any[] = [];
     private refs = new Map();
 
-    constructor(private fs: FileSystem) {
-        this.global = window;
-        this.global.fs = fs;
-    }
+    constructor(private global: Global) {}
 
     get mem() {
         // The buffer may change when requesting more memory.
@@ -159,7 +157,7 @@ export class Go {
                 const fd = this.getInt64(sp + 8);
                 const p = this.getInt64(sp + 16);
                 const n = this.mem.getInt32(sp + 24, true);
-                this.fs.writeSync(fd, new Uint8Array(this.inst.exports.mem.buffer, p, n));
+                this.global.fs.writeSync(fd, new Uint8Array(this.inst.exports.mem.buffer, p, n));
             },
 
             // func nanotime() int64
@@ -298,7 +296,7 @@ export class Go {
 
             // func valueInstanceOf(v ref, t ref) bool
             "syscall/js.valueInstanceOf": (sp) => {
-                this.mem.setUint8(sp + 24, this.loadValue(sp + 8) instanceof this.loadValue(sp + 16));
+                this.mem.setUint8(sp + 24, Number(this.loadValue(sp + 8) instanceof this.loadValue(sp + 16)));
             },
 
             // func copyBytesToGo(dst []byte, src ref) (int, bool)
@@ -335,7 +333,7 @@ export class Go {
         },
     };
 
-    async run(instance: WebAssembly.Instance) {
+    public async run(instance: WebAssembly.Instance) {
         this.inst = instance;
         this.values = [ // TODO: garbage collection
             NaN,

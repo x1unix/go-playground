@@ -6,10 +6,10 @@ import {
     newImportFileAction,
     newLoadingAction,
     newToggleThemeAction,
-    Action
+    Action, newProgramWriteAction
 } from './actions';
 import {State} from "./state";
-import client from '../services/api';
+import client, {EvalEventKind} from '../services/api';
 import config from '../services/config';
 import {DEMO_CODE} from '../editor/props';
 
@@ -113,3 +113,20 @@ export const dispatchToggleTheme: Dispatcher =
         config.darkThemeEnabled = !darkMode;
         dispatch(newToggleThemeAction())
     };
+
+
+//////////////////////////////////
+//          Adapters            //
+//////////////////////////////////
+
+export const createGoConsoleAdapter = (dispatch: DispatchFn) =>
+    ({
+        log: (eventType: EvalEventKind, message: string) => {
+            console.log('%s:\t%s', eventType, message);
+            dispatch(newProgramWriteAction({
+                Kind: eventType,
+                Message: message,
+                Delay: 0,
+            }));
+        }
+    });

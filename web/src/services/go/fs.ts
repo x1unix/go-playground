@@ -5,6 +5,13 @@ export type FileDescriptor = number;
 export const STDOUT: FileDescriptor = 1;
 export const STDERR: FileDescriptor = 2;
 
+export interface IFileSystem {
+    writeSync(fd: FileDescriptor, buf: Uint8Array): number
+    write(fd: FileDescriptor, buf: Uint8Array, offset: number, length: number, position: number, callback: NodeCallback<number>)
+    open(path: string, flags, mode, callback)
+    fsync(fd, callback)
+}
+
 /**
  * IWriter is abstract writer interface
  */
@@ -14,9 +21,9 @@ export interface IWriter {
 }
 
 /**
- * FileSystem is wrapper class for FS simulation
+ * FileSystemWrapper is wrapper class for FS simulation
  */
-export class FileSystem {
+export class FileSystemWrapper {
     descriptors = new Map<FileDescriptor, IWriter>();
     readonly constants = {
         O_WRONLY: -1,
