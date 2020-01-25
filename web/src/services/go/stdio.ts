@@ -20,7 +20,7 @@ export class StdioWrapper {
             write: (data: Uint8Array) => {
                 this.outputBuf += decoder.decode(data);
                 const nl = this.outputBuf.lastIndexOf('\n');
-                if (nl != -1) {
+                if (nl !== -1) {
                     const message = this.outputBuf.substr(0, nl);
                     this.logger.log(kind, message);
                     this.outputBuf = this.outputBuf.substr(nl + 1);

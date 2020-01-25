@@ -167,7 +167,7 @@ export class Go {
 
             // func walltime() (sec int64, nsec int32)
             "runtime.walltime": (sp) => {
-                const msec = (new Date).getTime();
+                const msec = (new Date()).getTime();
                 this.setInt64(sp + 8, msec / 1000);
                 this.mem.setInt32(sp + 16, (msec % 1000) * MS_IN_NANO, true);
             },
