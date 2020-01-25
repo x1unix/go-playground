@@ -1,12 +1,15 @@
 import {CompilerResponse} from "../services/api";
+import {MonacoState, RuntimeType} from './state';
 
 export enum ActionType {
-    IMPORT_FILE     = 'IMPORT_FILE',
-    FILE_CHANGE     = 'FILE_CHANGE',
-    LOADING         = 'LOADING',
-    ERROR           = 'ERROR',
-    COMPILE_RESULT  = 'COMPILE_RESULT',
-    TOGGLE_THEME    = 'TOGGLE_THEME'
+    IMPORT_FILE             = 'IMPORT_FILE',
+    FILE_CHANGE             = 'FILE_CHANGE',
+    LOADING                 = 'LOADING',
+    ERROR                   = 'ERROR',
+    COMPILE_RESULT          = 'COMPILE_RESULT',
+    TOGGLE_THEME            = 'TOGGLE_THEME',
+    BUILD_PARAMS_CHANGE     = 'BUILD_PARAMS_CHANGE',
+    MONACO_SETTINGS_CHANGE  = 'MONACO_SETTINGS_CHANGE'
 }
 
 export interface Action<T = any> {
@@ -18,6 +21,15 @@ export interface FileImportArgs {
     fileName: string
     contents: string
 }
+
+export interface BuildParamsArgs {
+    runtime: RuntimeType
+    autoFormat: boolean
+}
+
+export type MonacoParamsChanges<T = any> = {
+    [k in keyof MonacoState | string]: T;
+};
 
 export const newImportFileAction = (fileName: string, contents: string) =>
     ({
@@ -55,4 +67,14 @@ export const newLoadingAction = () =>
         payload: null,
     });
 
+export const newBuildParamsChangeAction = (runtime: RuntimeType, autoFormat: boolean) =>
+    ({
+        type: ActionType.BUILD_PARAMS_CHANGE,
+        payload: {runtime, autoFormat} as BuildParamsArgs
+    });
 
+export const newMonacoParamsChangeAction = <T>(changes: MonacoParamsChanges<T>) =>
+    ({
+        type: ActionType.MONACO_SETTINGS_CHANGE,
+        payload: changes
+    });

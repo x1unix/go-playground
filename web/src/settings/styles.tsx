@@ -1,9 +1,7 @@
 import {
     FontWeights,
     FontSizes,
-    mergeStyleSets,
-    mergeStyles,
-    ITheme
+    mergeStyleSets
 } from 'office-ui-fabric-react';
 
 export const settingsSectionStyles = mergeStyleSets({

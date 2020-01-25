@@ -2,7 +2,6 @@ import {
     FontWeights,
     FontSizes,
     mergeStyleSets,
-    mergeStyles,
     ITheme
 } from 'office-ui-fabric-react';
 

@@ -1,11 +1,28 @@
 import { connectRouter } from 'connected-react-router';
 import { combineReducers } from 'redux';
 
-import {Action, ActionType, FileImportArgs} from './actions';
-import {EditorState, SettingsState, State, StatusState} from './state';
+import {Action, ActionType, FileImportArgs, BuildParamsArgs, MonacoParamsChanges} from './actions';
+import {
+    EditorState,
+    SettingsState,
+    State,
+    StatusState,
+    MonacoState,
+    RuntimeType
+} from './state';
 import { CompilerResponse } from '../services/api';
 import localConfig from '../services/config'
 import {mapByAction} from './helpers';
+
+const defaultMonacoState: MonacoState = {
+    cursorBlinking: 'blink',
+    cursorStyle: 'line',
+    selectOnLineNumbers: true,
+    minimap: true,
+    contextMenu: true,
+    smoothScrolling: true,
+    mouseWheelZoom: true,
+};
 
 const reducers = {
     editor: mapByAction<EditorState>({
@@ -52,8 +69,16 @@ const reducers = {
             s.darkMode = !s.darkMode;
             localConfig.darkThemeEnabled = s.darkMode;
             return s;
+        },
+        [ActionType.BUILD_PARAMS_CHANGE]: (s: SettingsState, a: Action<BuildParamsArgs>) => {
+           return Object.assign({}, s, a.payload);
+        },
+    }, {darkMode: localConfig.darkThemeEnabled, autoFormat: true, runtime: RuntimeType.GoPlayground}),
+    monaco: mapByAction<MonacoState>({
+        [ActionType.MONACO_SETTINGS_CHANGE]: (s: MonacoState, a: Action<MonacoParamsChanges>) => {
+            return Object.assign({}, s, a.payload);
         }
-    }, {darkMode: localConfig.darkThemeEnabled})
+    }, defaultMonacoState)
 };
 
 export const getInitialState = (): State => ({
@@ -65,8 +90,11 @@ export const getInitialState = (): State => ({
         code: ''
     },
     settings: {
-        darkMode: localConfig.darkThemeEnabled
+        darkMode: localConfig.darkThemeEnabled,
+        autoFormat: true,
+        runtime: RuntimeType.GoPlayground
     },
+    monaco: defaultMonacoState,
 });
 
 export const createRootReducer = history => combineReducers({

@@ -1,15 +1,16 @@
 import React from 'react';
-import {Modal, Dropdown, Checkbox, IDropdownOption, IconButton, getTheme} from 'office-ui-fabric-react';
-import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
-import { getContentStyles, getIconButtonStyles } from '../styles/modal';
+import {Checkbox, Dropdown, getTheme, IconButton, IDropdownOption, Modal} from 'office-ui-fabric-react';
+import {Pivot, PivotItem} from 'office-ui-fabric-react/lib/Pivot';
+import {getContentStyles, getIconButtonStyles} from '../styles/modal';
 import SettingsProperty from './SettingsProperty';
+import {BuildParamsArgs, Connect, MonacoParamsChanges, MonacoState, RuntimeType, SettingsState} from "../store";
 
 const WASM_SUPPORTED = 'WebAssembly' in window;
 
 const COMPILER_OPTIONS: IDropdownOption[] = [
-    { key: 'GO_PLAYGROUND', text: 'Go Playground' },
+    { key: RuntimeType.GoPlayground, text: 'Go Playground' },
     {
-        key: 'WASM',
+        key: RuntimeType.WebAssembly,
         text: `WebAssembly (${WASM_SUPPORTED ? 'Experimental' : 'Unsupported'})`,
         disabled: !WASM_SUPPORTED
     },
@@ -32,24 +33,46 @@ const CURSOR_LINE_OPTS: IDropdownOption[] = [
     {key: 'underline-thin', text: 'Underline thin'},
 ];
 
-interface SettingsState {
+export interface SettingsChanges {
+    monaco?: MonacoParamsChanges
+    args?: BuildParamsArgs,
+}
+
+export interface SettingsProps {
     isOpen: boolean
+    onClose: (changes: SettingsChanges) => void
+    settings?: SettingsState
+    monaco?: MonacoState
+    dispatch?: (Action) => void
 }
 
-export interface SettingsProps extends SettingsState {
-    onClose: () => void
-}
-
-export default class SettingsModal extends React.Component<SettingsProps, SettingsState> {
+@Connect(state => ({
+    settings: state.settings,
+    monaco: state.monaco,
+}))
+export default class SettingsModal extends React.Component<SettingsProps, {isOpen: boolean}> {
     private titleID = 'Settings';
     private subtitleID = 'SettingsSubText';
+    private changes: SettingsChanges = {};
 
     constructor(props) {
         super(props);
-        console.log('SettingsModal.constructor');
         this.state = {
             isOpen: props.isOpen
         }
+    }
+
+    private onClose() {
+        this.props.onClose({...this.changes});
+        this.changes = {};
+    }
+
+    private touchMonacoProperty(key: keyof MonacoState, val: any) {
+        if (!this.changes.monaco) {
+            this.changes.monaco = {};
+        }
+
+        this.changes.monaco[key] = val;
     }
 
     render() {
@@ -61,7 +84,7 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
                 titleAriaId={this.titleID}
                 subtitleAriaId={this.subtitleID}
                 isOpen={this.props.isOpen}
-                onDismiss={this.props.onClose}
+                onDismiss={() => this.onClose()}
                 containerClassName={contentStyles.container}
             >
                 <div className={contentStyles.header}>
@@ -70,7 +93,7 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
                         iconProps={{ iconName: 'Cancel' }}
                         styles={iconButtonStyles}
                         ariaLabel="Close popup modal"
-                        onClick={this.props.onClose as any}
+                        onClick={() => this.onClose()}
                     />
                 </div>
                 <div id={this.subtitleID}  className={contentStyles.body}>
@@ -80,38 +103,80 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
                                 key='cursorBlinking'
                                 title='Cursor Blinking'
                                 description='Set cursor animation style'
-                                control={<Dropdown options={CURSOR_BLINK_STYLE_OPTS} defaultSelectedKey='blink'/>}
+                                control={<Dropdown
+                                    options={CURSOR_BLINK_STYLE_OPTS}
+                                    defaultSelectedKey={this.props.monaco?.cursorBlinking}
+                                    onChange={(_, num) => {
+                                        this.touchMonacoProperty('cursorBlinking', num?.key);
+                                    }}
+                                />}
                             />
                             <SettingsProperty
                                 key='cursorStyle'
                                 title='Cursor Style'
                                 description='Set the cursor style'
-                                control={<Dropdown options={CURSOR_LINE_OPTS} defaultSelectedKey='line'/>}
+                                control={<Dropdown
+                                    options={CURSOR_LINE_OPTS}
+                                    defaultSelectedKey={this.props.monaco?.cursorStyle}
+                                    onChange={(_, num) => {
+                                        this.touchMonacoProperty('cursorStyle', num?.key);
+                                    }}
+                                />}
                             />
                             <SettingsProperty
                                 key='selectOnLineNumbers'
                                 title='Select On Line Numbers'
-                                control={<Checkbox label="Select corresponding line on line number click" />}
+                                control={<Checkbox
+                                    label="Select corresponding line on line number click"
+                                    defaultChecked={this.props.monaco?.selectOnLineNumbers}
+                                    onChange={(_, val) => {
+                                        this.touchMonacoProperty('cursorStyle', val);
+                                    }}
+                                />}
                             />
                             <SettingsProperty
-                                key='miniMap'
+                                key='minimap'
                                 title='Mini Map'
-                                control={<Checkbox label="Enable mini map on side" />}
+                                control={<Checkbox
+                                    label="Enable mini map on side"
+                                    defaultChecked={this.props.monaco?.minimap}
+                                    onChange={(_, val) => {
+                                        this.touchMonacoProperty('minimap', val);
+                                    }}
+                                />}
                             />
                             <SettingsProperty
                                 key='contextMenu'
                                 title='Context Menu'
-                                control={<Checkbox label="Enable editor context menu (on right click)" />}
+                                control={<Checkbox
+                                    label="Enable editor context menu (on right click)"
+                                    defaultChecked={this.props.monaco?.contextMenu}
+                                    onChange={(_, val) => {
+                                        this.touchMonacoProperty('contextMenu', val);
+                                    }}
+                                />}
                             />
                             <SettingsProperty
                                 key='smoothScroll'
                                 title='Smooth Scrolling'
-                                control={<Checkbox label="Enable that the editor animates scrolling to a position" />}
+                                control={<Checkbox
+                                    label="Enable that the editor animates scrolling to a position"
+                                    defaultChecked={this.props.monaco?.smoothScrolling}
+                                    onChange={(_, val) => {
+                                        this.touchMonacoProperty('smoothScrolling', val);
+                                    }}
+                                />}
                             />
                             <SettingsProperty
                                 key='mouseWheelZoom'
                                 title='Mouse Wheel Zoom'
-                                control={<Checkbox label="Zoom the font in the editor when using the mouse wheel in combination with holding Ctrl" />}
+                                control={<Checkbox
+                                    label="Zoom the font in the editor when using the mouse wheel in combination with holding Ctrl"
+                                    defaultChecked={this.props.monaco?.mouseWheelZoom}
+                                    onChange={(_, val) => {
+                                        this.touchMonacoProperty('mouseWheelZoom', val);
+                                    }}
+                                />}
                             />
                         </PivotItem>
                         <PivotItem headerText='Runtime' style={{paddingBottom: '64px'}}>
@@ -119,12 +184,36 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
                                 key='compilerType'
                                 title='Compiler'
                                 description='This option lets you choose where your Go code should be executed.'
-                                control={<Dropdown key='opts' options={COMPILER_OPTIONS} defaultSelectedKey='GO_PLAYGROUND'/>}
+                                control={<Dropdown
+                                    options={COMPILER_OPTIONS}
+                                    defaultSelectedKey={this.props.settings?.runtime}
+                                    onChange={(_, val) => {
+                                        if (!val) {
+                                            return;
+                                        }
+                                        this.changes.args = {
+                                            runtime: val?.key as RuntimeType,
+                                            autoFormat: this.props.settings?.autoFormat ?? true,
+                                        };
+                                    }}
+                                />}
                             />
                             <SettingsProperty
                                 key='autoFormat'
                                 title='Auto Format'
-                                control={<Checkbox label="Auto format code before build" />}
+                                control={<Checkbox
+                                    label="Auto format code before build"
+                                    defaultChecked={this.props.settings?.autoFormat}
+                                    onChange={(_, val) => {
+                                        if (!val) {
+                                            return;
+                                        }
+                                        this.changes.args = {
+                                            autoFormat: val ?? false,
+                                            runtime: this.props.settings?.runtime ?? RuntimeType.GoPlayground,
+                                        };
+                                    }}
+                                />}
                             />
                         </PivotItem>
                     </Pivot>

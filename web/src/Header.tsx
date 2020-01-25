@@ -2,7 +2,7 @@ import React from 'react';
 import './Header.css'
 import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/CommandBar';
 import { getTheme } from '@uifabric/styling';
-import SettingsModal from './settings/SettingsModal';
+import SettingsModal, {SettingsChanges} from './settings/SettingsModal';
 import AboutModal from './AboutModal';
 import {
     Connect,
@@ -10,7 +10,7 @@ import {
     formatFileDispatcher,
     runFileDispatcher,
     saveFileDispatcher,
-    dispatchToggleTheme, shareSnippetDispatcher
+    dispatchToggleTheme, shareSnippetDispatcher, newMonacoParamsChangeAction, newBuildParamsChangeAction
 } from './store';
 
 
@@ -150,6 +150,21 @@ export class Header extends React.Component<any, HeaderState> {
         }
     }
 
+    private onSettingsClose(changes: SettingsChanges) {
+        if (changes.monaco) {
+            // Update monaco state if some of it's settings were changed
+            this.props.dispatch(newMonacoParamsChangeAction(changes.monaco));
+        }
+
+        if (changes.args) {
+            // Save runtime settings
+            const { runtime, autoFormat } = changes.args;
+            this.props.dispatch(newBuildParamsChangeAction(runtime, autoFormat));
+        }
+
+        this.setState({showSettings: false});
+    }
+
     render() {
         return <header className='header' style={this.styles}>
             <img
@@ -164,7 +179,7 @@ export class Header extends React.Component<any, HeaderState> {
                 overflowItems={this.overflowItems}
                 ariaLabel='CodeEditor menu'
             />
-            <SettingsModal onClose={() => this.setState({showSettings: false})} isOpen={this.state.showSettings} />
+            <SettingsModal onClose={(args) => this.onSettingsClose(args)} isOpen={this.state.showSettings} />
             <AboutModal onClose={() => this.setState({showAbout: false})} isOpen={this.state.showAbout} />
         </header>;
     }
