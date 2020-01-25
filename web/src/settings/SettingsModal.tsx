@@ -1,6 +1,8 @@
 import React from 'react';
 import {Checkbox, Dropdown, getTheme, IconButton, IDropdownOption, Modal} from 'office-ui-fabric-react';
 import {Pivot, PivotItem} from 'office-ui-fabric-react/lib/Pivot';
+import {MessageBar, MessageBarType} from 'office-ui-fabric-react/lib/MessageBar';
+import {Link} from 'office-ui-fabric-react/lib/Link';
 import {getContentStyles, getIconButtonStyles} from '../styles/modal';
 import SettingsProperty from './SettingsProperty';
 import {BuildParamsArgs, Connect, MonacoParamsChanges, MonacoState, RuntimeType, SettingsState} from "../store";
@@ -50,7 +52,7 @@ export interface SettingsProps {
     settings: state.settings,
     monaco: state.monaco,
 }))
-export default class SettingsModal extends React.Component<SettingsProps, {isOpen: boolean}> {
+export default class SettingsModal extends React.Component<SettingsProps, {isOpen: boolean, showWarning: boolean}> {
     private titleID = 'Settings';
     private subtitleID = 'SettingsSubText';
     private changes: SettingsChanges = {};
@@ -58,7 +60,8 @@ export default class SettingsModal extends React.Component<SettingsProps, {isOpe
     constructor(props) {
         super(props);
         this.state = {
-            isOpen: props.isOpen
+            isOpen: props.isOpen,
+            showWarning: props.settings.runtime === RuntimeType.WebAssembly,
         }
     }
 
@@ -73,6 +76,10 @@ export default class SettingsModal extends React.Component<SettingsProps, {isOpe
         }
 
         this.changes.monaco[key] = val;
+    }
+
+    get wasmWarningVisibility() {
+        return this.state.showWarning ? 'visible' : 'hidden'
     }
 
     render() {
@@ -179,10 +186,10 @@ export default class SettingsModal extends React.Component<SettingsProps, {isOpe
                                 />}
                             />
                         </PivotItem>
-                        <PivotItem headerText='Runtime' style={{paddingBottom: '64px'}}>
+                        <PivotItem headerText='Build' style={{paddingBottom: '64px'}}>
                             <SettingsProperty
-                                key='compilerType'
-                                title='Compiler'
+                                key='runtime'
+                                title='Runtime'
                                 description='This option lets you choose where your Go code should be executed.'
                                 control={<Dropdown
                                     options={COMPILER_OPTIONS}
@@ -195,9 +202,21 @@ export default class SettingsModal extends React.Component<SettingsProps, {isOpe
                                             runtime: val?.key as RuntimeType,
                                             autoFormat: this.props.settings?.autoFormat ?? true,
                                         };
+
+                                        this.setState({showWarning: val?.key === RuntimeType.WebAssembly});
                                     }}
                                 />}
                             />
+                            <div style={{visibility: this.wasmWarningVisibility, marginTop: '10px'}}>
+                                <MessageBar isMultiline={true} messageBarType={MessageBarType.warning}>
+                                    <b>WebAssembly</b> is a modern runtime that gives you additional features
+                                    like possibility to interact with web browser but is unstable.
+                                    Use it at your own risk.
+                                    <p>
+                                        See<Link href='https://github.com/golang/go/wiki/WebAssembly' target='_blank'>documentation</Link> for more details.
+                                    </p>
+                                </MessageBar>
+                            </div>
                             <SettingsProperty
                                 key='autoFormat'
                                 title='Auto Format'
