@@ -10,7 +10,7 @@ import {
     MonacoState,
     RuntimeType
 } from './state';
-import { CompilerResponse } from '../services/api';
+import {CompilerResponse, EvalEvent} from '../services/api';
 import localConfig from '../services/config'
 import {mapByAction} from './helpers';
 
@@ -60,8 +60,17 @@ const reducers = {
         [ActionType.ERROR]: (s: StatusState, a: Action<string>) => {
             return {...s, loading: false, lastError: a.payload}
         },
-        [ActionType.LOADING]: (s: StatusState, a: Action<string>) => {
+        [ActionType.LOADING]: (s: StatusState, _: Action<string>) => {
             return {...s, loading: true}
+        },
+        [ActionType.EVAL_START]: (s: StatusState, _: Action) => {
+            return {lastError: null, loading: true, events: []}
+        },
+        [ActionType.EVAL_EVENT]: (s: StatusState, a: Action<EvalEvent>) => {
+            return {lastError: null, loading: true, events: s.events?.concat(a.payload)}
+        },
+        [ActionType.EVAL_FINISH]: (s: StatusState, _: Action) => {
+            return {...s, loading: false}
         },
     }, {loading: false}),
     settings: mapByAction<SettingsState>({

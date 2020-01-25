@@ -1,4 +1,4 @@
-import {CompilerResponse} from "../services/api";
+import {CompilerResponse, EvalEvent} from "../services/api";
 import {MonacoState, RuntimeType} from './state';
 
 export enum ActionType {
@@ -9,7 +9,12 @@ export enum ActionType {
     COMPILE_RESULT          = 'COMPILE_RESULT',
     TOGGLE_THEME            = 'TOGGLE_THEME',
     BUILD_PARAMS_CHANGE     = 'BUILD_PARAMS_CHANGE',
-    MONACO_SETTINGS_CHANGE  = 'MONACO_SETTINGS_CHANGE'
+    MONACO_SETTINGS_CHANGE  = 'MONACO_SETTINGS_CHANGE',
+
+    // Special actions used by Go WASM bridge
+    EVAL_START      = 'EVAL_START',
+    EVAL_EVENT      = 'EVAL_EVENT',
+    EVAL_FINISH     = 'EVAL_FINISH'
 }
 
 export interface Action<T = any> {
@@ -30,6 +35,8 @@ export interface BuildParamsArgs {
 export type MonacoParamsChanges<T = any> = {
     [k in keyof MonacoState | string]: T;
 };
+
+export const actionOf = (type: ActionType) => ({type});
 
 export const newImportFileAction = (fileName: string, contents: string) =>
     ({
@@ -77,4 +84,10 @@ export const newMonacoParamsChangeAction = <T>(changes: MonacoParamsChanges<T>) 
     ({
         type: ActionType.MONACO_SETTINGS_CHANGE,
         payload: changes
+    });
+
+export const newProgramWriteAction = (event: EvalEvent) =>
+    ({
+        type: ActionType.EVAL_EVENT,
+        payload: event
     });

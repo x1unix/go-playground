@@ -6,6 +6,11 @@ import config from './config';
 const apiAddress = config.serverUrl;
 const axiosClient = axios.default.create({baseURL: `${apiAddress}/api`});
 
+export enum EvalEventKind {
+    Stdout = 'stdout',
+    Stderr = 'stderr'
+}
+
 export interface ShareResponse {
     snippetID: string
 }
@@ -17,7 +22,7 @@ export interface Snippet {
 
 export interface EvalEvent {
     Message: string
-    Kind: string
+    Kind: EvalEventKind
     Delay: number
 }
 

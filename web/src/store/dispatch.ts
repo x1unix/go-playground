@@ -5,16 +5,17 @@ import {
     newBuildResultAction,
     newImportFileAction,
     newLoadingAction,
-    newToggleThemeAction
+    newToggleThemeAction,
+    Action
 } from './actions';
 import {State} from "./state";
 import client from '../services/api';
 import config from '../services/config';
 import {DEMO_CODE} from '../editor/props';
 
-type StateProvider = () => State
-type DispatchFn = (Action) => any
-type Dispatcher = (DispatchFn, StateProvider) => void
+export type StateProvider = () => State
+export type DispatchFn = (a: Action|any) => any
+export type Dispatcher = (dispatch: DispatchFn, getState: StateProvider) => void
 
 /////////////////////////////
 //      Dispatchers        //
