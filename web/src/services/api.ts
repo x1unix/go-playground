@@ -1,10 +1,10 @@
 import * as axios from 'axios';
 import {AxiosInstance} from "axios";
 import * as monaco from "monaco-editor";
+import config from './config';
 
-const apiAddress = process.env['REACT_APP_LANG_SERVER'] ?? window.location.origin;
-
-let axiosClient = axios.default.create({baseURL: `${apiAddress}/api`});
+const apiAddress = config.serverUrl;
+const axiosClient = axios.default.create({baseURL: `${apiAddress}/api`});
 
 export interface ShareResponse {
     snippetID: string

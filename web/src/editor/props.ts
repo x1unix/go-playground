@@ -27,5 +27,6 @@ export const DEFAULT_EDITOR_OPTIONS: monaco.editor.IEditorOptions = {
     mouseWheelZoom: true,
     automaticLayout: true,
     fontFamily: EDITOR_FONTS,
-    showUnused: true
+    showUnused: true,
+    smoothScrolling: true,
 };
