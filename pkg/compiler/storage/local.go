@@ -20,7 +20,7 @@ const (
 	workDirName = "goplay-builds"
 
 	maxCleanTime = time.Second * 10
-	perm         = 0777
+	perm         = 0744
 )
 
 type LocalStorage struct {
