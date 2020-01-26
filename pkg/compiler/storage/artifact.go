@@ -3,6 +3,7 @@ package storage
 import (
 	"bytes"
 	"crypto/md5"
+	"encoding/hex"
 )
 
 const (
@@ -28,6 +29,6 @@ func GetArtifactID(data []byte) (ArtifactID, error) {
 		return "", err
 	}
 
-	fName := ArtifactID(h.Sum(nil))
-	return fName, nil
+	fName := hex.EncodeToString(h.Sum(nil))
+	return ArtifactID(fName), nil
 }

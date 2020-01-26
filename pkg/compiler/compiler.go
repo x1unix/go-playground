@@ -3,7 +3,7 @@ package compiler
 import (
 	"context"
 	"github.com/pkg/errors"
-	"github.com/x1unix/go-playground/pkg/storage"
+	"github.com/x1unix/go-playground/pkg/compiler/storage"
 	"go.uber.org/zap"
 	"io"
 	"os"

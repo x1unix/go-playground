@@ -20,12 +20,14 @@ const (
 	workDirName = "goplay-builds"
 
 	maxCleanTime = time.Second * 10
+	perm         = 0777
 )
 
 type LocalStorage struct {
 	log     *zap.SugaredLogger
 	useLock *sync.Mutex
 	dirty   *abool.AtomicBool
+	gcRun   *abool.AtomicBool
 	workDir string
 	srcDir  string
 	binDir  string
@@ -33,7 +35,7 @@ type LocalStorage struct {
 
 func NewLocalStorage(log *zap.SugaredLogger, baseDir string) (*LocalStorage, error) {
 	workDir := filepath.Join(baseDir, workDirName)
-	if err := os.Mkdir(workDir, os.ModeDir); err != nil {
+	if err := os.MkdirAll(workDir, perm); err != nil {
 		if !os.IsExist(err) {
 			return nil, errors.Wrap(err, "failed to create temporary build directory for WASM compiler")
 		}
@@ -43,6 +45,7 @@ func NewLocalStorage(log *zap.SugaredLogger, baseDir string) (*LocalStorage, err
 		workDir: workDir,
 		useLock: &sync.Mutex{},
 		dirty:   abool.NewBool(false),
+		gcRun:   abool.NewBool(false),
 		log:     log.Named("storage"),
 		binDir:  filepath.Join(workDir, binDirName),
 		srcDir:  filepath.Join(workDir, srcDirName),
@@ -68,7 +71,7 @@ func (s LocalStorage) CreateLocationAndDo(id ArtifactID, data []byte, cb Callbac
 	defer s.useLock.Unlock()
 	s.dirty.Set() // mark storage as dirty
 	tmpSrcDir := filepath.Join(s.srcDir, id.String())
-	if err := os.MkdirAll(tmpSrcDir, os.ModeDir); err != nil {
+	if err := os.MkdirAll(tmpSrcDir, perm); err != nil {
 		if !os.IsExist(err) {
 			s.log.Errorw("failed to create a temporary build directory",
 				"artifact", id.String(),
@@ -84,7 +87,7 @@ func (s LocalStorage) CreateLocationAndDo(id ArtifactID, data []byte, cb Callbac
 	wasmLocation := s.getOutputLocation(id)
 	goFileName := id.Ext(ExtGo)
 	srcFile := filepath.Join(tmpSrcDir, goFileName)
-	if err := ioutil.WriteFile(srcFile, data, 0644); err != nil {
+	if err := ioutil.WriteFile(srcFile, data, perm); err != nil {
 		s.log.Errorw(
 			"failed to save source file",
 			"artifact", id.String(),
@@ -120,17 +123,23 @@ func (s LocalStorage) clean() error {
 			}
 			return errors.Wrapf(err, "failed to remove %q", dir)
 		}
+
+		s.log.Debugf("cleaner: removed directory %q", dir)
 	}
 
 	s.dirty.UnSet() // remove dirty flag
+	s.log.Debug("cleaner: cleanup end")
 	return nil
 }
 
 func (s LocalStorage) StartCleaner(ctx context.Context, interval time.Duration) {
+	s.gcRun.Set()
+	s.log.Debug("cleaner worker starter")
 	for {
 		select {
 		case <-ctx.Done():
-			s.log.Debug("context done, cleanup exit")
+			s.log.Debug("context done, cleaner worker stopped")
+			s.gcRun.UnSet()
 			return
 		default:
 		}
