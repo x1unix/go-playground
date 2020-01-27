@@ -23,7 +23,8 @@ const (
 	frameTime               = time.Second
 	maxBuildTimeDuration    = time.Second * 30
 
-	wasmMimeType = "application/wasm"
+	wasmMimeType     = "application/wasm"
+	formatQueryParam = "format"
 )
 
 type Service struct {
@@ -112,9 +113,21 @@ func (s *Service) HandleGetSuggestion(w http.ResponseWriter, r *http.Request) {
 
 // goImportsCode reads code from request and performs "goimports" on it
 // if any error occurs, it sends error response to client and closes connection
+//
+// if "format" url query param is undefined or set to "false", just returns code as is
 func (s *Service) goImportsCode(w http.ResponseWriter, r *http.Request) ([]byte, error, bool) {
 	if err := goplay.ValidateContentLength(int(r.ContentLength)); err != nil {
 		Errorf(http.StatusRequestEntityTooLarge, err.Error()).Write(w)
+		return nil, err, false
+	}
+
+	shouldFormatCode, err := strconv.ParseBool(r.URL.Query().Get(formatQueryParam))
+	if err != nil {
+		Errorf(
+			http.StatusBadRequest,
+			"invalid %q query parameter value (expected boolean)",
+			formatQueryParam,
+		).Write(w)
 		return nil, err, false
 	}
 
@@ -122,6 +135,11 @@ func (s *Service) goImportsCode(w http.ResponseWriter, r *http.Request) ([]byte,
 	if err != nil {
 		Errorf(http.StatusBadGateway, "failed to read request: %s", err).Write(w)
 		return nil, err, false
+	}
+
+	if !shouldFormatCode {
+		// return code as is if don't need to format code
+		return src, nil, false
 	}
 
 	defer r.Body.Close()
