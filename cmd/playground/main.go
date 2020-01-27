@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/x1unix/go-playground/pkg/analyzer"
+	"github.com/x1unix/go-playground/pkg/compiler"
+	"github.com/x1unix/go-playground/pkg/compiler/storage"
 	"github.com/x1unix/go-playground/pkg/langserver"
 	"go.uber.org/zap"
 	"log"
@@ -16,8 +18,10 @@ func main() {
 	var packagesFile string
 	var addr string
 	var debug bool
+	var buildDir string
 	flag.StringVar(&packagesFile, "f", "packages.json", "Path to packages index JSON file")
 	flag.StringVar(&addr, "addr", ":8080", "TCP Listen address")
+	flag.StringVar(&buildDir, "wasm-build-dir", os.TempDir(), "Directory for WASM builds")
 	flag.BoolVar(&debug, "debug", false, "Enable debug mode")
 
 	goRoot, ok := os.LookupEnv("GOROOT")
@@ -29,7 +33,7 @@ func main() {
 	flag.Parse()
 	l := getLogger(debug)
 	defer l.Sync()
-	if err := start(packagesFile, addr, goRoot, debug); err != nil {
+	if err := start(packagesFile, addr, goRoot, buildDir, debug); err != nil {
 		l.Sugar().Fatal(err)
 	}
 }
@@ -51,7 +55,7 @@ func getLogger(debug bool) (l *zap.Logger) {
 	return l
 }
 
-func start(packagesFile, addr, goRoot string, debug bool) error {
+func start(packagesFile, addr, goRoot, buildDir string, debug bool) error {
 	zap.S().Infof("GOROOT is %q", goRoot)
 	zap.S().Infof("Packages file is %q", packagesFile)
 	analyzer.SetRoot(goRoot)
@@ -60,8 +64,14 @@ func start(packagesFile, addr, goRoot string, debug bool) error {
 		return fmt.Errorf("failed to read packages file %q: %s", packagesFile, err)
 	}
 
+	store, err := storage.NewLocalStorage(zap.S(), buildDir)
+	if err != nil {
+		return err
+	}
+
 	r := mux.NewRouter()
-	langserver.New(packages).Mount(r.PathPrefix("/api").Subrouter())
+	langserver.New(packages, compiler.NewBuildService(zap.S(), store)).
+		Mount(r.PathPrefix("/api").Subrouter())
 	r.PathPrefix("/").Handler(langserver.SpaFileServer("./public"))
 
 	zap.S().Infof("Listening on %q", addr)

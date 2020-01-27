@@ -1,6 +1,7 @@
 package compiler
 
 import (
+	"bytes"
 	"context"
 	"github.com/pkg/errors"
 	"github.com/x1unix/go-playground/pkg/compiler/storage"
@@ -14,6 +15,7 @@ var buildArgs = []string{
 	"CGO_ENABLED=0",
 	"GOOS=js",
 	"GOARCH=wasm",
+	"HOME=" + os.Getenv("HOME"),
 }
 
 type Result struct {
@@ -42,20 +44,19 @@ func (s BuildService) buildSource(ctx context.Context, outputLocation, sourceLoc
 	)
 
 	cmd.Env = buildArgs
-	errPipe, err := cmd.StderrPipe()
-	if err != nil {
-		s.log.Errorw("failed to attach to go builder stdout", "err", err)
-		return nil, err
-	}
+	buff := &bytes.Buffer{}
+	cmd.Stderr = buff
 
-	defer errPipe.Close()
-	s.log.Debugw("starting go build", "command", cmd.Args)
+	s.log.Debugw("starting go build", "command", cmd.Args, "env", cmd.Env)
 	if err := cmd.Start(); err != nil {
 		return nil, err
 	}
 
 	if err := cmd.Wait(); err != nil {
-		return nil, newBuildError(errPipe, err)
+		errMsg := buff.String()
+		s.log.Debugw("build failed", "err", err, "stderr", errMsg)
+		return nil, newBuildError(errMsg)
+		//return nil, newBuildError(errPipe, err)
 	}
 
 	// build finishes, now let's get the wasm file
@@ -77,6 +78,7 @@ func (s BuildService) Build(ctx context.Context, data []byte) (*Result, error) {
 	compiled, err := s.storage.GetItem(aid)
 	if err == nil {
 		// Just return precompiled result if data is cached already
+		s.log.Debugw("build cached, returning cached data", "artifact", aid.String())
 		result.Data = compiled
 		return result, nil
 	}

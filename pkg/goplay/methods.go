@@ -11,12 +11,8 @@ import (
 	"net/url"
 )
 
-type lener interface {
-	Len() int
-}
-
-func ValidateContentLength(r lener) error {
-	if r.Len() > maxSnippetSize {
+func ValidateContentLength(itemLen int) error {
+	if itemLen > maxSnippetSize {
 		return ErrSnippetTooLarge
 	}
 
