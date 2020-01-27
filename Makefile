@@ -16,5 +16,5 @@ run:
 
 .PHONY:ui
 ui:
-	@cd $(UI) && REACT_APP_LANG_SERVER=http://$(LISTEN_ADDR) yarn start
+	@cd $(UI) && REACT_APP_LANG_SERVER=http://$(LISTEN_ADDR) REACT_APP_VERSION=testing yarn start
 
