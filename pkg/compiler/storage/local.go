@@ -164,7 +164,7 @@ func (s LocalStorage) clean() error {
 	return nil
 }
 
-func (s LocalStorage) StartCleaner(ctx context.Context, interval time.Duration) {
+func (s LocalStorage) StartCleaner(ctx context.Context, interval time.Duration, wg *sync.WaitGroup) {
 	s.gcRun.Set()
 	s.log.Debug("cleaner worker starter")
 	for {
@@ -172,6 +172,9 @@ func (s LocalStorage) StartCleaner(ctx context.Context, interval time.Duration) 
 		case <-ctx.Done():
 			s.log.Debug("context done, cleaner worker stopped")
 			s.gcRun.UnSet()
+			if wg != nil {
+				wg.Done()
+			}
 			return
 		default:
 		}
