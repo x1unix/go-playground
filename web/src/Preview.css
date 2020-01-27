@@ -4,6 +4,7 @@
     max-height: 640px;
     height: 50%;
     box-sizing: border-box;
+    overflow: auto;
 }
 
 .app-preview__content {
