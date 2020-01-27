@@ -30,7 +30,7 @@ func TestLocalStorage_GetItem(t *testing.T) {
 	// Start trash collector in background
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	cleanInterval := time.Second * 2
-	go s.StartCleaner(ctx, cleanInterval)
+	go s.StartCleaner(ctx, cleanInterval, nil)
 	defer cancelFunc()
 	runtime.Gosched() // Ask Go to switch to cleaner goroutine
 	r.True(s.gcRun.IsSet(), "gc start flag not true")
