@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/x1unix/go-playground/pkg/compiler"
+	"github.com/x1unix/go-playground/pkg/compiler/storage"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -25,6 +26,7 @@ const (
 
 	wasmMimeType     = "application/wasm"
 	formatQueryParam = "format"
+	artifactParamVal = "artifactId"
 )
 
 type Service struct {
@@ -51,6 +53,7 @@ func (s *Service) Mount(r *mux.Router) {
 	r.Path("/format").Methods(http.MethodPost).HandlerFunc(s.HandleFormatCode)
 	r.Path("/share").Methods(http.MethodPost).HandlerFunc(s.HandleShare)
 	r.Path("/snippet/{id}").Methods(http.MethodGet).HandlerFunc(s.HandleGetSnippet)
+	r.Path("/artifacts/{artifactId:[a-fA-F0-9]+}.wasm").Methods(http.MethodGet).HandlerFunc(s.HandleArtifactRequest)
 }
 
 func (s *Service) lookupBuiltin(val string) (*SuggestionsResponse, error) {
@@ -174,7 +177,7 @@ func (s *Service) HandleFormatCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	WriteJSON(w, CompilerResponse{Formatted: string(code)})
+	WriteJSON(w, RunResponse{Formatted: string(code)})
 }
 
 func (s *Service) HandleShare(w http.ResponseWriter, r *http.Request) {
@@ -239,7 +242,7 @@ func (s *Service) HandleRunCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := CompilerResponse{Events: res.Events}
+	result := RunResponse{Events: res.Events}
 	if changed {
 		// Return formatted code if goimports had any effect
 		result.Formatted = string(src)
@@ -247,6 +250,35 @@ func (s *Service) HandleRunCode(w http.ResponseWriter, r *http.Request) {
 
 	s.log.Debugw("response from compiler", "res", res)
 	WriteJSON(w, result)
+}
+
+func (s *Service) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	artifactId := storage.ArtifactID(vars[artifactParamVal])
+	data, err := s.compiler.GetArtifact(artifactId)
+	if err != nil {
+		if err == storage.ErrNotExists {
+			Errorf(http.StatusNotFound, "artifact not found").Write(w)
+			return
+		}
+
+		NewErrorResponse(err).Write(w)
+		return
+	}
+
+	n, err := io.Copy(w, data)
+	defer data.Close()
+	if err != nil {
+		s.log.Errorw("failed to send artifact",
+			"artifactID", artifactId,
+			"err", err,
+		)
+		NewErrorResponse(err).Write(w)
+		return
+	}
+
+	w.Header().Set("Content-Type", wasmMimeType)
+	w.Header().Set("Content-Length", strconv.FormatInt(n, 10))
 }
 
 func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) {
@@ -259,7 +291,7 @@ func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err, _ := s.goImportsCode(w, r)
+	src, err, changed := s.goImportsCode(w, r)
 	if err != nil {
 		if goplay.IsCompileError(err) {
 			return
@@ -269,7 +301,7 @@ func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := s.compiler.Build(ctx, data)
+	result, err := s.compiler.Build(ctx, src)
 	if err != nil {
 		if compileErr, ok := err.(*compiler.BuildError); ok {
 			Errorf(http.StatusBadRequest, compileErr.Error()).Write(w)
@@ -280,16 +312,11 @@ func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	n, err := io.Copy(w, result.Data)
-	if err != nil {
-		s.log.Errorw("failed to send WASM response",
-			"file", result.FileName,
-			"err", err,
-		)
-		NewErrorResponse(err).Write(w)
-		return
+	resp := BuildResponse{FileName: result.FileName}
+	if changed {
+		// Return formatted code if goimports had any effect
+		resp.Formatted = string(src)
 	}
 
-	w.Header().Set("Content-Type", wasmMimeType)
-	w.Header().Set("Content-Length", strconv.FormatInt(n, 10))
+	WriteJSON(w, resp)
 }

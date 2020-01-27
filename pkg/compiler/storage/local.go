@@ -23,6 +23,17 @@ const (
 	perm         = 0744
 )
 
+type cachedFile struct {
+	io.ReadCloser
+	useLock *sync.Mutex
+}
+
+func (c cachedFile) Read(p []byte) (n int, err error) {
+	c.useLock.Lock()
+	defer c.useLock.Unlock()
+	return c.ReadCloser.Read(p)
+}
+
 type LocalStorage struct {
 	log     *zap.SugaredLogger
 	useLock *sync.Mutex
@@ -56,14 +67,35 @@ func (s LocalStorage) getOutputLocation(id ArtifactID) string {
 	return filepath.Join(s.binDir, id.Ext(ExtWasm))
 }
 
+func (s LocalStorage) HasItem(id ArtifactID) (bool, error) {
+	s.useLock.Lock()
+	s.useLock.Unlock()
+	fPath := s.getOutputLocation(id)
+	_, err := os.Stat(fPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+
+		return false, err
+	}
+
+	return true, nil
+}
+
 func (s LocalStorage) GetItem(id ArtifactID) (io.ReadCloser, error) {
+	s.useLock.Lock()
+	defer s.useLock.Unlock()
 	fPath := s.getOutputLocation(id)
 	f, err := os.Open(fPath)
 	if os.IsNotExist(err) {
 		return nil, ErrNotExists
 	}
 
-	return f, err
+	return cachedFile{
+		ReadCloser: f,
+		useLock:    s.useLock,
+	}, err
 }
 
 func (s LocalStorage) CreateLocationAndDo(id ArtifactID, data []byte, cb Callback) error {

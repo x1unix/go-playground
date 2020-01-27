@@ -68,7 +68,12 @@ func (r SuggestionsResponse) Write(w http.ResponseWriter) {
 	WriteJSON(w, r)
 }
 
-type CompilerResponse struct {
+type BuildResponse struct {
+	Formatted string `json:"formatted,omitempty"`
+	FileName  string `json:"fileName,omitempty"`
+}
+
+type RunResponse struct {
 	Formatted string                 `json:"formatted,omitempty"`
 	Events    []*goplay.CompileEvent `json:"events,omitempty"`
 }

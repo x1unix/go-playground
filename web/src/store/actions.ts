@@ -1,4 +1,4 @@
-import {CompilerResponse, EvalEvent} from "../services/api";
+import {RunResponse, EvalEvent} from "../services/api";
 import {MonacoSettings, RuntimeType} from "../services/config";
 
 export enum ActionType {
@@ -50,7 +50,7 @@ export const newFileChangeAction = (contents: string) =>
         payload: contents,
     });
 
-export const newBuildResultAction = (resp: CompilerResponse) =>
+export const newBuildResultAction = (resp: RunResponse) =>
     ({
         type: ActionType.COMPILE_RESULT,
         payload: resp,

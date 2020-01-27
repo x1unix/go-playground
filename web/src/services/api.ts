@@ -1,5 +1,5 @@
 import * as axios from 'axios';
-import {AxiosInstance} from "axios";
+import {AxiosInstance} from 'axios';
 import * as monaco from "monaco-editor";
 import config from './config';
 
@@ -26,19 +26,32 @@ export interface EvalEvent {
     Delay: number
 }
 
-export interface CompilerResponse {
-    formatted?: string|null
+export interface RunResponse {
+    formatted?: string | null
     events: EvalEvent[]
+}
+
+export interface BuildResponse {
+    formatted?: string | null
+    fileName: string
 }
 
 export interface IAPIClient {
     readonly axiosClient: AxiosInstance
-    getSuggestions(query: {packageName?: string, value?:string}): Promise<monaco.languages.CompletionList>
-    evaluateCode(code: string, format: boolean): Promise<CompilerResponse>
-    formatCode(code: string): Promise<CompilerResponse>
+
+    getSuggestions(query: { packageName?: string, value?: string }): Promise<monaco.languages.CompletionList>
+
+    evaluateCode(code: string, format: boolean): Promise<RunResponse>
+
+    formatCode(code: string): Promise<RunResponse>
+
+    build(code: string, format: boolean): Promise<BuildResponse>
+
+    getArtifact(fileName: string): Promise<Response>
+
     getSnippet(id: string): Promise<Snippet>
+
     shareSnippet(code: string): Promise<ShareResponse>
-    compileToWasm(code: string, format: boolean): Promise<Response>
 }
 
 export const instantiateStreaming = async (resp, importObject) => {
@@ -55,33 +68,34 @@ class Client implements IAPIClient {
         return this.client;
     }
 
-    constructor(private client: axios.AxiosInstance) {}
+    constructor(private client: axios.AxiosInstance) {
+    }
 
-    async getSuggestions(query: {packageName?: string, value?:string}): Promise<monaco.languages.CompletionList> {
+    async getSuggestions(query: { packageName?: string, value?: string }): Promise<monaco.languages.CompletionList> {
         const queryParams = Object.keys(query).map(k => `${k}=${query[k]}`).join('&');
         return this.get<monaco.languages.CompletionList>(`/suggest?${queryParams}`);
     }
 
-    async compileToWasm(code: string, format: boolean): Promise<Response> {
-        const resp = await fetch(`${apiAddress}/compile?format=${Boolean(format)}`, {
-            method: 'POST',
-            body: code,
-        });
+    async build(code: string, format: boolean): Promise<BuildResponse> {
+        return this.post<BuildResponse>(`/compile?format=${Boolean(format)}`, code);
+    }
 
+    async getArtifact(fileName: string): Promise<Response> {
+        const resp = await fetch(`${apiAddress}/artifacts/${fileName}`);
         if (resp.status >= 300) {
-           const err = await resp.json();
-           throw new Error(err.message ?? resp.statusText);
+            const err = await resp.json();
+            throw new Error(err.message ?? resp.statusText);
         }
 
         return resp;
     }
 
-    async evaluateCode(code: string, format: boolean): Promise<CompilerResponse> {
-        return this.post<CompilerResponse>(`/run?format=${Boolean(format)}`, code);
+    async evaluateCode(code: string, format: boolean): Promise<RunResponse> {
+        return this.post<RunResponse>(`/run?format=${Boolean(format)}`, code);
     }
 
-    async formatCode(code: string): Promise<CompilerResponse> {
-        return this.post<CompilerResponse>('/format', code);
+    async formatCode(code: string): Promise<RunResponse> {
+        return this.post<RunResponse>('/format', code);
     }
 
     async getSnippet(id: string): Promise<Snippet> {
@@ -96,7 +110,7 @@ class Client implements IAPIClient {
         try {
             const resp = await this.client.get<T>(uri);
             return resp.data;
-        } catch(err) {
+        } catch (err) {
             throw Client.extractAPIError(err);
         }
     }
@@ -105,7 +119,7 @@ class Client implements IAPIClient {
         try {
             const resp = await this.client.post<T>(uri, data, cfg);
             return resp.data;
-        } catch(err) {
+        } catch (err) {
             throw Client.extractAPIError(err);
         }
     }

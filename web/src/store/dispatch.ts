@@ -112,9 +112,11 @@ export const runFileDispatcher: Dispatcher =
                     dispatch(newBuildResultAction(res));
                     break;
                 case RuntimeType.WebAssembly:
-                    let resp = await client.compileToWasm(editor.code, settings.autoFormat);
-                    let instance = await instantiateStreaming(resp, getImportObject());
+                    let resp = await client.build(editor.code, settings.autoFormat);
+                    let wasmFile = await client.getArtifact(resp.fileName);
+                    let instance = await instantiateStreaming(wasmFile, getImportObject());
                     dispatch({type: ActionType.EVAL_START});
+                    dispatch(newBuildResultAction({formatted: resp.formatted, events: []}));
                     goRun(instance)
                         .then(result => console.log('exit code: %d', result))
                         .catch(err => console.log('err', err))

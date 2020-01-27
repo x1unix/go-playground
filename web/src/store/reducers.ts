@@ -8,7 +8,7 @@ import {
     State,
     StatusState,
 } from './state';
-import {CompilerResponse, EvalEvent} from '../services/api';
+import {RunResponse, EvalEvent} from '../services/api';
 import localConfig, {MonacoSettings, RuntimeType} from '../services/config'
 import {mapByAction} from './helpers';
 import config from "../services/config";
@@ -27,7 +27,7 @@ const reducers = {
                 fileName,
             };
         },
-        [ActionType.COMPILE_RESULT]: (s: EditorState, a: Action<CompilerResponse>) => {
+        [ActionType.COMPILE_RESULT]: (s: EditorState, a: Action<RunResponse>) => {
             if (a.payload.formatted) {
                 s.code = a.payload.formatted;
             }
@@ -36,7 +36,7 @@ const reducers = {
         },
     }, {fileName: 'main.go', code: ''}),
     status: mapByAction<StatusState>({
-        [ActionType.COMPILE_RESULT]: (s: StatusState, a: Action<CompilerResponse>) => {
+        [ActionType.COMPILE_RESULT]: (s: StatusState, a: Action<RunResponse>) => {
             return {
                 loading: false,
                 lastError: null,

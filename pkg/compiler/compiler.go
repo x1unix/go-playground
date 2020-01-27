@@ -3,7 +3,6 @@ package compiler
 import (
 	"bytes"
 	"context"
-	"github.com/pkg/errors"
 	"github.com/x1unix/go-playground/pkg/compiler/storage"
 	"go.uber.org/zap"
 	"io"
@@ -20,7 +19,6 @@ var buildArgs = []string{
 
 type Result struct {
 	FileName string
-	Data     io.ReadCloser
 }
 
 type BuildService struct {
@@ -35,7 +33,7 @@ func NewBuildService(log *zap.SugaredLogger, store storage.StoreProvider) BuildS
 	}
 }
 
-func (s BuildService) buildSource(ctx context.Context, outputLocation, sourceLocation string) (io.ReadCloser, error) {
+func (s BuildService) buildSource(ctx context.Context, outputLocation, sourceLocation string) error {
 	cmd := exec.CommandContext(ctx, "go",
 		"build",
 		"-o",
@@ -49,23 +47,20 @@ func (s BuildService) buildSource(ctx context.Context, outputLocation, sourceLoc
 
 	s.log.Debugw("starting go build", "command", cmd.Args, "env", cmd.Env)
 	if err := cmd.Start(); err != nil {
-		return nil, err
+		return err
 	}
 
 	if err := cmd.Wait(); err != nil {
 		errMsg := buff.String()
 		s.log.Debugw("build failed", "err", err, "stderr", errMsg)
-		return nil, newBuildError(errMsg)
-		//return nil, newBuildError(errPipe, err)
+		return newBuildError(errMsg)
 	}
 
-	// build finishes, now let's get the wasm file
-	f, err := os.Open(outputLocation)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to open compiled WASM file")
-	}
+	return nil
+}
 
-	return f, nil
+func (s BuildService) GetArtifact(id storage.ArtifactID) (io.ReadCloser, error) {
+	return s.storage.GetItem(id)
 }
 
 func (s BuildService) Build(ctx context.Context, data []byte) (*Result, error) {
@@ -75,21 +70,20 @@ func (s BuildService) Build(ctx context.Context, data []byte) (*Result, error) {
 	}
 
 	result := &Result{FileName: aid.Ext(storage.ExtWasm)}
-	compiled, err := s.storage.GetItem(aid)
-	if err == nil {
+	isCached, err := s.storage.HasItem(aid)
+	if err != nil {
+		s.log.Errorw("failed to check cache", "artifact", aid.String(), "err", err)
+		return nil, err
+	}
+
+	if isCached {
 		// Just return precompiled result if data is cached already
-		s.log.Debugw("build cached, returning cached data", "artifact", aid.String())
-		result.Data = compiled
+		s.log.Debugw("build cached, returning cached file", "artifact", aid.String())
 		return result, nil
 	}
 
-	if err != storage.ErrNotExists {
-		s.log.Errorw("failed to open cached file", "artifact", aid.String(), "err", err)
-	}
-
-	_ = s.storage.CreateLocationAndDo(aid, data, func(wasmLocation, sourceLocation string) error {
-		result.Data, err = s.buildSource(ctx, wasmLocation, sourceLocation)
-		return nil
+	err = s.storage.CreateLocationAndDo(aid, data, func(wasmLocation, sourceLocation string) error {
+		return s.buildSource(ctx, wasmLocation, sourceLocation)
 	})
 
 	return result, err

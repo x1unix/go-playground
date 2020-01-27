@@ -47,8 +47,9 @@ func TestLocalStorage_GetItem(t *testing.T) {
 		r.NoError(err, "failed to read test file")
 
 		r.Equal(data, expectData, "input and result don't match")
-
-		must(t, os.Mkdir(filepath.Join(s.binDir), perm), "failed to create bin dir")
+		if err := os.Mkdir(filepath.Join(s.binDir), perm); !os.IsExist(err) {
+			must(t, err, "failed to create bin dir")
+		}
 		err = ioutil.WriteFile(wasmLocation, expectData, perm)
 		must(t, err, "failed to write dest file")
 		return expErr
