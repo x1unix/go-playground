@@ -44,23 +44,47 @@ type LocalStorage struct {
 	binDir  string
 }
 
-func NewLocalStorage(log *zap.SugaredLogger, baseDir string) (*LocalStorage, error) {
+func NewLocalStorage(log *zap.SugaredLogger, baseDir string) (ls *LocalStorage, err error) {
+	logger := log.Named("storage")
+	isDirty := false
 	workDir := filepath.Join(baseDir, workDirName)
-	if err := os.MkdirAll(workDir, perm); err != nil {
+	if err = os.MkdirAll(workDir, perm); err != nil {
 		if !os.IsExist(err) {
 			return nil, errors.Wrap(err, "failed to create temporary build directory for WASM compiler")
 		}
 	}
 
+	isDirty, err = isDirDirty(workDir)
+	if err != nil {
+		logger.Errorw("failed to check if work dir is dirty", "err", err)
+	}
+
+	if isDirty {
+		logger.Info("storage directory is not empty and dirty")
+	}
+
 	return &LocalStorage{
+		log:     logger,
 		workDir: workDir,
 		useLock: &sync.Mutex{},
-		dirty:   abool.NewBool(false),
+		dirty:   abool.NewBool(isDirty),
 		gcRun:   abool.NewBool(false),
-		log:     log.Named("storage"),
 		binDir:  filepath.Join(workDir, binDirName),
 		srcDir:  filepath.Join(workDir, srcDirName),
 	}, nil
+}
+
+func isDirDirty(dir string) (bool, error) {
+	items, err := ioutil.ReadDir(dir)
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+
+	if err != nil {
+		return false, err
+	}
+
+	return len(items) > 0, nil
 }
 
 func (s LocalStorage) getOutputLocation(id ArtifactID) string {
