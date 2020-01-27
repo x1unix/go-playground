@@ -7,6 +7,7 @@ interface ViewData {
     message: string,
     kind: string,
     delay: number
+    showDelay: boolean
 }
 
 const pad = (num: number, size: number) => ('000000000' + num).substr(-size);
@@ -24,7 +25,7 @@ export default class EvalEventView extends React.Component<ViewData> {
     render() {
         return <div className="evalEvent">
             <pre className={this.domClassName}>{this.props.message}</pre>
-            <span className="evalEvent__delay">[{this.delay}]</span>
+            <span className="evalEvent__delay">{this.props.showDelay ? `[${this.delay}]` : ''}</span>
         </div>
     }
 }
