@@ -91,7 +91,7 @@ func start(goRoot string, args appArgs) error {
 
 	ctx, _ := app.GetApplicationContext()
 	wg := &sync.WaitGroup{}
-	go store.StartCleaner(ctx, cleanInterval, wg)
+	go store.StartCleaner(ctx, cleanInterval, nil)
 
 	r := mux.NewRouter()
 	langserver.New(packages, compiler.NewBuildService(zap.S(), store)).
