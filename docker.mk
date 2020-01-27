@@ -2,7 +2,7 @@ DOCKERFILE ?= ./build/Dockerfile
 IMG_NAME ?= x1unix/go-playground
 
 .PHONY: docker
-docker: docker-login docker-make-image
+docker: docker-login docker-image
 	@echo "- Pushing $(IMG_NAME):$(TAG) (as latest)..."
 	docker push $(IMG_NAME):$(TAG)
 	docker push $(IMG_NAME):latest
@@ -17,8 +17,8 @@ docker-login:
 	fi;
 	@docker login -u $(DOCKER_USER) -p $(DOCKER_PASS) && echo "- Docker login success";
 
-.PHONY: docker-make-image
-docker-make-image:
+.PHONY: docker-image
+docker-image:
 	@if [ -z "$(TAG)" ]; then\
 		echo "required parameter TAG is undefined" && exit 1; \
 	fi;
