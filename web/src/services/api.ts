@@ -34,11 +34,11 @@ export interface CompilerResponse {
 export interface IAPIClient {
     readonly axiosClient: AxiosInstance
     getSuggestions(query: {packageName?: string, value?:string}): Promise<monaco.languages.CompletionList>
-    evaluateCode(code: string): Promise<CompilerResponse>
+    evaluateCode(code: string, format: boolean): Promise<CompilerResponse>
     formatCode(code: string): Promise<CompilerResponse>
     getSnippet(id: string): Promise<Snippet>
     shareSnippet(code: string): Promise<ShareResponse>
-    compileToWasm(code: string): Promise<Response>
+    compileToWasm(code: string, format: boolean): Promise<Response>
 }
 
 export const instantiateStreaming = async (resp, importObject) => {
@@ -62,8 +62,8 @@ class Client implements IAPIClient {
         return this.get<monaco.languages.CompletionList>(`/suggest?${queryParams}`);
     }
 
-    async compileToWasm(code: string): Promise<Response> {
-        const resp = await fetch(`${apiAddress}/compile`, {
+    async compileToWasm(code: string, format: boolean): Promise<Response> {
+        const resp = await fetch(`${apiAddress}/compile?format=${Boolean(format)}`, {
             method: 'POST',
             body: code,
         });
@@ -76,8 +76,8 @@ class Client implements IAPIClient {
         return resp;
     }
 
-    async evaluateCode(code: string): Promise<CompilerResponse> {
-        return this.post<CompilerResponse>('/run', code);
+    async evaluateCode(code: string, format: boolean): Promise<CompilerResponse> {
+        return this.post<CompilerResponse>(`/run?format=${Boolean(format)}`, code);
     }
 
     async formatCode(code: string): Promise<CompilerResponse> {

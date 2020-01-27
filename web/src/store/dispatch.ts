@@ -108,11 +108,11 @@ export const runFileDispatcher: Dispatcher =
             const { settings, editor } = getState();
             switch (settings.runtime) {
                 case RuntimeType.GoPlayground:
-                    const res = await client.evaluateCode(editor.code);
+                    const res = await client.evaluateCode(editor.code, settings.autoFormat);
                     dispatch(newBuildResultAction(res));
                     break;
                 case RuntimeType.WebAssembly:
-                    let resp = await client.compileToWasm(editor.code);
+                    let resp = await client.compileToWasm(editor.code, settings.autoFormat);
                     let instance = await instantiateStreaming(resp, getImportObject());
                     dispatch({type: ActionType.EVAL_START});
                     goRun(instance)
