@@ -7,22 +7,11 @@ import {
     SettingsState,
     State,
     StatusState,
-    MonacoState,
-    RuntimeType
 } from './state';
 import {CompilerResponse, EvalEvent} from '../services/api';
-import localConfig from '../services/config'
+import localConfig, {MonacoSettings, RuntimeType} from '../services/config'
 import {mapByAction} from './helpers';
-
-const defaultMonacoState: MonacoState = {
-    cursorBlinking: 'blink',
-    cursorStyle: 'line',
-    selectOnLineNumbers: true,
-    minimap: true,
-    contextMenu: true,
-    smoothScrolling: true,
-    mouseWheelZoom: true,
-};
+import config from "../services/config";
 
 const reducers = {
     editor: mapByAction<EditorState>({
@@ -91,11 +80,11 @@ const reducers = {
            return Object.assign({}, s, a.payload);
         },
     }, {darkMode: localConfig.darkThemeEnabled, autoFormat: true, runtime: RuntimeType.GoPlayground}),
-    monaco: mapByAction<MonacoState>({
-        [ActionType.MONACO_SETTINGS_CHANGE]: (s: MonacoState, a: Action<MonacoParamsChanges>) => {
+    monaco: mapByAction<MonacoSettings>({
+        [ActionType.MONACO_SETTINGS_CHANGE]: (s: MonacoSettings, a: Action<MonacoParamsChanges>) => {
             return Object.assign({}, s, a.payload);
         }
-    }, defaultMonacoState)
+    }, config.monacoSettings)
 };
 
 export const getInitialState = (): State => ({
@@ -108,10 +97,10 @@ export const getInitialState = (): State => ({
     },
     settings: {
         darkMode: localConfig.darkThemeEnabled,
-        autoFormat: true,
-        runtime: RuntimeType.GoPlayground
+        autoFormat: localConfig.autoFormat,
+        runtime: localConfig.runtimeType,
     },
-    monaco: defaultMonacoState,
+    monaco: config.monacoSettings,
 });
 
 export const createRootReducer = history => combineReducers({

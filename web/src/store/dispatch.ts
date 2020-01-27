@@ -2,17 +2,17 @@ import {saveAs} from 'file-saver';
 import {push} from 'connected-react-router';
 import {
     Action,
-    ActionType,
+    ActionType, MonacoParamsChanges, newBuildParamsChangeAction,
     newBuildResultAction,
     newErrorAction,
     newImportFileAction,
-    newLoadingAction,
+    newLoadingAction, newMonacoParamsChangeAction,
     newProgramWriteAction,
     newToggleThemeAction
 } from './actions';
-import {RuntimeType, State} from "./state";
+import {State} from "./state";
 import client, {EvalEventKind, instantiateStreaming} from '../services/api';
-import config from '../services/config';
+import config, {RuntimeType} from '../services/config';
 import {DEMO_CODE} from '../editor/props';
 import {getImportObject, goRun} from '../services/go';
 
@@ -40,6 +40,24 @@ export function newImportFileDispatcher(f: File): Dispatcher {
         reader.readAsText(f, 'UTF-8');
     };
 }
+
+export function newMonacoParamsChangeDispatcher(changes: MonacoParamsChanges): Dispatcher {
+    return (dispatch: DispatchFn, _: StateProvider) => {
+        const current = config.monacoSettings;
+        config.monacoSettings = Object.assign(current, changes);
+        dispatch(newMonacoParamsChangeAction(changes));
+    };
+}
+
+
+export function newBuildParamsChangeDispatcher(runtime: RuntimeType, autoFormat: boolean): Dispatcher {
+    return (dispatch: DispatchFn, _: StateProvider) => {
+        config.runtimeType = runtime;
+        config.autoFormat = autoFormat;
+        dispatch(newBuildParamsChangeAction(runtime, autoFormat));
+    };
+}
+
 
 export function newSnippetLoadDispatcher(snippetID: string): Dispatcher {
     return async(dispatch: DispatchFn, _: StateProvider) => {

@@ -1,7 +1,8 @@
 import React from 'react';
 import './Preview.css';
 import {EDITOR_FONTS} from './editor/props';
-import {Connect, RuntimeType} from './store';
+import {Connect} from './store';
+import { RuntimeType } from './services/config';
 import {EvalEvent} from './services/api';
 import EvalEventView from './EvalEventView';
 import {getTheme} from '@uifabric/styling';

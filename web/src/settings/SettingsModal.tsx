@@ -5,7 +5,8 @@ import {MessageBar, MessageBarType} from 'office-ui-fabric-react/lib/MessageBar'
 import {Link} from 'office-ui-fabric-react/lib/Link';
 import {getContentStyles, getIconButtonStyles} from '../styles/modal';
 import SettingsProperty from './SettingsProperty';
-import {BuildParamsArgs, Connect, MonacoParamsChanges, MonacoState, RuntimeType, SettingsState} from "../store";
+import {MonacoSettings, RuntimeType} from '../services/config';
+import {BuildParamsArgs, Connect, MonacoParamsChanges, SettingsState} from "../store";
 
 const WASM_SUPPORTED = 'WebAssembly' in window;
 
@@ -44,7 +45,7 @@ export interface SettingsProps {
     isOpen: boolean
     onClose: (changes: SettingsChanges) => void
     settings?: SettingsState
-    monaco?: MonacoState
+    monaco?: MonacoSettings
     dispatch?: (Action) => void
 }
 
@@ -70,7 +71,7 @@ export default class SettingsModal extends React.Component<SettingsProps, {isOpe
         this.changes = {};
     }
 
-    private touchMonacoProperty(key: keyof MonacoState, val: any) {
+    private touchMonacoProperty(key: keyof MonacoSettings, val: any) {
         if (!this.changes.monaco) {
             this.changes.monaco = {};
         }

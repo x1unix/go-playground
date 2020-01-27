@@ -1,5 +1,5 @@
 import {CompilerResponse, EvalEvent} from "../services/api";
-import {MonacoState, RuntimeType} from './state';
+import {MonacoSettings, RuntimeType} from "../services/config";
 
 export enum ActionType {
     IMPORT_FILE             = 'IMPORT_FILE',
@@ -33,7 +33,7 @@ export interface BuildParamsArgs {
 }
 
 export type MonacoParamsChanges<T = any> = {
-    [k in keyof MonacoState | string]: T;
+    [k in keyof MonacoSettings | string]: T;
 };
 
 export const actionOf = (type: ActionType) => ({type});

@@ -10,7 +10,10 @@ import {
     formatFileDispatcher,
     runFileDispatcher,
     saveFileDispatcher,
-    dispatchToggleTheme, shareSnippetDispatcher, newMonacoParamsChangeAction, newBuildParamsChangeAction
+    dispatchToggleTheme,
+    shareSnippetDispatcher,
+    newBuildParamsChangeDispatcher,
+    newMonacoParamsChangeDispatcher
 } from './store';
 
 
@@ -153,13 +156,13 @@ export class Header extends React.Component<any, HeaderState> {
     private onSettingsClose(changes: SettingsChanges) {
         if (changes.monaco) {
             // Update monaco state if some of it's settings were changed
-            this.props.dispatch(newMonacoParamsChangeAction(changes.monaco));
+            this.props.dispatch(newMonacoParamsChangeDispatcher(changes.monaco));
         }
 
         if (changes.args) {
             // Save runtime settings
             const { runtime, autoFormat } = changes.args;
-            this.props.dispatch(newBuildParamsChangeAction(runtime, autoFormat));
+            this.props.dispatch(newBuildParamsChangeDispatcher(runtime, autoFormat));
         }
 
         this.setState({showSettings: false});
