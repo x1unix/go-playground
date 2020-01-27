@@ -30,6 +30,10 @@ export class StdioWrapper {
         };
     }
 
+    reset() {
+        this.outputBuf = '';
+    }
+
     get stdoutPipe(): IWriter {
         return this.getWriter(EvalEventKind.Stdout);
     }

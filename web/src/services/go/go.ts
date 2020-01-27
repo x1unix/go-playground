@@ -1,6 +1,9 @@
 import {IFileSystem} from "./fs";
 import {encoder, decoder} from './foundation';
 
+// Doesn't work (idk why), Go throws "undefined" errors
+// Use "wasm_exec.js" for now
+
 const MAX_UINT32 = 4294967296;
 const NAN_HEAD = 0x7FF80000;
 const MS_IN_NANO = 1000000;
@@ -16,22 +19,25 @@ export class Go {
     exited = false;
     private lastExitCode = 0;
     private pendingEvent: any = null;
-    private scheduledTimeouts = new Map<number, any>();
-    private nextCallbackTimeoutID = 1;
+    private _scheduledTimeouts = new Map<number, any>();
+    private _nextCallbackTimeoutID = 1;
     private _resolveExitPromise?: (exitCode: number) => void;
     private exitPromise = new Promise<number>((resolve) => {
         this._resolveExitPromise = resolve;
     });
 
-    private inst: any;
-    private values: any[] = [];
-    private refs = new Map();
+    public _inst: any;
+    public _values: any[] = [];
+    public _refs = new Map();
 
-    constructor(private global: Global) {}
+    constructor(private global: Global) {
+        this._values = [];
+        this._refs = new Map();
+    }
 
     get mem() {
         // The buffer may change when requesting more memory.
-        return new DataView(this.inst.exports.mem.buffer);
+        return new DataView(this._inst.exports.mem.buffer);
     }
 
     setInt64(addr, v) {
@@ -55,7 +61,7 @@ export class Go {
         }
 
         const id = this.mem.getUint32(addr, true);
-        return this.values[id];
+        return this._values[id];
     }
 
     storeValue(addr, v) {
@@ -92,11 +98,12 @@ export class Go {
                 return;
         }
 
-        let ref = this.refs.get(v);
+        console.log(this);
+        let ref = this._refs.get(v);
         if (ref === undefined) {
-            ref = this.values.length;
-            this.values.push(v);
-            this.refs.set(v, ref);
+            ref = this._values.length;
+            this._values.push(v);
+            this._refs.set(v, ref);
         }
         let typeFlag = 0;
         switch (typeof v) {
@@ -117,7 +124,7 @@ export class Go {
     loadSlice(addr) {
         const array = this.getInt64(addr + 0);
         const len = this.getInt64(addr + 8);
-        return new Uint8Array(this.inst.exports.mem.buffer, array, len);
+        return new Uint8Array(this._inst.exports.mem.buffer, array, len);
     }
 
     loadSliceOfValues(addr) {
@@ -133,7 +140,7 @@ export class Go {
     loadString(addr) {
         const saddr = this.getInt64(addr + 0);
         const len = this.getInt64(addr + 8);
-        return decoder.decode(new DataView(this.inst.exports.mem.buffer, saddr, len));
+        return decoder.decode(new DataView(this._inst.exports.mem.buffer, saddr, len));
     }
 
     importObject = {
@@ -147,9 +154,12 @@ export class Go {
             "runtime.wasmExit": (sp) => {
                 const code = this.mem.getInt32(sp + 8, true);
                 this.exited = true;
-                delete this.inst;
-                delete this.values;
-                delete this.refs;
+                // delete this._inst;
+                // this._inst = null;
+                this._values = [];
+                this._refs = new Map();
+                // delete this._values;
+                // delete this._refs;
                 this.exit(code);
             },
 
@@ -158,7 +168,7 @@ export class Go {
                 const fd = this.getInt64(sp + 8);
                 const p = this.getInt64(sp + 16);
                 const n = this.mem.getInt32(sp + 24, true);
-                this.global.fs.writeSync(fd, new Uint8Array(this.inst.exports.mem.buffer, p, n));
+                this.global.fs.writeSync(fd, new Uint8Array(this._inst.exports.mem.buffer, p, n));
             },
 
             // func nanotime() int64
@@ -175,16 +185,16 @@ export class Go {
 
             // func scheduleTimeoutEvent(delay int64) int32
             "runtime.scheduleTimeoutEvent": (sp) => {
-                const id = this.nextCallbackTimeoutID;
-                this.nextCallbackTimeoutID++;
-                this.scheduledTimeouts.set(id, setTimeout(
+                const id = this._nextCallbackTimeoutID;
+                this._nextCallbackTimeoutID++;
+                this._scheduledTimeouts.set(id, setTimeout(
                     () => {
-                        this.resume();
-                        while (this.scheduledTimeouts.has(id)) {
+                        this._resume();
+                        while (this._scheduledTimeouts.has(id)) {
                             // for some reason Go failed to register the timeout event, log and try again
                             // (temporary workaround for https://github.com/golang/go/issues/28975)
                             console.warn("scheduleTimeoutEvent: missed timeout event");
-                            this.resume();
+                            this._resume();
                         }
                     },
                     this.getInt64(sp + 8) + 1, // setTimeout has been seen to fire up to 1 millisecond early
@@ -195,8 +205,8 @@ export class Go {
             // func clearTimeoutEvent(id int32)
             "runtime.clearTimeoutEvent": (sp) => {
                 const id = this.mem.getInt32(sp + 8, true);
-                clearTimeout(this.scheduledTimeouts.get(id));
-                this.scheduledTimeouts.delete(id);
+                clearTimeout(this._scheduledTimeouts.get(id));
+                this._scheduledTimeouts.delete(id);
             },
 
             // func getRandomData(r []byte)
@@ -212,7 +222,7 @@ export class Go {
             // func valueGet(v ref, p string) ref
             "syscall/js.valueGet": (sp) => {
                 const result = Reflect.get(this.loadValue(sp + 8), this.loadString(sp + 16));
-                sp = this.inst.exports.getsp(); // see comment above
+                sp = this._inst.exports.getsp(); // see comment above
                 this.storeValue(sp + 32, result);
             },
 
@@ -238,7 +248,7 @@ export class Go {
                     const m = Reflect.get(v, this.loadString(sp + 16));
                     const args = this.loadSliceOfValues(sp + 32);
                     const result = Reflect.apply(m, v, args);
-                    sp = this.inst.exports.getsp(); // see comment above
+                    sp = this._inst.exports.getsp(); // see comment above
                     this.storeValue(sp + 56, result);
                     this.mem.setUint8(sp + 64, 1);
                 } catch (err) {
@@ -253,7 +263,7 @@ export class Go {
                     const v = this.loadValue(sp + 8);
                     const args = this.loadSliceOfValues(sp + 16);
                     const result = Reflect.apply(v, undefined, args);
-                    sp = this.inst.exports.getsp(); // see comment above
+                    sp = this._inst.exports.getsp(); // see comment above
                     this.storeValue(sp + 40, result);
                     this.mem.setUint8(sp + 48, 1);
                 } catch (err) {
@@ -268,7 +278,7 @@ export class Go {
                     const v = this.loadValue(sp + 8);
                     const args = this.loadSliceOfValues(sp + 16);
                     const result = Reflect.construct(v, args);
-                    sp = this.inst.exports.getsp(); // see comment above
+                    sp = this._inst.exports.getsp(); // see comment above
                     this.storeValue(sp + 40, result);
                     this.mem.setUint8(sp + 48, 1);
                 } catch (err) {
@@ -336,8 +346,9 @@ export class Go {
 
     public async run(instance: WebAssembly.Instance): Promise<number> {
         this.lastExitCode = 0;
-        this.inst = instance;
-        this.values = [ // TODO: garbage collection
+        this._inst = instance;
+        this._refs = new Map();
+        this._values = [ // TODO: garbage collection
             NaN,
             0,
             null,
@@ -346,10 +357,10 @@ export class Go {
             global,
             this,
         ];
-        this.refs = new Map();
+        this._refs = new Map();
         this.exited = false;
 
-        const mem = new DataView(this.inst.exports.mem.buffer);
+        const mem = new DataView(this._inst.exports.mem.buffer);
 
         // Pass command line arguments and environment variables to WebAssembly by writing them to the linear memory.
         let offset = 4096;
@@ -385,30 +396,30 @@ export class Go {
             offset += 8;
         });
 
-        this.inst.exports.run(argc, argv);
+        this._inst.exports.run(argc, argv);
         if (this.exited) {
             this._resolveExitPromise && this._resolveExitPromise(this.lastExitCode);
         }
         return await this.exitPromise;
     }
 
-    resume() {
+    _resume() {
         if (this.exited) {
             throw new Error("Go program has already exited");
         }
-        this.inst.exports.resume();
+        this._inst.exports.resume();
         if (this.exited) {
             this._resolveExitPromise && this._resolveExitPromise(this.lastExitCode);
         }
     }
 
-    makeFuncWrapper(id) {
+    _makeFuncWrapper(id) {
         const go = this;
         return function () {
             // @ts-ignore
             const event: any = { id: id, this: this, args: arguments };
             go.pendingEvent = event;
-            go.resume();
+            go._resume();
             return event.result;
         };
     }
