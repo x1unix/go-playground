@@ -274,5 +274,4 @@ func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", wasmMimeType)
 	w.Header().Set("Content-Length", strconv.FormatInt(n, 10))
-	w.WriteHeader(http.StatusOK)
 }
