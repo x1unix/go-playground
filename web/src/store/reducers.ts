@@ -72,6 +72,14 @@ const reducers = {
         [ActionType.EVAL_FINISH]: (s: StatusState, _: Action) => {
             return {...s, loading: false}
         },
+        [ActionType.BUILD_PARAMS_CHANGE]: (s: StatusState, a: Action<BuildParamsArgs>) => {
+            if (a.payload.runtime) {
+                // Reset build output if build runtime was changed
+                return {loading: false, lastError: null}
+            }
+
+            return s;
+        },
     }, {loading: false}),
     settings: mapByAction<SettingsState>({
         [ActionType.TOGGLE_THEME]: (s: SettingsState, a: Action) => {
