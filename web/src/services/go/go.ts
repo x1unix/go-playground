@@ -14,11 +14,12 @@ export class Go {
     env: {[k: string]: string} = {};
     timeOrigin = Date.now() - performance.now();
     exited = false;
+    private lastExitCode = 0;
     private pendingEvent: any = null;
     private scheduledTimeouts = new Map<number, any>();
     private nextCallbackTimeoutID = 1;
-    private _resolveExitPromise?: (val?: any) => void;
-    private exitPromise = new Promise((resolve) => {
+    private _resolveExitPromise?: (exitCode: number) => void;
+    private exitPromise = new Promise<number>((resolve) => {
         this._resolveExitPromise = resolve;
     });
 
@@ -333,7 +334,8 @@ export class Go {
         },
     };
 
-    public async run(instance: WebAssembly.Instance) {
+    public async run(instance: WebAssembly.Instance): Promise<number> {
+        this.lastExitCode = 0;
         this.inst = instance;
         this.values = [ // TODO: garbage collection
             NaN,
@@ -385,9 +387,9 @@ export class Go {
 
         this.inst.exports.run(argc, argv);
         if (this.exited) {
-            this._resolveExitPromise && this._resolveExitPromise();
+            this._resolveExitPromise && this._resolveExitPromise(this.lastExitCode);
         }
-        await this.exitPromise;
+        return await this.exitPromise;
     }
 
     resume() {
@@ -396,7 +398,7 @@ export class Go {
         }
         this.inst.exports.resume();
         if (this.exited) {
-            this._resolveExitPromise && this._resolveExitPromise();
+            this._resolveExitPromise && this._resolveExitPromise(this.lastExitCode);
         }
     }
 
@@ -412,8 +414,6 @@ export class Go {
     }
 
     exit(code = 0) {
-        if (code !== 0) {
-            console.warn('exit code: ', code);
-        }
+        this.lastExitCode = code;
     }
 }

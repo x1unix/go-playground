@@ -64,10 +64,10 @@ const reducers = {
             return {...s, loading: true}
         },
         [ActionType.EVAL_START]: (s: StatusState, _: Action) => {
-            return {lastError: null, loading: true, events: []}
+            return {lastError: null, loading: false, events: []}
         },
         [ActionType.EVAL_EVENT]: (s: StatusState, a: Action<EvalEvent>) => {
-            return {lastError: null, loading: true, events: s.events?.concat(a.payload)}
+            return {lastError: null, loading: false, events: s.events?.concat(a.payload)}
         },
         [ActionType.EVAL_FINISH]: (s: StatusState, _: Action) => {
             return {...s, loading: false}

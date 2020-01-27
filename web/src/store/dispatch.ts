@@ -1,17 +1,20 @@
-import { saveAs } from 'file-saver';
-import { push } from 'connected-react-router';
+import {saveAs} from 'file-saver';
+import {push} from 'connected-react-router';
 import {
-    newErrorAction,
+    Action,
+    ActionType,
     newBuildResultAction,
+    newErrorAction,
     newImportFileAction,
     newLoadingAction,
-    newToggleThemeAction,
-    Action, newProgramWriteAction
+    newProgramWriteAction,
+    newToggleThemeAction
 } from './actions';
-import {State} from "./state";
-import client, {EvalEventKind} from '../services/api';
+import {RuntimeType, State} from "./state";
+import client, {EvalEventKind, instantiateStreaming} from '../services/api';
 import config from '../services/config';
 import {DEMO_CODE} from '../editor/props';
+import {getImportObject, goRun} from '../services/go';
 
 export type StateProvider = () => State
 export type DispatchFn = (a: Action|any) => any
@@ -84,9 +87,24 @@ export const runFileDispatcher: Dispatcher =
     async (dispatch: DispatchFn, getState: StateProvider) => {
         dispatch(newLoadingAction());
         try {
-            const {code} = getState().editor;
-            const res = await client.evaluateCode(code);
-            dispatch(newBuildResultAction(res));
+            const { settings, editor } = getState();
+            switch (settings.runtime) {
+                case RuntimeType.GoPlayground:
+                    const res = await client.evaluateCode(editor.code);
+                    dispatch(newBuildResultAction(res));
+                    break;
+                case RuntimeType.WebAssembly:
+                    let resp = await client.compileToWasm(editor.code);
+                    let instance = await instantiateStreaming(resp, getImportObject());
+                    dispatch({type: ActionType.EVAL_START});
+                    goRun(instance)
+                        .then(result => console.log('exit code: %d', result))
+                        .catch(err => console.log('err', err))
+                        .finally(() => dispatch({type: ActionType.EVAL_FINISH}));
+                    break;
+                default:
+                    dispatch(newErrorAction(`AppError: Unknown Go runtime type "${settings.runtime}"`));
+            }
         } catch (err) {
             dispatch(newErrorAction(err.message));
         }

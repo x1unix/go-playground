@@ -4,13 +4,15 @@ import {StdioWrapper, ConsoleLogger} from './stdio';
 
 let instance: Go;
 
-export const run = async(m: WebAssembly.Instance) => {
+export const goRun = async(m: WebAssembly.WebAssemblyInstantiatedSource) => {
     if (!instance) {
         throw new Error('Go runner instance is not initialized');
     }
 
-    return instance.run(m);
+    return instance.run(m.instance);
 };
+
+export const getImportObject = () => instance.importObject;
 
 export const bootstrapGo = (logger: ConsoleLogger) => {
     if (instance) {
