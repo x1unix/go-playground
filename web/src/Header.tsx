@@ -2,25 +2,40 @@ import React from 'react';
 import './Header.css'
 import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/CommandBar';
 import { getTheme } from '@uifabric/styling';
+import SettingsModal, {SettingsChanges} from './settings/SettingsModal';
+import AboutModal from './AboutModal';
 import {
     Connect,
     newImportFileDispatcher,
     formatFileDispatcher,
     runFileDispatcher,
     saveFileDispatcher,
-    dispatchToggleTheme, shareSnippetDispatcher
+    dispatchToggleTheme,
+    shareSnippetDispatcher,
+    newBuildParamsChangeDispatcher,
+    newMonacoParamsChangeDispatcher
 } from './store';
 
+
+interface HeaderState {
+    showSettings: boolean
+    showAbout: boolean
+    loading: boolean
+}
+
 @Connect(s => ({darkMode: s.settings.darkMode, loading: s.status?.loading}))
-export class Header extends React.Component<any> {
+export class Header extends React.Component<any, HeaderState> {
     private fileInput?: HTMLInputElement;
 
     constructor(props) {
         super(props);
         this.state = {
+            showSettings: false,
+            showAbout: false,
             loading: false
         };
     }
+
     componentDidMount(): void {
         const fileElement = document.createElement('input') as HTMLInputElement;
         fileElement.type = 'file';
@@ -104,12 +119,53 @@ export class Header extends React.Component<any> {
         ];
     }
 
+    get overflowItems(): ICommandBarItemProps[] {
+        return [
+            {
+                key: 'settings',
+                text: 'Settings',
+                ariaLabel: 'Settings',
+                iconOnly: true,
+                iconProps: {iconName: 'Settings'},
+                disabled: this.props.loading,
+                onClick: () => {
+                    this.setState({showSettings: true});
+                }
+            },
+            {
+                key: 'about',
+                text: 'About',
+                ariaLabel: 'About',
+                iconOnly: true,
+                iconProps: {iconName: 'Info'},
+                onClick: () => {
+                    this.setState({showAbout: true});
+                }
+            }
+        ]
+    }
+
     get styles() {
         // Apply the same colors as rest of Fabric components
         const theme = getTheme();
         return {
             backgroundColor: theme.palette.white
         }
+    }
+
+    private onSettingsClose(changes: SettingsChanges) {
+        if (changes.monaco) {
+            // Update monaco state if some of it's settings were changed
+            this.props.dispatch(newMonacoParamsChangeDispatcher(changes.monaco));
+        }
+
+        if (changes.args) {
+            // Save runtime settings
+            const { runtime, autoFormat } = changes.args;
+            this.props.dispatch(newBuildParamsChangeDispatcher(runtime, autoFormat));
+        }
+
+        this.setState({showSettings: false});
     }
 
     render() {
@@ -123,8 +179,11 @@ export class Header extends React.Component<any> {
                 className='header__commandBar'
                 items={this.menuItems}
                 farItems={this.asideItems}
+                overflowItems={this.overflowItems}
                 ariaLabel='CodeEditor menu'
             />
+            <SettingsModal onClose={(args) => this.onSettingsClose(args)} isOpen={this.state.showSettings} />
+            <AboutModal onClose={() => this.setState({showAbout: false})} isOpen={this.state.showAbout} />
         </header>;
     }
 }

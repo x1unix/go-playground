@@ -1,17 +1,21 @@
 import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import {editor} from 'monaco-editor';
-import { Connect, newFileChangeAction } from '../store';
-// import { connect } from 'react-redux';
+import {Connect, newFileChangeAction} from '../store';
 
-import { DEFAULT_EDITOR_OPTIONS, LANGUAGE_GOLANG } from './props';
+import { LANGUAGE_GOLANG, stateToOptions } from './props';
 
 interface CodeEditorState {
     code?: string
     loading?:boolean
 }
 
-@Connect(s => ({code: s.editor.code, darkMode: s.settings.darkMode, loading: s.status?.loading}))
+@Connect(s => ({
+    code: s.editor.code,
+    darkMode: s.settings.darkMode,
+    loading: s.status?.loading,
+    options: s.monaco,
+}))
 export default class CodeEditor extends React.Component<any, CodeEditorState> {
     editorDidMount(editor: editor.IStandaloneCodeEditor, monaco: any) {
         editor.focus();
@@ -22,11 +26,12 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
     }
 
     render() {
+        const options = stateToOptions(this.props.options);
         return <MonacoEditor
             language={LANGUAGE_GOLANG}
             theme={this.props.darkMode ? 'vs-dark' : 'vs-light'}
             value={this.props.code}
-            options={DEFAULT_EDITOR_OPTIONS}
+            options={options}
             onChange={(newVal, e) => this.onChange(newVal, e)}
             editorDidMount={(e, m: any) => this.editorDidMount(e, m)}
         />;

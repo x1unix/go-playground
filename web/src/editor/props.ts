@@ -1,4 +1,5 @@
 import * as monaco from 'monaco-editor';
+import {MonacoSettings} from "../services/config";
 
 export const LANGUAGE_GOLANG = 'go';
 
@@ -22,10 +23,15 @@ export const EDITOR_FONTS = [
     'monospace'
 ].join(', ');
 
-export const DEFAULT_EDITOR_OPTIONS: monaco.editor.IEditorOptions = {
-    selectOnLineNumbers: true,
-    mouseWheelZoom: true,
-    automaticLayout: true,
-    fontFamily: EDITOR_FONTS,
-    showUnused: true
+// stateToOptions converts MonacoState to IEditorOptions
+export const stateToOptions = (state: MonacoSettings): monaco.editor.IEditorOptions => {
+    const {selectOnLineNumbers, mouseWheelZoom, smoothScrolling, cursorBlinking, cursorStyle, contextMenu } = state;
+    return {
+        selectOnLineNumbers, mouseWheelZoom, smoothScrolling, cursorBlinking, cursorStyle,
+        fontFamily: EDITOR_FONTS,
+        showUnused: true,
+        automaticLayout: true,
+        minimap: {enabled: state.minimap},
+        contextmenu: contextMenu,
+    };
 };

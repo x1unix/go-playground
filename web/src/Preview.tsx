@@ -1,11 +1,12 @@
 import React from 'react';
 import './Preview.css';
-import { EDITOR_FONTS } from './editor/props';
-import { Connect } from './store';
+import {EDITOR_FONTS} from './editor/props';
+import {Connect} from './store';
+import { RuntimeType } from './services/config';
 import {EvalEvent} from './services/api';
 import EvalEventView from './EvalEventView';
-import { getTheme } from '@uifabric/styling';
-import { MessageBar, MessageBarType } from 'office-ui-fabric-react';
+import {getTheme} from '@uifabric/styling';
+import {MessageBar, MessageBarType} from 'office-ui-fabric-react';
 import {ProgressIndicator} from "office-ui-fabric-react/lib/ProgressIndicator";
 
 
@@ -13,9 +14,10 @@ interface PreviewProps {
     lastError?:string | null;
     events?: EvalEvent[]
     loading?: boolean
+    runtime?: RuntimeType
 }
 
-@Connect(s => ({darkMode: s.settings.darkMode, ...s.status}))
+@Connect(s => ({darkMode: s.settings.darkMode, runtime: s.settings.runtime, ...s.status}))
 export default class Preview extends React.Component<PreviewProps> {
     get styles() {
         const { palette } = getTheme();
@@ -31,6 +33,8 @@ export default class Preview extends React.Component<PreviewProps> {
     }
 
     render() {
+        // Some content should not be displayed in WASM mode (like delay, etc)
+        const isWasm = this.props.runtime === RuntimeType.WebAssembly;
         let content;
         if (this.props.lastError) {
             content = <MessageBar messageBarType={MessageBarType.error} isMultiline={true}>
@@ -45,9 +49,12 @@ export default class Preview extends React.Component<PreviewProps> {
                 message={e.Message}
                 delay={e.Delay}
                 kind={e.Kind}
+                showDelay={!isWasm}
             />);
 
-            content.push(<div className="app-preview__epilogue" key="exit">Program exited.</div>)
+            if (!isWasm) {
+                content.push(<div className="app-preview__epilogue" key="exit">Program exited.</div>)
+            }
         } else {
             content = <span>Press "Run" to compile program.</span>;
         }

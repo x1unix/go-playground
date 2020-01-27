@@ -11,7 +11,9 @@ Improved Go Playground powered by Monaco Editor and React
 
 * 💡 Code autocomplete
 * 💾 Load and save files
+* 🛠 [WebAssembly](https://github.com/golang/go/wiki/WebAssembly) support
 * 🌚 Dark theme
+
 
 And more
 

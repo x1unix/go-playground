@@ -1,10 +1,15 @@
 import * as axios from 'axios';
-import {AxiosInstance} from "axios";
+import {AxiosInstance} from 'axios';
 import * as monaco from "monaco-editor";
+import config from './config';
 
-const apiAddress = process.env['REACT_APP_LANG_SERVER'] ?? window.location.origin;
+const apiAddress = `${config.serverUrl}/api`;
+const axiosClient = axios.default.create({baseURL: apiAddress});
 
-let axiosClient = axios.default.create({baseURL: `${apiAddress}/api`});
+export enum EvalEventKind {
+    Stdout = 'stdout',
+    Stderr = 'stderr'
+}
 
 export interface ShareResponse {
     snippetID: string
@@ -17,42 +22,80 @@ export interface Snippet {
 
 export interface EvalEvent {
     Message: string
-    Kind: string
+    Kind: EvalEventKind
     Delay: number
 }
 
-export interface CompilerResponse {
-    formatted?: string|null
+export interface RunResponse {
+    formatted?: string | null
     events: EvalEvent[]
+}
+
+export interface BuildResponse {
+    formatted?: string | null
+    fileName: string
 }
 
 export interface IAPIClient {
     readonly axiosClient: AxiosInstance
-    getSuggestions(query: {packageName?: string, value?:string}): Promise<monaco.languages.CompletionList>
-    evaluateCode(code: string): Promise<CompilerResponse>
-    formatCode(code: string): Promise<CompilerResponse>
+
+    getSuggestions(query: { packageName?: string, value?: string }): Promise<monaco.languages.CompletionList>
+
+    evaluateCode(code: string, format: boolean): Promise<RunResponse>
+
+    formatCode(code: string): Promise<RunResponse>
+
+    build(code: string, format: boolean): Promise<BuildResponse>
+
+    getArtifact(fileName: string): Promise<Response>
+
     getSnippet(id: string): Promise<Snippet>
+
     shareSnippet(code: string): Promise<ShareResponse>
 }
+
+export const instantiateStreaming = async (resp, importObject) => {
+    if ('instantiateStreaming' in WebAssembly) {
+        return await WebAssembly.instantiateStreaming(resp, importObject);
+    }
+
+    const source = await (await resp).arrayBuffer();
+    return await WebAssembly.instantiate(source, importObject);
+};
 
 class Client implements IAPIClient {
     get axiosClient() {
         return this.client;
     }
 
-    constructor(private client: axios.AxiosInstance) {}
+    constructor(private client: axios.AxiosInstance) {
+    }
 
-    async getSuggestions(query: {packageName?: string, value?:string}): Promise<monaco.languages.CompletionList> {
+    async getSuggestions(query: { packageName?: string, value?: string }): Promise<monaco.languages.CompletionList> {
         const queryParams = Object.keys(query).map(k => `${k}=${query[k]}`).join('&');
         return this.get<monaco.languages.CompletionList>(`/suggest?${queryParams}`);
     }
 
-    async evaluateCode(code: string): Promise<CompilerResponse> {
-        return this.post<CompilerResponse>('/compile', code);
+    async build(code: string, format: boolean): Promise<BuildResponse> {
+        return this.post<BuildResponse>(`/compile?format=${Boolean(format)}`, code);
     }
 
-    async formatCode(code: string): Promise<CompilerResponse> {
-        return this.post<CompilerResponse>('/format', code);
+    async getArtifact(fileName: string): Promise<Response> {
+        const resp = await fetch(`${apiAddress}/artifacts/${fileName}`);
+        if (resp.status >= 300) {
+            const err = await resp.json();
+            throw new Error(err.message ?? resp.statusText);
+        }
+
+        return resp;
+    }
+
+    async evaluateCode(code: string, format: boolean): Promise<RunResponse> {
+        return this.post<RunResponse>(`/run?format=${Boolean(format)}`, code);
+    }
+
+    async formatCode(code: string): Promise<RunResponse> {
+        return this.post<RunResponse>('/format', code);
     }
 
     async getSnippet(id: string): Promise<Snippet> {
@@ -67,16 +110,16 @@ class Client implements IAPIClient {
         try {
             const resp = await this.client.get<T>(uri);
             return resp.data;
-        } catch(err) {
+        } catch (err) {
             throw Client.extractAPIError(err);
         }
     }
 
-    private async post<T>(uri: string, data: any): Promise<T> {
+    private async post<T>(uri: string, data: any, cfg?: axios.AxiosRequestConfig): Promise<T> {
         try {
-            const resp = await this.client.post<T>(uri, data);
+            const resp = await this.client.post<T>(uri, data, cfg);
             return resp.data;
-        } catch(err) {
+        } catch (err) {
             throw Client.extractAPIError(err);
         }
     }

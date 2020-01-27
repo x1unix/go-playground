@@ -58,7 +58,7 @@ func doRequest(ctx context.Context, method, url, contentType string, body io.Rea
 	if err != nil {
 		return nil, err
 	}
-	if err = ValidateContentLength(bodyBytes); err != nil {
+	if err = ValidateContentLength(bodyBytes.Len()); err != nil {
 		return nil, err
 	}
 
