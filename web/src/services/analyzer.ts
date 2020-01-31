@@ -94,4 +94,8 @@ export class Analyzer {
             this.worker.postMessage(msg);
         });
     }
+
+    static supported() {
+        return 'WebAssembly' in window;
+    }
 }

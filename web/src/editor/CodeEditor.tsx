@@ -25,8 +25,13 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
     editorInstance?: editor.IStandaloneCodeEditor;
 
     editorDidMount(editorInstance: editor.IStandaloneCodeEditor, _: monaco.editor.IEditorConstructionOptions) {
-        this.analyzer = new Analyzer();
         this.editorInstance = editorInstance;
+        if (Analyzer.supported()) {
+            this.analyzer = new Analyzer();
+        } else {
+            console.info('Analyzer requires WebAssembly support');
+        }
+
         editorInstance.focus();
     }
 
@@ -36,7 +41,10 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
 
     onChange(newValue: string, e: editor.IModelContentChangedEvent) {
         this.props.dispatch(newFileChangeAction(newValue));
-        this.doAnalyze(newValue);
+
+        if (this.analyzer) {
+            this.doAnalyze(newValue);
+        }
     }
 
     private doAnalyze(code: string) {
