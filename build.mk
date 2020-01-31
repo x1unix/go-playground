@@ -1,4 +1,6 @@
 TOOLS ?= ./tools
+PUBLIC_DIR ?= $(UI)/public
+WEBWORKER_PKG ?= ./cmd/webworker
 
 .PHONY: clean
 clean:
@@ -25,8 +27,14 @@ build-ui:
 	@echo "- Building UI..."
 	cd $(UI) && yarn build
 
+.PHONY:build-webworker
+build-webworker:
+	@echo "Building Go Webworker module..." && \
+	GOOS=js GOARCH=wasm go build -o $(PUBLIC_DIR)/worker.wasm $(WEBWORKER_PKG) && \
+	cp "$$(go env GOROOT)/misc/wasm/wasm_exec.js" $(PUBLIC_DIR)
+
 .PHONY: build
-build: clean preinstall collect-meta build-server build-ui
+build: clean preinstall collect-meta build-server build-webworker build-ui
 	@echo "- Copying assets..."
 	cp -rf ./data $(TARGET)/data
 	mv $(UI)/build $(TARGET)/public

@@ -1,6 +1,6 @@
 import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
-import {editor} from 'monaco-editor';
+import {editor, default as monaco, MarkerSeverity} from 'monaco-editor';
 import {Connect, newFileChangeAction} from '../store';
 
 import { LANGUAGE_GOLANG, stateToOptions } from './props';
@@ -17,8 +17,18 @@ interface CodeEditorState {
     options: s.monaco,
 }))
 export default class CodeEditor extends React.Component<any, CodeEditorState> {
-    editorDidMount(editor: editor.IStandaloneCodeEditor, monaco: any) {
-        editor.focus();
+    editorDidMount(editorInstance: editor.IStandaloneCodeEditor, _: monaco.editor.IEditorConstructionOptions) {
+        editor.setModelMarkers(editorInstance.getModel() as editor.ITextModel, "owner", [
+            {
+                startLineNumber: 3,
+                startColumn: 18,
+                endLineNumber: 3,
+                endColumn: 23,
+                message: 'Error!',
+                severity: 8
+            }
+        ]);
+        editorInstance.focus();
     }
 
     onChange(newValue: string, e: editor.IModelContentChangedEvent) {
