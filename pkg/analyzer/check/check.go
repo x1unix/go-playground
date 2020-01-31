@@ -9,7 +9,7 @@ import (
 // Check checks Go code and returns check result
 func Check(src string) (*Result, error) {
 	fset := token.NewFileSet()
-	_, err := parser.ParseFile(fset, "main.go", src, parser.AllErrors)
+	_, err := parser.ParseFile(fset, "main.go", src, parser.DeclarationErrors)
 	if err == nil {
 		return &Result{HasErrors: false}, nil
 	}
