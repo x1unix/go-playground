@@ -71,10 +71,6 @@ function main() {
     fetchAndInstantiate("worker.wasm", go.importObject)
         .then(instance => go.run(instance))
         .catch(err => console.error('worker: Go error ', err));
-
-    onmessage = (data) => {
-        console.log('worker: onmessage ', data);
-    }
 }
 
 main();
