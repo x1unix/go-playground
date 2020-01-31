@@ -1,6 +1,8 @@
 importScripts('wasm_exec.js');
 
 const FN_EXIT = 'exit';
+const TYPE_ANALYZE = 'ANALYZE';
+const TYPE_EXIT = 'EXIT';
 
 function wrapModule(module) {
     const wrapped = {
@@ -34,13 +36,23 @@ function wrapModule(module) {
  * @param module {Object}
  */
 function onModuleInit(module) {
-    console.log('module loaded!', module);
     module = wrapModule(module);
-
-    module.analyzeCode('foo')
-        .then(result => console.log(result))
-        .catch(err => console.error(err));
-    //module.exit();
+    onmessage = (msg) => {
+        const {id, type, data} = msg.data;
+        switch (type) {
+            case TYPE_ANALYZE:
+                module.analyzeCode(data)
+                    .then(result => postMessage({id, type, result}))
+                    .catch(error => postMessage({id, type, error}));
+                break;
+            case TYPE_EXIT:
+                module.exit();
+                break;
+            default:
+                console.error('worker: unknown message type "%s"', type);
+                return;
+        }
+    };
 }
 
 function fetchAndInstantiate(url, importObject) {
