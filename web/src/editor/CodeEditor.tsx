@@ -55,7 +55,6 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
         this._previousTimeout = setTimeout(() => {
             this._previousTimeout = null;
             this.analyzer?.analyzeCode(code).then(result => {
-                console.log('got analysis', result);
                 editor.setModelMarkers(
                     this.editorInstance?.getModel() as editor.ITextModel,
                     this.editorInstance?.getId() as string,
