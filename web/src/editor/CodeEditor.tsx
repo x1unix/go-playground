@@ -1,9 +1,12 @@
 import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
-import {editor} from 'monaco-editor';
+import {editor, default as monaco} from 'monaco-editor';
 import {Connect, newFileChangeAction} from '../store';
+import { Analyzer } from '../services/analyzer';
 
 import { LANGUAGE_GOLANG, stateToOptions } from './props';
+
+const ANALYZE_DEBOUNCE_TIME = 500;
 
 interface CodeEditorState {
     code?: string
@@ -17,12 +20,48 @@ interface CodeEditorState {
     options: s.monaco,
 }))
 export default class CodeEditor extends React.Component<any, CodeEditorState> {
-    editorDidMount(editor: editor.IStandaloneCodeEditor, monaco: any) {
-        editor.focus();
+    analyzer?: Analyzer;
+    _previousTimeout: any;
+    editorInstance?: editor.IStandaloneCodeEditor;
+
+    editorDidMount(editorInstance: editor.IStandaloneCodeEditor, _: monaco.editor.IEditorConstructionOptions) {
+        this.editorInstance = editorInstance;
+        if (Analyzer.supported()) {
+            this.analyzer = new Analyzer();
+        } else {
+            console.info('Analyzer requires WebAssembly support');
+        }
+
+        editorInstance.focus();
+    }
+
+    componentWillUnmount() {
+        this.analyzer?.dispose();
     }
 
     onChange(newValue: string, e: editor.IModelContentChangedEvent) {
         this.props.dispatch(newFileChangeAction(newValue));
+
+        if (this.analyzer) {
+            this.doAnalyze(newValue);
+        }
+    }
+
+    private doAnalyze(code: string) {
+        if (this._previousTimeout) {
+            clearTimeout(this._previousTimeout);
+        }
+
+        this._previousTimeout = setTimeout(() => {
+            this._previousTimeout = null;
+            this.analyzer?.analyzeCode(code).then(result => {
+                editor.setModelMarkers(
+                    this.editorInstance?.getModel() as editor.ITextModel,
+                    this.editorInstance?.getId() as string,
+                    result.markers
+                );
+            }).catch(err => console.error('failed to perform code analysis: %s', err));
+        }, ANALYZE_DEBOUNCE_TIME);
     }
 
     render() {
