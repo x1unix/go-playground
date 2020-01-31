@@ -37,7 +37,7 @@ function onModuleInit(module) {
     console.log('module loaded!', module);
     module = wrapModule(module);
 
-    module.handleMessage('foo')
+    module.analyzeCode('foo')
         .then(result => console.log(result))
         .catch(err => console.error(err));
     //module.exit();
@@ -55,6 +55,7 @@ function fetchAndInstantiate(url, importObject) {
 
 function main() {
     const go = new Go();
+    go.argv = ['js', 'onModuleInit'];
     fetchAndInstantiate("worker.wasm", go.importObject)
         .then(instance => go.run(instance))
         .catch(err => console.error('worker: Go error ', err));
