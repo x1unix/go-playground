@@ -1,9 +1,12 @@
 import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
-import {editor, default as monaco, MarkerSeverity} from 'monaco-editor';
+import {editor, default as monaco} from 'monaco-editor';
 import {Connect, newFileChangeAction} from '../store';
+import { Analyzer } from '../services/analyzer';
 
 import { LANGUAGE_GOLANG, stateToOptions } from './props';
+
+const ANALYZE_DEBOUNCE_TIME = 500;
 
 interface CodeEditorState {
     code?: string
@@ -17,22 +20,41 @@ interface CodeEditorState {
     options: s.monaco,
 }))
 export default class CodeEditor extends React.Component<any, CodeEditorState> {
+    analyzer?: Analyzer;
+    _previousTimeout: any;
+    editorInstance?: editor.IStandaloneCodeEditor;
+
     editorDidMount(editorInstance: editor.IStandaloneCodeEditor, _: monaco.editor.IEditorConstructionOptions) {
-        editor.setModelMarkers(editorInstance.getModel() as editor.ITextModel, "owner", [
-            {
-                startLineNumber: 3,
-                startColumn: 18,
-                endLineNumber: 3,
-                endColumn: 23,
-                message: 'Error!',
-                severity: 8
-            }
-        ]);
+        this.analyzer = new Analyzer();
+        this.editorInstance = editorInstance;
         editorInstance.focus();
+    }
+
+    componentWillUnmount() {
+        this.analyzer?.dispose();
     }
 
     onChange(newValue: string, e: editor.IModelContentChangedEvent) {
         this.props.dispatch(newFileChangeAction(newValue));
+        this.doAnalyze(newValue);
+    }
+
+    private doAnalyze(code: string) {
+        if (this._previousTimeout) {
+            clearTimeout(this._previousTimeout);
+        }
+
+        this._previousTimeout = setTimeout(() => {
+            this._previousTimeout = null;
+            this.analyzer?.analyzeCode(code).then(result => {
+                console.log('got analysis', result);
+                editor.setModelMarkers(
+                    this.editorInstance?.getModel() as editor.ITextModel,
+                    this.editorInstance?.getId() as string,
+                    result.markers
+                );
+            }).catch(err => console.error('failed to perform code analysis: %s', err));
+        }, ANALYZE_DEBOUNCE_TIME);
     }
 
     render() {
