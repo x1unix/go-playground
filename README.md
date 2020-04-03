@@ -39,3 +39,33 @@ $ ./playground -f ./data/packages.json -debug
 ```
 
 Use `-help` to get information about command params
+
+## Contributors
+
+### Code Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/x1unix/go-playground/graphs/contributors"><img src="https://opencollective.com/bttr-go-playground/contributors.svg?width=890&button=false" /></a>
+
+### Financial Contributors
+
+Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/bttr-go-playground/contribute)]
+
+#### Individuals
+
+<a href="https://opencollective.com/bttr-go-playground"><img src="https://opencollective.com/bttr-go-playground/individuals.svg?width=890"></a>
+
+#### Organizations
+
+Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/bttr-go-playground/contribute)]
+
+<a href="https://opencollective.com/bttr-go-playground/organization/0/website"><img src="https://opencollective.com/bttr-go-playground/organization/0/avatar.svg"></a>
+<a href="https://opencollective.com/bttr-go-playground/organization/1/website"><img src="https://opencollective.com/bttr-go-playground/organization/1/avatar.svg"></a>
+<a href="https://opencollective.com/bttr-go-playground/organization/2/website"><img src="https://opencollective.com/bttr-go-playground/organization/2/avatar.svg"></a>
+<a href="https://opencollective.com/bttr-go-playground/organization/3/website"><img src="https://opencollective.com/bttr-go-playground/organization/3/avatar.svg"></a>
+<a href="https://opencollective.com/bttr-go-playground/organization/4/website"><img src="https://opencollective.com/bttr-go-playground/organization/4/avatar.svg"></a>
+<a href="https://opencollective.com/bttr-go-playground/organization/5/website"><img src="https://opencollective.com/bttr-go-playground/organization/5/avatar.svg"></a>
+<a href="https://opencollective.com/bttr-go-playground/organization/6/website"><img src="https://opencollective.com/bttr-go-playground/organization/6/avatar.svg"></a>
+<a href="https://opencollective.com/bttr-go-playground/organization/7/website"><img src="https://opencollective.com/bttr-go-playground/organization/7/avatar.svg"></a>
+<a href="https://opencollective.com/bttr-go-playground/organization/8/website"><img src="https://opencollective.com/bttr-go-playground/organization/8/avatar.svg"></a>
+<a href="https://opencollective.com/bttr-go-playground/organization/9/website"><img src="https://opencollective.com/bttr-go-playground/organization/9/avatar.svg"></a>
