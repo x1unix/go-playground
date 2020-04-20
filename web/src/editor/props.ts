@@ -5,7 +5,7 @@ export const LANGUAGE_GOLANG = 'go';
 
 export const DEMO_CODE = [
     'package main\n',
-    'import (\n"fmt"\n)\n',
+    'import (\n"\t\tfmt"\n)\n',
     'func main() {',
     '\tfmt.Println("Hello World")',
     '}\n'
