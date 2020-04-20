@@ -5,6 +5,7 @@
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
+    <meta name="x-gtag" content="%REACT_APP_GTAG%" />
     <meta
       name="description"
       content="Better Go Playground with syntax highlight support"
@@ -29,5 +30,22 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <script>
+      (function(d){
+        var e = d.querySelector('meta[name=x-gtag]');
+        if (!e || !e.content) return;
+        var s = d.createElement('script');
+        s.async = true; s.src = "https://www.googletagmanager.com/gtag/js?id=" + e.content;
+        s.onload = function() {
+          console.log('GA load done');
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-164070125-1');
+        };
+        d.body.appendChild(s);
+      })(document)
+    </script>
   </body>
 </html>
