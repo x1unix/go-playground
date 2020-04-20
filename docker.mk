@@ -23,4 +23,6 @@ docker-image:
 		echo "required parameter TAG is undefined" && exit 1; \
 	fi;
 	@echo "- Building '$(IMG_NAME):latest' $(TAG)..."
-	docker image build -t $(IMG_NAME):latest -t $(IMG_NAME):$(TAG) -f $(DOCKERFILE) --build-arg APP_VERSION=$(TAG) .
+	docker image build -t $(IMG_NAME):latest -t $(IMG_NAME):$(TAG) -f $(DOCKERFILE) \
+		--build-arg APP_VERSION=$(TAG) \
+		--build-arg APP_GTAG=$(GTAG) .

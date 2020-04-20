@@ -2,8 +2,10 @@ FROM node:13-alpine as ui-build
 COPY web /tmp/web
 WORKDIR /tmp/web
 ARG APP_VERSION=1.0.0
+ARG APP_GTAG=""
 ARG GITHUB_URL=https://github.com/x1unix/go-playground
-RUN yarn install --silent && REACT_APP_VERSION=$APP_VERSION REACT_APP_GITHUB_URL=$GITHUB_URL yarn build
+RUN yarn install --silent && \
+    REACT_APP_VERSION=$APP_VERSION REACT_APP_GITHUB_URL=$GITHUB_URL REACT_APP_GTAG=$APP_GTAG yarn build
 
 FROM golang:1.13-alpine as build
 WORKDIR /tmp/playground
