@@ -15,9 +15,8 @@ type spaFileServer struct {
 }
 
 func (fs *spaFileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
 	if containsDotDot(r.URL.Path) {
-		Errorf(http.StatusBadRequest, "Bad Request").Write(w)
+		Errorf(http.StatusNotFound, "Not Found").WriteResponse(w)
 		return
 	}
 

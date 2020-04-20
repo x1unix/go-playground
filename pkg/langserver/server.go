@@ -3,16 +3,15 @@ package langserver
 import (
 	"context"
 	"fmt"
-	"github.com/x1unix/go-playground/pkg/compiler"
-	"github.com/x1unix/go-playground/pkg/compiler/storage"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/x1unix/go-playground/pkg/analyzer"
+	"github.com/x1unix/go-playground/pkg/compiler"
+	"github.com/x1unix/go-playground/pkg/compiler/storage"
 	"github.com/x1unix/go-playground/pkg/goplay"
 	"go.uber.org/zap"
 	"golang.org/x/time/rate"
@@ -47,13 +46,20 @@ func New(packages []*analyzer.Package, builder compiler.BuildService) *Service {
 
 // Mount mounts service on route
 func (s *Service) Mount(r *mux.Router) {
-	r.Path("/suggest").HandlerFunc(s.HandleGetSuggestion)
-	r.Path("/run").Methods(http.MethodPost).HandlerFunc(s.HandleRunCode)
-	r.Path("/compile").Methods(http.MethodPost).HandlerFunc(s.HandleCompile)
-	r.Path("/format").Methods(http.MethodPost).HandlerFunc(s.HandleFormatCode)
-	r.Path("/share").Methods(http.MethodPost).HandlerFunc(s.HandleShare)
-	r.Path("/snippet/{id}").Methods(http.MethodGet).HandlerFunc(s.HandleGetSnippet)
-	r.Path("/artifacts/{artifactId:[a-fA-F0-9]+}.wasm").Methods(http.MethodGet).HandlerFunc(s.HandleArtifactRequest)
+	r.Path("/suggest").
+		HandlerFunc(WrapHandler(s.HandleGetSuggestion))
+	r.Path("/run").Methods(http.MethodPost).
+		HandlerFunc(WrapHandler(s.HandleRunCode, ValidateContentLength))
+	r.Path("/compile").Methods(http.MethodPost).
+		HandlerFunc(WrapHandler(s.HandleCompile, ValidateContentLength))
+	r.Path("/format").Methods(http.MethodPost).
+		HandlerFunc(WrapHandler(s.HandleFormatCode, ValidateContentLength))
+	r.Path("/share").Methods(http.MethodPost).
+		HandlerFunc(WrapHandler(s.HandleShare, ValidateContentLength))
+	r.Path("/snippet/{id}").Methods(http.MethodGet).
+		HandlerFunc(WrapHandler(s.HandleGetSnippet))
+	r.Path("/artifacts/{artifactId:[a-fA-F0-9]+}.wasm").Methods(http.MethodGet).
+		HandlerFunc(WrapHandler(s.HandleArtifactRequest))
 }
 
 func (s *Service) lookupBuiltin(val string) (*SuggestionsResponse, error) {
@@ -100,146 +106,109 @@ func (s *Service) provideSuggestion(req SuggestionRequest) (*SuggestionsResponse
 	return s.lookupBuiltin(req.Value)
 }
 
-func (s *Service) HandleGetSuggestion(w http.ResponseWriter, r *http.Request) {
+func (s *Service) HandleGetSuggestion(w http.ResponseWriter, r *http.Request) error {
 	q := r.URL.Query()
 	value := q.Get("value")
 	pkgName := q.Get("packageName")
 
 	resp, err := s.provideSuggestion(SuggestionRequest{PackageName: pkgName, Value: value})
 	if err != nil {
-		NewErrorResponse(err).Write(w)
-		return
+		return err
 	}
 
 	resp.Write(w)
+	return nil
 }
 
-// goImportsCode reads code from request and performs "goimports" on it
-// if any error occurs, it sends error response to client and closes connection
-//
-// if "format" url query param is undefined or set to "false", just returns code as is
-func (s *Service) goImportsCode(w http.ResponseWriter, r *http.Request) ([]byte, error, bool) {
-	if err := goplay.ValidateContentLength(int(r.ContentLength)); err != nil {
-		Errorf(http.StatusRequestEntityTooLarge, err.Error()).Write(w)
-		return nil, err, false
-	}
-
-	shouldFormatCode, err := strconv.ParseBool(r.URL.Query().Get(formatQueryParam))
+func (s *Service) HandleFormatCode(w http.ResponseWriter, r *http.Request) error {
+	src, err := getPayloadFromRequest(r)
 	if err != nil {
-		Errorf(
-			http.StatusBadRequest,
-			"invalid %q query parameter value (expected boolean)",
-			formatQueryParam,
-		).Write(w)
-		return nil, err, false
+		return err
 	}
 
-	src, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		Errorf(http.StatusBadGateway, "failed to read request: %s", err).Write(w)
-		return nil, err, false
-	}
-
-	if !shouldFormatCode {
-		// return code as is if don't need to format code
-		return src, nil, false
-	}
-
-	defer r.Body.Close()
-	resp, err := goplay.GoImports(r.Context(), src)
-	if err != nil {
-		if err == goplay.ErrSnippetTooLarge {
-			Errorf(http.StatusRequestEntityTooLarge, err.Error()).Write(w)
-			return nil, err, false
-		}
-
-		NewErrorResponse(err).Write(w)
-		return nil, err, false
-	}
-
-	if err = resp.HasError(); err != nil {
-		Errorf(http.StatusBadRequest, err.Error()).Write(w)
-		return nil, err, false
-	}
-
-	changed := resp.Body != string(src)
-	return []byte(resp.Body), nil, changed
-}
-
-func (s *Service) HandleFormatCode(w http.ResponseWriter, r *http.Request) {
-	code, err, _ := s.goImportsCode(w, r)
+	formatted, _, err := goImportsCode(r.Context(), src)
 	if err != nil {
 		if goplay.IsCompileError(err) {
-			return
+			return NewHTTPError(http.StatusBadRequest, err)
 		}
 
 		s.log.Error(err)
-		return
+		return err
 	}
 
-	WriteJSON(w, RunResponse{Formatted: string(code)})
+	WriteJSON(w, RunResponse{Formatted: string(formatted)})
+	return nil
 }
 
-func (s *Service) HandleShare(w http.ResponseWriter, r *http.Request) {
+func (s *Service) HandleShare(w http.ResponseWriter, r *http.Request) error {
 	shareID, err := goplay.Share(r.Context(), r.Body)
 	defer r.Body.Close()
 	if err != nil {
 		if err == goplay.ErrSnippetTooLarge {
-			Errorf(http.StatusRequestEntityTooLarge, err.Error()).Write(w)
-			return
+			return NewHTTPError(http.StatusRequestEntityTooLarge, err)
 		}
 
 		s.log.Error("failed to share code: ", err)
-		NewErrorResponse(err).Write(w)
+		return err
 	}
 
 	WriteJSON(w, ShareResponse{SnippetID: shareID})
+	return nil
 }
 
-func (s *Service) HandleGetSnippet(w http.ResponseWriter, r *http.Request) {
+func (s *Service) HandleGetSnippet(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	snippetID := vars["id"]
 	snippet, err := goplay.GetSnippet(r.Context(), snippetID)
 	if err != nil {
 		if err == goplay.ErrSnippetNotFound {
-			Errorf(http.StatusNotFound, "snippet %q not found", snippetID).Write(w)
-			return
+			return Errorf(http.StatusNotFound, "snippet %q not found", snippetID)
 		}
 
 		s.log.Errorw("failed to get snippet",
 			"snippetID", snippetID,
 			"err", err,
 		)
-		NewErrorResponse(err).Write(w)
-		return
+		return err
 	}
 
 	WriteJSON(w, SnippetResponse{
 		FileName: snippet.FileName,
 		Code:     snippet.Contents,
 	})
+	return nil
 }
 
-func (s *Service) HandleRunCode(w http.ResponseWriter, r *http.Request) {
-	src, err, changed := s.goImportsCode(w, r)
+func (s *Service) HandleRunCode(w http.ResponseWriter, r *http.Request) error {
+	src, err := getPayloadFromRequest(r)
 	if err != nil {
-		if goplay.IsCompileError(err) {
-			return
-		}
+		return err
+	}
 
-		s.log.Error(err)
-		return
+	shouldFormat, err := shouldFormatCode(r)
+	if err != nil {
+		return err
+	}
+
+	var changed bool
+	if shouldFormat {
+		src, changed, err = goImportsCode(r.Context(), src)
+		if err != nil {
+			if goplay.IsCompileError(err) {
+				return NewHTTPError(http.StatusBadRequest, err)
+			}
+			s.log.Error(err)
+			return err
+		}
 	}
 
 	res, err := goplay.Compile(r.Context(), src)
 	if err != nil {
-		NewErrorResponse(err).Write(w)
-		return
+		return err
 	}
 
 	if err := res.HasError(); err != nil {
-		Errorf(http.StatusBadRequest, err.Error()).Write(w)
-		return
+		return NewHTTPError(http.StatusBadRequest, err)
 	}
 
 	result := RunResponse{Events: res.Events}
@@ -250,20 +219,19 @@ func (s *Service) HandleRunCode(w http.ResponseWriter, r *http.Request) {
 
 	s.log.Debugw("response from compiler", "res", res)
 	WriteJSON(w, result)
+	return nil
 }
 
-func (s *Service) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) {
+func (s *Service) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	artifactId := storage.ArtifactID(vars[artifactParamVal])
 	data, err := s.compiler.GetArtifact(artifactId)
 	if err != nil {
 		if err == storage.ErrNotExists {
-			Errorf(http.StatusNotFound, "artifact not found").Write(w)
-			return
+			return Errorf(http.StatusNotFound, "artifact not found")
 		}
 
-		NewErrorResponse(err).Write(w)
-		return
+		return err
 	}
 
 	n, err := io.Copy(w, data)
@@ -273,43 +241,53 @@ func (s *Service) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) 
 			"artifactID", artifactId,
 			"err", err,
 		)
-		NewErrorResponse(err).Write(w)
-		return
+		return err
 	}
 
 	w.Header().Set("Content-Type", wasmMimeType)
 	w.Header().Set("Content-Length", strconv.FormatInt(n, 10))
+	return nil
 }
 
-func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) {
+func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) error {
 	// Limit for request timeout
 	ctx, _ := context.WithDeadline(r.Context(), time.Now().Add(maxBuildTimeDuration))
 
 	// Wait for our queue in line for compilation
 	if err := s.limiter.Wait(ctx); err != nil {
-		Errorf(http.StatusTooManyRequests, err.Error()).Write(w)
-		return
+		return NewHTTPError(http.StatusTooManyRequests, err)
 	}
 
-	src, err, changed := s.goImportsCode(w, r)
+	src, err := getPayloadFromRequest(r)
 	if err != nil {
-		if goplay.IsCompileError(err) {
-			return
-		}
+		return err
+	}
 
-		s.log.Error(err)
-		return
+	shouldFormat, err := shouldFormatCode(r)
+	if err != nil {
+		return err
+	}
+
+	var changed bool
+	if shouldFormat {
+		src, changed, err = goImportsCode(r.Context(), src)
+		if err != nil {
+			if goplay.IsCompileError(err) {
+				return NewHTTPError(http.StatusBadRequest, err)
+			}
+			s.log.Error(err)
+			return err
+		}
 	}
 
 	result, err := s.compiler.Build(ctx, src)
 	if err != nil {
-		if compileErr, ok := err.(*compiler.BuildError); ok {
-			Errorf(http.StatusBadRequest, compileErr.Error()).Write(w)
-			return
+		switch err.(type) {
+		case *compiler.BuildError:
+			return NewHTTPError(http.StatusBadRequest, err)
+		default:
+			return err
 		}
-
-		Errorf(http.StatusBadRequest, err.Error()).Write(w)
-		return
 	}
 
 	resp := BuildResponse{FileName: result.FileName}
@@ -319,4 +297,5 @@ func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	WriteJSON(w, resp)
+	return nil
 }
