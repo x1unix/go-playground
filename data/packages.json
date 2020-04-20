@@ -1,23 +1,23 @@
 [
 	{
 		"name": "archive",
-		"synopsis": "\n\n[\"archive\" on godoc.org](https://golang.org/pkg/archive/)",
-		"url": "https://golang.org/pkg/archive/",
+		"synopsis": "\n\n[\"archive\" on pkg.go.dev](https://pkg.go.dev/archive/)",
+		"url": "https://pkg.go.dev/archive/",
 		"path": "archive",
 		"depth": 0,
 		"children": [
 			{
 				"name": "tar",
-				"synopsis": "Package tar implements access to tar archives.\n\n[\"archive/tar\" on godoc.org](https://golang.org/pkg/archive/tar/)",
-				"url": "https://golang.org/pkg/archive/tar/",
+				"synopsis": "Package tar implements access to tar archives.\n\n[\"archive/tar\" on pkg.go.dev](https://pkg.go.dev/archive/tar/)",
+				"url": "https://pkg.go.dev/archive/tar/",
 				"path": "archive/tar",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "zip",
-				"synopsis": "Package zip provides support for reading and writing ZIP archives.\n\n[\"archive/zip\" on godoc.org](https://golang.org/pkg/archive/zip/)",
-				"url": "https://golang.org/pkg/archive/zip/",
+				"synopsis": "Package zip provides support for reading and writing ZIP archives.\n\n[\"archive/zip\" on pkg.go.dev](https://pkg.go.dev/archive/zip/)",
+				"url": "https://pkg.go.dev/archive/zip/",
 				"path": "archive/zip",
 				"depth": 20,
 				"children": []
@@ -26,71 +26,71 @@
 	},
 	{
 		"name": "bufio",
-		"synopsis": "Package bufio implements buffered I/O. It wraps an io.Reader or io.Writer object, creating another object (Reader or Writer) that also implements the interface but provides buffering and some help for textual I/O.\n\n[\"bufio\" on godoc.org](https://golang.org/pkg/bufio/)",
-		"url": "https://golang.org/pkg/bufio/",
+		"synopsis": "Package bufio implements buffered I/O. It wraps an io.Reader or io.Writer object, creating another object (Reader or Writer) that also implements the interface but provides buffering and some help for textual I/O.\n\n[\"bufio\" on pkg.go.dev](https://pkg.go.dev/bufio/)",
+		"url": "https://pkg.go.dev/bufio/",
 		"path": "bufio",
 		"depth": 0,
 		"children": []
 	},
 	{
 		"name": "builtin",
-		"synopsis": "Package builtin provides documentation for Go's predeclared identifiers.\n\n[\"builtin\" on godoc.org](https://golang.org/pkg/builtin/)",
-		"url": "https://golang.org/pkg/builtin/",
+		"synopsis": "Package builtin provides documentation for Go's predeclared identifiers.\n\n[\"builtin\" on pkg.go.dev](https://pkg.go.dev/builtin/)",
+		"url": "https://pkg.go.dev/builtin/",
 		"path": "builtin",
 		"depth": 0,
 		"children": []
 	},
 	{
 		"name": "bytes",
-		"synopsis": "Package bytes implements functions for the manipulation of byte slices.\n\n[\"bytes\" on godoc.org](https://golang.org/pkg/bytes/)",
-		"url": "https://golang.org/pkg/bytes/",
+		"synopsis": "Package bytes implements functions for the manipulation of byte slices.\n\n[\"bytes\" on pkg.go.dev](https://pkg.go.dev/bytes/)",
+		"url": "https://pkg.go.dev/bytes/",
 		"path": "bytes",
 		"depth": 0,
 		"children": []
 	},
 	{
 		"name": "compress",
-		"synopsis": "\n\n[\"compress\" on godoc.org](https://golang.org/pkg/compress/)",
-		"url": "https://golang.org/pkg/compress/",
+		"synopsis": "\n\n[\"compress\" on pkg.go.dev](https://pkg.go.dev/compress/)",
+		"url": "https://pkg.go.dev/compress/",
 		"path": "compress",
 		"depth": 0,
 		"children": [
 			{
 				"name": "bzip2",
-				"synopsis": "Package bzip2 implements bzip2 decompression.\n\n[\"compress/bzip2\" on godoc.org](https://golang.org/pkg/compress/bzip2/)",
-				"url": "https://golang.org/pkg/compress/bzip2/",
+				"synopsis": "Package bzip2 implements bzip2 decompression.\n\n[\"compress/bzip2\" on pkg.go.dev](https://pkg.go.dev/compress/bzip2/)",
+				"url": "https://pkg.go.dev/compress/bzip2/",
 				"path": "compress/bzip2",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "flate",
-				"synopsis": "Package flate implements the DEFLATE compressed data format, described in RFC 1951.\n\n[\"compress/flate\" on godoc.org](https://golang.org/pkg/compress/flate/)",
-				"url": "https://golang.org/pkg/compress/flate/",
+				"synopsis": "Package flate implements the DEFLATE compressed data format, described in RFC 1951.\n\n[\"compress/flate\" on pkg.go.dev](https://pkg.go.dev/compress/flate/)",
+				"url": "https://pkg.go.dev/compress/flate/",
 				"path": "compress/flate",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "gzip",
-				"synopsis": "Package gzip implements reading and writing of gzip format compressed files, as specified in RFC 1952.\n\n[\"compress/gzip\" on godoc.org](https://golang.org/pkg/compress/gzip/)",
-				"url": "https://golang.org/pkg/compress/gzip/",
+				"synopsis": "Package gzip implements reading and writing of gzip format compressed files, as specified in RFC 1952.\n\n[\"compress/gzip\" on pkg.go.dev](https://pkg.go.dev/compress/gzip/)",
+				"url": "https://pkg.go.dev/compress/gzip/",
 				"path": "compress/gzip",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "lzw",
-				"synopsis": "Package lzw implements the Lempel-Ziv-Welch compressed data format, described in T. A. Welch, “A Technique for High-Performance Data Compression”, Computer, 17(6) (June 1984), pp 8-19.\n\n[\"compress/lzw\" on godoc.org](https://golang.org/pkg/compress/lzw/)",
-				"url": "https://golang.org/pkg/compress/lzw/",
+				"synopsis": "Package lzw implements the Lempel-Ziv-Welch compressed data format, described in T. A. Welch, “A Technique for High-Performance Data Compression”, Computer, 17(6) (June 1984), pp 8-19.\n\n[\"compress/lzw\" on pkg.go.dev](https://pkg.go.dev/compress/lzw/)",
+				"url": "https://pkg.go.dev/compress/lzw/",
 				"path": "compress/lzw",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "zlib",
-				"synopsis": "Package zlib implements reading and writing of zlib format compressed data, as specified in RFC 1950.\n\n[\"compress/zlib\" on godoc.org](https://golang.org/pkg/compress/zlib/)",
-				"url": "https://golang.org/pkg/compress/zlib/",
+				"synopsis": "Package zlib implements reading and writing of zlib format compressed data, as specified in RFC 1950.\n\n[\"compress/zlib\" on pkg.go.dev](https://pkg.go.dev/compress/zlib/)",
+				"url": "https://pkg.go.dev/compress/zlib/",
 				"path": "compress/zlib",
 				"depth": 20,
 				"children": []
@@ -99,31 +99,31 @@
 	},
 	{
 		"name": "container",
-		"synopsis": "\n\n[\"container\" on godoc.org](https://golang.org/pkg/container/)",
-		"url": "https://golang.org/pkg/container/",
+		"synopsis": "\n\n[\"container\" on pkg.go.dev](https://pkg.go.dev/container/)",
+		"url": "https://pkg.go.dev/container/",
 		"path": "container",
 		"depth": 0,
 		"children": [
 			{
 				"name": "heap",
-				"synopsis": "Package heap provides heap operations for any type that implements heap.Interface.\n\n[\"container/heap\" on godoc.org](https://golang.org/pkg/container/heap/)",
-				"url": "https://golang.org/pkg/container/heap/",
+				"synopsis": "Package heap provides heap operations for any type that implements heap.Interface.\n\n[\"container/heap\" on pkg.go.dev](https://pkg.go.dev/container/heap/)",
+				"url": "https://pkg.go.dev/container/heap/",
 				"path": "container/heap",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "list",
-				"synopsis": "Package list implements a doubly linked list.\n\n[\"container/list\" on godoc.org](https://golang.org/pkg/container/list/)",
-				"url": "https://golang.org/pkg/container/list/",
+				"synopsis": "Package list implements a doubly linked list.\n\n[\"container/list\" on pkg.go.dev](https://pkg.go.dev/container/list/)",
+				"url": "https://pkg.go.dev/container/list/",
 				"path": "container/list",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "ring",
-				"synopsis": "Package ring implements operations on circular lists.\n\n[\"container/ring\" on godoc.org](https://golang.org/pkg/container/ring/)",
-				"url": "https://golang.org/pkg/container/ring/",
+				"synopsis": "Package ring implements operations on circular lists.\n\n[\"container/ring\" on pkg.go.dev](https://pkg.go.dev/container/ring/)",
+				"url": "https://pkg.go.dev/container/ring/",
 				"path": "container/ring",
 				"depth": 20,
 				"children": []
@@ -132,166 +132,166 @@
 	},
 	{
 		"name": "context",
-		"synopsis": "Package context defines the Context type, which carries deadlines, cancellation signals, and other request-scoped values across API boundaries and between processes.\n\n[\"context\" on godoc.org](https://golang.org/pkg/context/)",
-		"url": "https://golang.org/pkg/context/",
+		"synopsis": "Package context defines the Context type, which carries deadlines, cancellation signals, and other request-scoped values across API boundaries and between processes.\n\n[\"context\" on pkg.go.dev](https://pkg.go.dev/context/)",
+		"url": "https://pkg.go.dev/context/",
 		"path": "context",
 		"depth": 0,
 		"children": []
 	},
 	{
 		"name": "crypto",
-		"synopsis": "Package crypto collects common cryptographic constants.\n\n[\"crypto\" on godoc.org](https://golang.org/pkg/crypto/)",
-		"url": "https://golang.org/pkg/crypto/",
+		"synopsis": "Package crypto collects common cryptographic constants.\n\n[\"crypto\" on pkg.go.dev](https://pkg.go.dev/crypto/)",
+		"url": "https://pkg.go.dev/crypto/",
 		"path": "crypto",
 		"depth": 0,
 		"children": [
 			{
 				"name": "aes",
-				"synopsis": "Package aes implements AES encryption (formerly Rijndael), as defined in U.S. Federal Information Processing Standards Publication 197.\n\n[\"crypto/aes\" on godoc.org](https://golang.org/pkg/crypto/aes/)",
-				"url": "https://golang.org/pkg/crypto/aes/",
+				"synopsis": "Package aes implements AES encryption (formerly Rijndael), as defined in U.S. Federal Information Processing Standards Publication 197.\n\n[\"crypto/aes\" on pkg.go.dev](https://pkg.go.dev/crypto/aes/)",
+				"url": "https://pkg.go.dev/crypto/aes/",
 				"path": "crypto/aes",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "cipher",
-				"synopsis": "Package cipher implements standard block cipher modes that can be wrapped around low-level block cipher implementations.\n\n[\"crypto/cipher\" on godoc.org](https://golang.org/pkg/crypto/cipher/)",
-				"url": "https://golang.org/pkg/crypto/cipher/",
+				"synopsis": "Package cipher implements standard block cipher modes that can be wrapped around low-level block cipher implementations.\n\n[\"crypto/cipher\" on pkg.go.dev](https://pkg.go.dev/crypto/cipher/)",
+				"url": "https://pkg.go.dev/crypto/cipher/",
 				"path": "crypto/cipher",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "des",
-				"synopsis": "Package des implements the Data Encryption Standard (DES) and the Triple Data Encryption Algorithm (TDEA) as defined in U.S. Federal Information Processing Standards Publication 46-3.\n\n[\"crypto/des\" on godoc.org](https://golang.org/pkg/crypto/des/)",
-				"url": "https://golang.org/pkg/crypto/des/",
+				"synopsis": "Package des implements the Data Encryption Standard (DES) and the Triple Data Encryption Algorithm (TDEA) as defined in U.S. Federal Information Processing Standards Publication 46-3.\n\n[\"crypto/des\" on pkg.go.dev](https://pkg.go.dev/crypto/des/)",
+				"url": "https://pkg.go.dev/crypto/des/",
 				"path": "crypto/des",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "dsa",
-				"synopsis": "Package dsa implements the Digital Signature Algorithm, as defined in FIPS 186-3.\n\n[\"crypto/dsa\" on godoc.org](https://golang.org/pkg/crypto/dsa/)",
-				"url": "https://golang.org/pkg/crypto/dsa/",
+				"synopsis": "Package dsa implements the Digital Signature Algorithm, as defined in FIPS 186-3.\n\n[\"crypto/dsa\" on pkg.go.dev](https://pkg.go.dev/crypto/dsa/)",
+				"url": "https://pkg.go.dev/crypto/dsa/",
 				"path": "crypto/dsa",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "ecdsa",
-				"synopsis": "Package ecdsa implements the Elliptic Curve Digital Signature Algorithm, as defined in FIPS 186-3.\n\n[\"crypto/ecdsa\" on godoc.org](https://golang.org/pkg/crypto/ecdsa/)",
-				"url": "https://golang.org/pkg/crypto/ecdsa/",
+				"synopsis": "Package ecdsa implements the Elliptic Curve Digital Signature Algorithm, as defined in FIPS 186-3.\n\n[\"crypto/ecdsa\" on pkg.go.dev](https://pkg.go.dev/crypto/ecdsa/)",
+				"url": "https://pkg.go.dev/crypto/ecdsa/",
 				"path": "crypto/ecdsa",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "ed25519",
-				"synopsis": "Package ed25519 implements the Ed25519 signature algorithm.\n\n[\"crypto/ed25519\" on godoc.org](https://golang.org/pkg/crypto/ed25519/)",
-				"url": "https://golang.org/pkg/crypto/ed25519/",
+				"synopsis": "Package ed25519 implements the Ed25519 signature algorithm.\n\n[\"crypto/ed25519\" on pkg.go.dev](https://pkg.go.dev/crypto/ed25519/)",
+				"url": "https://pkg.go.dev/crypto/ed25519/",
 				"path": "crypto/ed25519",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "elliptic",
-				"synopsis": "Package elliptic implements several standard elliptic curves over prime fields.\n\n[\"crypto/elliptic\" on godoc.org](https://golang.org/pkg/crypto/elliptic/)",
-				"url": "https://golang.org/pkg/crypto/elliptic/",
+				"synopsis": "Package elliptic implements several standard elliptic curves over prime fields.\n\n[\"crypto/elliptic\" on pkg.go.dev](https://pkg.go.dev/crypto/elliptic/)",
+				"url": "https://pkg.go.dev/crypto/elliptic/",
 				"path": "crypto/elliptic",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "hmac",
-				"synopsis": "Package hmac implements the Keyed-Hash Message Authentication Code (HMAC) as defined in U.S. Federal Information Processing Standards Publication 198.\n\n[\"crypto/hmac\" on godoc.org](https://golang.org/pkg/crypto/hmac/)",
-				"url": "https://golang.org/pkg/crypto/hmac/",
+				"synopsis": "Package hmac implements the Keyed-Hash Message Authentication Code (HMAC) as defined in U.S. Federal Information Processing Standards Publication 198.\n\n[\"crypto/hmac\" on pkg.go.dev](https://pkg.go.dev/crypto/hmac/)",
+				"url": "https://pkg.go.dev/crypto/hmac/",
 				"path": "crypto/hmac",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "md5",
-				"synopsis": "Package md5 implements the MD5 hash algorithm as defined in RFC 1321.\n\n[\"crypto/md5\" on godoc.org](https://golang.org/pkg/crypto/md5/)",
-				"url": "https://golang.org/pkg/crypto/md5/",
+				"synopsis": "Package md5 implements the MD5 hash algorithm as defined in RFC 1321.\n\n[\"crypto/md5\" on pkg.go.dev](https://pkg.go.dev/crypto/md5/)",
+				"url": "https://pkg.go.dev/crypto/md5/",
 				"path": "crypto/md5",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "rand",
-				"synopsis": "Package rand implements a cryptographically secure random number generator.\n\n[\"crypto/rand\" on godoc.org](https://golang.org/pkg/crypto/rand/)",
-				"url": "https://golang.org/pkg/crypto/rand/",
+				"synopsis": "Package rand implements a cryptographically secure random number generator.\n\n[\"crypto/rand\" on pkg.go.dev](https://pkg.go.dev/crypto/rand/)",
+				"url": "https://pkg.go.dev/crypto/rand/",
 				"path": "crypto/rand",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "rc4",
-				"synopsis": "Package rc4 implements RC4 encryption, as defined in Bruce Schneier's Applied Cryptography.\n\n[\"crypto/rc4\" on godoc.org](https://golang.org/pkg/crypto/rc4/)",
-				"url": "https://golang.org/pkg/crypto/rc4/",
+				"synopsis": "Package rc4 implements RC4 encryption, as defined in Bruce Schneier's Applied Cryptography.\n\n[\"crypto/rc4\" on pkg.go.dev](https://pkg.go.dev/crypto/rc4/)",
+				"url": "https://pkg.go.dev/crypto/rc4/",
 				"path": "crypto/rc4",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "rsa",
-				"synopsis": "Package rsa implements RSA encryption as specified in PKCS#1.\n\n[\"crypto/rsa\" on godoc.org](https://golang.org/pkg/crypto/rsa/)",
-				"url": "https://golang.org/pkg/crypto/rsa/",
+				"synopsis": "Package rsa implements RSA encryption as specified in PKCS#1.\n\n[\"crypto/rsa\" on pkg.go.dev](https://pkg.go.dev/crypto/rsa/)",
+				"url": "https://pkg.go.dev/crypto/rsa/",
 				"path": "crypto/rsa",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "sha1",
-				"synopsis": "Package sha1 implements the SHA-1 hash algorithm as defined in RFC 3174.\n\n[\"crypto/sha1\" on godoc.org](https://golang.org/pkg/crypto/sha1/)",
-				"url": "https://golang.org/pkg/crypto/sha1/",
+				"synopsis": "Package sha1 implements the SHA-1 hash algorithm as defined in RFC 3174.\n\n[\"crypto/sha1\" on pkg.go.dev](https://pkg.go.dev/crypto/sha1/)",
+				"url": "https://pkg.go.dev/crypto/sha1/",
 				"path": "crypto/sha1",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "sha256",
-				"synopsis": "Package sha256 implements the SHA224 and SHA256 hash algorithms as defined in FIPS 180-4.\n\n[\"crypto/sha256\" on godoc.org](https://golang.org/pkg/crypto/sha256/)",
-				"url": "https://golang.org/pkg/crypto/sha256/",
+				"synopsis": "Package sha256 implements the SHA224 and SHA256 hash algorithms as defined in FIPS 180-4.\n\n[\"crypto/sha256\" on pkg.go.dev](https://pkg.go.dev/crypto/sha256/)",
+				"url": "https://pkg.go.dev/crypto/sha256/",
 				"path": "crypto/sha256",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "sha512",
-				"synopsis": "Package sha512 implements the SHA-384, SHA-512, SHA-512/224, and SHA-512/256 hash algorithms as defined in FIPS 180-4.\n\n[\"crypto/sha512\" on godoc.org](https://golang.org/pkg/crypto/sha512/)",
-				"url": "https://golang.org/pkg/crypto/sha512/",
+				"synopsis": "Package sha512 implements the SHA-384, SHA-512, SHA-512/224, and SHA-512/256 hash algorithms as defined in FIPS 180-4.\n\n[\"crypto/sha512\" on pkg.go.dev](https://pkg.go.dev/crypto/sha512/)",
+				"url": "https://pkg.go.dev/crypto/sha512/",
 				"path": "crypto/sha512",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "subtle",
-				"synopsis": "Package subtle implements functions that are often useful in cryptographic code but require careful thought to use correctly.\n\n[\"crypto/subtle\" on godoc.org](https://golang.org/pkg/crypto/subtle/)",
-				"url": "https://golang.org/pkg/crypto/subtle/",
+				"synopsis": "Package subtle implements functions that are often useful in cryptographic code but require careful thought to use correctly.\n\n[\"crypto/subtle\" on pkg.go.dev](https://pkg.go.dev/crypto/subtle/)",
+				"url": "https://pkg.go.dev/crypto/subtle/",
 				"path": "crypto/subtle",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "tls",
-				"synopsis": "Package tls partially implements TLS 1.2, as specified in RFC 5246, and TLS 1.3, as specified in RFC 8446.\n\n[\"crypto/tls\" on godoc.org](https://golang.org/pkg/crypto/tls/)",
-				"url": "https://golang.org/pkg/crypto/tls/",
+				"synopsis": "Package tls partially implements TLS 1.2, as specified in RFC 5246, and TLS 1.3, as specified in RFC 8446.\n\n[\"crypto/tls\" on pkg.go.dev](https://pkg.go.dev/crypto/tls/)",
+				"url": "https://pkg.go.dev/crypto/tls/",
 				"path": "crypto/tls",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "x509",
-				"synopsis": "Package x509 parses X.509-encoded keys and certificates.\n\n[\"crypto/x509\" on godoc.org](https://golang.org/pkg/crypto/x509/)",
-				"url": "https://golang.org/pkg/crypto/x509/",
+				"synopsis": "Package x509 parses X.509-encoded keys and certificates.\n\n[\"crypto/x509\" on pkg.go.dev](https://pkg.go.dev/crypto/x509/)",
+				"url": "https://pkg.go.dev/crypto/x509/",
 				"path": "crypto/x509",
 				"depth": 20,
 				"children": [
 					{
 						"name": "pkix",
-						"synopsis": "Package pkix contains shared, low level structures used for ASN.1 parsing and serialization of X.509 certificates, CRL and OCSP.\n\n[\"crypto/x509/pkix\" on godoc.org](https://golang.org/pkg/crypto/x509/pkix/)",
-						"url": "https://golang.org/pkg/crypto/x509/pkix/",
+						"synopsis": "Package pkix contains shared, low level structures used for ASN.1 parsing and serialization of X.509 certificates, CRL and OCSP.\n\n[\"crypto/x509/pkix\" on pkg.go.dev](https://pkg.go.dev/crypto/x509/pkix/)",
+						"url": "https://pkg.go.dev/crypto/x509/pkix/",
 						"path": "crypto/x509/pkix",
 						"depth": 40,
 						"children": []
@@ -302,22 +302,22 @@
 	},
 	{
 		"name": "database",
-		"synopsis": "\n\n[\"database\" on godoc.org](https://golang.org/pkg/database/)",
-		"url": "https://golang.org/pkg/database/",
+		"synopsis": "\n\n[\"database\" on pkg.go.dev](https://pkg.go.dev/database/)",
+		"url": "https://pkg.go.dev/database/",
 		"path": "database",
 		"depth": 0,
 		"children": [
 			{
 				"name": "sql",
-				"synopsis": "Package sql provides a generic interface around SQL (or SQL-like) databases.\n\n[\"database/sql\" on godoc.org](https://golang.org/pkg/database/sql/)",
-				"url": "https://golang.org/pkg/database/sql/",
+				"synopsis": "Package sql provides a generic interface around SQL (or SQL-like) databases.\n\n[\"database/sql\" on pkg.go.dev](https://pkg.go.dev/database/sql/)",
+				"url": "https://pkg.go.dev/database/sql/",
 				"path": "database/sql",
 				"depth": 20,
 				"children": [
 					{
 						"name": "driver",
-						"synopsis": "Package driver defines interfaces to be implemented by database drivers as used by package sql.\n\n[\"database/sql/driver\" on godoc.org](https://golang.org/pkg/database/sql/driver/)",
-						"url": "https://golang.org/pkg/database/sql/driver/",
+						"synopsis": "Package driver defines interfaces to be implemented by database drivers as used by package sql.\n\n[\"database/sql/driver\" on pkg.go.dev](https://pkg.go.dev/database/sql/driver/)",
+						"url": "https://pkg.go.dev/database/sql/driver/",
 						"path": "database/sql/driver",
 						"depth": 40,
 						"children": []
@@ -328,55 +328,55 @@
 	},
 	{
 		"name": "debug",
-		"synopsis": "\n\n[\"debug\" on godoc.org](https://golang.org/pkg/debug/)",
-		"url": "https://golang.org/pkg/debug/",
+		"synopsis": "\n\n[\"debug\" on pkg.go.dev](https://pkg.go.dev/debug/)",
+		"url": "https://pkg.go.dev/debug/",
 		"path": "debug",
 		"depth": 0,
 		"children": [
 			{
 				"name": "dwarf",
-				"synopsis": "Package dwarf provides access to DWARF debugging information loaded from executable files, as defined in the DWARF 2.0 Standard at http://dwarfstd.org/doc/dwarf-2.0.0.pdf\n\n[\"debug/dwarf\" on godoc.org](https://golang.org/pkg/debug/dwarf/)",
-				"url": "https://golang.org/pkg/debug/dwarf/",
+				"synopsis": "Package dwarf provides access to DWARF debugging information loaded from executable files, as defined in the DWARF 2.0 Standard at http://dwarfstd.org/doc/dwarf-2.0.0.pdf\n\n[\"debug/dwarf\" on pkg.go.dev](https://pkg.go.dev/debug/dwarf/)",
+				"url": "https://pkg.go.dev/debug/dwarf/",
 				"path": "debug/dwarf",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "elf",
-				"synopsis": "Package elf implements access to ELF object files.\n\n[\"debug/elf\" on godoc.org](https://golang.org/pkg/debug/elf/)",
-				"url": "https://golang.org/pkg/debug/elf/",
+				"synopsis": "Package elf implements access to ELF object files.\n\n[\"debug/elf\" on pkg.go.dev](https://pkg.go.dev/debug/elf/)",
+				"url": "https://pkg.go.dev/debug/elf/",
 				"path": "debug/elf",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "gosym",
-				"synopsis": "Package gosym implements access to the Go symbol and line number tables embedded in Go binaries generated by the gc compilers.\n\n[\"debug/gosym\" on godoc.org](https://golang.org/pkg/debug/gosym/)",
-				"url": "https://golang.org/pkg/debug/gosym/",
+				"synopsis": "Package gosym implements access to the Go symbol and line number tables embedded in Go binaries generated by the gc compilers.\n\n[\"debug/gosym\" on pkg.go.dev](https://pkg.go.dev/debug/gosym/)",
+				"url": "https://pkg.go.dev/debug/gosym/",
 				"path": "debug/gosym",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "macho",
-				"synopsis": "Package macho implements access to Mach-O object files.\n\n[\"debug/macho\" on godoc.org](https://golang.org/pkg/debug/macho/)",
-				"url": "https://golang.org/pkg/debug/macho/",
+				"synopsis": "Package macho implements access to Mach-O object files.\n\n[\"debug/macho\" on pkg.go.dev](https://pkg.go.dev/debug/macho/)",
+				"url": "https://pkg.go.dev/debug/macho/",
 				"path": "debug/macho",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "pe",
-				"synopsis": "Package pe implements access to PE (Microsoft Windows Portable Executable) files.\n\n[\"debug/pe\" on godoc.org](https://golang.org/pkg/debug/pe/)",
-				"url": "https://golang.org/pkg/debug/pe/",
+				"synopsis": "Package pe implements access to PE (Microsoft Windows Portable Executable) files.\n\n[\"debug/pe\" on pkg.go.dev](https://pkg.go.dev/debug/pe/)",
+				"url": "https://pkg.go.dev/debug/pe/",
 				"path": "debug/pe",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "plan9obj",
-				"synopsis": "Package plan9obj implements access to Plan 9 a.out object files.\n\n[\"debug/plan9obj\" on godoc.org](https://golang.org/pkg/debug/plan9obj/)",
-				"url": "https://golang.org/pkg/debug/plan9obj/",
+				"synopsis": "Package plan9obj implements access to Plan 9 a.out object files.\n\n[\"debug/plan9obj\" on pkg.go.dev](https://pkg.go.dev/debug/plan9obj/)",
+				"url": "https://pkg.go.dev/debug/plan9obj/",
 				"path": "debug/plan9obj",
 				"depth": 20,
 				"children": []
@@ -385,95 +385,95 @@
 	},
 	{
 		"name": "encoding",
-		"synopsis": "Package encoding defines interfaces shared by other packages that convert data to and from byte-level and textual representations.\n\n[\"encoding\" on godoc.org](https://golang.org/pkg/encoding/)",
-		"url": "https://golang.org/pkg/encoding/",
+		"synopsis": "Package encoding defines interfaces shared by other packages that convert data to and from byte-level and textual representations.\n\n[\"encoding\" on pkg.go.dev](https://pkg.go.dev/encoding/)",
+		"url": "https://pkg.go.dev/encoding/",
 		"path": "encoding",
 		"depth": 0,
 		"children": [
 			{
 				"name": "ascii85",
-				"synopsis": "Package ascii85 implements the ascii85 data encoding as used in the btoa tool and Adobe's PostScript and PDF document formats.\n\n[\"encoding/ascii85\" on godoc.org](https://golang.org/pkg/encoding/ascii85/)",
-				"url": "https://golang.org/pkg/encoding/ascii85/",
+				"synopsis": "Package ascii85 implements the ascii85 data encoding as used in the btoa tool and Adobe's PostScript and PDF document formats.\n\n[\"encoding/ascii85\" on pkg.go.dev](https://pkg.go.dev/encoding/ascii85/)",
+				"url": "https://pkg.go.dev/encoding/ascii85/",
 				"path": "encoding/ascii85",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "asn1",
-				"synopsis": "Package asn1 implements parsing of DER-encoded ASN.1 data structures, as defined in ITU-T Rec X.690.\n\n[\"encoding/asn1\" on godoc.org](https://golang.org/pkg/encoding/asn1/)",
-				"url": "https://golang.org/pkg/encoding/asn1/",
+				"synopsis": "Package asn1 implements parsing of DER-encoded ASN.1 data structures, as defined in ITU-T Rec X.690.\n\n[\"encoding/asn1\" on pkg.go.dev](https://pkg.go.dev/encoding/asn1/)",
+				"url": "https://pkg.go.dev/encoding/asn1/",
 				"path": "encoding/asn1",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "base32",
-				"synopsis": "Package base32 implements base32 encoding as specified by RFC 4648.\n\n[\"encoding/base32\" on godoc.org](https://golang.org/pkg/encoding/base32/)",
-				"url": "https://golang.org/pkg/encoding/base32/",
+				"synopsis": "Package base32 implements base32 encoding as specified by RFC 4648.\n\n[\"encoding/base32\" on pkg.go.dev](https://pkg.go.dev/encoding/base32/)",
+				"url": "https://pkg.go.dev/encoding/base32/",
 				"path": "encoding/base32",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "base64",
-				"synopsis": "Package base64 implements base64 encoding as specified by RFC 4648.\n\n[\"encoding/base64\" on godoc.org](https://golang.org/pkg/encoding/base64/)",
-				"url": "https://golang.org/pkg/encoding/base64/",
+				"synopsis": "Package base64 implements base64 encoding as specified by RFC 4648.\n\n[\"encoding/base64\" on pkg.go.dev](https://pkg.go.dev/encoding/base64/)",
+				"url": "https://pkg.go.dev/encoding/base64/",
 				"path": "encoding/base64",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "binary",
-				"synopsis": "Package binary implements simple translation between numbers and byte sequences and encoding and decoding of varints.\n\n[\"encoding/binary\" on godoc.org](https://golang.org/pkg/encoding/binary/)",
-				"url": "https://golang.org/pkg/encoding/binary/",
+				"synopsis": "Package binary implements simple translation between numbers and byte sequences and encoding and decoding of varints.\n\n[\"encoding/binary\" on pkg.go.dev](https://pkg.go.dev/encoding/binary/)",
+				"url": "https://pkg.go.dev/encoding/binary/",
 				"path": "encoding/binary",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "csv",
-				"synopsis": "Package csv reads and writes comma-separated values (CSV) files.\n\n[\"encoding/csv\" on godoc.org](https://golang.org/pkg/encoding/csv/)",
-				"url": "https://golang.org/pkg/encoding/csv/",
+				"synopsis": "Package csv reads and writes comma-separated values (CSV) files.\n\n[\"encoding/csv\" on pkg.go.dev](https://pkg.go.dev/encoding/csv/)",
+				"url": "https://pkg.go.dev/encoding/csv/",
 				"path": "encoding/csv",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "gob",
-				"synopsis": "Package gob manages streams of gobs - binary values exchanged between an Encoder (transmitter) and a Decoder (receiver).\n\n[\"encoding/gob\" on godoc.org](https://golang.org/pkg/encoding/gob/)",
-				"url": "https://golang.org/pkg/encoding/gob/",
+				"synopsis": "Package gob manages streams of gobs - binary values exchanged between an Encoder (transmitter) and a Decoder (receiver).\n\n[\"encoding/gob\" on pkg.go.dev](https://pkg.go.dev/encoding/gob/)",
+				"url": "https://pkg.go.dev/encoding/gob/",
 				"path": "encoding/gob",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "hex",
-				"synopsis": "Package hex implements hexadecimal encoding and decoding.\n\n[\"encoding/hex\" on godoc.org](https://golang.org/pkg/encoding/hex/)",
-				"url": "https://golang.org/pkg/encoding/hex/",
+				"synopsis": "Package hex implements hexadecimal encoding and decoding.\n\n[\"encoding/hex\" on pkg.go.dev](https://pkg.go.dev/encoding/hex/)",
+				"url": "https://pkg.go.dev/encoding/hex/",
 				"path": "encoding/hex",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "json",
-				"synopsis": "Package json implements encoding and decoding of JSON as defined in RFC 7159.\n\n[\"encoding/json\" on godoc.org](https://golang.org/pkg/encoding/json/)",
-				"url": "https://golang.org/pkg/encoding/json/",
+				"synopsis": "Package json implements encoding and decoding of JSON as defined in RFC 7159.\n\n[\"encoding/json\" on pkg.go.dev](https://pkg.go.dev/encoding/json/)",
+				"url": "https://pkg.go.dev/encoding/json/",
 				"path": "encoding/json",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "pem",
-				"synopsis": "Package pem implements the PEM data encoding, which originated in Privacy Enhanced Mail.\n\n[\"encoding/pem\" on godoc.org](https://golang.org/pkg/encoding/pem/)",
-				"url": "https://golang.org/pkg/encoding/pem/",
+				"synopsis": "Package pem implements the PEM data encoding, which originated in Privacy Enhanced Mail.\n\n[\"encoding/pem\" on pkg.go.dev](https://pkg.go.dev/encoding/pem/)",
+				"url": "https://pkg.go.dev/encoding/pem/",
 				"path": "encoding/pem",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "xml",
-				"synopsis": "Package xml implements a simple XML 1.0 parser that understands XML name spaces.\n\n[\"encoding/xml\" on godoc.org](https://golang.org/pkg/encoding/xml/)",
-				"url": "https://golang.org/pkg/encoding/xml/",
+				"synopsis": "Package xml implements a simple XML 1.0 parser that understands XML name spaces.\n\n[\"encoding/xml\" on pkg.go.dev](https://pkg.go.dev/encoding/xml/)",
+				"url": "https://pkg.go.dev/encoding/xml/",
 				"path": "encoding/xml",
 				"depth": 20,
 				"children": []
@@ -482,127 +482,127 @@
 	},
 	{
 		"name": "errors",
-		"synopsis": "Package errors implements functions to manipulate errors.\n\n[\"errors\" on godoc.org](https://golang.org/pkg/errors/)",
-		"url": "https://golang.org/pkg/errors/",
+		"synopsis": "Package errors implements functions to manipulate errors.\n\n[\"errors\" on pkg.go.dev](https://pkg.go.dev/errors/)",
+		"url": "https://pkg.go.dev/errors/",
 		"path": "errors",
 		"depth": 0,
 		"children": []
 	},
 	{
 		"name": "expvar",
-		"synopsis": "Package expvar provides a standardized interface to public variables, such as operation counters in servers.\n\n[\"expvar\" on godoc.org](https://golang.org/pkg/expvar/)",
-		"url": "https://golang.org/pkg/expvar/",
+		"synopsis": "Package expvar provides a standardized interface to public variables, such as operation counters in servers.\n\n[\"expvar\" on pkg.go.dev](https://pkg.go.dev/expvar/)",
+		"url": "https://pkg.go.dev/expvar/",
 		"path": "expvar",
 		"depth": 0,
 		"children": []
 	},
 	{
 		"name": "flag",
-		"synopsis": "Package flag implements command-line flag parsing.\n\n[\"flag\" on godoc.org](https://golang.org/pkg/flag/)",
-		"url": "https://golang.org/pkg/flag/",
+		"synopsis": "Package flag implements command-line flag parsing.\n\n[\"flag\" on pkg.go.dev](https://pkg.go.dev/flag/)",
+		"url": "https://pkg.go.dev/flag/",
 		"path": "flag",
 		"depth": 0,
 		"children": []
 	},
 	{
 		"name": "fmt",
-		"synopsis": "Package fmt implements formatted I/O with functions analogous to C's printf and scanf.\n\n[\"fmt\" on godoc.org](https://golang.org/pkg/fmt/)",
-		"url": "https://golang.org/pkg/fmt/",
+		"synopsis": "Package fmt implements formatted I/O with functions analogous to C's printf and scanf.\n\n[\"fmt\" on pkg.go.dev](https://pkg.go.dev/fmt/)",
+		"url": "https://pkg.go.dev/fmt/",
 		"path": "fmt",
 		"depth": 0,
 		"children": []
 	},
 	{
 		"name": "go",
-		"synopsis": "\n\n[\"go\" on godoc.org](https://golang.org/pkg/go/)",
-		"url": "https://golang.org/pkg/go/",
+		"synopsis": "\n\n[\"go\" on pkg.go.dev](https://pkg.go.dev/go/)",
+		"url": "https://pkg.go.dev/go/",
 		"path": "go",
 		"depth": 0,
 		"children": [
 			{
 				"name": "ast",
-				"synopsis": "Package ast declares the types used to represent syntax trees for Go packages.\n\n[\"go/ast\" on godoc.org](https://golang.org/pkg/go/ast/)",
-				"url": "https://golang.org/pkg/go/ast/",
+				"synopsis": "Package ast declares the types used to represent syntax trees for Go packages.\n\n[\"go/ast\" on pkg.go.dev](https://pkg.go.dev/go/ast/)",
+				"url": "https://pkg.go.dev/go/ast/",
 				"path": "go/ast",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "build",
-				"synopsis": "Package build gathers information about Go packages.\n\n[\"go/build\" on godoc.org](https://golang.org/pkg/go/build/)",
-				"url": "https://golang.org/pkg/go/build/",
+				"synopsis": "Package build gathers information about Go packages.\n\n[\"go/build\" on pkg.go.dev](https://pkg.go.dev/go/build/)",
+				"url": "https://pkg.go.dev/go/build/",
 				"path": "go/build",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "constant",
-				"synopsis": "Package constant implements Values representing untyped Go constants and their corresponding operations.\n\n[\"go/constant\" on godoc.org](https://golang.org/pkg/go/constant/)",
-				"url": "https://golang.org/pkg/go/constant/",
+				"synopsis": "Package constant implements Values representing untyped Go constants and their corresponding operations.\n\n[\"go/constant\" on pkg.go.dev](https://pkg.go.dev/go/constant/)",
+				"url": "https://pkg.go.dev/go/constant/",
 				"path": "go/constant",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "doc",
-				"synopsis": "Package doc extracts source code documentation from a Go AST.\n\n[\"go/doc\" on godoc.org](https://golang.org/pkg/go/doc/)",
-				"url": "https://golang.org/pkg/go/doc/",
+				"synopsis": "Package doc extracts source code documentation from a Go AST.\n\n[\"go/doc\" on pkg.go.dev](https://pkg.go.dev/go/doc/)",
+				"url": "https://pkg.go.dev/go/doc/",
 				"path": "go/doc",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "format",
-				"synopsis": "Package format implements standard formatting of Go source.\n\n[\"go/format\" on godoc.org](https://golang.org/pkg/go/format/)",
-				"url": "https://golang.org/pkg/go/format/",
+				"synopsis": "Package format implements standard formatting of Go source.\n\n[\"go/format\" on pkg.go.dev](https://pkg.go.dev/go/format/)",
+				"url": "https://pkg.go.dev/go/format/",
 				"path": "go/format",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "importer",
-				"synopsis": "Package importer provides access to export data importers.\n\n[\"go/importer\" on godoc.org](https://golang.org/pkg/go/importer/)",
-				"url": "https://golang.org/pkg/go/importer/",
+				"synopsis": "Package importer provides access to export data importers.\n\n[\"go/importer\" on pkg.go.dev](https://pkg.go.dev/go/importer/)",
+				"url": "https://pkg.go.dev/go/importer/",
 				"path": "go/importer",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "parser",
-				"synopsis": "Package parser implements a parser for Go source files.\n\n[\"go/parser\" on godoc.org](https://golang.org/pkg/go/parser/)",
-				"url": "https://golang.org/pkg/go/parser/",
+				"synopsis": "Package parser implements a parser for Go source files.\n\n[\"go/parser\" on pkg.go.dev](https://pkg.go.dev/go/parser/)",
+				"url": "https://pkg.go.dev/go/parser/",
 				"path": "go/parser",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "printer",
-				"synopsis": "Package printer implements printing of AST nodes.\n\n[\"go/printer\" on godoc.org](https://golang.org/pkg/go/printer/)",
-				"url": "https://golang.org/pkg/go/printer/",
+				"synopsis": "Package printer implements printing of AST nodes.\n\n[\"go/printer\" on pkg.go.dev](https://pkg.go.dev/go/printer/)",
+				"url": "https://pkg.go.dev/go/printer/",
 				"path": "go/printer",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "scanner",
-				"synopsis": "Package scanner implements a scanner for Go source text.\n\n[\"go/scanner\" on godoc.org](https://golang.org/pkg/go/scanner/)",
-				"url": "https://golang.org/pkg/go/scanner/",
+				"synopsis": "Package scanner implements a scanner for Go source text.\n\n[\"go/scanner\" on pkg.go.dev](https://pkg.go.dev/go/scanner/)",
+				"url": "https://pkg.go.dev/go/scanner/",
 				"path": "go/scanner",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "token",
-				"synopsis": "Package token defines constants representing the lexical tokens of the Go programming language and basic operations on tokens (printing, predicates).\n\n[\"go/token\" on godoc.org](https://golang.org/pkg/go/token/)",
-				"url": "https://golang.org/pkg/go/token/",
+				"synopsis": "Package token defines constants representing the lexical tokens of the Go programming language and basic operations on tokens (printing, predicates).\n\n[\"go/token\" on pkg.go.dev](https://pkg.go.dev/go/token/)",
+				"url": "https://pkg.go.dev/go/token/",
 				"path": "go/token",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "types",
-				"synopsis": "Package types declares the data types and implements the algorithms for type-checking of Go packages.\n\n[\"go/types\" on godoc.org](https://golang.org/pkg/go/types/)",
-				"url": "https://golang.org/pkg/go/types/",
+				"synopsis": "Package types declares the data types and implements the algorithms for type-checking of Go packages.\n\n[\"go/types\" on pkg.go.dev](https://pkg.go.dev/go/types/)",
+				"url": "https://pkg.go.dev/go/types/",
 				"path": "go/types",
 				"depth": 20,
 				"children": []
@@ -611,40 +611,48 @@
 	},
 	{
 		"name": "hash",
-		"synopsis": "Package hash provides interfaces for hash functions.\n\n[\"hash\" on godoc.org](https://golang.org/pkg/hash/)",
-		"url": "https://golang.org/pkg/hash/",
+		"synopsis": "Package hash provides interfaces for hash functions.\n\n[\"hash\" on pkg.go.dev](https://pkg.go.dev/hash/)",
+		"url": "https://pkg.go.dev/hash/",
 		"path": "hash",
 		"depth": 0,
 		"children": [
 			{
 				"name": "adler32",
-				"synopsis": "Package adler32 implements the Adler-32 checksum.\n\n[\"hash/adler32\" on godoc.org](https://golang.org/pkg/hash/adler32/)",
-				"url": "https://golang.org/pkg/hash/adler32/",
+				"synopsis": "Package adler32 implements the Adler-32 checksum.\n\n[\"hash/adler32\" on pkg.go.dev](https://pkg.go.dev/hash/adler32/)",
+				"url": "https://pkg.go.dev/hash/adler32/",
 				"path": "hash/adler32",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "crc32",
-				"synopsis": "Package crc32 implements the 32-bit cyclic redundancy check, or CRC-32, checksum.\n\n[\"hash/crc32\" on godoc.org](https://golang.org/pkg/hash/crc32/)",
-				"url": "https://golang.org/pkg/hash/crc32/",
+				"synopsis": "Package crc32 implements the 32-bit cyclic redundancy check, or CRC-32, checksum.\n\n[\"hash/crc32\" on pkg.go.dev](https://pkg.go.dev/hash/crc32/)",
+				"url": "https://pkg.go.dev/hash/crc32/",
 				"path": "hash/crc32",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "crc64",
-				"synopsis": "Package crc64 implements the 64-bit cyclic redundancy check, or CRC-64, checksum.\n\n[\"hash/crc64\" on godoc.org](https://golang.org/pkg/hash/crc64/)",
-				"url": "https://golang.org/pkg/hash/crc64/",
+				"synopsis": "Package crc64 implements the 64-bit cyclic redundancy check, or CRC-64, checksum.\n\n[\"hash/crc64\" on pkg.go.dev](https://pkg.go.dev/hash/crc64/)",
+				"url": "https://pkg.go.dev/hash/crc64/",
 				"path": "hash/crc64",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "fnv",
-				"synopsis": "Package fnv implements FNV-1 and FNV-1a, non-cryptographic hash functions created by Glenn Fowler, Landon Curt Noll, and Phong Vo.\n\n[\"hash/fnv\" on godoc.org](https://golang.org/pkg/hash/fnv/)",
-				"url": "https://golang.org/pkg/hash/fnv/",
+				"synopsis": "Package fnv implements FNV-1 and FNV-1a, non-cryptographic hash functions created by Glenn Fowler, Landon Curt Noll, and Phong Vo.\n\n[\"hash/fnv\" on pkg.go.dev](https://pkg.go.dev/hash/fnv/)",
+				"url": "https://pkg.go.dev/hash/fnv/",
 				"path": "hash/fnv",
+				"depth": 20,
+				"children": []
+			},
+			{
+				"name": "maphash",
+				"synopsis": "Package maphash provides hash functions on byte sequences.\n\n[\"hash/maphash\" on pkg.go.dev](https://pkg.go.dev/hash/maphash/)",
+				"url": "https://pkg.go.dev/hash/maphash/",
+				"path": "hash/maphash",
 				"depth": 20,
 				"children": []
 			}
@@ -652,15 +660,15 @@
 	},
 	{
 		"name": "html",
-		"synopsis": "Package html provides functions for escaping and unescaping HTML text.\n\n[\"html\" on godoc.org](https://golang.org/pkg/html/)",
-		"url": "https://golang.org/pkg/html/",
+		"synopsis": "Package html provides functions for escaping and unescaping HTML text.\n\n[\"html\" on pkg.go.dev](https://pkg.go.dev/html/)",
+		"url": "https://pkg.go.dev/html/",
 		"path": "html",
 		"depth": 0,
 		"children": [
 			{
 				"name": "template",
-				"synopsis": "Package template (html/template) implements data-driven templates for generating HTML output safe against code injection.\n\n[\"html/template\" on godoc.org](https://golang.org/pkg/html/template/)",
-				"url": "https://golang.org/pkg/html/template/",
+				"synopsis": "Package template (html/template) implements data-driven templates for generating HTML output safe against code injection.\n\n[\"html/template\" on pkg.go.dev](https://pkg.go.dev/html/template/)",
+				"url": "https://pkg.go.dev/html/template/",
 				"path": "html/template",
 				"depth": 20,
 				"children": []
@@ -669,22 +677,22 @@
 	},
 	{
 		"name": "image",
-		"synopsis": "Package image implements a basic 2-D image library.\n\n[\"image\" on godoc.org](https://golang.org/pkg/image/)",
-		"url": "https://golang.org/pkg/image/",
+		"synopsis": "Package image implements a basic 2-D image library.\n\n[\"image\" on pkg.go.dev](https://pkg.go.dev/image/)",
+		"url": "https://pkg.go.dev/image/",
 		"path": "image",
 		"depth": 0,
 		"children": [
 			{
 				"name": "color",
-				"synopsis": "Package color implements a basic color library.\n\n[\"image/color\" on godoc.org](https://golang.org/pkg/image/color/)",
-				"url": "https://golang.org/pkg/image/color/",
+				"synopsis": "Package color implements a basic color library.\n\n[\"image/color\" on pkg.go.dev](https://pkg.go.dev/image/color/)",
+				"url": "https://pkg.go.dev/image/color/",
 				"path": "image/color",
 				"depth": 20,
 				"children": [
 					{
 						"name": "palette",
-						"synopsis": "Package palette provides standard color palettes.\n\n[\"image/color/palette\" on godoc.org](https://golang.org/pkg/image/color/palette/)",
-						"url": "https://golang.org/pkg/image/color/palette/",
+						"synopsis": "Package palette provides standard color palettes.\n\n[\"image/color/palette\" on pkg.go.dev](https://pkg.go.dev/image/color/palette/)",
+						"url": "https://pkg.go.dev/image/color/palette/",
 						"path": "image/color/palette",
 						"depth": 40,
 						"children": []
@@ -693,32 +701,32 @@
 			},
 			{
 				"name": "draw",
-				"synopsis": "Package draw provides image composition functions.\n\n[\"image/draw\" on godoc.org](https://golang.org/pkg/image/draw/)",
-				"url": "https://golang.org/pkg/image/draw/",
+				"synopsis": "Package draw provides image composition functions.\n\n[\"image/draw\" on pkg.go.dev](https://pkg.go.dev/image/draw/)",
+				"url": "https://pkg.go.dev/image/draw/",
 				"path": "image/draw",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "gif",
-				"synopsis": "Package gif implements a GIF image decoder and encoder.\n\n[\"image/gif\" on godoc.org](https://golang.org/pkg/image/gif/)",
-				"url": "https://golang.org/pkg/image/gif/",
+				"synopsis": "Package gif implements a GIF image decoder and encoder.\n\n[\"image/gif\" on pkg.go.dev](https://pkg.go.dev/image/gif/)",
+				"url": "https://pkg.go.dev/image/gif/",
 				"path": "image/gif",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "jpeg",
-				"synopsis": "Package jpeg implements a JPEG image decoder and encoder.\n\n[\"image/jpeg\" on godoc.org](https://golang.org/pkg/image/jpeg/)",
-				"url": "https://golang.org/pkg/image/jpeg/",
+				"synopsis": "Package jpeg implements a JPEG image decoder and encoder.\n\n[\"image/jpeg\" on pkg.go.dev](https://pkg.go.dev/image/jpeg/)",
+				"url": "https://pkg.go.dev/image/jpeg/",
 				"path": "image/jpeg",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "png",
-				"synopsis": "Package png implements a PNG image decoder and encoder.\n\n[\"image/png\" on godoc.org](https://golang.org/pkg/image/png/)",
-				"url": "https://golang.org/pkg/image/png/",
+				"synopsis": "Package png implements a PNG image decoder and encoder.\n\n[\"image/png\" on pkg.go.dev](https://pkg.go.dev/image/png/)",
+				"url": "https://pkg.go.dev/image/png/",
 				"path": "image/png",
 				"depth": 20,
 				"children": []
@@ -727,15 +735,15 @@
 	},
 	{
 		"name": "index",
-		"synopsis": "\n\n[\"index\" on godoc.org](https://golang.org/pkg/index/)",
-		"url": "https://golang.org/pkg/index/",
+		"synopsis": "\n\n[\"index\" on pkg.go.dev](https://pkg.go.dev/index/)",
+		"url": "https://pkg.go.dev/index/",
 		"path": "index",
 		"depth": 0,
 		"children": [
 			{
 				"name": "suffixarray",
-				"synopsis": "Package suffixarray implements substring search in logarithmic time using an in-memory suffix array.\n\n[\"index/suffixarray\" on godoc.org](https://golang.org/pkg/index/suffixarray/)",
-				"url": "https://golang.org/pkg/index/suffixarray/",
+				"synopsis": "Package suffixarray implements substring search in logarithmic time using an in-memory suffix array.\n\n[\"index/suffixarray\" on pkg.go.dev](https://pkg.go.dev/index/suffixarray/)",
+				"url": "https://pkg.go.dev/index/suffixarray/",
 				"path": "index/suffixarray",
 				"depth": 20,
 				"children": []
@@ -744,15 +752,15 @@
 	},
 	{
 		"name": "io",
-		"synopsis": "Package io provides basic interfaces to I/O primitives.\n\n[\"io\" on godoc.org](https://golang.org/pkg/io/)",
-		"url": "https://golang.org/pkg/io/",
+		"synopsis": "Package io provides basic interfaces to I/O primitives.\n\n[\"io\" on pkg.go.dev](https://pkg.go.dev/io/)",
+		"url": "https://pkg.go.dev/io/",
 		"path": "io",
 		"depth": 0,
 		"children": [
 			{
 				"name": "ioutil",
-				"synopsis": "Package ioutil implements some I/O utility functions.\n\n[\"io/ioutil\" on godoc.org](https://golang.org/pkg/io/ioutil/)",
-				"url": "https://golang.org/pkg/io/ioutil/",
+				"synopsis": "Package ioutil implements some I/O utility functions.\n\n[\"io/ioutil\" on pkg.go.dev](https://pkg.go.dev/io/ioutil/)",
+				"url": "https://pkg.go.dev/io/ioutil/",
 				"path": "io/ioutil",
 				"depth": 20,
 				"children": []
@@ -761,15 +769,15 @@
 	},
 	{
 		"name": "log",
-		"synopsis": "Package log implements a simple logging package.\n\n[\"log\" on godoc.org](https://golang.org/pkg/log/)",
-		"url": "https://golang.org/pkg/log/",
+		"synopsis": "Package log implements a simple logging package.\n\n[\"log\" on pkg.go.dev](https://pkg.go.dev/log/)",
+		"url": "https://pkg.go.dev/log/",
 		"path": "log",
 		"depth": 0,
 		"children": [
 			{
 				"name": "syslog",
-				"synopsis": "Package syslog provides a simple interface to the system log service.\n\n[\"log/syslog\" on godoc.org](https://golang.org/pkg/log/syslog/)",
-				"url": "https://golang.org/pkg/log/syslog/",
+				"synopsis": "Package syslog provides a simple interface to the system log service.\n\n[\"log/syslog\" on pkg.go.dev](https://pkg.go.dev/log/syslog/)",
+				"url": "https://pkg.go.dev/log/syslog/",
 				"path": "log/syslog",
 				"depth": 20,
 				"children": []
@@ -778,39 +786,39 @@
 	},
 	{
 		"name": "math",
-		"synopsis": "Package math provides basic constants and mathematical functions.\n\n[\"math\" on godoc.org](https://golang.org/pkg/math/)",
-		"url": "https://golang.org/pkg/math/",
+		"synopsis": "Package math provides basic constants and mathematical functions.\n\n[\"math\" on pkg.go.dev](https://pkg.go.dev/math/)",
+		"url": "https://pkg.go.dev/math/",
 		"path": "math",
 		"depth": 0,
 		"children": [
 			{
 				"name": "big",
-				"synopsis": "Package big implements arbitrary-precision arithmetic (big numbers).\n\n[\"math/big\" on godoc.org](https://golang.org/pkg/math/big/)",
-				"url": "https://golang.org/pkg/math/big/",
+				"synopsis": "Package big implements arbitrary-precision arithmetic (big numbers).\n\n[\"math/big\" on pkg.go.dev](https://pkg.go.dev/math/big/)",
+				"url": "https://pkg.go.dev/math/big/",
 				"path": "math/big",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "bits",
-				"synopsis": "Package bits implements bit counting and manipulation functions for the predeclared unsigned integer types.\n\n[\"math/bits\" on godoc.org](https://golang.org/pkg/math/bits/)",
-				"url": "https://golang.org/pkg/math/bits/",
+				"synopsis": "Package bits implements bit counting and manipulation functions for the predeclared unsigned integer types.\n\n[\"math/bits\" on pkg.go.dev](https://pkg.go.dev/math/bits/)",
+				"url": "https://pkg.go.dev/math/bits/",
 				"path": "math/bits",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "cmplx",
-				"synopsis": "Package cmplx provides basic constants and mathematical functions for complex numbers.\n\n[\"math/cmplx\" on godoc.org](https://golang.org/pkg/math/cmplx/)",
-				"url": "https://golang.org/pkg/math/cmplx/",
+				"synopsis": "Package cmplx provides basic constants and mathematical functions for complex numbers.\n\n[\"math/cmplx\" on pkg.go.dev](https://pkg.go.dev/math/cmplx/)",
+				"url": "https://pkg.go.dev/math/cmplx/",
 				"path": "math/cmplx",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "rand",
-				"synopsis": "Package rand implements pseudo-random number generators.\n\n[\"math/rand\" on godoc.org](https://golang.org/pkg/math/rand/)",
-				"url": "https://golang.org/pkg/math/rand/",
+				"synopsis": "Package rand implements pseudo-random number generators.\n\n[\"math/rand\" on pkg.go.dev](https://pkg.go.dev/math/rand/)",
+				"url": "https://pkg.go.dev/math/rand/",
 				"path": "math/rand",
 				"depth": 20,
 				"children": []
@@ -819,23 +827,23 @@
 	},
 	{
 		"name": "mime",
-		"synopsis": "Package mime implements parts of the MIME spec.\n\n[\"mime\" on godoc.org](https://golang.org/pkg/mime/)",
-		"url": "https://golang.org/pkg/mime/",
+		"synopsis": "Package mime implements parts of the MIME spec.\n\n[\"mime\" on pkg.go.dev](https://pkg.go.dev/mime/)",
+		"url": "https://pkg.go.dev/mime/",
 		"path": "mime",
 		"depth": 0,
 		"children": [
 			{
 				"name": "multipart",
-				"synopsis": "Package multipart implements MIME multipart parsing, as defined in RFC 2046.\n\n[\"mime/multipart\" on godoc.org](https://golang.org/pkg/mime/multipart/)",
-				"url": "https://golang.org/pkg/mime/multipart/",
+				"synopsis": "Package multipart implements MIME multipart parsing, as defined in RFC 2046.\n\n[\"mime/multipart\" on pkg.go.dev](https://pkg.go.dev/mime/multipart/)",
+				"url": "https://pkg.go.dev/mime/multipart/",
 				"path": "mime/multipart",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "quotedprintable",
-				"synopsis": "Package quotedprintable implements quoted-printable encoding as specified by RFC 2045.\n\n[\"mime/quotedprintable\" on godoc.org](https://golang.org/pkg/mime/quotedprintable/)",
-				"url": "https://golang.org/pkg/mime/quotedprintable/",
+				"synopsis": "Package quotedprintable implements quoted-printable encoding as specified by RFC 2045.\n\n[\"mime/quotedprintable\" on pkg.go.dev](https://pkg.go.dev/mime/quotedprintable/)",
+				"url": "https://pkg.go.dev/mime/quotedprintable/",
 				"path": "mime/quotedprintable",
 				"depth": 20,
 				"children": []
@@ -844,70 +852,70 @@
 	},
 	{
 		"name": "net",
-		"synopsis": "Package net provides a portable interface for network I/O, including TCP/IP, UDP, domain name resolution, and Unix domain sockets.\n\n[\"net\" on godoc.org](https://golang.org/pkg/net/)",
-		"url": "https://golang.org/pkg/net/",
+		"synopsis": "Package net provides a portable interface for network I/O, including TCP/IP, UDP, domain name resolution, and Unix domain sockets.\n\n[\"net\" on pkg.go.dev](https://pkg.go.dev/net/)",
+		"url": "https://pkg.go.dev/net/",
 		"path": "net",
 		"depth": 0,
 		"children": [
 			{
 				"name": "http",
-				"synopsis": "Package http provides HTTP client and server implementations.\n\n[\"net/http\" on godoc.org](https://golang.org/pkg/net/http/)",
-				"url": "https://golang.org/pkg/net/http/",
+				"synopsis": "Package http provides HTTP client and server implementations.\n\n[\"net/http\" on pkg.go.dev](https://pkg.go.dev/net/http/)",
+				"url": "https://pkg.go.dev/net/http/",
 				"path": "net/http",
 				"depth": 20,
 				"children": [
 					{
 						"name": "cgi",
-						"synopsis": "Package cgi implements CGI (Common Gateway Interface) as specified in RFC 3875.\n\n[\"net/http/cgi\" on godoc.org](https://golang.org/pkg/net/http/cgi/)",
-						"url": "https://golang.org/pkg/net/http/cgi/",
+						"synopsis": "Package cgi implements CGI (Common Gateway Interface) as specified in RFC 3875.\n\n[\"net/http/cgi\" on pkg.go.dev](https://pkg.go.dev/net/http/cgi/)",
+						"url": "https://pkg.go.dev/net/http/cgi/",
 						"path": "net/http/cgi",
 						"depth": 40,
 						"children": []
 					},
 					{
 						"name": "cookiejar",
-						"synopsis": "Package cookiejar implements an in-memory RFC 6265-compliant http.CookieJar.\n\n[\"net/http/cookiejar\" on godoc.org](https://golang.org/pkg/net/http/cookiejar/)",
-						"url": "https://golang.org/pkg/net/http/cookiejar/",
+						"synopsis": "Package cookiejar implements an in-memory RFC 6265-compliant http.CookieJar.\n\n[\"net/http/cookiejar\" on pkg.go.dev](https://pkg.go.dev/net/http/cookiejar/)",
+						"url": "https://pkg.go.dev/net/http/cookiejar/",
 						"path": "net/http/cookiejar",
 						"depth": 40,
 						"children": []
 					},
 					{
 						"name": "fcgi",
-						"synopsis": "Package fcgi implements the FastCGI protocol.\n\n[\"net/http/fcgi\" on godoc.org](https://golang.org/pkg/net/http/fcgi/)",
-						"url": "https://golang.org/pkg/net/http/fcgi/",
+						"synopsis": "Package fcgi implements the FastCGI protocol.\n\n[\"net/http/fcgi\" on pkg.go.dev](https://pkg.go.dev/net/http/fcgi/)",
+						"url": "https://pkg.go.dev/net/http/fcgi/",
 						"path": "net/http/fcgi",
 						"depth": 40,
 						"children": []
 					},
 					{
 						"name": "httptest",
-						"synopsis": "Package httptest provides utilities for HTTP testing.\n\n[\"net/http/httptest\" on godoc.org](https://golang.org/pkg/net/http/httptest/)",
-						"url": "https://golang.org/pkg/net/http/httptest/",
+						"synopsis": "Package httptest provides utilities for HTTP testing.\n\n[\"net/http/httptest\" on pkg.go.dev](https://pkg.go.dev/net/http/httptest/)",
+						"url": "https://pkg.go.dev/net/http/httptest/",
 						"path": "net/http/httptest",
 						"depth": 40,
 						"children": []
 					},
 					{
 						"name": "httptrace",
-						"synopsis": "Package httptrace provides mechanisms to trace the events within HTTP client requests.\n\n[\"net/http/httptrace\" on godoc.org](https://golang.org/pkg/net/http/httptrace/)",
-						"url": "https://golang.org/pkg/net/http/httptrace/",
+						"synopsis": "Package httptrace provides mechanisms to trace the events within HTTP client requests.\n\n[\"net/http/httptrace\" on pkg.go.dev](https://pkg.go.dev/net/http/httptrace/)",
+						"url": "https://pkg.go.dev/net/http/httptrace/",
 						"path": "net/http/httptrace",
 						"depth": 40,
 						"children": []
 					},
 					{
 						"name": "httputil",
-						"synopsis": "Package httputil provides HTTP utility functions, complementing the more common ones in the net/http package.\n\n[\"net/http/httputil\" on godoc.org](https://golang.org/pkg/net/http/httputil/)",
-						"url": "https://golang.org/pkg/net/http/httputil/",
+						"synopsis": "Package httputil provides HTTP utility functions, complementing the more common ones in the net/http package.\n\n[\"net/http/httputil\" on pkg.go.dev](https://pkg.go.dev/net/http/httputil/)",
+						"url": "https://pkg.go.dev/net/http/httputil/",
 						"path": "net/http/httputil",
 						"depth": 40,
 						"children": []
 					},
 					{
 						"name": "pprof",
-						"synopsis": "Package pprof serves via its HTTP server runtime profiling data in the format expected by the pprof visualization tool.\n\n[\"net/http/pprof\" on godoc.org](https://golang.org/pkg/net/http/pprof/)",
-						"url": "https://golang.org/pkg/net/http/pprof/",
+						"synopsis": "Package pprof serves via its HTTP server runtime profiling data in the format expected by the pprof visualization tool.\n\n[\"net/http/pprof\" on pkg.go.dev](https://pkg.go.dev/net/http/pprof/)",
+						"url": "https://pkg.go.dev/net/http/pprof/",
 						"path": "net/http/pprof",
 						"depth": 40,
 						"children": []
@@ -916,23 +924,23 @@
 			},
 			{
 				"name": "mail",
-				"synopsis": "Package mail implements parsing of mail messages.\n\n[\"net/mail\" on godoc.org](https://golang.org/pkg/net/mail/)",
-				"url": "https://golang.org/pkg/net/mail/",
+				"synopsis": "Package mail implements parsing of mail messages.\n\n[\"net/mail\" on pkg.go.dev](https://pkg.go.dev/net/mail/)",
+				"url": "https://pkg.go.dev/net/mail/",
 				"path": "net/mail",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "rpc",
-				"synopsis": "Package rpc provides access to the exported methods of an object across a network or other I/O connection.\n\n[\"net/rpc\" on godoc.org](https://golang.org/pkg/net/rpc/)",
-				"url": "https://golang.org/pkg/net/rpc/",
+				"synopsis": "Package rpc provides access to the exported methods of an object across a network or other I/O connection.\n\n[\"net/rpc\" on pkg.go.dev](https://pkg.go.dev/net/rpc/)",
+				"url": "https://pkg.go.dev/net/rpc/",
 				"path": "net/rpc",
 				"depth": 20,
 				"children": [
 					{
 						"name": "jsonrpc",
-						"synopsis": "Package jsonrpc implements a JSON-RPC 1.0 ClientCodec and ServerCodec for the rpc package.\n\n[\"net/rpc/jsonrpc\" on godoc.org](https://golang.org/pkg/net/rpc/jsonrpc/)",
-						"url": "https://golang.org/pkg/net/rpc/jsonrpc/",
+						"synopsis": "Package jsonrpc implements a JSON-RPC 1.0 ClientCodec and ServerCodec for the rpc package.\n\n[\"net/rpc/jsonrpc\" on pkg.go.dev](https://pkg.go.dev/net/rpc/jsonrpc/)",
+						"url": "https://pkg.go.dev/net/rpc/jsonrpc/",
 						"path": "net/rpc/jsonrpc",
 						"depth": 40,
 						"children": []
@@ -941,24 +949,24 @@
 			},
 			{
 				"name": "smtp",
-				"synopsis": "Package smtp implements the Simple Mail Transfer Protocol as defined in RFC 5321.\n\n[\"net/smtp\" on godoc.org](https://golang.org/pkg/net/smtp/)",
-				"url": "https://golang.org/pkg/net/smtp/",
+				"synopsis": "Package smtp implements the Simple Mail Transfer Protocol as defined in RFC 5321.\n\n[\"net/smtp\" on pkg.go.dev](https://pkg.go.dev/net/smtp/)",
+				"url": "https://pkg.go.dev/net/smtp/",
 				"path": "net/smtp",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "textproto",
-				"synopsis": "Package textproto implements generic support for text-based request/response protocols in the style of HTTP, NNTP, and SMTP.\n\n[\"net/textproto\" on godoc.org](https://golang.org/pkg/net/textproto/)",
-				"url": "https://golang.org/pkg/net/textproto/",
+				"synopsis": "Package textproto implements generic support for text-based request/response protocols in the style of HTTP, NNTP, and SMTP.\n\n[\"net/textproto\" on pkg.go.dev](https://pkg.go.dev/net/textproto/)",
+				"url": "https://pkg.go.dev/net/textproto/",
 				"path": "net/textproto",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "url",
-				"synopsis": "Package url parses URLs and implements query escaping.\n\n[\"net/url\" on godoc.org](https://golang.org/pkg/net/url/)",
-				"url": "https://golang.org/pkg/net/url/",
+				"synopsis": "Package url parses URLs and implements query escaping.\n\n[\"net/url\" on pkg.go.dev](https://pkg.go.dev/net/url/)",
+				"url": "https://pkg.go.dev/net/url/",
 				"path": "net/url",
 				"depth": 20,
 				"children": []
@@ -967,31 +975,31 @@
 	},
 	{
 		"name": "os",
-		"synopsis": "Package os provides a platform-independent interface to operating system functionality.\n\n[\"os\" on godoc.org](https://golang.org/pkg/os/)",
-		"url": "https://golang.org/pkg/os/",
+		"synopsis": "Package os provides a platform-independent interface to operating system functionality.\n\n[\"os\" on pkg.go.dev](https://pkg.go.dev/os/)",
+		"url": "https://pkg.go.dev/os/",
 		"path": "os",
 		"depth": 0,
 		"children": [
 			{
 				"name": "exec",
-				"synopsis": "Package exec runs external commands.\n\n[\"os/exec\" on godoc.org](https://golang.org/pkg/os/exec/)",
-				"url": "https://golang.org/pkg/os/exec/",
+				"synopsis": "Package exec runs external commands.\n\n[\"os/exec\" on pkg.go.dev](https://pkg.go.dev/os/exec/)",
+				"url": "https://pkg.go.dev/os/exec/",
 				"path": "os/exec",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "signal",
-				"synopsis": "Package signal implements access to incoming signals.\n\n[\"os/signal\" on godoc.org](https://golang.org/pkg/os/signal/)",
-				"url": "https://golang.org/pkg/os/signal/",
+				"synopsis": "Package signal implements access to incoming signals.\n\n[\"os/signal\" on pkg.go.dev](https://pkg.go.dev/os/signal/)",
+				"url": "https://pkg.go.dev/os/signal/",
 				"path": "os/signal",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "user",
-				"synopsis": "Package user allows user account lookups by name or id.\n\n[\"os/user\" on godoc.org](https://golang.org/pkg/os/user/)",
-				"url": "https://golang.org/pkg/os/user/",
+				"synopsis": "Package user allows user account lookups by name or id.\n\n[\"os/user\" on pkg.go.dev](https://pkg.go.dev/os/user/)",
+				"url": "https://pkg.go.dev/os/user/",
 				"path": "os/user",
 				"depth": 20,
 				"children": []
@@ -1000,15 +1008,15 @@
 	},
 	{
 		"name": "path",
-		"synopsis": "Package path implements utility routines for manipulating slash-separated paths.\n\n[\"path\" on godoc.org](https://golang.org/pkg/path/)",
-		"url": "https://golang.org/pkg/path/",
+		"synopsis": "Package path implements utility routines for manipulating slash-separated paths.\n\n[\"path\" on pkg.go.dev](https://pkg.go.dev/path/)",
+		"url": "https://pkg.go.dev/path/",
 		"path": "path",
 		"depth": 0,
 		"children": [
 			{
 				"name": "filepath",
-				"synopsis": "Package filepath implements utility routines for manipulating filename paths in a way compatible with the target operating system-defined file paths.\n\n[\"path/filepath\" on godoc.org](https://golang.org/pkg/path/filepath/)",
-				"url": "https://golang.org/pkg/path/filepath/",
+				"synopsis": "Package filepath implements utility routines for manipulating filename paths in a way compatible with the target operating system-defined file paths.\n\n[\"path/filepath\" on pkg.go.dev](https://pkg.go.dev/path/filepath/)",
+				"url": "https://pkg.go.dev/path/filepath/",
 				"path": "path/filepath",
 				"depth": 20,
 				"children": []
@@ -1017,31 +1025,31 @@
 	},
 	{
 		"name": "plugin",
-		"synopsis": "Package plugin implements loading and symbol resolution of Go plugins.\n\n[\"plugin\" on godoc.org](https://golang.org/pkg/plugin/)",
-		"url": "https://golang.org/pkg/plugin/",
+		"synopsis": "Package plugin implements loading and symbol resolution of Go plugins.\n\n[\"plugin\" on pkg.go.dev](https://pkg.go.dev/plugin/)",
+		"url": "https://pkg.go.dev/plugin/",
 		"path": "plugin",
 		"depth": 0,
 		"children": []
 	},
 	{
 		"name": "reflect",
-		"synopsis": "Package reflect implements run-time reflection, allowing a program to manipulate objects with arbitrary types.\n\n[\"reflect\" on godoc.org](https://golang.org/pkg/reflect/)",
-		"url": "https://golang.org/pkg/reflect/",
+		"synopsis": "Package reflect implements run-time reflection, allowing a program to manipulate objects with arbitrary types.\n\n[\"reflect\" on pkg.go.dev](https://pkg.go.dev/reflect/)",
+		"url": "https://pkg.go.dev/reflect/",
 		"path": "reflect",
 		"depth": 0,
 		"children": []
 	},
 	{
 		"name": "regexp",
-		"synopsis": "Package regexp implements regular expression search.\n\n[\"regexp\" on godoc.org](https://golang.org/pkg/regexp/)",
-		"url": "https://golang.org/pkg/regexp/",
+		"synopsis": "Package regexp implements regular expression search.\n\n[\"regexp\" on pkg.go.dev](https://pkg.go.dev/regexp/)",
+		"url": "https://pkg.go.dev/regexp/",
 		"path": "regexp",
 		"depth": 0,
 		"children": [
 			{
 				"name": "syntax",
-				"synopsis": "Package syntax parses regular expressions into parse trees and compiles parse trees into programs.\n\n[\"regexp/syntax\" on godoc.org](https://golang.org/pkg/regexp/syntax/)",
-				"url": "https://golang.org/pkg/regexp/syntax/",
+				"synopsis": "Package syntax parses regular expressions into parse trees and compiles parse trees into programs.\n\n[\"regexp/syntax\" on pkg.go.dev](https://pkg.go.dev/regexp/syntax/)",
+				"url": "https://pkg.go.dev/regexp/syntax/",
 				"path": "regexp/syntax",
 				"depth": 20,
 				"children": []
@@ -1050,55 +1058,55 @@
 	},
 	{
 		"name": "runtime",
-		"synopsis": "Package runtime contains operations that interact with Go's runtime system, such as functions to control goroutines.\n\n[\"runtime\" on godoc.org](https://golang.org/pkg/runtime/)",
-		"url": "https://golang.org/pkg/runtime/",
+		"synopsis": "Package runtime contains operations that interact with Go's runtime system, such as functions to control goroutines.\n\n[\"runtime\" on pkg.go.dev](https://pkg.go.dev/runtime/)",
+		"url": "https://pkg.go.dev/runtime/",
 		"path": "runtime",
 		"depth": 0,
 		"children": [
 			{
 				"name": "cgo",
-				"synopsis": "Package cgo contains runtime support for code generated by the cgo tool.\n\n[\"runtime/cgo\" on godoc.org](https://golang.org/pkg/runtime/cgo/)",
-				"url": "https://golang.org/pkg/runtime/cgo/",
+				"synopsis": "Package cgo contains runtime support for code generated by the cgo tool.\n\n[\"runtime/cgo\" on pkg.go.dev](https://pkg.go.dev/runtime/cgo/)",
+				"url": "https://pkg.go.dev/runtime/cgo/",
 				"path": "runtime/cgo",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "debug",
-				"synopsis": "Package debug contains facilities for programs to debug themselves while they are running.\n\n[\"runtime/debug\" on godoc.org](https://golang.org/pkg/runtime/debug/)",
-				"url": "https://golang.org/pkg/runtime/debug/",
+				"synopsis": "Package debug contains facilities for programs to debug themselves while they are running.\n\n[\"runtime/debug\" on pkg.go.dev](https://pkg.go.dev/runtime/debug/)",
+				"url": "https://pkg.go.dev/runtime/debug/",
 				"path": "runtime/debug",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "msan",
-				"synopsis": "\n\n[\"runtime/msan\" on godoc.org](https://golang.org/pkg/runtime/msan/)",
-				"url": "https://golang.org/pkg/runtime/msan/",
+				"synopsis": "\n\n[\"runtime/msan\" on pkg.go.dev](https://pkg.go.dev/runtime/msan/)",
+				"url": "https://pkg.go.dev/runtime/msan/",
 				"path": "runtime/msan",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "pprof",
-				"synopsis": "Package pprof writes runtime profiling data in the format expected by the pprof visualization tool.\n\n[\"runtime/pprof\" on godoc.org](https://golang.org/pkg/runtime/pprof/)",
-				"url": "https://golang.org/pkg/runtime/pprof/",
+				"synopsis": "Package pprof writes runtime profiling data in the format expected by the pprof visualization tool.\n\n[\"runtime/pprof\" on pkg.go.dev](https://pkg.go.dev/runtime/pprof/)",
+				"url": "https://pkg.go.dev/runtime/pprof/",
 				"path": "runtime/pprof",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "race",
-				"synopsis": "Package race implements data race detection logic.\n\n[\"runtime/race\" on godoc.org](https://golang.org/pkg/runtime/race/)",
-				"url": "https://golang.org/pkg/runtime/race/",
+				"synopsis": "Package race implements data race detection logic.\n\n[\"runtime/race\" on pkg.go.dev](https://pkg.go.dev/runtime/race/)",
+				"url": "https://pkg.go.dev/runtime/race/",
 				"path": "runtime/race",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "trace",
-				"synopsis": "Package trace contains facilities for programs to generate traces for the Go execution tracer.\n\n[\"runtime/trace\" on godoc.org](https://golang.org/pkg/runtime/trace/)",
-				"url": "https://golang.org/pkg/runtime/trace/",
+				"synopsis": "Package trace contains facilities for programs to generate traces for the Go execution tracer.\n\n[\"runtime/trace\" on pkg.go.dev](https://pkg.go.dev/runtime/trace/)",
+				"url": "https://pkg.go.dev/runtime/trace/",
 				"path": "runtime/trace",
 				"depth": 20,
 				"children": []
@@ -1107,39 +1115,39 @@
 	},
 	{
 		"name": "sort",
-		"synopsis": "Package sort provides primitives for sorting slices and user-defined collections.\n\n[\"sort\" on godoc.org](https://golang.org/pkg/sort/)",
-		"url": "https://golang.org/pkg/sort/",
+		"synopsis": "Package sort provides primitives for sorting slices and user-defined collections.\n\n[\"sort\" on pkg.go.dev](https://pkg.go.dev/sort/)",
+		"url": "https://pkg.go.dev/sort/",
 		"path": "sort",
 		"depth": 0,
 		"children": []
 	},
 	{
 		"name": "strconv",
-		"synopsis": "Package strconv implements conversions to and from string representations of basic data types.\n\n[\"strconv\" on godoc.org](https://golang.org/pkg/strconv/)",
-		"url": "https://golang.org/pkg/strconv/",
+		"synopsis": "Package strconv implements conversions to and from string representations of basic data types.\n\n[\"strconv\" on pkg.go.dev](https://pkg.go.dev/strconv/)",
+		"url": "https://pkg.go.dev/strconv/",
 		"path": "strconv",
 		"depth": 0,
 		"children": []
 	},
 	{
 		"name": "strings",
-		"synopsis": "Package strings implements simple functions to manipulate UTF-8 encoded strings.\n\n[\"strings\" on godoc.org](https://golang.org/pkg/strings/)",
-		"url": "https://golang.org/pkg/strings/",
+		"synopsis": "Package strings implements simple functions to manipulate UTF-8 encoded strings.\n\n[\"strings\" on pkg.go.dev](https://pkg.go.dev/strings/)",
+		"url": "https://pkg.go.dev/strings/",
 		"path": "strings",
 		"depth": 0,
 		"children": []
 	},
 	{
 		"name": "sync",
-		"synopsis": "Package sync provides basic synchronization primitives such as mutual exclusion locks.\n\n[\"sync\" on godoc.org](https://golang.org/pkg/sync/)",
-		"url": "https://golang.org/pkg/sync/",
+		"synopsis": "Package sync provides basic synchronization primitives such as mutual exclusion locks.\n\n[\"sync\" on pkg.go.dev](https://pkg.go.dev/sync/)",
+		"url": "https://pkg.go.dev/sync/",
 		"path": "sync",
 		"depth": 0,
 		"children": [
 			{
 				"name": "atomic",
-				"synopsis": "Package atomic provides low-level atomic memory primitives useful for implementing synchronization algorithms.\n\n[\"sync/atomic\" on godoc.org](https://golang.org/pkg/sync/atomic/)",
-				"url": "https://golang.org/pkg/sync/atomic/",
+				"synopsis": "Package atomic provides low-level atomic memory primitives useful for implementing synchronization algorithms.\n\n[\"sync/atomic\" on pkg.go.dev](https://pkg.go.dev/sync/atomic/)",
+				"url": "https://pkg.go.dev/sync/atomic/",
 				"path": "sync/atomic",
 				"depth": 20,
 				"children": []
@@ -1148,15 +1156,15 @@
 	},
 	{
 		"name": "syscall",
-		"synopsis": "Package syscall contains an interface to the low-level operating system primitives.\n\n[\"syscall\" on godoc.org](https://golang.org/pkg/syscall/)",
-		"url": "https://golang.org/pkg/syscall/",
+		"synopsis": "Package syscall contains an interface to the low-level operating system primitives.\n\n[\"syscall\" on pkg.go.dev](https://pkg.go.dev/syscall/)",
+		"url": "https://pkg.go.dev/syscall/",
 		"path": "syscall",
 		"depth": 0,
 		"children": [
 			{
 				"name": "js",
-				"synopsis": "Package js gives access to the WebAssembly host environment when using the js/wasm architecture.\n\n[\"syscall/js\" on godoc.org](https://golang.org/pkg/syscall/js/)",
-				"url": "https://golang.org/pkg/syscall/js/",
+				"synopsis": "Package js gives access to the WebAssembly host environment when using the js/wasm architecture.\n\n[\"syscall/js\" on pkg.go.dev](https://pkg.go.dev/syscall/js/)",
+				"url": "https://pkg.go.dev/syscall/js/",
 				"path": "syscall/js",
 				"depth": 20,
 				"children": []
@@ -1165,23 +1173,23 @@
 	},
 	{
 		"name": "testing",
-		"synopsis": "Package testing provides support for automated testing of Go packages.\n\n[\"testing\" on godoc.org](https://golang.org/pkg/testing/)",
-		"url": "https://golang.org/pkg/testing/",
+		"synopsis": "Package testing provides support for automated testing of Go packages.\n\n[\"testing\" on pkg.go.dev](https://pkg.go.dev/testing/)",
+		"url": "https://pkg.go.dev/testing/",
 		"path": "testing",
 		"depth": 0,
 		"children": [
 			{
 				"name": "iotest",
-				"synopsis": "Package iotest implements Readers and Writers useful mainly for testing.\n\n[\"testing/iotest\" on godoc.org](https://golang.org/pkg/testing/iotest/)",
-				"url": "https://golang.org/pkg/testing/iotest/",
+				"synopsis": "Package iotest implements Readers and Writers useful mainly for testing.\n\n[\"testing/iotest\" on pkg.go.dev](https://pkg.go.dev/testing/iotest/)",
+				"url": "https://pkg.go.dev/testing/iotest/",
 				"path": "testing/iotest",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "quick",
-				"synopsis": "Package quick implements utility functions to help with black box testing.\n\n[\"testing/quick\" on godoc.org](https://golang.org/pkg/testing/quick/)",
-				"url": "https://golang.org/pkg/testing/quick/",
+				"synopsis": "Package quick implements utility functions to help with black box testing.\n\n[\"testing/quick\" on pkg.go.dev](https://pkg.go.dev/testing/quick/)",
+				"url": "https://pkg.go.dev/testing/quick/",
 				"path": "testing/quick",
 				"depth": 20,
 				"children": []
@@ -1190,38 +1198,38 @@
 	},
 	{
 		"name": "text",
-		"synopsis": "\n\n[\"text\" on godoc.org](https://golang.org/pkg/text/)",
-		"url": "https://golang.org/pkg/text/",
+		"synopsis": "\n\n[\"text\" on pkg.go.dev](https://pkg.go.dev/text/)",
+		"url": "https://pkg.go.dev/text/",
 		"path": "text",
 		"depth": 0,
 		"children": [
 			{
 				"name": "scanner",
-				"synopsis": "Package scanner provides a scanner and tokenizer for UTF-8-encoded text.\n\n[\"text/scanner\" on godoc.org](https://golang.org/pkg/text/scanner/)",
-				"url": "https://golang.org/pkg/text/scanner/",
+				"synopsis": "Package scanner provides a scanner and tokenizer for UTF-8-encoded text.\n\n[\"text/scanner\" on pkg.go.dev](https://pkg.go.dev/text/scanner/)",
+				"url": "https://pkg.go.dev/text/scanner/",
 				"path": "text/scanner",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "tabwriter",
-				"synopsis": "Package tabwriter implements a write filter (tabwriter.Writer) that translates tabbed columns in input into properly aligned text.\n\n[\"text/tabwriter\" on godoc.org](https://golang.org/pkg/text/tabwriter/)",
-				"url": "https://golang.org/pkg/text/tabwriter/",
+				"synopsis": "Package tabwriter implements a write filter (tabwriter.Writer) that translates tabbed columns in input into properly aligned text.\n\n[\"text/tabwriter\" on pkg.go.dev](https://pkg.go.dev/text/tabwriter/)",
+				"url": "https://pkg.go.dev/text/tabwriter/",
 				"path": "text/tabwriter",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "template",
-				"synopsis": "Package template implements data-driven templates for generating textual output.\n\n[\"text/template\" on godoc.org](https://golang.org/pkg/text/template/)",
-				"url": "https://golang.org/pkg/text/template/",
+				"synopsis": "Package template implements data-driven templates for generating textual output.\n\n[\"text/template\" on pkg.go.dev](https://pkg.go.dev/text/template/)",
+				"url": "https://pkg.go.dev/text/template/",
 				"path": "text/template",
 				"depth": 20,
 				"children": [
 					{
 						"name": "parse",
-						"synopsis": "Package parse builds parse trees for templates as defined by text/template and html/template.\n\n[\"text/template/parse\" on godoc.org](https://golang.org/pkg/text/template/parse/)",
-						"url": "https://golang.org/pkg/text/template/parse/",
+						"synopsis": "Package parse builds parse trees for templates as defined by text/template and html/template.\n\n[\"text/template/parse\" on pkg.go.dev](https://pkg.go.dev/text/template/parse/)",
+						"url": "https://pkg.go.dev/text/template/parse/",
 						"path": "text/template/parse",
 						"depth": 40,
 						"children": []
@@ -1232,31 +1240,31 @@
 	},
 	{
 		"name": "time",
-		"synopsis": "Package time provides functionality for measuring and displaying time.\n\n[\"time\" on godoc.org](https://golang.org/pkg/time/)",
-		"url": "https://golang.org/pkg/time/",
+		"synopsis": "Package time provides functionality for measuring and displaying time.\n\n[\"time\" on pkg.go.dev](https://pkg.go.dev/time/)",
+		"url": "https://pkg.go.dev/time/",
 		"path": "time",
 		"depth": 0,
 		"children": []
 	},
 	{
 		"name": "unicode",
-		"synopsis": "Package unicode provides data and functions to test some properties of Unicode code points.\n\n[\"unicode\" on godoc.org](https://golang.org/pkg/unicode/)",
-		"url": "https://golang.org/pkg/unicode/",
+		"synopsis": "Package unicode provides data and functions to test some properties of Unicode code points.\n\n[\"unicode\" on pkg.go.dev](https://pkg.go.dev/unicode/)",
+		"url": "https://pkg.go.dev/unicode/",
 		"path": "unicode",
 		"depth": 0,
 		"children": [
 			{
 				"name": "utf16",
-				"synopsis": "Package utf16 implements encoding and decoding of UTF-16 sequences.\n\n[\"unicode/utf16\" on godoc.org](https://golang.org/pkg/unicode/utf16/)",
-				"url": "https://golang.org/pkg/unicode/utf16/",
+				"synopsis": "Package utf16 implements encoding and decoding of UTF-16 sequences.\n\n[\"unicode/utf16\" on pkg.go.dev](https://pkg.go.dev/unicode/utf16/)",
+				"url": "https://pkg.go.dev/unicode/utf16/",
 				"path": "unicode/utf16",
 				"depth": 20,
 				"children": []
 			},
 			{
 				"name": "utf8",
-				"synopsis": "Package utf8 implements functions and constants to support text encoded in UTF-8.\n\n[\"unicode/utf8\" on godoc.org](https://golang.org/pkg/unicode/utf8/)",
-				"url": "https://golang.org/pkg/unicode/utf8/",
+				"synopsis": "Package utf8 implements functions and constants to support text encoded in UTF-8.\n\n[\"unicode/utf8\" on pkg.go.dev](https://pkg.go.dev/unicode/utf8/)",
+				"url": "https://pkg.go.dev/unicode/utf8/",
 				"path": "unicode/utf8",
 				"depth": 20,
 				"children": []
@@ -1265,8 +1273,8 @@
 	},
 	{
 		"name": "unsafe",
-		"synopsis": "Package unsafe contains operations that step around the type safety of Go programs.\n\n[\"unsafe\" on godoc.org](https://golang.org/pkg/unsafe/)",
-		"url": "https://golang.org/pkg/unsafe/",
+		"synopsis": "Package unsafe contains operations that step around the type safety of Go programs.\n\n[\"unsafe\" on pkg.go.dev](https://pkg.go.dev/unsafe/)",
+		"url": "https://pkg.go.dev/unsafe/",
 		"path": "unsafe",
 		"depth": 0,
 		"children": []

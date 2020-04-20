@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"go.uber.org/zap"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+
+	"go.uber.org/zap"
 )
 
 func ValidateContentLength(itemLen int) error {
@@ -89,11 +90,8 @@ func Compile(ctx context.Context, src []byte) (*CompileResponse, error) {
 
 	dest := &CompileResponse{}
 	if err := json.Unmarshal(resp, dest); err != nil {
-		zap.S().Errorw("Compiler response is not JSON",
-			"err", err,
-			"resp", string(resp),
-		)
-		return nil, fmt.Errorf("failed to decode upstream server response: %s", err)
+		// return response text as errors
+		return nil, fmt.Errorf("error from %q: %s", goPlayURL, string(resp))
 	}
 
 	return dest, err

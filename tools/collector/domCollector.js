@@ -1,6 +1,7 @@
 // Parses list of built-in Go packages from https://golang.org/pkg/
 
 const GODOC_URL = 'https://golang.org/pkg';
+const DOC_BASE_URL = 'https://pkg.go.dev';
 
 const parseRowMetadata = row => {
     if (!row) {
@@ -10,11 +11,11 @@ const parseRowMetadata = row => {
     const tr = row.querySelector('.pkg-name');
     const name = tr.textContent.trim();
     const path = tr.querySelector('a').href.slice(0, -1);   // Trim "/" suffix
-    const url = `${GODOC_URL}/${path}/`;
+    const url = `${DOC_BASE_URL}/${path}/`;
     let synopsis = row.querySelector('.pkg-synopsis').textContent.trim();
 
     // Add GoDoc link
-    synopsis += `\n\n["${path}" on godoc.org](${url})`;
+    synopsis += `\n\n["${path}" on pkg.go.dev](${url})`;
 
     // sub-packages have "padding-left: Npx" style attribute
     const depth = parseInt(tr.style.paddingLeft, 10);

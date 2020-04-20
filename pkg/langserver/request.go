@@ -1,16 +1,16 @@
 package langserver
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
+	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 
-	"github.com/x1unix/go-playground/pkg/goplay"
-
-	"go.uber.org/zap"
-
 	"github.com/x1unix/go-playground/pkg/analyzer"
+	"github.com/x1unix/go-playground/pkg/goplay"
+	"go.uber.org/zap"
 )
 
 type SnippetResponse struct {
@@ -39,19 +39,11 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
-func NewErrorResponse(err error) ErrorResponse {
-	return ErrorResponse{Error: err.Error(), code: http.StatusInternalServerError}
+func NewErrorResponse(err error) *ErrorResponse {
+	return &ErrorResponse{Error: err.Error(), code: http.StatusInternalServerError}
 }
 
-// Errorf creates error response
-func Errorf(code int, format string, args ...interface{}) ErrorResponse {
-	return ErrorResponse{
-		code:  code,
-		Error: fmt.Sprintf(format, args...),
-	}
-}
-
-func (r ErrorResponse) Write(w http.ResponseWriter) http.ResponseWriter {
+func (r *ErrorResponse) Write(w http.ResponseWriter) http.ResponseWriter {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(r.code)
 	if err := json.NewEncoder(w).Encode(r); err != nil {
@@ -89,4 +81,53 @@ func WriteJSON(w http.ResponseWriter, i interface{}) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(data)
 	return
+}
+
+// goImportsCode reads code from request and performs "goimports" on it
+// if any error occurs, it sends error response to client and closes connection
+//
+// if "format" url query param is undefined or set to "false", just returns code as is
+func goImportsCode(ctx context.Context, src []byte) ([]byte, bool, error) {
+	resp, err := goplay.GoImports(ctx, src)
+	if err != nil {
+		if err == goplay.ErrSnippetTooLarge {
+			return nil, false, NewHTTPError(http.StatusRequestEntityTooLarge, err)
+		}
+
+		return nil, false, err
+	}
+
+	if err = resp.HasError(); err != nil {
+		return nil, false, err
+	}
+
+	changed := resp.Body != string(src)
+	return []byte(resp.Body), changed, nil
+}
+
+func shouldFormatCode(r *http.Request) (bool, error) {
+	val := r.URL.Query().Get(formatQueryParam)
+	if val == "" {
+		return false, nil
+	}
+
+	boolVal, err := strconv.ParseBool(val)
+	if err != nil {
+		return false, Errorf(
+			http.StatusBadRequest,
+			"invalid %q query parameter value (expected boolean)", formatQueryParam,
+		)
+	}
+
+	return boolVal, nil
+}
+
+func getPayloadFromRequest(r *http.Request) ([]byte, error) {
+	src, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return nil, Errorf(http.StatusBadGateway, "failed to read request: %s", err)
+	}
+
+	r.Body.Close()
+	return src, nil
 }
