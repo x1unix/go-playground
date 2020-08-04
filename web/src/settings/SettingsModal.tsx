@@ -6,7 +6,8 @@ import {Link} from 'office-ui-fabric-react/lib/Link';
 import {getContentStyles, getIconButtonStyles} from '../styles/modal';
 import SettingsProperty from './SettingsProperty';
 import {MonacoSettings, RuntimeType} from '../services/config';
-import {BuildParamsArgs, Connect, MonacoParamsChanges, SettingsState} from "../store";
+import { DEFAULT_FONT, getAvailableFonts } from '../services/fonts';
+import {BuildParamsArgs, Connect, MonacoParamsChanges, SettingsState} from '../store';
 
 const WASM_SUPPORTED = 'WebAssembly' in window;
 
@@ -34,6 +35,14 @@ const CURSOR_LINE_OPTS: IDropdownOption[] = [
     {key: 'line-thin', text: 'Line thin'},
     {key: 'block-outline', text: 'Block outline'},
     {key: 'underline-thin', text: 'Underline thin'},
+];
+
+const FONT_OPTS: IDropdownOption[] = [
+    {key: DEFAULT_FONT, text: 'System default'},
+    ...getAvailableFonts().map(f => ({
+        key: f.family,
+        text: f.label,
+    }))
 ];
 
 export interface SettingsChanges {
@@ -107,6 +116,18 @@ export default class SettingsModal extends React.Component<SettingsProps, {isOpe
                 <div id={this.subtitleID}  className={contentStyles.body}>
                     <Pivot aria-label='Settings'>
                         <PivotItem headerText='Editor'>
+                            <SettingsProperty
+                                key='fontFamily'
+                                title='Font Family'
+                                description='Controls editor font family'
+                                control={<Dropdown
+                                    options={FONT_OPTS}
+                                    defaultSelectedKey={this.props.monaco?.fontFamily ?? DEFAULT_FONT}
+                                    onChange={(_, num) => {
+                                        this.touchMonacoProperty('fontFamily', num?.key);
+                                    }}
+                                />}
+                            />
                             <SettingsProperty
                                 key='cursorBlinking'
                                 title='Cursor Blinking'

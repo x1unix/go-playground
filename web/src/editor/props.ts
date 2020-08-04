@@ -1,5 +1,6 @@
 import * as monaco from 'monaco-editor';
-import {MonacoSettings} from "../services/config";
+import {MonacoSettings} from '../services/config';
+import { getFontFamily, getDefaultFontFamily } from '../services/fonts';
 
 export const LANGUAGE_GOLANG = 'go';
 
@@ -13,24 +14,12 @@ export const DEMO_CODE = [
     '}\n'
 ].join('\n');
 
-export const EDITOR_FONTS = [
-    'Fira Code',
-    'Menlo',
-    'Monaco',
-    'Consolas',
-    'Lucida Console',
-    'Roboto Mono',
-    'Droid Sans',
-    'Courier New',
-    'monospace'
-].join(', ');
-
 // stateToOptions converts MonacoState to IEditorOptions
 export const stateToOptions = (state: MonacoSettings): monaco.editor.IEditorOptions => {
     const {selectOnLineNumbers, mouseWheelZoom, smoothScrolling, cursorBlinking, cursorStyle, contextMenu } = state;
     return {
         selectOnLineNumbers, mouseWheelZoom, smoothScrolling, cursorBlinking, cursorStyle,
-        fontFamily: EDITOR_FONTS,
+        fontFamily: state.fontFamily ? getFontFamily(state.fontFamily) : getDefaultFontFamily(),
         showUnused: true,
         automaticLayout: true,
         minimap: {enabled: state.minimap},

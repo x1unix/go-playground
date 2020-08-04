@@ -1,10 +1,12 @@
 import {loadTheme} from '@uifabric/styling';
-import {DarkTheme, LightTheme} from "./colors";
+import { DEFAULT_FONT } from './fonts';
+import {DarkTheme, LightTheme} from './colors';
 
 const DARK_THEME_KEY = 'ui.darkTheme.enabled';
 const RUNTIME_TYPE_KEY = 'go.build.runtime';
 const AUTOFORMAT_KEY = 'go.build.autoFormat';
 const MONACO_SETTINGS = 'ms.monaco.settings';
+
 
 export enum RuntimeType {
     GoPlayground = 'GO_PLAYGROUND',
@@ -12,6 +14,7 @@ export enum RuntimeType {
 }
 
 export interface MonacoSettings {
+    fontFamily: string,
     cursorBlinking: 'blink' | 'smooth' | 'phase' | 'expand' | 'solid',
     cursorStyle: 'line' | 'block' | 'underline' | 'line-thin' | 'block-outline' | 'underline-thin',
     selectOnLineNumbers: boolean,
@@ -22,6 +25,7 @@ export interface MonacoSettings {
 }
 
 const defaultMonacoSettings: MonacoSettings = {
+    fontFamily: DEFAULT_FONT,
     cursorBlinking: 'blink',
     cursorStyle: 'line',
     selectOnLineNumbers: true,
