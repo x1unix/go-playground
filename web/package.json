@@ -26,8 +26,8 @@
     "uuid": "^3.4.0"
   },
   "scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
+    "start": "GENERATE_SOURCEMAP=true react-app-rewired start",
+    "build": "GENERATE_SOURCEMAP=false react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
     "gen:suggestions": "node ./src/editor/internal/genpkgcache.js"
