@@ -58,11 +58,16 @@ export interface SettingsProps {
     dispatch?: (Action) => void
 }
 
+interface SettingsModalState {
+    isOpen: boolean,
+    showWarning: boolean
+}
+
 @Connect(state => ({
     settings: state.settings,
     monaco: state.monaco,
 }))
-export default class SettingsModal extends React.Component<SettingsProps, {isOpen: boolean, showWarning: boolean}> {
+export default class SettingsModal extends React.Component<SettingsProps, SettingsModalState> {
     private titleID = 'Settings';
     private subtitleID = 'SettingsSubText';
     private changes: SettingsChanges = {};
@@ -71,7 +76,7 @@ export default class SettingsModal extends React.Component<SettingsProps, {isOpe
         super(props);
         this.state = {
             isOpen: props.isOpen,
-            showWarning: props.settings.runtime === RuntimeType.WebAssembly,
+            showWarning: props.settings.runtime === RuntimeType.WebAssembly
         }
     }
 
@@ -125,6 +130,17 @@ export default class SettingsModal extends React.Component<SettingsProps, {isOpe
                                     defaultSelectedKey={this.props.monaco?.fontFamily ?? DEFAULT_FONT}
                                     onChange={(_, num) => {
                                         this.touchMonacoProperty('fontFamily', num?.key);
+                                    }}
+                                />}
+                            />
+                            <SettingsProperty
+                                key='fontLigatures'
+                                title='Font Ligatures'
+                                control={<Checkbox
+                                    label='Enable programming font ligatures. Should be supported by font.'
+                                    defaultChecked={this.props.monaco?.fontLigatures}
+                                    onChange={(_, val) => {
+                                        this.touchMonacoProperty('fontLigatures', val);
                                     }}
                                 />}
                             />

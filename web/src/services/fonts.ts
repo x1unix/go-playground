@@ -42,30 +42,25 @@ const fontsList: {[label: string]: FontDeclaration} = {
             }
         ]
     },
-    'CascadiaCode-PL': {
-        label: 'Cascadia Code (with Powerline)',
-        family: 'CascadiaCode-PL',
+    'FiraCode': {
+        label: 'Fira Code',
+        family: 'FiraCode',
         fonts: [
             {
-                src: [{url: '/fonts/CascadiaCodePL.ttf', format: 'truetype'}]
-            }
-        ]
-    },
-    'CascadiaMono': {
-        label: 'Cascadia Mono',
-        family: 'CascadiaMono',
-        fonts: [
+                src: [{url: '/fonts/FiraCode-Retina.ttf', format: 'truetype'}],
+                weight: 400,
+            },
             {
-                src: [{url: '/fonts/CascadiaMono.ttf', format: 'truetype'}]
-            }
-        ]
-    },
-    'CascadiaMono-PL': {
-        label: 'Cascadia Mono (with Powerline)',
-        family: 'CascadiaMono',
-        fonts: [
+                src: [{url: '/fonts/FiraCode-Medium.ttf', format: 'truetype'}],
+                weight: 500,
+            },
             {
-                src: [{url: '/fonts/CascadiaMonoPL.ttf', format: 'truetype'}]
+                src: [{url: '/fonts/FiraCode-SemiBold.ttf', format: 'truetype'}],
+                weight: 600,
+            },
+            {
+                src: [{url: '/fonts/FiraCode-Bold.ttf', format: 'truetype'}],
+                weight: 700,
             }
         ]
     },
@@ -75,7 +70,7 @@ const fontsList: {[label: string]: FontDeclaration} = {
         fonts: [
             {
                 src: [{url: '/fonts/JetBrainsMono-Regular.ttf', format: 'truetype'}],
-                weight: 'normal',
+                weight: 400,
             },
             {
                 src: [{url: '/fonts/JetBrainsMono-Medium.ttf', format: 'truetype'}],
@@ -83,7 +78,7 @@ const fontsList: {[label: string]: FontDeclaration} = {
             },
             {
                 src: [{url: '/fonts/JetBrainsMono-Bold.ttf', format: 'truetype'}],
-                weight: 'bold',
+                weight: 700,
             }
         ]
     },

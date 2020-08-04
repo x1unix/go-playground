@@ -15,6 +15,7 @@ export enum RuntimeType {
 
 export interface MonacoSettings {
     fontFamily: string,
+    fontLigatures: boolean,
     cursorBlinking: 'blink' | 'smooth' | 'phase' | 'expand' | 'solid',
     cursorStyle: 'line' | 'block' | 'underline' | 'line-thin' | 'block-outline' | 'underline-thin',
     selectOnLineNumbers: boolean,
@@ -26,6 +27,7 @@ export interface MonacoSettings {
 
 const defaultMonacoSettings: MonacoSettings = {
     fontFamily: DEFAULT_FONT,
+    fontLigatures: false,
     cursorBlinking: 'blink',
     cursorStyle: 'line',
     selectOnLineNumbers: true,
