@@ -137,7 +137,7 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
                                 key='fontLigatures'
                                 title='Font Ligatures'
                                 control={<Checkbox
-                                    label='Enable programming font ligatures. Should be supported by font.'
+                                    label='Enable programming font ligatures in supported fonts'
                                     defaultChecked={this.props.monaco?.fontLigatures}
                                     onChange={(_, val) => {
                                         this.touchMonacoProperty('fontLigatures', val);
