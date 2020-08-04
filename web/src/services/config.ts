@@ -49,6 +49,8 @@ export default {
     appVersion: getVariableValue('VERSION', '1.0.0'),
     serverUrl: getVariableValue('LANG_SERVER', window.location.origin),
     githubUrl: getVariableValue('GITHUB_URL', 'https://github.com/x1unix/go-playground'),
+    issueUrl: getVariableValue('ISSUE_URL', 'https://github.com/x1unix/go-playground/issues/new'),
+    donateUrl: getVariableValue('DONATE_URL', 'https://opencollective.com/bttr-go-playground'),
 
     get darkThemeEnabled(): boolean {
         if (this._cache[DARK_THEME_KEY]) {

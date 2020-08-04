@@ -4,6 +4,7 @@ import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/Com
 import { getTheme } from '@uifabric/styling';
 import SettingsModal, {SettingsChanges} from './settings/SettingsModal';
 import AboutModal from './AboutModal';
+import config from './services/config';
 import {
     Connect,
     newImportFileDispatcher,
@@ -89,6 +90,16 @@ export class Header extends React.Component<any, HeaderState> {
                 onClick: () => {
                     this.props.dispatch(saveFileDispatcher);
                 },
+            },
+            {
+                key: 'settings',
+                text: 'Settings',
+                ariaLabel: 'Settings',
+                iconProps: {iconName: 'Settings'},
+                disabled: this.props.loading,
+                onClick: () => {
+                    this.setState({showSettings: true});
+                }
             }
         ];
     }
@@ -122,21 +133,23 @@ export class Header extends React.Component<any, HeaderState> {
     get overflowItems(): ICommandBarItemProps[] {
         return [
             {
-                key: 'settings',
-                text: 'Settings',
-                ariaLabel: 'Settings',
-                iconOnly: true,
-                iconProps: {iconName: 'Settings'},
-                disabled: this.props.loading,
-                onClick: () => {
-                    this.setState({showSettings: true});
-                }
+                key: 'new-issue',
+                text: 'Submit Issue',
+                ariaLabel: 'Submit Issue',
+                iconProps: {iconName: 'Bug'},
+                onClick: () => window.open(config.issueUrl, '_blank')
+            },
+            {
+                key: 'donate',
+                text: 'Donate',
+                ariaLabel: 'Donate',
+                iconProps: {iconName: 'Heart'},
+                onClick: () => window.open(config.donateUrl, '_blank')
             },
             {
                 key: 'about',
                 text: 'About',
                 ariaLabel: 'About',
-                iconOnly: true,
                 iconProps: {iconName: 'Info'},
                 onClick: () => {
                     this.setState({showAbout: true});
