@@ -18,7 +18,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const Version = "testing"
+var Version = "testing"
 
 type appArgs struct {
 	packagesFile    string
