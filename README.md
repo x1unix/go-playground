@@ -44,7 +44,8 @@ Use `-help` to get information about command params
 ### Third-party credits
 
 * Default playground run server provided by [play.golang.org](https://play.golang.org)
-* Snippets for templates and tutorials provided by [gobyexample.com](https://gobyexample.com/) 
+* Code for templates and tutorials provided by [gobyexample.com](https://gobyexample.com/)
+* Code completion snippets were inspired by [tj/vscode-snippets](https://github.com/tj/vscode-snippets/blob/master/go.json)
 
 
 ## Contributors
