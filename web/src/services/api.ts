@@ -36,8 +36,14 @@ export interface BuildResponse {
     fileName: string
 }
 
+export interface VersionResponse {
+    version: string
+}
+
 export interface IAPIClient {
     readonly axiosClient: AxiosInstance
+
+    getVersion(): Promise<VersionResponse>
 
     getSuggestions(query: { packageName?: string, value?: string }): Promise<monaco.languages.CompletionList>
 
@@ -69,6 +75,10 @@ class Client implements IAPIClient {
     }
 
     constructor(private client: axios.AxiosInstance) {
+    }
+
+    async getVersion(): Promise<VersionResponse> {
+        return this.get<VersionResponse>(`/version?=${Date.now()}`)
     }
 
     async getSuggestions(query: { packageName?: string, value?: string }): Promise<monaco.languages.CompletionList> {

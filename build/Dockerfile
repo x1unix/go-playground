@@ -13,7 +13,7 @@ COPY cmd ./cmd
 COPY pkg ./pkg
 COPY go.mod .
 COPY go.sum .
-RUN go build -o server ./cmd/playground && \
+RUN go build -o server -ldflags="-X 'main.Version=$APP_VERSION'" ./cmd/playground && \
     GOOS=js GOARCH=wasm go build -o ./worker.wasm ./cmd/webworker && \
     cp $(go env GOROOT)/misc/wasm/wasm_exec.js .
 

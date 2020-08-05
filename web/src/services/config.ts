@@ -139,5 +139,9 @@ export default {
 
     sync() {
         setThemeStyles(this.darkThemeEnabled);
+    },
+
+    forceRefreshPage() {
+        document.location.reload(true);
     }
 };
