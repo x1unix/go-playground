@@ -17,12 +17,14 @@ import {
     saveFileDispatcher,
     shareSnippetDispatcher
 } from './store';
+import ChangeLogModal from "./ChangeLogModal";
 
 
 
 interface HeaderState {
     showSettings: boolean
     showAbout: boolean
+    showChangelog: boolean
     loading: boolean
 }
 
@@ -36,6 +38,7 @@ export class Header extends React.Component<any, HeaderState> {
         this.state = {
             showSettings: false,
             showAbout: false,
+            showChangelog: false,
             loading: false
         };
     }
@@ -118,6 +121,16 @@ export class Header extends React.Component<any, HeaderState> {
 
     get asideItems(): ICommandBarItemProps[] {
         return [
+            {
+                key: 'changelog',
+                text: 'What\'s new',
+                ariaLabel: 'Changelog',
+                disabled: this.props.loading,
+                iconProps: {iconName: 'Giftbox'},
+                onClick: () => {
+                    this.setState({showChangelog: true});
+                }
+            },
             {
                 key: 'format',
                 text: 'Format',
@@ -209,6 +222,7 @@ export class Header extends React.Component<any, HeaderState> {
             />
             <SettingsModal onClose={(args) => this.onSettingsClose(args)} isOpen={this.state.showSettings} />
             <AboutModal onClose={() => this.setState({showAbout: false})} isOpen={this.state.showAbout} />
+            <ChangeLogModal onClose={() => this.setState({showChangelog: false})} isOpen={this.state.showChangelog} />
         </header>;
     }
 }
