@@ -83,10 +83,6 @@ func (s *Service) lookupBuiltin(val string) (*SuggestionsResponse, error) {
 }
 
 func (s *Service) provideSuggestion(req SuggestionRequest) (*SuggestionsResponse, error) {
-	if req.Value == "" {
-		return nil, fmt.Errorf("empty suggestion request value, nothing to provide")
-	}
-
 	// Provide package suggestions (if requested)
 	if req.PackageName != "" {
 		pkg, ok := s.index.PackageByName(req.PackageName)
@@ -98,9 +94,20 @@ func (s *Service) provideSuggestion(req SuggestionRequest) (*SuggestionsResponse
 			return nil, fmt.Errorf("failed to analyze package %q: %s", req.PackageName, err)
 		}
 
+		var symbols []*analyzer.CompletionItem
+		if req.Value != "" {
+			symbols = pkg.SymbolByChar(req.Value)
+		} else {
+			symbols = pkg.AllSymbols()
+		}
+
 		return &SuggestionsResponse{
-			Suggestions: pkg.SymbolByChar(req.Value),
+			Suggestions: symbols,
 		}, nil
+	}
+
+	if req.Value == "" {
+		return nil, fmt.Errorf("empty suggestion request value, nothing to provide")
 	}
 
 	return s.lookupBuiltin(req.Value)
