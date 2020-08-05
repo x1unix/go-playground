@@ -1,21 +1,23 @@
 import React from 'react';
 import './Header.css'
-import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/CommandBar';
-import { getTheme } from '@uifabric/styling';
+import {CommandBar, ICommandBarItemProps} from 'office-ui-fabric-react/lib/CommandBar';
+import {getTheme} from '@uifabric/styling';
 import SettingsModal, {SettingsChanges} from './settings/SettingsModal';
 import AboutModal from './AboutModal';
 import config from './services/config';
+import { getSnippetsMenuItems, SnippetMenuItem } from './utils/headerutils';
 import {
     Connect,
-    newImportFileDispatcher,
+    dispatchToggleTheme,
     formatFileDispatcher,
+    newBuildParamsChangeDispatcher, newCodeImportDispatcher,
+    newImportFileDispatcher,
+    newMonacoParamsChangeDispatcher, newSnippetLoadDispatcher,
     runFileDispatcher,
     saveFileDispatcher,
-    dispatchToggleTheme,
-    shareSnippetDispatcher,
-    newBuildParamsChangeDispatcher,
-    newMonacoParamsChangeDispatcher
+    shareSnippetDispatcher
 } from './store';
+
 
 
 interface HeaderState {
@@ -27,6 +29,7 @@ interface HeaderState {
 @Connect(s => ({darkMode: s.settings.darkMode, loading: s.status?.loading}))
 export class Header extends React.Component<any, HeaderState> {
     private fileInput?: HTMLInputElement;
+    private snippetMenuItems = getSnippetsMenuItems(i => this.onSnippetMenuItemClick(i));
 
     constructor(props) {
         super(props);
@@ -54,14 +57,23 @@ export class Header extends React.Component<any, HeaderState> {
         this.props.dispatch(newImportFileDispatcher(file));
     }
 
+    onSnippetMenuItemClick(item: SnippetMenuItem) {
+        const dispatcher = item.snippet ? newSnippetLoadDispatcher(item.snippet) : newCodeImportDispatcher(item.label, item.text as string);
+        this.props.dispatch(dispatcher);
+    }
+
     get menuItems(): ICommandBarItemProps[] {
         return [
             {
                 key: 'openFile',
                 text: 'Open',
+                split: true,
                 iconProps: {iconName: 'OpenFile'},
                 disabled: this.props.loading,
                 onClick: () => this.fileInput?.click(),
+                subMenuProps: {
+                    items: this.snippetMenuItems,
+                },
             },
             {
                 key: 'run',
