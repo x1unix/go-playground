@@ -27,7 +27,7 @@ export default function ChangeLogModal(props: ChangeLogModalProps) {
             containerClassName={contentStyles.container}
         >
             <div className={contentStyles.header}>
-                <span id={TITLE_ID}>Changelog</span>
+                <span id={TITLE_ID}>Changelog for {config.appVersion}</span>
                 <IconButton
                     iconProps={{ iconName: 'Cancel' }}
                     styles={iconButtonStyles}
@@ -52,10 +52,25 @@ export default function ChangeLogModal(props: ChangeLogModalProps) {
                     </ul>
                 </p>
                 <p>
+                    <b>Interface - Editor</b>
+                    <ul>
+                        <li>
+                            Added code snippets to make code input faster:
+                            <ul>
+                                <li><code>iferr</code> - Error handling snippet</li>
+                                <li><code>switch</code> - Quick switch declaration</li>
+                                <li><code>typestruct</code> - Quickly declare struct</li>
+                                <li><code>fmtprintf</code> - fmt.Printf shorthand</li>
+                                <li>and other (see release notes)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </p>
+                <p>
                     And more!
                 </p>
                 <p>
-                    Full release notes for {config.appVersion} are available <Link href={`${config.githubUrl}/releases/latest`} target='_blank'>here</Link>
+                    Full release notes for are available <Link href={`${config.githubUrl}/releases/latest`} target='_blank'>here</Link>
                 </p>
             </div>
         </Modal>
