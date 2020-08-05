@@ -1,10 +1,12 @@
 import {loadTheme} from '@uifabric/styling';
-import {DarkTheme, LightTheme} from "./colors";
+import { DEFAULT_FONT } from './fonts';
+import {DarkTheme, LightTheme} from './colors';
 
 const DARK_THEME_KEY = 'ui.darkTheme.enabled';
 const RUNTIME_TYPE_KEY = 'go.build.runtime';
 const AUTOFORMAT_KEY = 'go.build.autoFormat';
 const MONACO_SETTINGS = 'ms.monaco.settings';
+
 
 export enum RuntimeType {
     GoPlayground = 'GO_PLAYGROUND',
@@ -12,6 +14,8 @@ export enum RuntimeType {
 }
 
 export interface MonacoSettings {
+    fontFamily: string,
+    fontLigatures: boolean,
     cursorBlinking: 'blink' | 'smooth' | 'phase' | 'expand' | 'solid',
     cursorStyle: 'line' | 'block' | 'underline' | 'line-thin' | 'block-outline' | 'underline-thin',
     selectOnLineNumbers: boolean,
@@ -22,6 +26,8 @@ export interface MonacoSettings {
 }
 
 const defaultMonacoSettings: MonacoSettings = {
+    fontFamily: DEFAULT_FONT,
+    fontLigatures: false,
     cursorBlinking: 'blink',
     cursorStyle: 'line',
     selectOnLineNumbers: true,
@@ -43,6 +49,8 @@ export default {
     appVersion: getVariableValue('VERSION', '1.0.0'),
     serverUrl: getVariableValue('LANG_SERVER', window.location.origin),
     githubUrl: getVariableValue('GITHUB_URL', 'https://github.com/x1unix/go-playground'),
+    issueUrl: getVariableValue('ISSUE_URL', 'https://github.com/x1unix/go-playground/issues/new'),
+    donateUrl: getVariableValue('DONATE_URL', 'https://opencollective.com/bttr-go-playground'),
 
     get darkThemeEnabled(): boolean {
         if (this._cache[DARK_THEME_KEY]) {
@@ -131,5 +139,9 @@ export default {
 
     sync() {
         setThemeStyles(this.darkThemeEnabled);
+    },
+
+    forceRefreshPage() {
+        document.location.reload(true);
     }
 };

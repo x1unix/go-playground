@@ -1,5 +1,6 @@
 import * as monaco from 'monaco-editor';
 import {IAPIClient} from '../services/api';
+import snippets from './snippets'
 
 // Import aliases
 type CompletionList = monaco.languages.CompletionList;
@@ -53,10 +54,11 @@ class GoCompletionItemProvider implements monaco.languages.CompletionItemProvide
 
         try {
             const resp = await this.client.getSuggestions(query);
-            return Promise.resolve(resp);
+            resp.suggestions = resp.suggestions ? snippets.concat(resp.suggestions) : snippets;
+            return resp;
         } catch (err) {
             console.error(`Failed to get code completion from server: ${err.message}`);
-            return Promise.resolve({suggestions: []});
+            return {suggestions: snippets};
         }
     }
 }

@@ -50,6 +50,13 @@ func (p *Package) SymbolByChar(chr string) []*CompletionItem {
 	return append(p.Functions.Match(chr), result...)
 }
 
+func (p *Package) AllSymbols() []*CompletionItem {
+	out := make([]*CompletionItem, 0, p.Values.Len()+p.Functions.Len())
+	out = append(out, p.Functions.Symbols...)
+	out = append(out, p.Values.Symbols...)
+	return out
+}
+
 func (p *Package) GetCompletionItem() *CompletionItem {
 	return &CompletionItem{
 		Label:         p.Name,

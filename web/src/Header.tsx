@@ -1,38 +1,48 @@
 import React from 'react';
 import './Header.css'
-import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/CommandBar';
-import { getTheme } from '@uifabric/styling';
+import { MessageBarButton } from 'office-ui-fabric-react';
+import {CommandBar, ICommandBarItemProps} from 'office-ui-fabric-react/lib/CommandBar';
+import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
+import {getTheme} from '@uifabric/styling';
 import SettingsModal, {SettingsChanges} from './settings/SettingsModal';
 import AboutModal from './AboutModal';
+import config from './services/config';
+import api from './services/api';
+import { getSnippetsMenuItems, SnippetMenuItem } from './utils/headerutils';
 import {
     Connect,
-    newImportFileDispatcher,
+    dispatchToggleTheme,
     formatFileDispatcher,
+    newBuildParamsChangeDispatcher, newCodeImportDispatcher,
+    newImportFileDispatcher,
+    newMonacoParamsChangeDispatcher, newSnippetLoadDispatcher,
     runFileDispatcher,
     saveFileDispatcher,
-    dispatchToggleTheme,
-    shareSnippetDispatcher,
-    newBuildParamsChangeDispatcher,
-    newMonacoParamsChangeDispatcher
+    shareSnippetDispatcher
 } from './store';
-
+import ChangeLogModal from "./ChangeLogModal";
 
 interface HeaderState {
     showSettings: boolean
     showAbout: boolean
+    showChangelog: boolean
     loading: boolean
+    showUpdateBanner: boolean
 }
 
 @Connect(s => ({darkMode: s.settings.darkMode, loading: s.status?.loading}))
 export class Header extends React.Component<any, HeaderState> {
     private fileInput?: HTMLInputElement;
+    private snippetMenuItems = getSnippetsMenuItems(i => this.onSnippetMenuItemClick(i));
 
     constructor(props) {
         super(props);
         this.state = {
             showSettings: false,
             showAbout: false,
-            loading: false
+            showChangelog: false,
+            loading: false,
+            showUpdateBanner: false
         };
     }
 
@@ -42,6 +52,13 @@ export class Header extends React.Component<any, HeaderState> {
         fileElement.accept = '.go';
         fileElement.addEventListener('change', () => this.onItemSelect(), false);
         this.fileInput = fileElement;
+
+        // show update popover
+        api.getVersion().then(r => {
+            const {version} = r;
+            if (!version) return;
+            this.setState({showUpdateBanner: version !== config.appVersion});
+        }).catch(err => console.warn('failed to check server API version: ', err));
     }
 
     onItemSelect() {
@@ -53,14 +70,23 @@ export class Header extends React.Component<any, HeaderState> {
         this.props.dispatch(newImportFileDispatcher(file));
     }
 
+    onSnippetMenuItemClick(item: SnippetMenuItem) {
+        const dispatcher = item.snippet ? newSnippetLoadDispatcher(item.snippet) : newCodeImportDispatcher(item.label, item.text as string);
+        this.props.dispatch(dispatcher);
+    }
+
     get menuItems(): ICommandBarItemProps[] {
         return [
             {
                 key: 'openFile',
                 text: 'Open',
+                split: true,
                 iconProps: {iconName: 'OpenFile'},
                 disabled: this.props.loading,
                 onClick: () => this.fileInput?.click(),
+                subMenuProps: {
+                    items: this.snippetMenuItems,
+                },
             },
             {
                 key: 'run',
@@ -89,12 +115,32 @@ export class Header extends React.Component<any, HeaderState> {
                 onClick: () => {
                     this.props.dispatch(saveFileDispatcher);
                 },
+            },
+            {
+                key: 'settings',
+                text: 'Settings',
+                ariaLabel: 'Settings',
+                iconProps: {iconName: 'Settings'},
+                disabled: this.props.loading,
+                onClick: () => {
+                    this.setState({showSettings: true});
+                }
             }
         ];
     }
 
     get asideItems(): ICommandBarItemProps[] {
         return [
+            {
+                key: 'changelog',
+                text: 'What\'s new',
+                ariaLabel: 'Changelog',
+                disabled: this.props.loading,
+                iconProps: {iconName: 'Giftbox'},
+                onClick: () => {
+                    this.setState({showChangelog: true});
+                }
+            },
             {
                 key: 'format',
                 text: 'Format',
@@ -122,21 +168,23 @@ export class Header extends React.Component<any, HeaderState> {
     get overflowItems(): ICommandBarItemProps[] {
         return [
             {
-                key: 'settings',
-                text: 'Settings',
-                ariaLabel: 'Settings',
-                iconOnly: true,
-                iconProps: {iconName: 'Settings'},
-                disabled: this.props.loading,
-                onClick: () => {
-                    this.setState({showSettings: true});
-                }
+                key: 'new-issue',
+                text: 'Submit Issue',
+                ariaLabel: 'Submit Issue',
+                iconProps: {iconName: 'Bug'},
+                onClick: () => window.open(config.issueUrl, '_blank')
+            },
+            {
+                key: 'donate',
+                text: 'Donate',
+                ariaLabel: 'Donate',
+                iconProps: {iconName: 'Heart'},
+                onClick: () => window.open(config.donateUrl, '_blank')
             },
             {
                 key: 'about',
                 text: 'About',
                 ariaLabel: 'About',
-                iconOnly: true,
                 iconProps: {iconName: 'Info'},
                 onClick: () => {
                     this.setState({showAbout: true});
@@ -170,6 +218,23 @@ export class Header extends React.Component<any, HeaderState> {
 
     render() {
         return <header className='header' style={this.styles}>
+            <MessageBar
+                className={this.state.showUpdateBanner ? 'app__update app__update--visible' : 'app__update'}
+                messageBarType={MessageBarType.warning}
+                onDismiss={() => this.setState({showUpdateBanner: false})}
+                dismissButtonAriaLabel="Close"
+                isMultiline={false}
+                actions={
+                    <div>
+                        <MessageBarButton onClick={() => {
+                            this.setState({showUpdateBanner: false});
+                            config.forceRefreshPage();
+                        }}>Action</MessageBarButton>
+                    </div>
+                }
+            >
+                Web application was updated, click <b>Reload</b> to apply changes
+            </MessageBar>
             <img
                 src='/go-logo-blue.svg'
                 className='header__logo'
@@ -184,6 +249,7 @@ export class Header extends React.Component<any, HeaderState> {
             />
             <SettingsModal onClose={(args) => this.onSettingsClose(args)} isOpen={this.state.showSettings} />
             <AboutModal onClose={() => this.setState({showAbout: false})} isOpen={this.state.showAbout} />
+            <ChangeLogModal onClose={() => this.setState({showChangelog: false})} isOpen={this.state.showChangelog} />
         </header>;
     }
 }

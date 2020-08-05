@@ -1,14 +1,13 @@
 import React from 'react';
 import './Preview.css';
-import {EDITOR_FONTS} from './editor/props';
+import {getDefaultFontFamily} from './services/fonts';
 import {Connect} from './store';
 import { RuntimeType } from './services/config';
 import {EvalEvent} from './services/api';
 import EvalEventView from './EvalEventView';
 import {getTheme} from '@uifabric/styling';
 import {MessageBar, MessageBarType} from 'office-ui-fabric-react';
-import {ProgressIndicator} from "office-ui-fabric-react/lib/ProgressIndicator";
-
+import {ProgressIndicator} from 'office-ui-fabric-react/lib/ProgressIndicator';
 
 interface PreviewProps {
     lastError?:string | null;
@@ -24,7 +23,7 @@ export default class Preview extends React.Component<PreviewProps> {
         return {
             backgroundColor: palette.neutralLight,
             color: palette.neutralDark,
-            fontFamily: EDITOR_FONTS
+            fontFamily: getDefaultFontFamily(),
         }
     }
 

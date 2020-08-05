@@ -1,0 +1,169 @@
+{
+  "Templates": [
+    {
+      "label": "New Empty Test",
+      "type": "test",
+      "text": "package main\n\nimport \"testing\"\n\nfunc TestExample(t *testing.T) {\n\tt.Log(\"this is unit test sample\")\n}\n"
+    },
+    {
+      "label": "Example Test",
+      "type": "test",
+      "snippet": "GFuPdlBlyMU"
+    },
+    {
+      "label": "Hello World",
+      "snippet": "NeviD0awXjt"
+    }
+  ],
+  "Basic Examples": [
+    {
+      "label": "Hello World",
+      "snippet": "NeviD0awXjt"
+    },
+    {
+      "label": "Maps",
+      "snippet": "agK2Ro2i-Lu"
+    },
+    {
+      "label": "Sorting",
+      "snippet": "_gY0tANzJ4l"
+    },
+    {
+      "label": "Custom sort",
+      "snippet": "h4g4vaLBtkw"
+    },
+    {
+      "label": "Recursion",
+      "snippet": "smWim1q9ofu"
+    },
+    {
+      "label": "Structs & methods",
+      "snippet": "4wmDCAydC1e"
+    },
+    {
+      "label": "Interfaces",
+      "snippet": "XJASG4MxBQr"
+    },
+    {
+      "label": "Errors",
+      "snippet": "NiJOpCPO3L0"
+    }
+  ],
+  "Concurrency": [
+      {
+        "label": "Goroutines",
+        "snippet": "I7scqRijEJt"
+      },
+      {
+        "label": "Channels",
+        "snippet": "MaLY7AiAkHM"
+      },
+      {
+        "label": "Buffered channels",
+        "snippet": "3BRCdRnRszb"
+      },
+      {
+        "label": "Select",
+        "snippet": "FzONhs4-tae"
+      },
+      {
+        "label": "Timeouts",
+        "snippet": "4oOz0j29MJ6"
+      },
+      {
+        "label": "Non-blocking channel operations",
+        "snippet": "TFv6-7OVNVq"
+      },
+      {
+        "label": "Closing channels",
+        "snippet": "yQMclmwOYs9"
+      },
+      {
+        "label": "Timers",
+        "snippet": "gF7VLRz3URM"
+      },
+      {
+        "label": "Tickers",
+        "snippet": "gs6zoJP-Pl9"
+      },
+      {
+        "label": "Worker pools",
+        "snippet": "hiSJJsYZJKL"
+      },
+      {
+        "label": "Rate limit",
+        "snippet": "20c_m1AtOEI"
+      },
+      {
+        "label": "Atomics",
+        "snippet": "j-14agntvEO"
+      },
+      {
+        "label": "Mutexes",
+        "snippet": "0WEmOOjoCjp"
+      },
+      {
+        "label": "Mutexes",
+        "snippet": "0WEmOOjoCjp"
+      },
+      {
+        "label": "Stateful goroutines",
+        "snippet": "5mf_P9xqBzk"
+      },
+      {
+        "label": "Context",
+        "snippet": "0_bu1o8rIBO"
+      }
+  ],
+  "Other examples": [
+    {
+      "label": "Random number",
+      "snippet": "PGklfJzErTN"
+    },
+    {
+      "label": "Number parsing",
+      "snippet": "ZAMEid6Fpmu"
+    },
+    {
+      "label": "Regular expressions",
+      "snippet": "LEKGY_d3Nu_P"
+    },
+    {
+      "label": "JSON",
+      "snippet": "JOQpRGJWAxR"
+    },
+    {
+      "label": "HTTP Client",
+      "snippet": "kHCcVLoz7nd"
+    },
+    {
+      "label": "Time",
+      "snippet": "YAM3s1KPc8c"
+    },
+    {
+      "label": "Time formatting",
+      "snippet": "BoZYtr_2j66"
+    },
+    {
+      "label": "SHA1 hash",
+      "snippet": "XLftf8Gvj4y"
+    },
+    {
+      "label": "Base64 encoding",
+      "snippet": "S7ff3UgzNlG"
+    },
+    {
+      "label": "Writing files",
+      "snippet": "fQ7sd4gXv0F"
+    },
+    {
+      "label": "Reading files",
+      "snippet": "kF0cDC0drsX"
+    },
+    {
+      "label": "Signals",
+      "snippet": "YRV64KEXJW1"
+    }
+  ]
+
+}

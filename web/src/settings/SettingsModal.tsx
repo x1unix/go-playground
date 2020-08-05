@@ -6,7 +6,8 @@ import {Link} from 'office-ui-fabric-react/lib/Link';
 import {getContentStyles, getIconButtonStyles} from '../styles/modal';
 import SettingsProperty from './SettingsProperty';
 import {MonacoSettings, RuntimeType} from '../services/config';
-import {BuildParamsArgs, Connect, MonacoParamsChanges, SettingsState} from "../store";
+import { DEFAULT_FONT, getAvailableFonts } from '../services/fonts';
+import {BuildParamsArgs, Connect, MonacoParamsChanges, SettingsState} from '../store';
 
 const WASM_SUPPORTED = 'WebAssembly' in window;
 
@@ -36,6 +37,14 @@ const CURSOR_LINE_OPTS: IDropdownOption[] = [
     {key: 'underline-thin', text: 'Underline thin'},
 ];
 
+const FONT_OPTS: IDropdownOption[] = [
+    {key: DEFAULT_FONT, text: 'System default'},
+    ...getAvailableFonts().map(f => ({
+        key: f.family,
+        text: f.label,
+    }))
+];
+
 export interface SettingsChanges {
     monaco?: MonacoParamsChanges
     args?: BuildParamsArgs,
@@ -49,11 +58,16 @@ export interface SettingsProps {
     dispatch?: (Action) => void
 }
 
+interface SettingsModalState {
+    isOpen: boolean,
+    showWarning: boolean
+}
+
 @Connect(state => ({
     settings: state.settings,
     monaco: state.monaco,
 }))
-export default class SettingsModal extends React.Component<SettingsProps, {isOpen: boolean, showWarning: boolean}> {
+export default class SettingsModal extends React.Component<SettingsProps, SettingsModalState> {
     private titleID = 'Settings';
     private subtitleID = 'SettingsSubText';
     private changes: SettingsChanges = {};
@@ -62,7 +76,7 @@ export default class SettingsModal extends React.Component<SettingsProps, {isOpe
         super(props);
         this.state = {
             isOpen: props.isOpen,
-            showWarning: props.settings.runtime === RuntimeType.WebAssembly,
+            showWarning: props.settings.runtime === RuntimeType.WebAssembly
         }
     }
 
@@ -107,6 +121,29 @@ export default class SettingsModal extends React.Component<SettingsProps, {isOpe
                 <div id={this.subtitleID}  className={contentStyles.body}>
                     <Pivot aria-label='Settings'>
                         <PivotItem headerText='Editor'>
+                            <SettingsProperty
+                                key='fontFamily'
+                                title='Font Family'
+                                description='Controls editor font family'
+                                control={<Dropdown
+                                    options={FONT_OPTS}
+                                    defaultSelectedKey={this.props.monaco?.fontFamily ?? DEFAULT_FONT}
+                                    onChange={(_, num) => {
+                                        this.touchMonacoProperty('fontFamily', num?.key);
+                                    }}
+                                />}
+                            />
+                            <SettingsProperty
+                                key='fontLigatures'
+                                title='Font Ligatures'
+                                control={<Checkbox
+                                    label='Enable programming font ligatures in supported fonts'
+                                    defaultChecked={this.props.monaco?.fontLigatures}
+                                    onChange={(_, val) => {
+                                        this.touchMonacoProperty('fontLigatures', val);
+                                    }}
+                                />}
+                            />
                             <SettingsProperty
                                 key='cursorBlinking'
                                 title='Cursor Blinking'

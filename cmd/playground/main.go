@@ -18,6 +18,8 @@ import (
 	"go.uber.org/zap"
 )
 
+const Version = "testing"
+
 type appArgs struct {
 	packagesFile    string
 	addr            string
@@ -75,6 +77,7 @@ func start(goRoot string, args appArgs) error {
 		return fmt.Errorf("invalid cleanup interval parameter: %s", err)
 	}
 
+	zap.S().Info("Server version: ", Version)
 	zap.S().Infof("GOROOT is %q", goRoot)
 	zap.S().Infof("Packages file is %q", args.packagesFile)
 	zap.S().Infof("Cleanup interval is %s", cleanInterval.String())
@@ -94,7 +97,7 @@ func start(goRoot string, args appArgs) error {
 	go store.StartCleaner(ctx, cleanInterval, nil)
 
 	r := mux.NewRouter()
-	langserver.New(packages, compiler.NewBuildService(zap.S(), store)).
+	langserver.New(Version, packages, compiler.NewBuildService(zap.S(), store)).
 		Mount(r.PathPrefix("/api").Subrouter())
 	r.PathPrefix("/").Handler(langserver.SpaFileServer("./public"))
 

@@ -52,6 +52,14 @@ func (r *ErrorResponse) Write(w http.ResponseWriter) http.ResponseWriter {
 	return w
 }
 
+type VersionResponse struct {
+	Version string `json:"version"`
+}
+
+func (r VersionResponse) Write(w http.ResponseWriter) {
+	WriteJSON(w, r)
+}
+
 type SuggestionsResponse struct {
 	Suggestions []*analyzer.CompletionItem `json:"suggestions"`
 }

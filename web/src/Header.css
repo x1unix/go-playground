@@ -7,6 +7,21 @@
     min-height: 44px;
 }
 
+.app__update {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 500px;
+    z-index: 9999;
+}
+
+.app__update.app__update--visible {
+    display: block
+}
+
 .header__preloader {
     margin-right: 15px;
 }

@@ -41,6 +41,12 @@ export function newImportFileDispatcher(f: File): Dispatcher {
     };
 }
 
+export function newCodeImportDispatcher(name: string, contents: string): Dispatcher {
+    return (dispatch: DispatchFn, _: StateProvider) => {
+        dispatch(newImportFileAction(`${encodeURIComponent(name)}.go`, contents));
+    };
+}
+
 export function newMonacoParamsChangeDispatcher(changes: MonacoParamsChanges): Dispatcher {
     return (dispatch: DispatchFn, _: StateProvider) => {
         const current = config.monacoSettings;
@@ -66,6 +72,7 @@ export function newSnippetLoadDispatcher(snippetID: string): Dispatcher {
             return;
         }
 
+        dispatch(newLoadingAction());
         try {
             console.log('loading snippet %s', snippetID);
             const resp = await client.getSnippet(snippetID);

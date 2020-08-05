@@ -29,15 +29,17 @@ const (
 )
 
 type Service struct {
+	version  string
 	log      *zap.SugaredLogger
 	index    analyzer.PackageIndex
 	compiler compiler.BuildService
 	limiter  *rate.Limiter
 }
 
-func New(packages []*analyzer.Package, builder compiler.BuildService) *Service {
+func New(version string, packages []*analyzer.Package, builder compiler.BuildService) *Service {
 	return &Service{
 		compiler: builder,
+		version:  version,
 		log:      zap.S().Named("langserver"),
 		index:    analyzer.BuildPackageIndex(packages),
 		limiter:  rate.NewLimiter(rate.Every(frameTime), compileRequestsPerFrame),
@@ -46,6 +48,8 @@ func New(packages []*analyzer.Package, builder compiler.BuildService) *Service {
 
 // Mount mounts service on route
 func (s *Service) Mount(r *mux.Router) {
+	r.Path("/version").
+		HandlerFunc(WrapHandler(s.HandleGetVersion))
 	r.Path("/suggest").
 		HandlerFunc(WrapHandler(s.HandleGetSuggestion))
 	r.Path("/run").Methods(http.MethodPost).
@@ -83,10 +87,6 @@ func (s *Service) lookupBuiltin(val string) (*SuggestionsResponse, error) {
 }
 
 func (s *Service) provideSuggestion(req SuggestionRequest) (*SuggestionsResponse, error) {
-	if req.Value == "" {
-		return nil, fmt.Errorf("empty suggestion request value, nothing to provide")
-	}
-
 	// Provide package suggestions (if requested)
 	if req.PackageName != "" {
 		pkg, ok := s.index.PackageByName(req.PackageName)
@@ -98,12 +98,28 @@ func (s *Service) provideSuggestion(req SuggestionRequest) (*SuggestionsResponse
 			return nil, fmt.Errorf("failed to analyze package %q: %s", req.PackageName, err)
 		}
 
+		var symbols []*analyzer.CompletionItem
+		if req.Value != "" {
+			symbols = pkg.SymbolByChar(req.Value)
+		} else {
+			symbols = pkg.AllSymbols()
+		}
+
 		return &SuggestionsResponse{
-			Suggestions: pkg.SymbolByChar(req.Value),
+			Suggestions: symbols,
 		}, nil
 	}
 
+	if req.Value == "" {
+		return nil, fmt.Errorf("empty suggestion request value, nothing to provide")
+	}
+
 	return s.lookupBuiltin(req.Value)
+}
+
+func (s *Service) HandleGetVersion(w http.ResponseWriter, r *http.Request) error {
+	WriteJSON(w, VersionResponse{Version: s.version})
+	return nil
 }
 
 func (s *Service) HandleGetSuggestion(w http.ResponseWriter, r *http.Request) error {

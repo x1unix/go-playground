@@ -6,6 +6,10 @@ type SymbolIndex struct {
 	charMap map[string][]*CompletionItem
 }
 
+func (si *SymbolIndex) Len() int {
+	return len(si.Symbols)
+}
+
 func emptySymbolIndex() SymbolIndex {
 	return SymbolIndex{
 		Symbols: []*CompletionItem{},

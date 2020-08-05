@@ -11,7 +11,8 @@ Improved Go Playground powered by Monaco Editor and React
 
 * 💡 Code autocomplete
 * 💾 Load and save files
-* 🛠 [WebAssembly](https://github.com/golang/go/wiki/WebAssembly) support (see [latest release notes](https://github.com/x1unix/go-playground/releases/tag/v1.3.0))
+* 📔 Snippets and tutorials
+* 🛠 [WebAssembly](https://github.com/golang/go/wiki/WebAssembly) support
 * 🌚 Dark theme
 
 
@@ -19,7 +20,7 @@ And more
 
 ## Demo
 
-[http://goplay.x1unix.com/](http://goplay.x1unix.com/)
+[http://goplay.tools/](goplay.tools)
 
 ## Installation
 
@@ -39,6 +40,13 @@ $ ./playground -f ./data/packages.json -debug
 ```
 
 Use `-help` to get information about command params
+
+### Third-party credits
+
+* Default playground run server provided by [play.golang.org](https://play.golang.org)
+* Code for templates and tutorials provided by [gobyexample.com](https://gobyexample.com/)
+* Code completion snippets were inspired by [tj/vscode-snippets](https://github.com/tj/vscode-snippets/blob/master/go.json)
+
 
 ## Contributors
 
