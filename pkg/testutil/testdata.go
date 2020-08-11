@@ -27,3 +27,7 @@ func ReadTestdata(t *testing.T, fPath string) []byte {
 
 	return data
 }
+
+func TestdataPath(fPath string) string {
+	return filepath.Join("testdata", fPath)
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "name": "time",
+    "synopsis": "Package time provides functionality for measuring and displaying time.\n\n[\"time\" on pkg.go.dev](https://pkg.go.dev/time/)",
+    "url": "https://pkg.go.dev/time/",
+    "path": "time",
+    "depth": 0
+  },
+  {
+    "name": "unicode",
+    "synopsis": "Package unicode provides data and functions to test some properties of Unicode code points.\n\n[\"unicode\" on pkg.go.dev](https://pkg.go.dev/unicode/)",
+    "url": "https://pkg.go.dev/unicode/",
+    "path": "unicode",
+    "depth": 0,
+    "children": [
+      {
+        "name": "utf16",
+        "synopsis": "Package utf16 implements encoding and decoding of UTF-16 sequences.\n\n[\"unicode/utf16\" on pkg.go.dev](https://pkg.go.dev/unicode/utf16/)",
+        "url": "https://pkg.go.dev/unicode/utf16/",
+        "path": "unicode/utf16",
+        "depth": 20
+      },
+      {
+        "name": "utf8",
+        "synopsis": "Package utf8 implements functions and constants to support text encoded in UTF-8.\n\n[\"unicode/utf8\" on pkg.go.dev](https://pkg.go.dev/unicode/utf8/)",
+        "url": "https://pkg.go.dev/unicode/utf8/",
+        "path": "unicode/utf8",
+        "depth": 20
+      }
+    ]
+  }
+]
