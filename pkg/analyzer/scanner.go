@@ -7,11 +7,15 @@ import (
 	"strings"
 )
 
+// PackageSummary is package contents summary
 type PackageSummary struct {
+	// Functions is index of functions
 	Functions SymbolIndex
-	Values    SymbolIndex
+	// Values is index of other symbolx
+	Values SymbolIndex
 }
 
+// NewPackageSummary is PackageSummary constructor
 func NewPackageSummary() PackageSummary {
 	return PackageSummary{
 		Functions: emptySymbolIndex(),
@@ -19,11 +23,13 @@ func NewPackageSummary() PackageSummary {
 	}
 }
 
+// PackageScanner is package source files scanner
 type PackageScanner struct {
 	name, path  string
 	scanPrivate bool
 }
 
+// NewPackageScanner is PackageScanner constructor
 func NewPackageScanner(pkgName, pkgPath string, scanPrivate bool) PackageScanner {
 	return PackageScanner{
 		name:        pkgName,
@@ -76,6 +82,7 @@ func (p *PackageScanner) appendFunc(fn *ast.FuncDecl, dest *SymbolIndex) {
 	dest.Append(item)
 }
 
+// Scan performs source files scan
 func (p *PackageScanner) Scan() (PackageSummary, error) {
 	sum := NewPackageSummary()
 	set := token.NewFileSet()

@@ -34,6 +34,7 @@ func (c cachedFile) Read(p []byte) (n int, err error) {
 	return c.ReadCloser.Read(p)
 }
 
+// LocalStorage is local build artigact storage
 type LocalStorage struct {
 	log     *zap.SugaredLogger
 	useLock *sync.Mutex
@@ -44,6 +45,7 @@ type LocalStorage struct {
 	binDir  string
 }
 
+// NewLocalStorage constructs new local storage
 func NewLocalStorage(log *zap.SugaredLogger, baseDir string) (ls *LocalStorage, err error) {
 	logger := log.Named("storage")
 	isDirty := false
@@ -91,6 +93,7 @@ func (s LocalStorage) getOutputLocation(id ArtifactID) string {
 	return filepath.Join(s.binDir, id.Ext(ExtWasm))
 }
 
+// HasItem implements storage interface
 func (s LocalStorage) HasItem(id ArtifactID) (bool, error) {
 	s.useLock.Lock()
 	s.useLock.Unlock()
@@ -107,6 +110,7 @@ func (s LocalStorage) HasItem(id ArtifactID) (bool, error) {
 	return true, nil
 }
 
+// GetItem implements storage interface
 func (s LocalStorage) GetItem(id ArtifactID) (io.ReadCloser, error) {
 	s.useLock.Lock()
 	defer s.useLock.Unlock()
@@ -122,6 +126,7 @@ func (s LocalStorage) GetItem(id ArtifactID) (io.ReadCloser, error) {
 	}, err
 }
 
+// CreateLocationAndDo implements storage interface
 func (s LocalStorage) CreateLocationAndDo(id ArtifactID, data []byte, cb Callback) error {
 	s.useLock.Lock()
 	defer s.useLock.Unlock()
@@ -188,6 +193,7 @@ func (s LocalStorage) clean() error {
 	return nil
 }
 
+// StartCleaner implements storage interface
 func (s LocalStorage) StartCleaner(ctx context.Context, interval time.Duration, wg *sync.WaitGroup) {
 	s.gcRun.Set()
 	s.log.Debug("cleaner worker starter")

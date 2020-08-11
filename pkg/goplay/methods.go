@@ -12,6 +12,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// ValidateContentLength validates snippet size
 func ValidateContentLength(itemLen int) error {
 	if itemLen > maxSnippetSize {
 		return ErrSnippetTooLarge
@@ -20,6 +21,7 @@ func ValidateContentLength(itemLen int) error {
 	return nil
 }
 
+// GetSnippet returns snippet from Go playground
 func GetSnippet(ctx context.Context, snippetID string) (*Snippet, error) {
 	fileName := snippetID + ".go"
 	resp, err := getRequest(ctx, "p/"+fileName)
@@ -46,6 +48,7 @@ func GetSnippet(ctx context.Context, snippetID string) (*Snippet, error) {
 	}
 }
 
+// Share shares snippet to go playground
 func Share(ctx context.Context, src io.Reader) (string, error) {
 	resp, err := doRequest(ctx, http.MethodPost, "share", "text/plain", src)
 	if err != nil {
@@ -56,6 +59,7 @@ func Share(ctx context.Context, src io.Reader) (string, error) {
 	return shareID, nil
 }
 
+// GoImports performs Goimports
 func GoImports(ctx context.Context, src []byte) (*FmtResponse, error) {
 	form := url.Values{}
 	form.Add("imports", "true")
@@ -78,6 +82,7 @@ func GoImports(ctx context.Context, src []byte) (*FmtResponse, error) {
 	return dest, nil
 }
 
+// Compile runs code in goplayground and returns response
 func Compile(ctx context.Context, src []byte) (*CompileResponse, error) {
 	form := url.Values{}
 	form.Add("body", string(src))

@@ -16,12 +16,18 @@ const (
 // MarkerData is a structure defining a problem/warning/etc.
 // Equivalent to IMarkerData in 'monaco-editor'
 type MarkerData struct {
-	Severity        MarkerSeverity `json:"severity"`
-	StartLineNumber int            `json:"startLineNumber"`
-	StartColumn     int            `json:"startColumn"`
-	EndLineNumber   int            `json:"endLineNumber"`
-	EndColumn       int            `json:"endColumn"`
-	Message         string         `json:"message"`
+	// Severity is marker severity
+	Severity MarkerSeverity `json:"severity"`
+	// StartLineNumber is start line number
+	StartLineNumber int `json:"startLineNumber"`
+	// StartColumn is start column
+	StartColumn int `json:"startColumn"`
+	// EndLineNumber is end line number
+	EndLineNumber int `json:"endLineNumber"`
+	// EndColumn is end column
+	EndColumn int `json:"endColumn"`
+	// Message is marker message
+	Message string `json:"message"`
 }
 
 func errorsListToMarkers(errList scanner.ErrorList) []MarkerData {
@@ -40,7 +46,11 @@ func errorsListToMarkers(errList scanner.ErrorList) []MarkerData {
 	return markers
 }
 
+// Result is result
 type Result struct {
-	HasErrors bool         `json:"hasErrors"`
-	Markers   []MarkerData `json:"markers"`
+	// HasErrors is error status
+	HasErrors bool `json:"hasErrors"`
+
+	// Markers is list of marker data
+	Markers []MarkerData `json:"markers"`
 }

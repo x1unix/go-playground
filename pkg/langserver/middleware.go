@@ -5,9 +5,13 @@ import (
 	"net/http"
 )
 
+// HandlerFunc is langserver request handler
 type HandlerFunc func(http.ResponseWriter, *http.Request) error
+
+// GuardFn is guard middleware handler
 type GuardFn func(r *http.Request) error
 
+// WrapHandler wraps handler
 func WrapHandler(h HandlerFunc, guards ...GuardFn) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if len(guards) == 0 {
@@ -23,6 +27,7 @@ func WrapHandler(h HandlerFunc, guards ...GuardFn) http.HandlerFunc {
 	}
 }
 
+// ValidateContentLength validates Go code snippet size
 func ValidateContentLength(r *http.Request) error {
 	if err := goplay.ValidateContentLength(int(r.ContentLength)); err != nil {
 		return NewHTTPError(http.StatusRequestEntityTooLarge, err)
