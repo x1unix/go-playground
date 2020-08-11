@@ -3,8 +3,10 @@ package storage
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"sync"
@@ -34,6 +36,11 @@ func TestLocalStorage_GetItem(t *testing.T) {
 	expectData := []byte("foo")
 	aid, err := GetArtifactID(expectData)
 	must(t, err, "failed to create a test artifact ID")
+
+	// check not existing item
+	ok, err := s.HasItem(aid)
+	require.NoError(t, err)
+	require.False(t, ok)
 
 	_, err = s.GetItem(aid)
 	r.EqualError(err, ErrNotExists.Error(), "got unexpected error type")
@@ -98,6 +105,51 @@ func TestLocalStorage_GetItem(t *testing.T) {
 	must(t, os.RemoveAll(testDir), "failed to remove test dir after exit")
 }
 
+func TestLocalStorage_clean(t *testing.T) {
+	tempDir, err := ioutil.TempDir(os.TempDir(), "tempstore")
+	require.NoError(t, err)
+	defer os.RemoveAll(tempDir)
+
+	cases := map[string]struct {
+		dir     string
+		store   *LocalStorage
+		wantErr string
+	}{
+		"clean existing dir": {
+			dir: tempDir,
+		},
+		"clean error": {
+			store: &LocalStorage{
+				log:     testutil.GetLogger(t),
+				workDir: "/a/b/c/d",
+				useLock: &sync.Mutex{},
+				dirty:   abool.NewBool(false),
+				gcRun:   abool.NewBool(false),
+				binDir:  filepath.Join("/dev", binDirName),
+				srcDir:  filepath.Join("/dev", srcDirName),
+			},
+		},
+	}
+
+	for n, c := range cases {
+		t.Run(n, func(t *testing.T) {
+			if c.store == nil {
+				store, err := NewLocalStorage(testutil.GetLogger(t), c.dir)
+				require.NoError(t, err)
+				c.store = store
+			}
+
+			c.store.dirty.Set()
+			err := c.store.clean()
+			if c.wantErr != "" {
+				testutil.ContainsError(t, err, c.wantErr)
+				return
+			}
+			require.NoError(t, err)
+		})
+	}
+}
+
 func TestLocalStorage_CreateLocationAndDo(t *testing.T) {
 	tempDir, err := ioutil.TempDir(os.TempDir(), "tempstore")
 	require.NoError(t, err)
@@ -127,10 +179,36 @@ func TestLocalStorage_CreateLocationAndDo(t *testing.T) {
 			artifact: mustArtifactID(t, "test"),
 			data:     []byte("test"),
 			after: func() error {
-				f := filepath.Join(tempDir, srcDirName, mustArtifactID(t, "test").Ext(ExtGo))
-				s, err := os.Stat(f)
-				require.NoError(t, err, "created file not exists")
-				t.Log(s)
+				art := mustArtifactID(t, "test")
+				f := filepath.Join(tempDir, srcDirName, art.String(), art.Ext(ExtGo))
+				_, err := os.Stat(f)
+				if err != nil {
+					t.Log(f)
+					return fmt.Errorf("created file not exists - %w", err)
+				}
+				return nil
+			},
+		},
+		"unwritable": {
+			err:      "failed to save source file",
+			dir:      tempDir,
+			artifact: mustArtifactID(t, "test1"),
+			data:     []byte("test1"),
+			before: func() error {
+				art := mustArtifactID(t, "test1")
+				f := filepath.Join(tempDir, srcDirName, art.String())
+				if err := os.MkdirAll(f, perm); err != nil {
+					return err
+				}
+
+				// create broken symlink to create unwritable file
+				f = filepath.Join(f, art.Ext(ExtGo))
+				cmd := exec.Command("ln", "-s", "/dev/badpath", f)
+				out, err := cmd.CombinedOutput()
+				if err != nil {
+					t.Log(cmd.String())
+					return fmt.Errorf("%s (%w)", string(out), err)
+				}
 				return nil
 			},
 		},
