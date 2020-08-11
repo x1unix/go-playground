@@ -60,11 +60,12 @@ func TestBuildService_GetArtifact(t *testing.T) {
 
 func TestBuildService_Build(t *testing.T) {
 	cases := map[string]struct {
-		skip       bool
-		data       []byte
-		wantErr    string
-		wantResult *Result
-		store      func(t *testing.T) (storage.StoreProvider, func() error)
+		skip         bool
+		data         []byte
+		wantErr      string
+		wantResult   *Result
+		onErrorCheck func(t *testing.T, err error)
+		store        func(t *testing.T) (storage.StoreProvider, func() error)
 	}{
 		"bad store": {
 			wantErr: "test error",
@@ -92,6 +93,7 @@ func TestBuildService_Build(t *testing.T) {
 			},
 		},
 		"new build": {
+			wantErr: "can't load package",
 			store: func(t *testing.T) (storage.StoreProvider, func() error) {
 				tempDir, err := ioutil.TempDir(os.TempDir(), "tempstore")
 				require.NoError(t, err)
@@ -101,6 +103,10 @@ func TestBuildService_Build(t *testing.T) {
 				return s, func() error {
 					return os.RemoveAll(tempDir)
 				}
+			},
+			onErrorCheck: func(t *testing.T, err error) {
+				_, ok := err.(*BuildError)
+				require.True(t, ok, "expected compiler error")
 			},
 		},
 	}
@@ -124,6 +130,10 @@ func TestBuildService_Build(t *testing.T) {
 			bs := NewBuildService(zaptest.NewLogger(t).Sugar(), store)
 			got, err := bs.Build(context.TODO(), c.data)
 			if c.wantErr != "" {
+				if c.onErrorCheck != nil {
+					c.onErrorCheck(t, err)
+					return
+				}
 				testutil.ContainsError(t, err, c.wantErr)
 				return
 			}
