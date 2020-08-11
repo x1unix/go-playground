@@ -150,3 +150,8 @@ func mustArtifactID(t *testing.T, data []byte) storage.ArtifactID {
 	require.NoError(t, err)
 	return a
 }
+
+func TestBuildError_Error(t *testing.T) {
+	msg := "test"
+	require.Equal(t, msg, newBuildError(msg).Error())
+}

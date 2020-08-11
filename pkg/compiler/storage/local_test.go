@@ -99,8 +99,14 @@ func TestLocalStorage_GetItem(t *testing.T) {
 }
 
 func TestLocalStorage_CreateLocationAndDo(t *testing.T) {
+	tempDir, err := ioutil.TempDir(os.TempDir(), "tempstore")
+	require.NoError(t, err)
+	defer os.RemoveAll(tempDir)
+
 	cases := map[string]struct {
+		skip     bool
 		dir      string
+		data     []byte
 		artifact ArtifactID
 		err      string
 		before   func() error
@@ -116,10 +122,26 @@ func TestLocalStorage_CreateLocationAndDo(t *testing.T) {
 			artifact: "../../../../../../../../../../../foobar",
 			err:      "failed to create temporary build directory",
 		},
+		"ok": {
+			dir:      tempDir,
+			artifact: mustArtifactID(t, "test"),
+			data:     []byte("test"),
+			after: func() error {
+				f := filepath.Join(tempDir, srcDirName, mustArtifactID(t, "test").Ext(ExtGo))
+				s, err := os.Stat(f)
+				require.NoError(t, err, "created file not exists")
+				t.Log(s)
+				return nil
+			},
+		},
 	}
 
 	for n, c := range cases {
 		t.Run(n, func(t *testing.T) {
+			if c.skip {
+				t.Skip()
+				return
+			}
 			ls := &LocalStorage{
 				log:     zaptest.NewLogger(t).Sugar(),
 				workDir: c.dir,
@@ -137,7 +159,7 @@ func TestLocalStorage_CreateLocationAndDo(t *testing.T) {
 					assert.NoError(t, c.after(), "c.after() returned an error")
 				}
 			}()
-			err := ls.CreateLocationAndDo(c.artifact, nil, func(wasmLocation, sourceLocation string) error {
+			err := ls.CreateLocationAndDo(c.artifact, c.data, func(wasmLocation, sourceLocation string) error {
 				t.Logf("Callback call: %q, %q", wasmLocation, sourceLocation)
 				return nil
 			})
@@ -162,4 +184,11 @@ func strEndsWith(t *testing.T, str string, suffix string) {
 	t.Helper()
 	got := str[len(str)-len(suffix):]
 	require.Equal(t, suffix, got)
+}
+
+func mustArtifactID(t *testing.T, data string) ArtifactID {
+	t.Helper()
+	a, err := GetArtifactID([]byte(data))
+	require.NoError(t, err)
+	return a
 }
