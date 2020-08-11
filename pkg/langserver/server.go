@@ -277,7 +277,8 @@ func (s *Service) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) 
 // HandleCompile handles WASM build request
 func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) error {
 	// Limit for request timeout
-	ctx, _ := context.WithDeadline(r.Context(), time.Now().Add(maxBuildTimeDuration))
+	ctx, cancel := context.WithDeadline(r.Context(), time.Now().Add(maxBuildTimeDuration))
+	defer cancel()
 
 	// Wait for our queue in line for compilation
 	if err := s.limiter.Wait(ctx); err != nil {
