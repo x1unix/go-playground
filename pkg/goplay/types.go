@@ -44,12 +44,12 @@ type CompileResponse struct {
 }
 
 // GetBody returns response body
-func (r CompileResponse) GetBody() string {
-	if r.Body == nil {
+func (cr CompileResponse) GetBody() string {
+	if cr.Body == nil {
 		return ""
 	}
 
-	return *r.Body
+	return *cr.Body
 }
 
 // HasError returns error if any occurred
