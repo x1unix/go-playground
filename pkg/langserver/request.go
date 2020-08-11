@@ -44,7 +44,7 @@ func (sr SuggestionRequest) Trim() SuggestionRequest {
 
 // ErrorResponse is error response
 type ErrorResponse struct {
-	code int `json:"-"`
+	code int
 
 	// Error is error message
 	Error string `json:"error"`
