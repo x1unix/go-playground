@@ -15,5 +15,5 @@ before_install:
   - go get github.com/mattn/goveralls
 script:
   - go list ./... | grep -v worker | xargs go vet
-  - go test -v -covermode=count -coverprofile=coverage.out
+  - cat tools/cover.txt | xargs go test -v -covermode=count -coverprofile=coverage.out
   - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
