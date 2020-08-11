@@ -7,8 +7,10 @@ import (
 )
 
 const (
+	// ExtWasm is wasm file extension
 	ExtWasm = "wasm"
-	ExtGo   = "go"
+	// ExtGo is go file extension
+	ExtGo = "go"
 )
 
 // ArtifactID represents artifact ID
@@ -19,10 +21,12 @@ func (a ArtifactID) Ext(ext string) string {
 	return string(a) + "." + ext
 }
 
+// String returns string
 func (a ArtifactID) String() string {
 	return string(a)
 }
 
+// GetArtifactID generates new artifact ID from contents
 func GetArtifactID(data []byte) (ArtifactID, error) {
 	h := md5.New()
 	if _, err := h.Write(bytes.TrimSpace(data)); err != nil {

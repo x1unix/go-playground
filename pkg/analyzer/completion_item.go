@@ -1,5 +1,8 @@
 package analyzer
 
+// This file contains monaco-editor symbols bindings with the same symbol names.
+// See: https://microsoft.github.io/monaco-editor/api/enums/monaco.languages.completionitemkind.html
+
 // CompletionItemKind is monaco-editor binding
 type CompletionItemKind int
 
@@ -32,7 +35,7 @@ const (
 	Snippet
 )
 
-// CompletionItemKind is monaco-editor binding
+// CompletionItem is monaco-editor binding
 type CompletionItem struct {
 	// Label is item label
 	Label string `json:"label"`

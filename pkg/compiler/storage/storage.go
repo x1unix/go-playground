@@ -11,7 +11,7 @@ var ErrNotExists = errors.New("item not exists")
 // Callback is location callback
 type Callback = func(wasmLocation, sourceLocation string) error
 
-// StorageProvider is abstract artifact storage
+// StoreProvider is abstract artifact storage
 type StoreProvider interface {
 	// HasItem checks if item exists
 	HasItem(id ArtifactID) (bool, error)
