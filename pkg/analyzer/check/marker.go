@@ -1,4 +1,4 @@
-// package check checks provided Go code and reports syntax errors
+// Package check checks provided Go code and reports syntax errors
 package check
 
 import "go/scanner"
@@ -7,10 +7,14 @@ import "go/scanner"
 type MarkerSeverity = int
 
 const (
-	Hint    = MarkerSeverity(1)
-	Info    = MarkerSeverity(2)
+	// Hint is marker severity from monaco-editor
+	Hint = MarkerSeverity(1)
+	// Info is marker severity from monaco-editor
+	Info = MarkerSeverity(2)
+	// Warning is marker severity from monaco-editor
 	Warning = MarkerSeverity(3)
-	Error   = MarkerSeverity(8)
+	// Error is marker severity from monaco-editor
+	Error = MarkerSeverity(8)
 )
 
 // MarkerData is a structure defining a problem/warning/etc.

@@ -18,6 +18,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// Version is server version symbol. Should be replaced by linker during build
 var Version = "testing"
 
 type appArgs struct {
