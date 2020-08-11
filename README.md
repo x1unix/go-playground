@@ -2,6 +2,9 @@
 	
 # Better Go Playground
 
+[![Coverage Status](https://coveralls.io/repos/github/x1unix/go-playground/badge.svg?branch=master)](https://coveralls.io/github/x1unix/go-playground?branch=master)
+[![Goreportcard](https://goreportcard.com/badge/github.com/x1unix/go-playground)](https://goreportcard.com/report/github.com/x1unix/go-playground)
+
 Improved Go Playground powered by Monaco Editor and React
 
 ![alt text](./docs/demo.gif)
