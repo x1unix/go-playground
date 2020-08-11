@@ -54,3 +54,8 @@ type MarkdownString struct {
 	// Value is string contents
 	Value string `json:"value"`
 }
+
+// NewMarkdownString returns markdown string
+func NewMarkdownString(val string) MarkdownString {
+	return MarkdownString{Value: val}
+}

@@ -2,6 +2,7 @@ package analyzer
 
 import (
 	"github.com/stretchr/testify/require"
+	"github.com/x1unix/go-playground/pkg/testutil"
 	"testing"
 )
 
@@ -83,5 +84,10 @@ func TestPackage_HasChildren(t *testing.T) {
 }
 
 func TestPackage_AllSymbols(t *testing.T) {
-
+	SetRoot("testdata")
+	SetLogger(testutil.GetLogger(t).Desugar())
+	want := examplePackageSummary
+	pkg := Package{Path: "example"}
+	require.NoError(t, pkg.Analyze())
+	require.Equal(t, want, pkg.PackageSummary)
 }
