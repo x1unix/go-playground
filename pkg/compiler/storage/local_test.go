@@ -30,6 +30,7 @@ func getTestDir(t *testing.T) string {
 func TestLocalStorage_GetItem(t *testing.T) {
 	r := require.New(t)
 	testDir := getTestDir(t)
+	defer os.RemoveAll(testDir)
 	s, err := NewLocalStorage(zaptest.NewLogger(t).Sugar(), testDir)
 	r.NoError(err, "failed to create test storage")
 	r.Falsef(s.dirty.IsSet(), "dirty flag is not false")

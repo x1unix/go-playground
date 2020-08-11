@@ -59,6 +59,9 @@ func TestBuildService_GetArtifact(t *testing.T) {
 }
 
 func TestBuildService_Build(t *testing.T) {
+	tempDir, err := ioutil.TempDir(os.TempDir(), "tempstore")
+	require.NoError(t, err)
+	defer os.RemoveAll(tempDir)
 	cases := map[string]struct {
 		skip         bool
 		data         []byte
@@ -95,9 +98,6 @@ func TestBuildService_Build(t *testing.T) {
 		"new build": {
 			wantErr: "can't load package",
 			store: func(t *testing.T) (storage.StoreProvider, func() error) {
-				tempDir, err := ioutil.TempDir(os.TempDir(), "tempstore")
-				require.NoError(t, err)
-
 				s, err := storage.NewLocalStorage(zaptest.NewLogger(t).Sugar(), tempDir)
 				require.NoError(t, err)
 				return s, func() error {
