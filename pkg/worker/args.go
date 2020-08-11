@@ -10,7 +10,9 @@ func NewTypeError(expType, gotType js.Type) error {
 	return fmt.Errorf("value type should be %q, but got %q", expType, gotType)
 }
 
+// ValueUnmarshaler unmarshal JS value
 type ValueUnmarshaler interface {
+	// UnmarshalValue unmarshal JS value
 	UnmarshalValue(js.Value) error
 }
 
