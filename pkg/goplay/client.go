@@ -19,6 +19,7 @@ const (
 	maxSnippetSize = 64 * 1024
 )
 
+// ErrSnippetTooLarge is snippet max size limit error
 var ErrSnippetTooLarge = fmt.Errorf("code snippet too large (max %d bytes)", maxSnippetSize)
 
 func newRequest(ctx context.Context, method, queryPath string, body io.Reader) (*http.Request, error) {

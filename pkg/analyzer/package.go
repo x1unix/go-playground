@@ -14,8 +14,10 @@ const (
 	pkgBuiltin    = "builtin"
 )
 
+// Packages is list of packages
 type Packages []*Package
 
+// GetCompletionItems returns all symbols from packages
 func (pkgs Packages) GetCompletionItems() []*CompletionItem {
 	items := make([]*CompletionItem, 0, len(pkgs))
 	for _, pkg := range pkgs {
@@ -25,11 +27,17 @@ func (pkgs Packages) GetCompletionItems() []*CompletionItem {
 	return items
 }
 
+// Package is Go package metadata
 type Package struct {
-	Name     string     `json:"name"`
-	Synopsis string     `json:"synopsis"`
-	URL      string     `json:"url"`
-	Path     string     `json:"path"`
+	// Name is package name
+	Name string `json:"name"`
+	// Synopsis is package description
+	Synopsis string `json:"synopsis"`
+	// URL is godoc URL
+	URL string `json:"url"`
+	// Path is package import path
+	Path string `json:"path"`
+	// Children is list of sub-packages
 	Children []*Package `json:"children"`
 	PackageSummary
 
@@ -41,15 +49,18 @@ func (p *Package) IsBuiltin() bool {
 	return p.Name == pkgBuiltin
 }
 
+// GetLocation returns absolute package location on disk
 func (p *Package) GetLocation() string {
 	return path.Join(goRoot, "src", p.Path)
 }
 
+// SymbolByChar returns list of symbols by first char
 func (p *Package) SymbolByChar(chr string) []*CompletionItem {
 	result := p.Values.Match(chr)
 	return append(p.Functions.Match(chr), result...)
 }
 
+// AllSymbols returns all symbols
 func (p *Package) AllSymbols() []*CompletionItem {
 	out := make([]*CompletionItem, 0, p.Values.Len()+p.Functions.Len())
 	out = append(out, p.Functions.Symbols...)
@@ -57,6 +68,7 @@ func (p *Package) AllSymbols() []*CompletionItem {
 	return out
 }
 
+// GetCompletionItem returns package symbol
 func (p *Package) GetCompletionItem() *CompletionItem {
 	return &CompletionItem{
 		Label:         p.Name,
@@ -73,10 +85,14 @@ func (p *Package) documentation() MarkdownString {
 	}
 }
 
+// HasChildren returns if package has sub-packages
 func (p *Package) HasChildren() bool {
 	return len(p.Children) > 0
 }
 
+// Analyze performs package analysis from sources on disk
+//
+// This is one time operation
 func (p *Package) Analyze() (err error) {
 	p.scanOnce.Do(func() {
 		scanner := NewPackageScanner(p.Name, p.GetLocation(), p.IsBuiltin())

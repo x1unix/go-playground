@@ -17,15 +17,19 @@ var buildArgs = []string{
 	"HOME=" + os.Getenv("HOME"),
 }
 
+// Result is WASM build result
 type Result struct {
+	// FileName is artifact file name
 	FileName string
 }
 
+// BuildService is WASM build service
 type BuildService struct {
 	log     *zap.SugaredLogger
 	storage storage.StoreProvider
 }
 
+// NewBuildService is BuildService constructor
 func NewBuildService(log *zap.SugaredLogger, store storage.StoreProvider) BuildService {
 	return BuildService{
 		log:     log.Named("builder"),
@@ -59,10 +63,12 @@ func (s BuildService) buildSource(ctx context.Context, outputLocation, sourceLoc
 	return nil
 }
 
+// GetArtifact returns artifact by id
 func (s BuildService) GetArtifact(id storage.ArtifactID) (io.ReadCloser, error) {
 	return s.storage.GetItem(id)
 }
 
+// Build compiles Go source to WASM and returns result
 func (s BuildService) Build(ctx context.Context, data []byte) (*Result, error) {
 	aid, err := storage.GetArtifactID(data)
 	if err != nil {

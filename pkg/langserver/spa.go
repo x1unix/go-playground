@@ -14,6 +14,7 @@ type spaFileServer struct {
 	NotFoundHandler func(http.ResponseWriter, *http.Request)
 }
 
+// ServeHTTP implements http.Handler
 func (fs *spaFileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if containsDotDot(r.URL.Path) {
 		Errorf(http.StatusNotFound, "Not Found").WriteResponse(w)
@@ -64,6 +65,7 @@ func containsDotDot(v string) bool {
 
 func isSlashRune(r rune) bool { return r == '/' || r == '\\' }
 
+// SpaFileServer returns SPA handler
 func SpaFileServer(root http.Dir) http.Handler {
 	return &spaFileServer{root: root}
 }

@@ -28,6 +28,7 @@ const (
 	artifactParamVal = "artifactId"
 )
 
+// Service is language server service
 type Service struct {
 	version  string
 	log      *zap.SugaredLogger
@@ -36,6 +37,7 @@ type Service struct {
 	limiter  *rate.Limiter
 }
 
+// New is Service constructor
 func New(version string, packages []*analyzer.Package, builder compiler.BuildService) *Service {
 	return &Service{
 		compiler: builder,
@@ -117,11 +119,13 @@ func (s *Service) provideSuggestion(req SuggestionRequest) (*SuggestionsResponse
 	return s.lookupBuiltin(req.Value)
 }
 
+// HandleGetVersion handles /api/version
 func (s *Service) HandleGetVersion(w http.ResponseWriter, r *http.Request) error {
 	WriteJSON(w, VersionResponse{Version: s.version})
 	return nil
 }
 
+// HandleGetSuggestion handles code suggestion
 func (s *Service) HandleGetSuggestion(w http.ResponseWriter, r *http.Request) error {
 	q := r.URL.Query()
 	value := q.Get("value")
@@ -136,6 +140,7 @@ func (s *Service) HandleGetSuggestion(w http.ResponseWriter, r *http.Request) er
 	return nil
 }
 
+// HandleFormatCode handles goimports action
 func (s *Service) HandleFormatCode(w http.ResponseWriter, r *http.Request) error {
 	src, err := getPayloadFromRequest(r)
 	if err != nil {
@@ -156,6 +161,7 @@ func (s *Service) HandleFormatCode(w http.ResponseWriter, r *http.Request) error
 	return nil
 }
 
+// HandleShare handles snippet share
 func (s *Service) HandleShare(w http.ResponseWriter, r *http.Request) error {
 	shareID, err := goplay.Share(r.Context(), r.Body)
 	defer r.Body.Close()
@@ -172,6 +178,7 @@ func (s *Service) HandleShare(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+// HandleGetSnippet handles snippet load
 func (s *Service) HandleGetSnippet(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	snippetID := vars["id"]
@@ -195,6 +202,7 @@ func (s *Service) HandleGetSnippet(w http.ResponseWriter, r *http.Request) error
 	return nil
 }
 
+// HandleRunCode handles code run
 func (s *Service) HandleRunCode(w http.ResponseWriter, r *http.Request) error {
 	src, err := getPayloadFromRequest(r)
 	if err != nil {
@@ -238,6 +246,7 @@ func (s *Service) HandleRunCode(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+// HandleArtifactRequest handles WASM build artifact request
 func (s *Service) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	artifactId := storage.ArtifactID(vars[artifactParamVal])
@@ -265,6 +274,7 @@ func (s *Service) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) 
 	return nil
 }
 
+// HandleCompile handles WASM build request
 func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) error {
 	// Limit for request timeout
 	ctx, _ := context.WithDeadline(r.Context(), time.Now().Add(maxBuildTimeDuration))
