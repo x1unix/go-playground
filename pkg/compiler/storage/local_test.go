@@ -3,20 +3,31 @@ package storage
 import (
 	"context"
 	"errors"
-	"github.com/stretchr/testify/require"
-	"go.uber.org/zap/zaptest"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
+	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/tevino/abool"
+	"github.com/x1unix/go-playground/pkg/testutil"
+	"go.uber.org/zap/zaptest"
 )
 
-var testDir = os.TempDir()
+func getTestDir(t *testing.T) string {
+	t.Helper()
+	d, err := ioutil.TempDir(os.TempDir(), "storage_test")
+	require.NoError(t, err)
+	return d
+}
 
 func TestLocalStorage_GetItem(t *testing.T) {
 	r := require.New(t)
+	testDir := getTestDir(t)
 	s, err := NewLocalStorage(zaptest.NewLogger(t).Sugar(), testDir)
 	r.NoError(err, "failed to create test storage")
 	r.Falsef(s.dirty.IsSet(), "dirty flag is not false")
@@ -60,6 +71,9 @@ func TestLocalStorage_GetItem(t *testing.T) {
 	r.True(s.dirty.IsSet(), "dirty flag should be true after file manipulation")
 
 	// Try to get item from storage
+	has, err := s.HasItem(aid)
+	require.NoError(t, err)
+	require.True(t, has)
 	dataFile, err := s.GetItem(aid)
 	defer dataFile.Close()
 	r.NoError(err, "failed to get saved cached data")
@@ -82,6 +96,58 @@ func TestLocalStorage_GetItem(t *testing.T) {
 	r.False(s.gcRun.IsSet(), "collector not stopped after context death")
 
 	must(t, os.RemoveAll(testDir), "failed to remove test dir after exit")
+}
+
+func TestLocalStorage_CreateLocationAndDo(t *testing.T) {
+	cases := map[string]struct {
+		dir      string
+		artifact ArtifactID
+		err      string
+		before   func() error
+		after    func() error
+	}{
+		"inaccessible dir": {
+			dir:      "/root/foo",
+			artifact: "testartifactid",
+			err:      "failed to create temporary build directory",
+		},
+		"no perm": {
+			dir:      "/tmp/testdir",
+			artifact: "../../../../../../../../../../../foobar",
+			err:      "failed to create temporary build directory",
+		},
+	}
+
+	for n, c := range cases {
+		t.Run(n, func(t *testing.T) {
+			ls := &LocalStorage{
+				log:     zaptest.NewLogger(t).Sugar(),
+				workDir: c.dir,
+				useLock: &sync.Mutex{},
+				dirty:   abool.NewBool(false),
+				gcRun:   abool.NewBool(false),
+				binDir:  filepath.Join(c.dir, binDirName),
+				srcDir:  filepath.Join(c.dir, srcDirName),
+			}
+			if c.before != nil {
+				assert.NoError(t, c.before(), "c.before() returned an error")
+			}
+			defer func() {
+				if c.after != nil {
+					assert.NoError(t, c.after(), "c.after() returned an error")
+				}
+			}()
+			err := ls.CreateLocationAndDo(c.artifact, nil, func(wasmLocation, sourceLocation string) error {
+				t.Logf("Callback call: %q, %q", wasmLocation, sourceLocation)
+				return nil
+			})
+			if c.err != "" {
+				testutil.ContainsError(t, err, c.err)
+				return
+			}
+			require.NoError(t, err)
+		})
+	}
 }
 
 func must(t *testing.T, err error, msg string) {
