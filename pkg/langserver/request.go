@@ -1,7 +1,6 @@
 package langserver
 
 import (
-	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -117,28 +116,6 @@ func WriteJSON(w http.ResponseWriter, i interface{}) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(data)
 	return
-}
-
-// goImportsCode reads code from request and performs "goimports" on it
-// if any error occurs, it sends error response to client and closes connection
-//
-// if "format" url query param is undefined or set to "false", just returns code as is
-func goImportsCode(ctx context.Context, src []byte) ([]byte, bool, error) {
-	resp, err := goplay.GoImports(ctx, src)
-	if err != nil {
-		if err == goplay.ErrSnippetTooLarge {
-			return nil, false, NewHTTPError(http.StatusRequestEntityTooLarge, err)
-		}
-
-		return nil, false, err
-	}
-
-	if err = resp.HasError(); err != nil {
-		return nil, false, err
-	}
-
-	changed := resp.Body != string(src)
-	return []byte(resp.Body), changed, nil
 }
 
 func shouldFormatCode(r *http.Request) (bool, error) {

@@ -30,21 +30,23 @@ const (
 
 // Service is language server service
 type Service struct {
-	version  string
-	log      *zap.SugaredLogger
-	index    analyzer.PackageIndex
-	compiler compiler.BuildService
-	limiter  *rate.Limiter
+	version    string
+	log        *zap.SugaredLogger
+	index      analyzer.PackageIndex
+	compiler   compiler.BuildService
+	playground *goplay.Client
+	limiter    *rate.Limiter
 }
 
 // New is Service constructor
 func New(version string, packages []*analyzer.Package, builder compiler.BuildService) *Service {
 	return &Service{
-		compiler: builder,
-		version:  version,
-		log:      zap.S().Named("langserver"),
-		index:    analyzer.BuildPackageIndex(packages),
-		limiter:  rate.NewLimiter(rate.Every(frameTime), compileRequestsPerFrame),
+		compiler:   builder,
+		version:    version,
+		playground: goplay.NewDefaultClient(),
+		log:        zap.S().Named("langserver"),
+		index:      analyzer.BuildPackageIndex(packages),
+		limiter:    rate.NewLimiter(rate.Every(frameTime), compileRequestsPerFrame),
 	}
 }
 
@@ -147,7 +149,7 @@ func (s *Service) HandleFormatCode(w http.ResponseWriter, r *http.Request) error
 		return err
 	}
 
-	formatted, _, err := goImportsCode(r.Context(), src)
+	formatted, _, err := s.goImportsCode(r.Context(), src)
 	if err != nil {
 		if goplay.IsCompileError(err) {
 			return NewHTTPError(http.StatusBadRequest, err)
@@ -163,7 +165,7 @@ func (s *Service) HandleFormatCode(w http.ResponseWriter, r *http.Request) error
 
 // HandleShare handles snippet share
 func (s *Service) HandleShare(w http.ResponseWriter, r *http.Request) error {
-	shareID, err := goplay.Share(r.Context(), r.Body)
+	shareID, err := s.playground.Share(r.Context(), r.Body)
 	defer r.Body.Close()
 	if err != nil {
 		if err == goplay.ErrSnippetTooLarge {
@@ -182,7 +184,7 @@ func (s *Service) HandleShare(w http.ResponseWriter, r *http.Request) error {
 func (s *Service) HandleGetSnippet(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	snippetID := vars["id"]
-	snippet, err := goplay.GetSnippet(r.Context(), snippetID)
+	snippet, err := s.playground.GetSnippet(r.Context(), snippetID)
 	if err != nil {
 		if err == goplay.ErrSnippetNotFound {
 			return Errorf(http.StatusNotFound, "snippet %q not found", snippetID)
@@ -216,7 +218,7 @@ func (s *Service) HandleRunCode(w http.ResponseWriter, r *http.Request) error {
 
 	var changed bool
 	if shouldFormat {
-		src, changed, err = goImportsCode(r.Context(), src)
+		src, changed, err = s.goImportsCode(r.Context(), src)
 		if err != nil {
 			if goplay.IsCompileError(err) {
 				return NewHTTPError(http.StatusBadRequest, err)
@@ -226,7 +228,7 @@ func (s *Service) HandleRunCode(w http.ResponseWriter, r *http.Request) error {
 		}
 	}
 
-	res, err := goplay.Compile(r.Context(), src)
+	res, err := s.playground.Compile(r.Context(), src)
 	if err != nil {
 		return err
 	}
@@ -297,7 +299,7 @@ func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) error {
 
 	var changed bool
 	if shouldFormat {
-		src, changed, err = goImportsCode(r.Context(), src)
+		src, changed, err = s.goImportsCode(r.Context(), src)
 		if err != nil {
 			if goplay.IsCompileError(err) {
 				return NewHTTPError(http.StatusBadRequest, err)
@@ -325,4 +327,26 @@ func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) error {
 
 	WriteJSON(w, resp)
 	return nil
+}
+
+// goImportsCode reads code from request and performs "goimports" on it
+// if any error occurs, it sends error response to client and closes connection
+//
+// if "format" url query param is undefined or set to "false", just returns code as is
+func (s *Service) goImportsCode(ctx context.Context, src []byte) ([]byte, bool, error) {
+	resp, err := s.playground.GoImports(ctx, src)
+	if err != nil {
+		if err == goplay.ErrSnippetTooLarge {
+			return nil, false, NewHTTPError(http.StatusRequestEntityTooLarge, err)
+		}
+
+		return nil, false, err
+	}
+
+	if err = resp.HasError(); err != nil {
+		return nil, false, err
+	}
+
+	changed := resp.Body != string(src)
+	return []byte(resp.Body), changed, nil
 }

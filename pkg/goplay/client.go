@@ -5,14 +5,16 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 const (
-	userAgent = "goplay.x1unix.com/1.0 (http://goplay.x1unix.com/)"
-	goPlayURL = "https://play.golang.org"
+	defaultUserAgent = "goplay.tools/1.0 (http://goplay.tools/)"
+	playgroundUrl    = "https://play.golang.org"
 
 	// maxSnippetSize value taken from
 	// https://github.com/golang/playground/blob/master/app/goplay/share.go
@@ -22,33 +24,61 @@ const (
 // ErrSnippetTooLarge is snippet max size limit error
 var ErrSnippetTooLarge = fmt.Errorf("code snippet too large (max %d bytes)", maxSnippetSize)
 
-func newRequest(ctx context.Context, method, queryPath string, body io.Reader) (*http.Request, error) {
-	uri := goPlayURL + "/" + queryPath
+type Client struct {
+	client    http.Client
+	baseUrl   string
+	userAgent string
+}
+
+// NewClient returns new Go playground client
+func NewClient(baseUrl, userAgent string, timeout time.Duration) *Client {
+	return &Client{
+		baseUrl:   baseUrl,
+		userAgent: userAgent,
+		client: http.Client{
+			Timeout: timeout,
+			Transport: &http.Transport{
+				DialContext: (&net.Dialer{
+					Timeout: timeout,
+				}).DialContext,
+				TLSHandshakeTimeout: timeout,
+			},
+		},
+	}
+}
+
+// NewDefaultClient returns Go Playground client with defaults
+func NewDefaultClient() *Client {
+	return NewClient(playgroundUrl, defaultUserAgent, 15*time.Second)
+}
+
+func (c *Client) newRequest(ctx context.Context, method, queryPath string, body io.Reader) (*http.Request, error) {
+	uri := c.baseUrl + "/" + queryPath
 	req, err := http.NewRequestWithContext(ctx, method, uri, body)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Add("User-Agent", userAgent)
+	req.Header.Add("User-Agent", c.userAgent)
 	return req, nil
 }
 
-func getRequest(ctx context.Context, queryPath string) (*http.Response, error) {
-	req, err := newRequest(ctx, http.MethodGet, queryPath, nil)
+func (c *Client) getRequest(ctx context.Context, queryPath string) (*http.Response, error) {
+	req, err := c.newRequest(ctx, http.MethodGet, queryPath, nil)
 	if err != nil {
 		return nil, nil
 	}
 
-	return http.DefaultClient.Do(req)
+	return c.client.Do(req)
 }
 
-func doRequest(ctx context.Context, method, url, contentType string, body io.Reader) ([]byte, error) {
-	req, err := newRequest(ctx, method, url, body)
+func (c *Client) doRequest(ctx context.Context, method, url, contentType string, body io.Reader) ([]byte, error) {
+	req, err := c.newRequest(ctx, method, url, body)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Add("Content-Type", contentType)
-	response, err := http.DefaultClient.Do(req)
+	response, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -66,8 +96,8 @@ func doRequest(ctx context.Context, method, url, contentType string, body io.Rea
 	return bodyBytes.Bytes(), nil
 }
 
-func postForm(ctx context.Context, url string, data url.Values) ([]byte, error) {
-	return doRequest(
+func (c *Client) postForm(ctx context.Context, url string, data url.Values) ([]byte, error) {
+	return c.doRequest(
 		ctx, "POST", url,
 		"application/x-www-form-urlencoded", strings.NewReader(data.Encode()),
 	)
