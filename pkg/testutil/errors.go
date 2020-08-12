@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// ContainsError checks if error contains specified substring
 func ContainsError(t *testing.T, err error, msg string) {
 	t.Helper()
 	if err == nil {
