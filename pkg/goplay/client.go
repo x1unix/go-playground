@@ -24,6 +24,7 @@ const (
 // ErrSnippetTooLarge is snippet max size limit error
 var ErrSnippetTooLarge = fmt.Errorf("code snippet too large (max %d bytes)", maxSnippetSize)
 
+// Client is Go Playground API client
 type Client struct {
 	client    http.Client
 	baseUrl   string
