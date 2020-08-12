@@ -47,8 +47,8 @@ type LocalStorage struct {
 
 // NewLocalStorage constructs new local storage
 func NewLocalStorage(log *zap.SugaredLogger, baseDir string) (ls *LocalStorage, err error) {
+	var isDirty bool
 	logger := log.Named("storage")
-	isDirty := false
 	workDir := filepath.Join(baseDir, workDirName)
 	if err = os.MkdirAll(workDir, perm); err != nil {
 		if !os.IsExist(err) {
