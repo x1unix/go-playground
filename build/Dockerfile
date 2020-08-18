@@ -31,5 +31,5 @@ COPY --from=build /tmp/playground/server .
 COPY --from=build /tmp/playground/worker.wasm ./public
 COPY --from=build /tmp/playground/wasm_exec.js ./public
 EXPOSE 8000
-ENTRYPOINT /opt/playground/server -f=/opt/playground/data/packages.json -addr=:8000\
+ENTRYPOINT /opt/playground/server -f=/opt/playground/data/packages.json -addr=:8000 \
   -clean-interval=${APP_CLEAN_INTERVAL} -debug=${APP_DEBUG} -playground-url=${APP_PLAYGROUND_URL}
