@@ -39,31 +39,14 @@ export default function ChangeLogModal(props: ChangeLogModalProps) {
                 <p>
                     <b>Interface - Global</b>
                     <ul>
-                        <li>Added list of snippets with <u>templates and tutorials</u> near <b>Open</b> menu item</li>
-                        <li>Moved <b>Settings</b> menu button from drop-down to main section</li>
-                    </ul>
-                </p>
-                <p>
-                    <b>Interface - Settings</b>
-                    <ul>
-                        <li>Added editor fonts selector</li>
-                        <li>Added support of font code ligatures</li>
-                        <li>Fixed fallback font issue that might cause issues on Linux</li>
+                        <li>Add <kbd>F5</kbd> hotkey for <b>Run</b> action</li>
                     </ul>
                 </p>
                 <p>
                     <b>Interface - Editor</b>
                     <ul>
-                        <li>
-                            Added code snippets to make code input faster:
-                            <ul>
-                                <li><code>iferr</code> - Error handling snippet</li>
-                                <li><code>switch</code> - Quick switch declaration</li>
-                                <li><code>typestruct</code> - Quickly declare struct</li>
-                                <li><code>fmtprintf</code> - fmt.Printf shorthand</li>
-                                <li>and other (see release notes)</li>
-                            </ul>
-                        </li>
+                        <li>Suggest function arguments completion</li>
+                        <li>Fix snippets suggestion issue</li>
                     </ul>
                 </p>
                 <p>

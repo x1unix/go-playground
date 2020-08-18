@@ -2,6 +2,7 @@ package analyzer
 
 import (
 	"go/ast"
+	"strconv"
 	"strings"
 )
 
@@ -77,14 +78,52 @@ func funcToString(fn *ast.FuncType) string {
 	return str
 }
 
-func funcToItem(fn *ast.FuncDecl) *CompletionItem {
-	ci := &CompletionItem{
-		Label:         fn.Name.String(),
-		Kind:          Function,
-		Documentation: formatDoc(fn.Doc.Text()),
+// formatFuncInsertText returns `insertText` snippet template for monaco-editor
+// from function signature.
+//
+// Example:
+//		func sum(a, b int) int
+// Will output:
+//	"sum(${1:a}, ${2:b})"
+func formatFuncInsertText(fn *ast.FuncDecl) string {
+	sb := strings.Builder{}
+	sb.WriteString(fn.Name.String())
+	sb.WriteByte('(')
+
+	if fn.Type.Params != nil && fn.Type.Params.List != nil {
+		pos := 1 // in monaco, first input argument should start with 0
+		params := make([]string, 0, fn.Type.Params.NumFields())
+
+		for _, param := range fn.Type.Params.List {
+			if len(param.Names) == 0 {
+				// $pos
+				params = append(params, "$"+strconv.Itoa(pos))
+				pos++
+				continue
+			}
+
+			for _, p := range param.Names {
+				// ${pos:paramName}
+				params = append(params, "${"+strconv.Itoa(pos)+":"+p.Name+"}")
+				pos++
+			}
+		}
+		sb.WriteString(strings.Join(params, ", "))
 	}
 
-	ci.Detail = funcToString(fn.Type)
-	ci.InsertText = ci.Label + "()"
+	sb.WriteRune(')')
+	return sb.String()
+}
+
+func funcToItem(fn *ast.FuncDecl) *CompletionItem {
+	ci := &CompletionItem{
+		Label:           fn.Name.String(),
+		Kind:            Function,
+		Detail:          funcToString(fn.Type),
+		Documentation:   formatDoc(fn.Doc.Text()),
+		InsertText:      formatFuncInsertText(fn),
+		InsertTextRules: InsertAsSnippet,
+	}
+
 	return ci
 }

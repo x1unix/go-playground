@@ -78,7 +78,7 @@ func (p *PackageScanner) appendFunc(fn *ast.FuncDecl, dest *SymbolIndex) {
 	}
 
 	item := funcToItem(fn)
-	log.Debugf("found function '%s.%s'", p.name, item.InsertText)
+	log.Debugf("found function '%s.%s'", p.name, item.Detail)
 	dest.Append(item)
 }
 
