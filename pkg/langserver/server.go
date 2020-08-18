@@ -39,11 +39,11 @@ type Service struct {
 }
 
 // New is Service constructor
-func New(version string, packages []*analyzer.Package, builder compiler.BuildService) *Service {
+func New(version string, playground *goplay.Client, packages []*analyzer.Package, builder compiler.BuildService) *Service {
 	return &Service{
 		compiler:   builder,
 		version:    version,
-		playground: goplay.NewDefaultClient(),
+		playground: playground,
 		log:        zap.S().Named("langserver"),
 		index:      analyzer.BuildPackageIndex(packages),
 		limiter:    rate.NewLimiter(rate.Every(frameTime), compileRequestsPerFrame),
