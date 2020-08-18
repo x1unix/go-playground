@@ -35,6 +35,18 @@ const (
 	Snippet
 )
 
+// CompletionItemInsertTextRule is insert text insert rule.
+type CompletionItemInsertTextRule int
+
+const (
+	// KeepWhitespace is adjust whitespace/indentation of
+	// multiline insert texts to match the current line indentation.
+	KeepWhitespace CompletionItemInsertTextRule = 1
+
+	// InsertAsSnippet means that `insertText` is a snippet.
+	InsertAsSnippet CompletionItemInsertTextRule = 4
+)
+
 // CompletionItem is monaco-editor binding
 type CompletionItem struct {
 	// Label is item label
@@ -47,6 +59,9 @@ type CompletionItem struct {
 	Documentation interface{} `json:"documentation"`
 	// InsertText is text to be inserted
 	InsertText string `json:"insertText"`
+	// InsertTextRules is a string or snippet that should be inserted in a document
+	// when selecting this completion. When `falsy` the label in used.
+	InsertTextRules CompletionItemInsertTextRule `json:"insertTextRules,omitempty"`
 }
 
 // MarkdownString is monaco-editor string with markdown
