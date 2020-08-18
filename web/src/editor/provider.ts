@@ -52,13 +52,16 @@ class GoCompletionItemProvider implements monaco.languages.CompletionItemProvide
             return Promise.resolve({suggestions: []});
         }
 
+        // filter snippets by prefix.
+        // usually monaco does that but not always in right way
+        const relatedSnippets = snippets.filter(s => s.label.toString().startsWith(query.value))
         try {
             const resp = await this.client.getSuggestions(query);
-            resp.suggestions = resp.suggestions ? snippets.concat(resp.suggestions) : snippets;
+            resp.suggestions = resp.suggestions ? relatedSnippets.concat(resp.suggestions) : relatedSnippets;
             return resp;
         } catch (err) {
             console.error(`Failed to get code completion from server: ${err.message}`);
-            return {suggestions: snippets};
+            return {suggestions: relatedSnippets};
         }
     }
 }
