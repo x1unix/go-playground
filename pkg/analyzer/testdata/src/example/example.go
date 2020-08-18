@@ -77,3 +77,11 @@ func IfaceFunc() Action {
 func FuncReturnFuncAndIface() (func() (string, error), interface{ f() }) {
 	return nil, nil
 }
+
+// XXX is function example
+func XXX(a, b string) {
+
+}
+
+// FuncUnnamedParams is function with unnamed params
+func FuncUnnamedParams(string) {}
