@@ -46,6 +46,17 @@ export class Header extends React.Component<any, HeaderState> {
         };
     }
 
+    onKeyCommand = (e: KeyboardEvent) => {
+        switch (e.code) {
+            case 'F5':
+                e.preventDefault();
+                this.props.dispatch(runFileDispatcher);
+                return;
+            default:
+                return;
+        }
+    }
+
     componentDidMount(): void {
         const fileElement = document.createElement('input') as HTMLInputElement;
         fileElement.type = 'file';
@@ -59,6 +70,13 @@ export class Header extends React.Component<any, HeaderState> {
             if (!version) return;
             this.setState({showUpdateBanner: version !== config.appVersion});
         }).catch(err => console.warn('failed to check server API version: ', err));
+
+        // register keybindings
+        window.addEventListener('keydown', this.onKeyCommand)
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('keydown', this.onKeyCommand);
     }
 
     onItemSelect() {
@@ -91,7 +109,8 @@ export class Header extends React.Component<any, HeaderState> {
             {
                 key: 'run',
                 text: 'Run',
-                ariaLabel: 'Run',
+                ariaLabel: 'Run program (F5)',
+                title: 'Run program (F5)',
                 iconProps: {iconName: 'Play'},
                 disabled: this.props.loading,
                 onClick: () => {
