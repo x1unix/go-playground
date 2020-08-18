@@ -8,6 +8,6 @@ import (
 
 func TestNewDefaultClient(t *testing.T) {
 	c := NewDefaultClient()
-	require.Equal(t, c.baseUrl, playgroundUrl)
-	require.Equal(t, c.userAgent, defaultUserAgent)
+	require.Equal(t, c.baseUrl, DefaultPlaygroundURL)
+	require.Equal(t, c.userAgent, DefaultUserAgent)
 }

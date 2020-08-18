@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	defaultUserAgent = "goplay.tools/1.0 (http://goplay.tools/)"
-	playgroundUrl    = "https://play.golang.org"
+	DefaultUserAgent     = "goplay.tools/1.0 (http://goplay.tools/)"
+	DefaultPlaygroundURL = "https://play.golang.org"
 
 	// maxSnippetSize value taken from
 	// https://github.com/golang/playground/blob/master/app/goplay/share.go
@@ -50,7 +50,7 @@ func NewClient(baseUrl, userAgent string, timeout time.Duration) *Client {
 
 // NewDefaultClient returns Go Playground client with defaults
 func NewDefaultClient() *Client {
-	return NewClient(playgroundUrl, defaultUserAgent, 15*time.Second)
+	return NewClient(DefaultPlaygroundURL, DefaultUserAgent, 15*time.Second)
 }
 
 func (c *Client) newRequest(ctx context.Context, method, queryPath string, body io.Reader) (*http.Request, error) {
