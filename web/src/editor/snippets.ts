@@ -2,12 +2,7 @@ import * as monaco from 'monaco-editor';
 
 /* eslint-disable no-template-curly-in-string */
 
-// Import aliases
-type CompletionList = monaco.languages.CompletionList;
-type CompletionContext = monaco.languages.CompletionContext;
-type ITextModel = monaco.editor.ITextModel;
-type Position = monaco.Position;
-
+const Rule = monaco.languages.CompletionItemInsertTextRule;
 /**
  * List of snippets for editor
  */
@@ -121,7 +116,7 @@ const snippets = [
 
 ].map(s => ({
     kind: monaco.languages.CompletionItemKind.Snippet,
-    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+    insertTextRules: Rule.InsertAsSnippet,
     ...s,
 }));
 
