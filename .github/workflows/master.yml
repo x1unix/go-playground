@@ -12,6 +12,8 @@ on:
   release:
     types:
       - created
+  repository_dispatch:
+    types: manual-deploy
 
 jobs:
   deploy:
