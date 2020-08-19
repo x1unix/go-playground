@@ -20,9 +20,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set Release Version
-        run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF#refs/*/}
-      - name: Test
+      - name: Set release version
+        run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF#refs/*/v}
+      - name: Build Docker image
         run: |
-          echo $RELEASE_VERSION
-          echo ${{ env.RELEASE_VERSION }}
+          make docker-image TAG=${{ env.RELEASE_VERSION }} GTAG=${{ secrets.GTAG }}
+      - name: Deploy image to Docker hub
+        run: |
+          make docker-push-image TAG=${{ env.RELEASE_VERSION }} \
+            DOCKER_USER=${{ secrets.DOCKER_USER }} \
+            DOCKER_PASS=${{ secrets.DOCKER_PASS }}
