@@ -5,6 +5,8 @@ import {getTheme, IconButton } from 'office-ui-fabric-react';
 import {getContentStyles, getIconButtonStyles} from './styles/modal';
 import config from './services/config';
 
+import './ChangeLogModal.css';
+
 const TITLE_ID = 'ChangeLogTitle';
 const SUB_TITLE_ID = 'ChangeLogSubtitle';
 
@@ -36,19 +38,21 @@ export default function ChangeLogModal(props: ChangeLogModalProps) {
                 />
             </div>
             <div id={SUB_TITLE_ID}  className={contentStyles.body}>
-                <p>
-                    <b>Interface - Global</b>
-                    <ul>
-                        <li>Add <kbd>F5</kbd> hotkey for <b>Run</b> action</li>
-                    </ul>
-                </p>
-                <p>
-                    <b>Interface - Editor</b>
-                    <ul>
-                        <li>Suggest function arguments completion</li>
-                        <li>Fix snippets suggestion issue</li>
-                    </ul>
-                </p>
+                <b>Interface - Editor</b>
+                <ul>
+                    <li>
+                        <Link
+                            className='ChangeLogModal__issue-url'
+                            href='https://github.com/x1unix/go-playground/issues/40'
+                            target='_blank'
+                        >
+                            #40
+                        </Link>
+                        <span>Change hotkey for <b>Run Code</b> action - <kbd>Ctrl+Enter</kbd></span>
+                    </li>
+                    <li>Add hotkey for goimports - <kbd>Ctrl+Shift+F</kbd></li>
+                    <li>Add <b>Build And Run Code</b> and <b>goimports</b> commands to command palette.</li>
+                </ul>
                 <p>
                     And more!
                 </p>
