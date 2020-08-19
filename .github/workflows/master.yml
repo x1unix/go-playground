@@ -1,0 +1,26 @@
+#
+# Better Go Playground Docker image deployment workflow
+#
+# Builds and deploys image to Docker hub when a new release created.
+# Uses DOCKER_USER, DOCKER_PASS and GTAG env vars from GitHub repo secrets.
+#
+# see: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+#
+
+name: Deploy To Docker Hub
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set Release Version
+        run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF#refs/*/}
+      - name: Test
+        run: |
+          echo $RELEASE_VERSION
+          echo ${{ env.RELEASE_VERSION }}
