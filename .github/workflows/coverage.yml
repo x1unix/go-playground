@@ -1,0 +1,35 @@
+#
+# Code coverage report
+#
+# Reports tests code coverage to coveralls.
+# Uses COVERALLS_TOKEN env var from GitHub repo secrets.
+#
+# see: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+#
+
+name: Submit code coverage
+on:
+  push:
+    branches:
+      - master
+env:
+  GO111MODULE: on
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '^1.14.4'
+      - uses: actions/checkout@v2
+      - run: go version
+      - name: install
+        run: |
+          go get golang.org/x/tools/cmd/cover
+      - name: Test
+        run: cat tools/cover.txt | xargs go test -v -covermode=count -coverprofile=coverage.out
+      - name: Send coverage
+        uses: shogo82148/actions-goveralls@v1
+        with:
+          path-to-profile: coverage.out

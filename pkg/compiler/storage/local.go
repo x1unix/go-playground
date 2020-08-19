@@ -96,7 +96,7 @@ func (s LocalStorage) getOutputLocation(id ArtifactID) string {
 // HasItem implements storage interface
 func (s LocalStorage) HasItem(id ArtifactID) (bool, error) {
 	s.useLock.Lock()
-	s.useLock.Unlock()
+	defer s.useLock.Unlock()
 	fPath := s.getOutputLocation(id)
 	_, err := os.Stat(fPath)
 	if err != nil {

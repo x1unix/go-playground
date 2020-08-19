@@ -1,0 +1,25 @@
+#
+# Pull request check workflow
+#
+# Runs linter and tests on source branch to check code quality.
+#
+# see: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+#
+
+name: Check Pull Request
+on: [pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v1
+        with:
+          version: v1.27
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '^1.14.4'
+      - run: go version
+      - run: go test ./...

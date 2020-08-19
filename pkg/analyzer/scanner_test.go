@@ -10,7 +10,7 @@ import (
 
 // should be in sync with "testdata/src" !!!
 var examplePackageSummary = PackageSummary{
-	Functions: newSymbolIndex([]*CompletionItem{
+	Functions: NewSymbolIndex([]*CompletionItem{
 		{
 			Label:           "SomeFunc",
 			Kind:            Function,
@@ -71,7 +71,7 @@ var examplePackageSummary = PackageSummary{
 			Documentation:   NewMarkdownString("FuncUnnamedParams is function with unnamed params\n\n"),
 		},
 	}),
-	Values: newSymbolIndex([]*CompletionItem{
+	Values: NewSymbolIndex([]*CompletionItem{
 		{
 			Label:         "SomeConst",
 			Kind:          Constant,
