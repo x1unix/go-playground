@@ -13,7 +13,7 @@ func TestSymbolIndex(t *testing.T) {
 		{Label: "baz"},
 	}
 
-	index := newSymbolIndex(syms)
+	index := NewSymbolIndex(syms)
 	require.Equal(t, syms, index.Symbols)
 	require.Equal(t, len(syms), index.Len())
 

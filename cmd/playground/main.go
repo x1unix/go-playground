@@ -52,7 +52,7 @@ func main() {
 
 	flag.Parse()
 	l := getLogger(args.debug)
-	defer l.Sync()
+	defer l.Sync() //nolint:errcheck
 	if err := start(goRoot, args); err != nil {
 		l.Sugar().Fatal(err)
 	}
@@ -143,7 +143,6 @@ func startHttpServer(ctx context.Context, wg *sync.WaitGroup, server *http.Serve
 		if err := server.Shutdown(shutdownCtx); err != nil {
 			logger.Errorf("Could not gracefully shutdown the server: %v\n", err)
 		}
-		return
 	}()
 
 	wg.Add(1)

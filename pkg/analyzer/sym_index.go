@@ -20,7 +20,8 @@ func emptySymbolIndex() SymbolIndex {
 	}
 }
 
-func newSymbolIndex(items []*CompletionItem) SymbolIndex {
+// NewSymbolIndex creates a new symbol index from completion items
+func NewSymbolIndex(items []*CompletionItem) SymbolIndex {
 	idx := SymbolIndex{
 		Symbols: items,
 		nameMap: make(map[string]*CompletionItem, len(items)),

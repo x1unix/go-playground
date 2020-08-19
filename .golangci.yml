@@ -1,0 +1,5 @@
+run:
+  tests: false
+  skip-dirs:
+    - pkg/worker
+    - cmd/webworker

@@ -15,5 +15,4 @@ func ContainsError(t *testing.T, err error, msg string) {
 	if emsg := err.Error(); !strings.Contains(emsg, msg) {
 		t.Fatalf("error %q should include %q", emsg, msg)
 	}
-	return
 }

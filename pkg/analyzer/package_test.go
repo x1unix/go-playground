@@ -29,8 +29,8 @@ func TestPackage_SymbolByChar(t *testing.T) {
 	pkg := Package{
 		Synopsis: "test doc",
 		PackageSummary: PackageSummary{
-			Functions: newSymbolIndex(allFuncs),
-			Values:    newSymbolIndex(allSyms),
+			Functions: NewSymbolIndex(allFuncs),
+			Values:    NewSymbolIndex(allSyms),
 		},
 	}
 

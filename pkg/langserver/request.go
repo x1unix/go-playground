@@ -114,8 +114,7 @@ func WriteJSON(w http.ResponseWriter, i interface{}) {
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(data)
-	return
+	_, _ = w.Write(data)
 }
 
 func shouldFormatCode(r *http.Request) (bool, error) {
