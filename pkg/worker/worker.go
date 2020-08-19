@@ -1,3 +1,5 @@
+// +build js
+
 // Package worker contains Go web-worker WASM module bridge methods
 package worker
 
