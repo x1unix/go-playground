@@ -91,8 +91,8 @@ export class Header extends React.Component<any, HeaderState> {
             {
                 key: 'run',
                 text: 'Run',
-                ariaLabel: 'Run program (F5)',
-                title: 'Run program (F5)',
+                ariaLabel: 'Run program (Ctrl+Enter)',
+                title: 'Run program (Ctrl+Enter)',
                 iconProps: {iconName: 'Play'},
                 disabled: this.props.loading,
                 onClick: () => {
@@ -144,8 +144,8 @@ export class Header extends React.Component<any, HeaderState> {
             },
             {
                 key: 'format',
-                text: 'Format',
-                ariaLabel: 'Format',
+                text: 'Format Code',
+                ariaLabel: 'Format Code (Ctrl+Shift+F)',
                 iconOnly: true,
                 disabled: this.props.loading,
                 iconProps: {iconName: 'Code'},
