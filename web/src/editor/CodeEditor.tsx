@@ -1,7 +1,8 @@
 import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
-import {editor, default as monaco} from 'monaco-editor';
-import {Connect, newFileChangeAction} from '../store';
+import {editor} from 'monaco-editor';
+import * as monaco from 'monaco-editor';
+import {Connect, formatFileDispatcher, newFileChangeAction, runFileDispatcher} from '../store';
 import { Analyzer } from '../services/analyzer';
 
 import { LANGUAGE_GOLANG, stateToOptions } from './props';
@@ -32,6 +33,33 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
             console.info('Analyzer requires WebAssembly support');
         }
 
+        const actions = [
+            {
+                id: 'run-code',
+                label: 'Build And Run Code',
+                contextMenuGroupId: 'navigation',
+                keybindings: [
+                    monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter
+                ],
+                run: (ed, ...args) => {
+                    this.props.dispatch(runFileDispatcher);
+                }
+            },
+            {
+                id: 'format-code',
+                label: 'Format Code (goimports)',
+                contextMenuGroupId: 'navigation',
+                keybindings: [
+                    monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KEY_F
+                ],
+                run: (ed, ...args) => {
+                    this.props.dispatch(formatFileDispatcher);
+                }
+            }
+        ];
+
+        // Register custom actions
+        actions.forEach(action => editorInstance.addAction(action))
         editorInstance.focus();
     }
 
