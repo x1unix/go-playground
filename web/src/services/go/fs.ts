@@ -1,4 +1,4 @@
-import { NodeCallback } from './foundation';
+import { NodeCallback, enosys } from './foundation';
 
 export type FileDescriptor = number;
 
@@ -10,6 +10,29 @@ export interface IFileSystem {
     write(fd: FileDescriptor, buf: Uint8Array, offset: number, length: number, position: number, callback: NodeCallback<number>)
     open(path: string, flags, mode, callback)
     fsync(fd, callback)
+    chmod(path, mode, callback)
+    chown(path, uid, gid, callback)
+    close(fd, callback)
+    fchmod(fd, mode, callback)
+    fchown(fd, uid, gid, callback)
+    fstat(fd, callback)
+    fsync(fd, callback)
+    ftruncate(fd, length, callback)
+    lchown(path, uid, gid, callback)
+    link(path, link, callback)
+    lstat(path, callback)
+    mkdir(path, perm, callback)
+    open(path, flags, mode, callback)
+    read(fd, buffer, offset, length, position, callback)
+    readdir(path, callback)
+    readlink(path, callback)
+    rename(from, to, callback)
+    rmdir(path, callback)
+    stat(path, callback)
+    symlink(path, link, callback)
+    truncate(path, length, callback)
+    unlink(path, callback)
+    utimes(path, atime, mtime, callback)
 }
 
 /**
@@ -21,7 +44,9 @@ export interface IWriter {
 }
 
 /**
- * FileSystemWrapper is wrapper class for FS simulation
+ * FileSystemWrapper is file system stub implementation for browser
+ *
+ * Source: wasm_exec.js:39 in Go 1.14
  */
 export class FileSystemWrapper {
     descriptors = new Map<FileDescriptor, IWriter>();
@@ -42,9 +67,7 @@ export class FileSystemWrapper {
     writeSync(fd: FileDescriptor, buf: Uint8Array) {
         const writer = this.descriptors.get(fd);
         if (!writer) {
-            const err = new Error('not implemented');
-            err['code'] = 'ENOENT';
-            throw err;
+            throw enosys();
         }
 
         return writer.write(buf);
@@ -52,22 +75,20 @@ export class FileSystemWrapper {
 
     write(fd: FileDescriptor, buf: Uint8Array, offset: number, length: number, position: number, callback: NodeCallback<number>) {
         if (offset !== 0 || length !== buf.length || position !== null) {
-            throw new Error("not implemented");
+            callback(enosys(), null);
+            return;
         }
         const n = this.writeSync(fd, buf);
         callback(null, n);
     }
 
     open(path: string, flags, mode, callback) {
-        const err = new Error("not implemented");
-        err['code'] = "ENOSYS";
-        callback(err, null);
+        // TODO: implement file read-write
+        callback(enosys(), null);
     }
 
     read(fd: FileDescriptor, buffer, offset: number, length: number, position: number, callback: NodeCallback<any>) {
-        const err = new Error("not implemented");
-        err['code'] = "ENOSYS";
-        callback(err, null);
+        callback(enosys(), null);
     }
 
     fsync(fd, callback) {

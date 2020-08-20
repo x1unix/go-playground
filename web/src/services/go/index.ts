@@ -1,7 +1,11 @@
 import { FileSystemWrapper } from './fs';
-// import { Go, Global } from './go';
+import ProcessStub from './process';
+import { Global } from './go';
 import { Go } from './wasm_exec';
 import {StdioWrapper, ConsoleLogger} from './stdio';
+
+// TODO: Uncomment, when "go.ts" will be fixed
+// import { Go, Global } from './go';
 
 let instance: Go;
 let wrapper: StdioWrapper;
@@ -26,28 +30,20 @@ export const bootstrapGo = (logger: ConsoleLogger) => {
     // Wrap Go's calls to os.Stdout and os.Stderr
     wrapper = new StdioWrapper(logger);
 
-    // Monkey-patch global object to override some IO stuff (like FS)
-    const globalWrapper = window as any;
-    globalWrapper.global = window;
-    globalWrapper.fs = new FileSystemWrapper(wrapper.stdoutPipe, wrapper.stderrPipe);
-    globalWrapper.Go = Go;
+    // global overlay
+    const mocks = {
+        fs: new FileSystemWrapper(wrapper.stdoutPipe, wrapper.stderrPipe),
+        process: ProcessStub,
+        Go: Go,
+    };
 
-    // TODO: Uncomment, when "go.ts" will be fixed
-    // const mocks = {
-    //     fs: new FileSystemWrapper(w.stdoutPipe, w.stderrPipe),
-    //     Go: Go,
-    // };
-    //
-    // // Wrap global object to make it accessible to Go's wasm bridge
-    // const globalWrapper = new Proxy<Global>(window as any, {
-    //     has: (obj, prop) => prop in obj || prop in mocks,
-    //     get: (obj, prop) => {
-    //         console.log('go: get %s', prop);
-    //         return prop in obj ? obj[prop] : mocks[prop]
-    //     }
-    // });
-
-    // Create instance
-    // instance = new Go(globalWrapper);
-    instance = new Go();
+    // Wrap global object to make it accessible to Go's wasm bridge
+    const globalWrapper = new Proxy<Global>(window as any, {
+        has: (obj, prop) => prop in obj || prop in mocks,
+        get: (obj, prop) => {
+            console.log('go: get %s', prop);
+            return prop in obj ? obj[prop] : mocks[prop]
+        }
+    });
+    instance = new Go(globalWrapper);
 };
