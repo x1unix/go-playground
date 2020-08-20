@@ -1,7 +1,7 @@
 # Better Go Playground
 
 [![Docker Hub](https://img.shields.io/docker/pulls/x1unix/go-playground.svg)](https://hub.docker.com/r/x1unix/go-playground)
-[![Docker Hub](https://img.shields.io/docker/v/x1unix/go-playground.svg?sort=date)](https://hub.docker.com/r/x1unix/go-playground)
+[![Docker Hub](https://img.shields.io/docker/v/x1unix/go-playground.svg?sort=semver)](https://hub.docker.com/r/x1unix/go-playground)
 [![Build Status](https://travis-ci.org/x1unix/go-playground.svg?branch=master)](https://travis-ci.org/x1unix/go-playground) 
 [![Coverage Status](https://coveralls.io/repos/github/x1unix/go-playground/badge.svg?branch=dev)](https://coveralls.io/github/x1unix/go-playground?branch=dev)
 [![Goreportcard](https://goreportcard.com/badge/github.com/x1unix/go-playground)](https://goreportcard.com/report/github.com/x1unix/go-playground)
