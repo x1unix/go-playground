@@ -141,6 +141,9 @@ func startHttpServer(ctx context.Context, wg *sync.WaitGroup, server *http.Serve
 		defer wg.Done()
 		server.SetKeepAlivesEnabled(false)
 		if err := server.Shutdown(shutdownCtx); err != nil {
+			if err == context.Canceled {
+				return
+			}
 			logger.Errorf("Could not gracefully shutdown the server: %v\n", err)
 		}
 	}()
