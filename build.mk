@@ -1,3 +1,5 @@
+GO ?= go
+GOROOT ?= $(shell go env GOROOT)
 TOOLS ?= ./tools
 PUBLIC_DIR ?= $(UI)/public
 WEBWORKER_PKG ?= ./cmd/webworker
@@ -9,7 +11,7 @@ clean:
 # Build targets
 .PHONY: collect-meta
 collect-meta:
-	@node $(TOOLS)/collector
+	@$(GO) run $(TOOLS)/collector -goroot $(GOROOT) -out data/packages.json
 
 .PHONY:preinstall
 preinstall:
@@ -30,8 +32,8 @@ build-ui:
 .PHONY:build-webworker
 build-webworker:
 	@echo "Building Go Webworker module..." && \
-	GOOS=js GOARCH=wasm go build -o $(PUBLIC_DIR)/worker.wasm $(WEBWORKER_PKG) && \
-	cp "$$(go env GOROOT)/misc/wasm/wasm_exec.js" $(PUBLIC_DIR)
+	GOOS=js GOARCH=wasm $(GO) build -o $(PUBLIC_DIR)/worker.wasm $(WEBWORKER_PKG) && \
+	cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(PUBLIC_DIR)
 
 .PHONY: build
 build: clean preinstall collect-meta build-server build-webworker build-ui
