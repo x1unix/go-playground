@@ -40,4 +40,4 @@ build: clean preinstall collect-meta build-server build-webworker build-ui
 	@echo ":: Copying assets..." && \
 	cp -rfv ./data $(TARGET)/data && \
 	mv -v $(UI)/build $(TARGET)/public && \
-	echo ":: DONE!"
+	echo ":: Build done - $(TARGET)"
