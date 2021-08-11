@@ -6,7 +6,7 @@ WEBWORKER_PKG ?= ./cmd/webworker
 
 .PHONY: clean
 clean:
-	@echo ":: Cleanup..." && rm -rfv $(TARGET) && rm -rfv $(UI)/build
+	@echo ":: Cleanup..." && rm -rf $(TARGET) && rm -rf $(UI)/build
 
 # Build targets
 .PHONY: collect-meta
