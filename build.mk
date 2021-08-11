@@ -16,7 +16,6 @@ collect-meta:
 .PHONY:preinstall
 preinstall:
 	@echo "- Installing dependencies..."
-	cd $(TOOLS)/collector && npm install --silent
 	cd $(UI) && yarn install --silent
 
 .PHONY:build-server
