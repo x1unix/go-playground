@@ -10,7 +10,7 @@
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
     "axios": "^0.21.1",
-    "circular-dependency-plugin": "^5.2.0",
+    "circular-dependency-plugin": "^5.2.2",
     "connected-react-router": "^6.9.2",
     "file-saver": "^2.0.2",
     "monaco-editor": "^0.32.1",
