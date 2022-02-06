@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import {newSnippetLoadDispatcher} from "./store";
 import { connect } from 'react-redux';
 
-const Playground = connect()(function (props) {
+const Playground = connect()(function (props: any) {
     const {snippetID} = useParams();
     props.dispatch(newSnippetLoadDispatcher(snippetID));
 
