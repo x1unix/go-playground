@@ -77,7 +77,7 @@ class GoCompletionItemProvider implements monaco.languages.CompletionItemProvide
             return {
                 suggestions: relatedSnippets.concat(suggestions.map(s => ({...s, range})))
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error(`Failed to get code completion from server: ${err.message}`);
             return {suggestions: relatedSnippets};
         }

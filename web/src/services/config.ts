@@ -44,7 +44,7 @@ function setThemeStyles(isDark: boolean) {
 export const getVariableValue = (key: string, defaultValue: string) =>
     process.env[`REACT_APP_${key}`] ?? defaultValue;
 
-export default {
+const Config = {
     _cache: {},
     appVersion: getVariableValue('VERSION', '1.0.0'),
     serverUrl: getVariableValue('LANG_SERVER', window.location.origin),
@@ -142,6 +142,8 @@ export default {
     },
 
     forceRefreshPage() {
-        document.location.reload(true);
+        // document.location.reload(true);
     }
 };
+
+export default Config;
