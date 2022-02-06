@@ -28,7 +28,7 @@ export interface State {
 
 export function Connect(fn: (state: State) => any) {
     return function (constructor: Function) {
-        return connect(fn)(constructor);
+        return connect(fn)(constructor as any) as any;
     }
 }
 
