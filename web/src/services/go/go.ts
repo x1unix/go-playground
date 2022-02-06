@@ -190,10 +190,10 @@ export class Go {
                 if (!this.mem) return;
                 const code = this.mem.getInt32(sp + 8, true);
                 this.exited = true;
-                delete this._inst;
-                delete this._values;
-                delete this._goRefCounts;
-                delete this._ids;
+                delete this._inst; // @ts-ignore
+                delete this._values; // @ts-ignore
+                delete this._goRefCounts; // @ts-ignore
+                delete this._ids; // @ts-ignore
                 delete this._idPool;
                 this.exit(code);
             },

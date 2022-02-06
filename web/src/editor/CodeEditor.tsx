@@ -50,7 +50,7 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
                 label: 'Format Code (goimports)',
                 contextMenuGroupId: 'navigation',
                 keybindings: [
-                    monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KEY_F
+                    monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF
                 ],
                 run: (ed, ...args) => {
                     this.props.dispatch(formatFileDispatcher);

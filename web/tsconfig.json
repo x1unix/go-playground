@@ -20,6 +20,7 @@
     "jsx": "react",
     "noImplicitAny": false,
     "experimentalDecorators": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "src"

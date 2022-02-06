@@ -78,7 +78,7 @@ export function newSnippetLoadDispatcher(snippetID: string): Dispatcher {
             const resp = await client.getSnippet(snippetID);
             const { fileName, code } = resp;
             dispatch(newImportFileAction(fileName, code));
-        } catch(err) {
+        } catch(err: any) {
             dispatch(newErrorAction(err.message));
         }
     }
@@ -91,7 +91,7 @@ export const shareSnippetDispatcher: Dispatcher =
             const {code} = getState().editor;
             const res = await client.shareSnippet(code);
             dispatch(push(`/snippet/${res.snippetID}`));
-        } catch (err) {
+        } catch (err: any) {
             dispatch(newErrorAction(err.message));
         }
     };
@@ -132,7 +132,7 @@ export const runFileDispatcher: Dispatcher =
                 default:
                     dispatch(newErrorAction(`AppError: Unknown Go runtime type "${settings.runtime}"`));
             }
-        } catch (err) {
+        } catch (err: any) {
             dispatch(newErrorAction(err.message));
         }
     };
@@ -147,7 +147,7 @@ export const formatFileDispatcher: Dispatcher =
             if (res.formatted) {
                 dispatch(newBuildResultAction(res));
             }
-        } catch (err) {
+        } catch (err: any) {
             dispatch(newErrorAction(err.message));
         }
     };

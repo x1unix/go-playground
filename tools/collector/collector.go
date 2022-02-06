@@ -181,6 +181,10 @@ func analyzePackage(sdkDir, pathName string) ([]Package, error) {
 		}
 
 		pkg.Children, err = analyzeDir(sdkDir, pathName)
+		if err != nil {
+			return nil, fmt.Errorf("failed to analyze package %q: %w", pkg.Name, err)
+		}
+
 		pkgs = append(pkgs, pkg)
 	}
 	return pkgs, nil
