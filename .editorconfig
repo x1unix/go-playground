@@ -1,7 +1,7 @@
 # https://editorconfig.org
 root = true
 
-[*.{js,ts,css,less,scss}]
+[*.{js,ts,tsx,css,less,scss}]
 charset = utf-8
 end_of_line = lf
 indent_size = 2
