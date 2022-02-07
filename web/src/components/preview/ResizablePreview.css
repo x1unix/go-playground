@@ -1,0 +1,56 @@
+.ResizablePreview {
+  display: flex;
+  flex-direction: column;
+}
+
+.ResizablePreview .app-preview {
+  flex: 1 1 auto;
+}
+
+.ResizablePreview__handle--top:before {
+  content: '';
+  position: absolute;
+  background: var(--pg-handle-default-color);
+  transition: background-color 0.1s ease-in 0s;
+  top: 5px;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.ResizablePreview__handle--top {
+  transition: background-color 0.1s ease-in 0s;
+}
+
+.ResizablePreview__handle--top:hover:before,
+.ResizablePreview__handle--top:active:before {
+  background: var(--pg-handle-active-color);
+  height: 3px;
+}
+
+@media (hover: none), (pointer:coarse) {
+  .ResizablePreview__handle--top {
+    background: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ResizablePreview__handle--top:hover,
+  .ResizablePreview__handle--top:active {
+    background: var(--pg-handle-active-color);
+  }
+
+  .ResizablePreview__handle--top:before {
+    display: none;
+  }
+
+  .ResizablePreview__handle--top:after {
+    content: '';
+    background: #d3d3d3;
+    width: 25%;
+    height: 1px;
+    align-self: center;
+  }
+}

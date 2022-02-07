@@ -1,3 +1,7 @@
+GO ?= go
+GOROOT ?= $(shell go env GOROOT)
+GOPATH ?= $(shell go env GOPATH)
+
 PKG := ./cmd/playground
 UI := ./web
 TARGET := ./target
@@ -13,7 +17,7 @@ include docker.mk
 
 .PHONY:run
 run:
-	@go run $(PKG) -f ./data/packages.json -debug=$(DEBUG) -addr $(LISTEN_ADDR)
+	@GOROOT=$(GOROOT) $(GO) run $(PKG) -f ./data/packages.json -debug=$(DEBUG) -addr $(LISTEN_ADDR)
 
 .PHONY:ui
 ui:

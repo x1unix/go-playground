@@ -1,22 +1,22 @@
 import React from 'react';
-import './Preview.css';
-import {getDefaultFontFamily} from './services/fonts';
-import {Connect} from './store';
-import { RuntimeType } from './services/config';
-import {EvalEvent} from './services/api';
+import { getTheme } from '@uifabric/styling';
+import { MessageBar, MessageBarType } from 'office-ui-fabric-react';
+import { ProgressIndicator } from 'office-ui-fabric-react/lib/ProgressIndicator';
+import { getDefaultFontFamily } from '~/services/fonts';
+import { Connect } from '~/store';
+import { RuntimeType } from '~/services/config';
+import { EvalEvent } from '~/services/api';
 import EvalEventView from './EvalEventView';
-import {getTheme} from '@uifabric/styling';
-import {MessageBar, MessageBarType} from 'office-ui-fabric-react';
-import {ProgressIndicator} from 'office-ui-fabric-react/lib/ProgressIndicator';
+import './Preview.css';
 
-interface PreviewProps {
-    lastError?:string | null;
+export interface PreviewProps {
+    lastError?: string | null;
     events?: EvalEvent[]
     loading?: boolean
     runtime?: RuntimeType
 }
 
-@Connect(s => ({darkMode: s.settings.darkMode, runtime: s.settings.runtime, ...s.status}))
+@Connect(s => ({ darkMode: s.settings.darkMode, runtime: s.settings.runtime, ...s.status }))
 export default class Preview extends React.Component<PreviewProps> {
     get styles() {
         const { palette } = getTheme();
@@ -59,7 +59,7 @@ export default class Preview extends React.Component<PreviewProps> {
         }
 
         return <div className="app-preview" style={this.styles}>
-            <ProgressIndicator className={this.progressClass}/>
+            <ProgressIndicator className={this.progressClass} />
             <div className='app-preview__content'>
                 {content}
             </div>

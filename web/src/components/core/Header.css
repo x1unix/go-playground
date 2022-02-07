@@ -34,3 +34,10 @@
 .header__commandBar {
     flex: 1 1 auto;
 }
+
+@media only screen and (max-width: 600px) {
+  .header__logo {
+    height: 1em;
+    margin-left: 0;
+  }
+}

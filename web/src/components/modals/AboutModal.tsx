@@ -1,9 +1,9 @@
 import React from 'react';
 import { Modal } from 'office-ui-fabric-react/lib/Modal';
 import { Link } from 'office-ui-fabric-react/lib/Link';
-import {getTheme, IconButton, FontWeights, FontSizes, mergeStyleSets} from 'office-ui-fabric-react';
-import {getContentStyles, getIconButtonStyles} from './styles/modal';
-import config from './services/config';
+import { getTheme, IconButton, FontWeights, FontSizes, mergeStyleSets } from 'office-ui-fabric-react';
+import { getContentStyles, getIconButtonStyles } from '~/styles/modal';
+import config from '~/services/config';
 
 const TITLE_ID = 'AboutTitle';
 const SUB_TITLE_ID = 'AboutSubtitle';
@@ -31,7 +31,7 @@ export default function AboutModal(props: AboutModalProps) {
     const theme = getTheme();
     const contentStyles = getContentStyles(theme);
     const iconButtonStyles = getIconButtonStyles(theme);
-    
+
     return (
         <Modal
             titleAriaId={TITLE_ID}
@@ -48,7 +48,7 @@ export default function AboutModal(props: AboutModalProps) {
                     onClick={props.onClose as any}
                 />
             </div>
-            <div id={SUB_TITLE_ID}  className={contentStyles.body}>
+            <div id={SUB_TITLE_ID} className={contentStyles.body}>
                 <div className={modalStyles.title}>
                     Better Go Playground
                 </div>
@@ -61,4 +61,4 @@ export default function AboutModal(props: AboutModalProps) {
     )
 }
 
-AboutModal.defaultProps = {isOpen: false};
+AboutModal.defaultProps = { isOpen: false };

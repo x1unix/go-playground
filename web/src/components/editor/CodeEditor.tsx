@@ -1,9 +1,9 @@
 import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
-import {editor} from 'monaco-editor';
+import { editor } from 'monaco-editor';
 import * as monaco from 'monaco-editor';
-import {Connect, formatFileDispatcher, newFileChangeAction, runFileDispatcher} from '../store';
-import { Analyzer } from '../services/analyzer';
+import { Connect, formatFileDispatcher, newFileChangeAction, runFileDispatcher } from '~/store';
+import { Analyzer } from '~/services/analyzer';
 
 import { LANGUAGE_GOLANG, stateToOptions } from './props';
 
@@ -11,7 +11,7 @@ const ANALYZE_DEBOUNCE_TIME = 500;
 
 interface CodeEditorState {
     code?: string
-    loading?:boolean
+    loading?: boolean
 }
 
 @Connect(s => ({
