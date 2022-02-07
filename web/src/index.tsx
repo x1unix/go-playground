@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import { initializeIcons } from '@uifabric/icons';
+import { initializeIcons } from '@fluentui/react/lib/Icons';
 import * as serviceWorker from './serviceWorker';
 import {registerGoLanguageProvider} from './components/editor/provider';
 import apiClient from './services/api';

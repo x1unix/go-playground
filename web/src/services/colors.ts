@@ -1,5 +1,4 @@
-import { IPartialTheme } from '@uifabric/styling';
-import { DefaultPalette } from '@uifabric/styling';
+import { IPartialTheme, DefaultPalette } from '@fluentui/react';
 
 export const LightTheme: IPartialTheme = {
     palette: DefaultPalette,

@@ -1,8 +1,8 @@
 import React from 'react';
-import { Checkbox, Dropdown, getTheme, IconButton, IDropdownOption, Modal } from 'office-ui-fabric-react';
-import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
-import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
-import { Link } from 'office-ui-fabric-react/lib/Link';
+import { Checkbox, Dropdown, getTheme, IconButton, IDropdownOption, Modal } from '@fluentui/react';
+import { Pivot, PivotItem } from '@fluentui/react/lib/Pivot';
+import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
+import { Link } from '@fluentui/react/lib/Link';
 import { getContentStyles, getIconButtonStyles } from '../styles/modal';
 import SettingsProperty from './SettingsProperty';
 import { MonacoSettings, RuntimeType } from '../services/config';

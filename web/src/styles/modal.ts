@@ -3,7 +3,7 @@ import {
     FontSizes,
     mergeStyleSets,
     ITheme
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 
 export const getIconButtonStyles = (theme: ITheme) => mergeStyleSets({
     root: {

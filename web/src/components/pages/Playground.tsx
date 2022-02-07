@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from "react-router-dom";
+import { useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { newSnippetLoadDispatcher } from "~/store";
 import { Header } from '~/components/core/Header';

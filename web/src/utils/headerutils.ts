@@ -1,5 +1,5 @@
 import snippets, {Snippet, SnippetType} from '../services/go/snippets';
-import {ContextualMenuItemType, IContextualMenuItem, IIconProps} from "office-ui-fabric-react";
+import {ContextualMenuItemType, IContextualMenuItem, IIconProps} from '@fluentui/react';
 
 const snippetIconTypeMapping: {[type: string]: IIconProps} = {
     [SnippetType.Test]: {

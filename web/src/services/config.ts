@@ -1,4 +1,4 @@
-import {loadTheme} from '@uifabric/styling';
+import {loadTheme} from '@fluentui/react';
 import { DEFAULT_FONT } from './fonts';
 import {DarkTheme, LightTheme} from './colors';
 

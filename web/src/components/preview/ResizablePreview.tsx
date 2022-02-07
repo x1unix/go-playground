@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { getTheme } from '@uifabric/styling';
+import { getTheme } from '@fluentui/react';
 import { Resizable } from 're-resizable';
 import Preview from './Preview';
 

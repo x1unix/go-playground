@@ -2,7 +2,7 @@ import {
     FontWeights,
     FontSizes,
     mergeStyleSets
-} from 'office-ui-fabric-react';
+} from '@fluentui/react';
 
 export const settingsSectionStyles = mergeStyleSets({
     title: {

@@ -1,7 +1,6 @@
 import React from 'react';
-import { getTheme } from '@uifabric/styling';
-import { MessageBar, MessageBarType } from 'office-ui-fabric-react';
-import { ProgressIndicator } from 'office-ui-fabric-react/lib/ProgressIndicator';
+import { MessageBar, MessageBarType, getTheme } from '@fluentui/react';
+import { ProgressIndicator } from '@fluentui/react/lib/ProgressIndicator';
 import { getDefaultFontFamily } from '~/services/fonts';
 import { Connect } from '~/store';
 import { RuntimeType } from '~/services/config';

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Modal } from 'office-ui-fabric-react/lib/Modal';
-import { Link } from 'office-ui-fabric-react/lib/Link';
-import { getTheme, IconButton, FontWeights, FontSizes, mergeStyleSets } from 'office-ui-fabric-react';
+import { getTheme, IconButton, FontWeights, FontSizes, mergeStyleSets } from '@fluentui/react';
+import { Modal } from '@fluentui/react/lib/Modal';
+import { Link } from '@fluentui/react/lib/Link';
 import { getContentStyles, getIconButtonStyles } from '~/styles/modal';
 import config from '~/services/config';
 

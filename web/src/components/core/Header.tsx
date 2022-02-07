@@ -1,8 +1,7 @@
 import React from 'react';
-import { MessageBarButton } from 'office-ui-fabric-react';
-import { CommandBar, ICommandBarItemProps } from 'office-ui-fabric-react/lib/CommandBar';
-import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
-import { getTheme } from '@uifabric/styling';
+import { getTheme, MessageBarButton } from '@fluentui/react';
+import { CommandBar, ICommandBarItemProps } from '@fluentui/react/lib/CommandBar';
+import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 import SettingsModal, { SettingsChanges } from '~/settings/SettingsModal';
 import AboutModal from '~/components/modals/AboutModal';
 import config from '~/services/config';

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { Fabric } from 'office-ui-fabric-react/lib/Fabric';
 import { ConnectedRouter } from 'connected-react-router';
 import { Switch, Route } from "react-router-dom";
 
@@ -10,6 +9,7 @@ import { bootstrapGo } from './services/go';
 import Playground from '~/components/pages/Playground';
 import config from './services/config';
 import './App.css';
+import { ThemeProvider } from '@fluentui/react';
 
 // Configure store and import config from localStorage
 const store = configureStore();
@@ -22,14 +22,14 @@ function App() {
   return (
     <Provider store={store}>
       <ConnectedRouter history={history}>
-        <Fabric className="App">
+        <ThemeProvider className="App">
           <Switch>
             <Route
               path="/(snippet)?/:snippetID?"
               component={Playground}
             />
           </Switch>
-        </Fabric>
+        </ThemeProvider>
       </ConnectedRouter>
     </Provider>
   );
