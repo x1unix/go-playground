@@ -8,8 +8,8 @@ import { configureStore, createGoConsoleAdapter } from './store';
 import { history } from './store/configure';
 import { bootstrapGo } from './services/go';
 import Playground from '~/components/pages/Playground';
+import config from './services/config';
 import './App.css';
-import config from './services/config'
 
 // Configure store and import config from localStorage
 const store = configureStore();
@@ -19,20 +19,20 @@ config.sync();
 bootstrapGo(createGoConsoleAdapter(a => store.dispatch(a)));
 
 function App() {
-    return (
-        <Provider store={store}>
-            <ConnectedRouter history={history}>
-                <Fabric className="App">
-                    <Switch>
-                        <Route
-                            path="/(snippet)?/:snippetID?"
-                            component={Playground}
-                        />
-                    </Switch>
-                </Fabric>
-            </ConnectedRouter>
-        </Provider>
-    );
+  return (
+    <Provider store={store}>
+      <ConnectedRouter history={history}>
+        <Fabric className="App">
+          <Switch>
+            <Route
+              path="/(snippet)?/:snippetID?"
+              component={Playground}
+            />
+          </Switch>
+        </Fabric>
+      </ConnectedRouter>
+    </Provider>
+  );
 }
 
 export default App;
