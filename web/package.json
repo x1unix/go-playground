@@ -37,6 +37,7 @@
     "build": "GENERATE_SOURCEMAP=false craco build",
     "test": "craco test",
     "eject": "craco eject",
+    "lint": "npx eslint .",
     "gen:suggestions": "node ./src/editor/internal/genpkgcache.js"
   },
   "eslintConfig": {
@@ -56,5 +57,16 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint": "^8.8.0",
+    "eslint-config-react-app": "^7.0.0",
+    "eslint-plugin-flowtype": "^8.0.3",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jest": "^25.3.0",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.27.1",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "eslint-plugin-testing-library": "^5.0.1"
   }
 }

@@ -12,7 +12,31 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - id: go-cache-paths
+        run: |
+          echo "::set-output name=go-build::$(go env GOCACHE)"
+          echo "::set-output name=go-mod::$(go env GOMODCACHE)"
       - uses: actions/checkout@v2
+      - name: Go Build Cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.go-cache-paths.outputs.go-build }}
+          key: ${{ runner.os }}-go-build-${{ hashFiles('**/go.sum') }}
+      - name: Go Mod Cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.go-cache-paths.outputs.go-mod }}
+          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
+      - uses: actions/cache@v2
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - name: Install modules
+        run: yarn
+        working-directory: ./web
+      - name: Run ESLint
+        run: yarn lint
+        working-directory: ./web
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
@@ -20,6 +44,6 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v2
         with:
-          go-version: '^1.14.4'
+          go-version: "^1.14.4"
       - run: go version
       - run: go test ./...
