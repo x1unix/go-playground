@@ -19,8 +19,10 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
       - name: Install modules
         run: yarn
+        working-directory: ./web
       - name: Run ESLint
         run: yarn lint
+        working-directory: ./web
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
