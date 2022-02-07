@@ -1,9 +1,9 @@
 import React from 'react';
 import { Modal } from 'office-ui-fabric-react/lib/Modal';
 import { Link } from 'office-ui-fabric-react/lib/Link';
-import {getTheme, IconButton } from 'office-ui-fabric-react';
-import {getContentStyles, getIconButtonStyles} from './styles/modal';
-import config from './services/config';
+import { getTheme, IconButton } from 'office-ui-fabric-react';
+import { getContentStyles, getIconButtonStyles } from '~/styles/modal';
+import config from '~/services/config';
 
 import './ChangeLogModal.css';
 
@@ -37,7 +37,7 @@ export default function ChangeLogModal(props: ChangeLogModalProps) {
                     onClick={props.onClose as any}
                 />
             </div>
-            <div id={SUB_TITLE_ID}  className={contentStyles.body}>
+            <div id={SUB_TITLE_ID} className={contentStyles.body}>
                 <b>Interface - Editor</b>
                 <ul>
                     <li>
@@ -64,4 +64,4 @@ export default function ChangeLogModal(props: ChangeLogModalProps) {
     )
 }
 
-ChangeLogModal.defaultProps = {isOpen: false};
+ChangeLogModal.defaultProps = { isOpen: false };

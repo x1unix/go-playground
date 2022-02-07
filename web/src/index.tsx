@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import { initializeIcons } from '@uifabric/icons';
 import * as serviceWorker from './serviceWorker';
-import {registerGoLanguageProvider} from './editor/provider';
+import {registerGoLanguageProvider} from './components/editor/provider';
 import apiClient from './services/api';
 
 

@@ -13,7 +13,7 @@ import {
 import {State} from "./state";
 import client, {EvalEventKind, instantiateStreaming} from '../services/api';
 import config, {RuntimeType} from '../services/config';
-import {DEMO_CODE} from '../editor/props';
+import {DEMO_CODE} from '../components/editor/props';
 import {getImportObject, goRun} from '../services/go';
 
 export type StateProvider = () => State

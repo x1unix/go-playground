@@ -1,13 +1,13 @@
 import React from 'react';
-import {Checkbox, Dropdown, getTheme, IconButton, IDropdownOption, Modal} from 'office-ui-fabric-react';
-import {Pivot, PivotItem} from 'office-ui-fabric-react/lib/Pivot';
-import {MessageBar, MessageBarType} from 'office-ui-fabric-react/lib/MessageBar';
-import {Link} from 'office-ui-fabric-react/lib/Link';
-import {getContentStyles, getIconButtonStyles} from '../styles/modal';
+import { Checkbox, Dropdown, getTheme, IconButton, IDropdownOption, Modal } from 'office-ui-fabric-react';
+import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
+import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar';
+import { Link } from 'office-ui-fabric-react/lib/Link';
+import { getContentStyles, getIconButtonStyles } from '../styles/modal';
 import SettingsProperty from './SettingsProperty';
-import {MonacoSettings, RuntimeType} from '../services/config';
+import { MonacoSettings, RuntimeType } from '../services/config';
 import { DEFAULT_FONT, getAvailableFonts } from '../services/fonts';
-import {BuildParamsArgs, Connect, MonacoParamsChanges, SettingsState} from '../store';
+import { BuildParamsArgs, Connect, MonacoParamsChanges, SettingsState } from '~/store';
 
 const WASM_SUPPORTED = 'WebAssembly' in window;
 
@@ -21,24 +21,24 @@ const COMPILER_OPTIONS: IDropdownOption[] = [
 ];
 
 const CURSOR_BLINK_STYLE_OPTS: IDropdownOption[] = [
-    {key: 'blink', text: 'Blink (default)'},
-    {key: 'smooth', text: 'Smooth'},
-    {key: 'phase', text: 'Phase'},
-    {key: 'expand', text: 'Expand'},
-    {key: 'solid', text: 'Solid'},
+    { key: 'blink', text: 'Blink (default)' },
+    { key: 'smooth', text: 'Smooth' },
+    { key: 'phase', text: 'Phase' },
+    { key: 'expand', text: 'Expand' },
+    { key: 'solid', text: 'Solid' },
 ];
 
 const CURSOR_LINE_OPTS: IDropdownOption[] = [
-    {key: 'line', text: 'Line (default)'},
-    {key: 'block', text: 'Block'},
-    {key: 'underline', text: 'Underline'},
-    {key: 'line-thin', text: 'Line thin'},
-    {key: 'block-outline', text: 'Block outline'},
-    {key: 'underline-thin', text: 'Underline thin'},
+    { key: 'line', text: 'Line (default)' },
+    { key: 'block', text: 'Block' },
+    { key: 'underline', text: 'Underline' },
+    { key: 'line-thin', text: 'Line thin' },
+    { key: 'block-outline', text: 'Block outline' },
+    { key: 'underline-thin', text: 'Underline thin' },
 ];
 
 const FONT_OPTS: IDropdownOption[] = [
-    {key: DEFAULT_FONT, text: 'System default'},
+    { key: DEFAULT_FONT, text: 'System default' },
     ...getAvailableFonts().map(f => ({
         key: f.family,
         text: f.label,
@@ -81,7 +81,7 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
     }
 
     private onClose() {
-        this.props.onClose({...this.changes});
+        this.props.onClose({ ...this.changes });
         this.changes = {};
     }
 
@@ -118,7 +118,7 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
                         onClick={() => this.onClose()}
                     />
                 </div>
-                <div id={this.subtitleID}  className={contentStyles.body}>
+                <div id={this.subtitleID} className={contentStyles.body}>
                     <Pivot aria-label='Settings'>
                         <PivotItem headerText='Editor'>
                             <SettingsProperty
@@ -224,7 +224,7 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
                                 />}
                             />
                         </PivotItem>
-                        <PivotItem headerText='Build' style={{paddingBottom: '64px'}}>
+                        <PivotItem headerText='Build' style={{ paddingBottom: '64px' }}>
                             <SettingsProperty
                                 key='runtime'
                                 title='Runtime'
@@ -241,11 +241,11 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
                                             autoFormat: this.props.settings?.autoFormat ?? true,
                                         };
 
-                                        this.setState({showWarning: val?.key === RuntimeType.WebAssembly});
+                                        this.setState({ showWarning: val?.key === RuntimeType.WebAssembly });
                                     }}
                                 />}
                             />
-                            <div style={{visibility: this.wasmWarningVisibility, marginTop: '10px'}}>
+                            <div style={{ visibility: this.wasmWarningVisibility, marginTop: '10px' }}>
                                 <MessageBar isMultiline={true} messageBarType={MessageBarType.warning}>
                                     <b>WebAssembly</b> is a modern runtime that gives you additional features
                                     like possibility to interact with web browser but is unstable.
