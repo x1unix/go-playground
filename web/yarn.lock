@@ -3241,6 +3241,11 @@ cosmiconfig@^7, cosmiconfig@^7.0.0, cosmiconfig@^7.0.1:
     path-type "^4.0.0"
     yaml "^1.10.0"
 
+craco-alias@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/craco-alias/-/craco-alias-3.0.1.tgz#45e5cb338b222a7f62d17e398b54aff7cf1572af"
+  integrity sha512-N+Qaf/Gr/f3o5ZH2TQjMu5NhR9PnT1ZYsfejpNvZPpB0ujdrhsSr4Ct6GVjnV5ostCVquhTKJpIVBKyL9qDQYA==
+
 create-require@^1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/create-require/-/create-require-1.1.1.tgz#c1d7e8f1e5f6cfc9ff65f9cd352d37348756c333"
@@ -4282,6 +4287,11 @@ fast-levenshtein@^2.0.6, fast-levenshtein@~2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
   integrity sha1-PYpcZog6FqMMqGQ+hR8Zuqd5eRc=
+
+fast-memoize@^2.5.1:
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/fast-memoize/-/fast-memoize-2.5.2.tgz#79e3bb6a4ec867ea40ba0e7146816f6cdce9b57e"
+  integrity sha512-Ue0LwpDYErFbmNnZSF0UH6eImUwDmogUO1jyE+JbN2gsQz/jICm1Ve7t9QT0rNSsfJt+Hs4/S3GnsDVjL4HVrw==
 
 fastq@^1.6.0:
   version "1.13.0"
@@ -7252,6 +7262,13 @@ raw-body@2.4.2:
     http-errors "1.8.1"
     iconv-lite "0.4.24"
     unpipe "1.0.0"
+
+re-resizable@^6.9.1:
+  version "6.9.1"
+  resolved "https://registry.yarnpkg.com/re-resizable/-/re-resizable-6.9.1.tgz#6be082b55d02364ca4bfee139e04feebdf52441c"
+  integrity sha512-KRYAgr9/j1PJ3K+t+MBhlQ+qkkoLDJ1rs0z1heIWvYbCW/9Vq4djDU+QumJ3hQbwwtzXF6OInla6rOx6hhgRhQ==
+  dependencies:
+    fast-memoize "^2.5.1"
 
 react-app-polyfill@^3.0.0:
   version "3.0.0"
