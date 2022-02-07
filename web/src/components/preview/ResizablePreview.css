@@ -1,0 +1,9 @@
+.ResizablePreview {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.ResizablePreview .app-preview {
+  flex: 1 1 auto;
+}

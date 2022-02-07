@@ -9,7 +9,7 @@ import { EvalEvent } from '~/services/api';
 import EvalEventView from './EvalEventView';
 import './Preview.css';
 
-interface PreviewProps {
+export interface PreviewProps {
     lastError?: string | null;
     events?: EvalEvent[]
     loading?: boolean
