@@ -66,7 +66,7 @@ export function newBuildParamsChangeDispatcher(runtime: RuntimeType, autoFormat:
 }
 
 
-export function newSnippetLoadDispatcher(snippetID: string): Dispatcher {
+export function newSnippetLoadDispatcher(snippetID?: string): Dispatcher {
     return async(dispatch: DispatchFn, _: StateProvider) => {
         if (!snippetID) {
             dispatch(newImportFileAction('prog.go', DEMO_CODE));

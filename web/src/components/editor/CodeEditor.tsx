@@ -2,7 +2,7 @@ import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import { editor } from 'monaco-editor';
 import * as monaco from 'monaco-editor';
-import { Connect, formatFileDispatcher, newFileChangeAction, runFileDispatcher } from '~/store';
+import { Connect, formatFileDispatcher, newFileChangeAction, runFileDispatcher, newSnippetLoadDispatcher } from '~/store';
 import { Analyzer } from '~/services/analyzer';
 
 import { LANGUAGE_GOLANG, stateToOptions } from './props';
@@ -34,6 +34,14 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
     }
 
     const actions = [
+      {
+        id: 'clear',
+        label: 'Clear',
+        contextMenuGroupId: 'navigation',
+        run: () => {
+          this.props.dispatch(newSnippetLoadDispatcher());
+        }
+      },
       {
         id: 'run-code',
         label: 'Build And Run Code',
