@@ -8,8 +8,8 @@ import { history } from './store/configure';
 import { bootstrapGo } from './services/go';
 import Playground from '~/components/pages/Playground';
 import config from './services/config';
-import './App.css';
 import { ThemeProvider } from '@fluentui/react';
+import './App.css';
 
 // Configure store and import config from localStorage
 const store = configureStore();
