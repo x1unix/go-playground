@@ -251,7 +251,7 @@ export class Go {
         "syscall/js.valueGet": (sp) => {
           sp >>>= 0;
           const result = Reflect.get(loadValue(sp + 8), loadString(sp + 16));
-          sp = this._inst.exports.getsp(); // see comment above
+          sp = this._inst.exports.getsp() >>> 0; // see comment above
           storeValue(sp + 32, result);
         },
 
@@ -355,7 +355,7 @@ export class Go {
         // func valueInstanceOf(v ref, t ref) bool
         "syscall/js.valueInstanceOf": (sp) => {
           sp >>>= 0;
-          this.mem.setUint8(sp + 24, loadValue(sp + 8) instanceof loadValue(sp + 16));
+          this.mem.setUint8(sp + 24, (loadValue(sp + 8) instanceof loadValue(sp + 16)) ? 1 : 0);
         },
 
         // func copyBytesToGo(dst []byte, src ref) (int, bool)
