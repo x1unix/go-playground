@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 //
-// x1unix: Adapted original wasm_exec.js from Go 1.147SDK
+// x1unix: Adapted original wasm_exec.js from Go 1.17 SDK
 
 // Map multiple JavaScript environments to a single common API,
 // preferring web standards over Node.js API.
