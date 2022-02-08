@@ -40,10 +40,7 @@ export const bootstrapGo = (logger: ConsoleLogger) => {
   // Wrap global object to make it accessible to Go's wasm bridge
   const globalWrapper = new Proxy<Global>(window as any, {
     has: (obj, prop) => prop in obj || prop in mocks,
-    get: (obj, prop) => {
-      console.log('go: get %s', prop);
-      return prop in obj ? obj[prop] : mocks[prop]
-    }
+    get: (obj, prop) => prop in obj ? obj[prop] : mocks[prop]
   });
   instance = new Go(globalWrapper);
 };
