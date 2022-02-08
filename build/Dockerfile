@@ -1,4 +1,4 @@
-FROM node:13-alpine as ui-build
+FROM node:17-alpine as ui-build
 COPY web /tmp/web
 WORKDIR /tmp/web
 ARG APP_VERSION=1.0.0
@@ -32,4 +32,4 @@ COPY --from=build /tmp/playground/worker.wasm ./public
 COPY --from=build /tmp/playground/wasm_exec.js ./public
 EXPOSE 8000
 ENTRYPOINT /opt/playground/server -f=/opt/playground/data/packages.json -addr=:8000 \
-  -clean-interval=${APP_CLEAN_INTERVAL} -debug=${APP_DEBUG} -playground-url=${APP_PLAYGROUND_URL}
+    -clean-interval=${APP_CLEAN_INTERVAL} -debug=${APP_DEBUG} -playground-url=${APP_PLAYGROUND_URL}
