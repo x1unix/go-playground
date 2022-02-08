@@ -91,8 +91,8 @@ export const shareSnippetDispatcher: Dispatcher =
         try {
             const {code} = getState().editor;
             const {snippetID} = await client.shareSnippet(code);
-            dispatch(newUIStateChangeAction({shareCreated: true, snippetId: snippetID}));
             dispatch(push(`/snippet/${snippetID}`));
+            dispatch(newUIStateChangeAction({shareCreated: true, snippetId: snippetID}));
         } catch (err: any) {
             dispatch(newErrorAction(err.message));
         }
