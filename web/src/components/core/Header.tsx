@@ -161,6 +161,7 @@ export class Header extends React.Component<any, HeaderState> {
         key: 'changelog',
         text: 'What\'s new',
         ariaLabel: 'Changelog',
+        iconOnly: true,
         disabled: this.props.loading,
         iconProps: { iconName: 'Giftbox' },
         onClick: () => {
