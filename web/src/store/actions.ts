@@ -1,3 +1,4 @@
+import { UIState } from ".";
 import {RunResponse, EvalEvent} from "../services/api";
 import {MonacoSettings, RuntimeType} from "../services/config";
 
@@ -10,6 +11,7 @@ export enum ActionType {
     TOGGLE_THEME            = 'TOGGLE_THEME',
     BUILD_PARAMS_CHANGE     = 'BUILD_PARAMS_CHANGE',
     MONACO_SETTINGS_CHANGE  = 'MONACO_SETTINGS_CHANGE',
+    UI_STATE_CHANGE         = 'UI_STATE_CHANGE',
 
     // Special actions used by Go WASM bridge
     EVAL_START      = 'EVAL_START',
@@ -90,4 +92,10 @@ export const newProgramWriteAction = (event: EvalEvent) =>
     ({
         type: ActionType.EVAL_EVENT,
         payload: event
+    });
+
+export const newUIStateChangeAction = (changes: Partial<UIState>) =>
+    ({
+      type: ActionType.UI_STATE_CHANGE,
+      payload: changes
     });

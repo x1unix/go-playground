@@ -8,7 +8,8 @@ import {
     newImportFileAction,
     newLoadingAction, newMonacoParamsChangeAction,
     newProgramWriteAction,
-    newToggleThemeAction
+    newToggleThemeAction,
+    newUIStateChangeAction
 } from './actions';
 import {State} from "./state";
 import client, {EvalEventKind, instantiateStreaming} from '../services/api';
@@ -89,8 +90,9 @@ export const shareSnippetDispatcher: Dispatcher =
         dispatch(newLoadingAction());
         try {
             const {code} = getState().editor;
-            const res = await client.shareSnippet(code);
-            dispatch(push(`/snippet/${res.snippetID}`));
+            const {snippetID} = await client.shareSnippet(code);
+            dispatch(push(`/snippet/${snippetID}`));
+            dispatch(newUIStateChangeAction({shareCreated: true, snippetId: snippetID}));
         } catch (err: any) {
             dispatch(newErrorAction(err.message));
         }

@@ -7,9 +7,11 @@ import AboutModal from '~/components/modals/AboutModal';
 import config from '~/services/config';
 import api from '~/services/api';
 import { getSnippetsMenuItems, SnippetMenuItem } from '~/utils/headerutils';
-import ChangeLogModal from '@components/modals/ChangeLogModal';
+import ChangeLogModal from '~/components/modals/ChangeLogModal';
+import SharePopup from '~/components/utils/SharePopup';
 import {
   Connect,
+  Dispatcher,
   dispatchToggleTheme,
   formatFileDispatcher,
   newBuildParamsChangeDispatcher, newCodeImportDispatcher,
@@ -21,27 +23,46 @@ import {
 } from '~/store';
 import './Header.css';
 
+/**
+ * Uniquie class name for share button to use as popover target.
+ */
+const BTN_SHARE_CLASSNAME = 'Header__btn--share';
+
 interface HeaderState {
-  showSettings: boolean
-  showAbout: boolean
-  showChangelog: boolean
-  loading: boolean
-  showUpdateBanner: boolean
+  showSettings?: boolean
+  showAbout?: boolean
+  showChangelog?: boolean
+  loading?: boolean
+  showUpdateBanner?: boolean
+  showShareMessage?: boolean
 }
 
-@Connect(s => ({ darkMode: s.settings.darkMode, loading: s.status?.loading }))
+interface Props {
+  darkMode: boolean
+  loading: boolean
+  snippetName?: string
+  dispatch: (d: Dispatcher) => void
+}
+
+@Connect(({ settings, status, ui }) => ({
+  darkMode: settings.darkMode,
+  loading: status?.loading,
+  snippetName: ui?.shareCreated && ui?.snippetId
+}))
 export class Header extends React.Component<any, HeaderState> {
   private fileInput?: HTMLInputElement;
   private snippetMenuItems = getSnippetsMenuItems(i => this.onSnippetMenuItemClick(i));
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
     this.state = {
       showSettings: false,
       showAbout: false,
       showChangelog: false,
       loading: false,
-      showUpdateBanner: false
+      showUpdateBanner: false,
+      // showShareMessage: false
+      showShareMessage: true
     };
   }
 
@@ -70,6 +91,9 @@ export class Header extends React.Component<any, HeaderState> {
   }
 
   onSnippetMenuItemClick(item: SnippetMenuItem) {
+    // if (item.snippet) {
+    //   this.setState({ showShareMessage: true });
+    // }
     const dispatcher = item.snippet ? newSnippetLoadDispatcher(item.snippet) : newCodeImportDispatcher(item.label, item.text as string);
     this.props.dispatch(dispatcher);
   }
@@ -101,9 +125,11 @@ export class Header extends React.Component<any, HeaderState> {
       {
         key: 'share',
         text: 'Share',
+        className: BTN_SHARE_CLASSNAME,
         iconProps: { iconName: 'Share' },
         disabled: this.props.loading,
         onClick: () => {
+          this.setState({ showShareMessage: true });
           this.props.dispatch(shareSnippetDispatcher);
         }
       },
@@ -217,6 +243,9 @@ export class Header extends React.Component<any, HeaderState> {
   }
 
   render() {
+    const { showShareMessage } = this.state;
+    const { snippetName } = this.props;
+
     return <header className='header' style={this.styles}>
       <MessageBar
         className={this.state.showUpdateBanner ? 'app__update app__update--visible' : 'app__update'}
@@ -246,6 +275,12 @@ export class Header extends React.Component<any, HeaderState> {
         farItems={this.asideItems}
         overflowItems={this.overflowItems}
         ariaLabel='CodeEditor menu'
+      />
+      <SharePopup
+        visible={!!(showShareMessage && snippetName)}
+        target={`.${BTN_SHARE_CLASSNAME}`}
+        snippetId={snippetName}
+        onDismiss={() => this.setState({ showShareMessage: false })}
       />
       <SettingsModal onClose={(args) => this.onSettingsClose(args)} isOpen={this.state.showSettings} />
       <AboutModal onClose={() => this.setState({ showAbout: false })} isOpen={this.state.showAbout} />

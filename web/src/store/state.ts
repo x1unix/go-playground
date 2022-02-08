@@ -2,6 +2,11 @@ import { connect } from 'react-redux';
 import { EvalEvent } from '../services/api';
 import {MonacoSettings, RuntimeType} from '../services/config';
 
+export interface UIState {
+  shareCreated?: boolean
+  snippetId?: string | null
+}
+
 export interface EditorState {
     fileName: string,
     code: string
@@ -24,6 +29,7 @@ export interface State {
     status?: StatusState,
     settings: SettingsState
     monaco: MonacoSettings
+    ui?: UIState
 }
 
 export function Connect(fn: (state: State) => any) {

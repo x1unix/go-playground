@@ -51,16 +51,16 @@ export interface SettingsChanges {
 }
 
 export interface SettingsProps {
-    isOpen: boolean
+    isOpen?: boolean
     onClose: (changes: SettingsChanges) => void
     settings?: SettingsState
     monaco?: MonacoSettings
-    dispatch?: (Action) => void
+    dispatch?: (action) => void
 }
 
 interface SettingsModalState {
-    isOpen: boolean,
-    showWarning: boolean
+    isOpen?: boolean,
+    showWarning?: boolean
 }
 
 @Connect(state => ({
