@@ -44,15 +44,39 @@ export default function ChangeLogModal(props: ChangeLogModalProps) {
           <li>
             <Link
               className='ChangeLogModal__issue-url'
-              href='https://github.com/x1unix/go-playground/issues/40'
+              href='https://github.com/x1unix/go-playground/issues/81'
               target='_blank'
             >
-              #40
+              #81
             </Link>
-            <span>Change hotkey for <b>Run Code</b> action - <kbd>Ctrl+Enter</kbd></span>
+            <span>Add resizable application output</span>
           </li>
-          <li>Add hotkey for goimports - <kbd>Ctrl+Shift+F</kbd></li>
-          <li>Add <b>Build And Run Code</b> and <b>goimports</b> commands to command palette.</li>
+          <li>
+            <Link
+              className='ChangeLogModal__issue-url'
+              href='https://github.com/x1unix/go-playground/issues/60'
+              target='_blank'
+            >
+              #60
+            </Link>
+            <span>Add clear command</span>
+          </li>
+          <li>
+            <Link
+              className='ChangeLogModal__issue-url'
+              href='https://github.com/x1unix/go-playground/issues/6'
+              target='_blank'
+            >
+              #6
+            </Link>
+            <span>Add share snippet notification</span>
+          </li>
+          <li> Hide text in <i>What's new</i> button to save space on mobile devices.</li>
+          <li>Add PWA support.</li>
+        </ul>
+        <b>Compiler - WebAssembly</b>
+        <ul>
+          <li>Update SDK to Go 1.17.6</li>
         </ul>
         <p>
           And more!
