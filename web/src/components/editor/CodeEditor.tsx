@@ -36,7 +36,7 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
     const actions = [
       {
         id: 'clear',
-        label: 'Clear',
+        label: 'Reset contents',
         contextMenuGroupId: 'navigation',
         run: () => {
           this.props.dispatch(newSnippetLoadDispatcher());
