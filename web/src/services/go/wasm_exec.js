@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 //
-// x1unix: Adapted original wasm_exec.js from Go 1.14 SDK
+// x1unix: Adapted original wasm_exec.js from Go 1.147SDK
 
 // Map multiple JavaScript environments to a single common API,
 // preferring web standards over Node.js API.
@@ -14,6 +14,10 @@
 // - Parcel
 
 /* eslint-disable */
+
+// x1unix: globalThis predefined value ID.
+// Should be in sync with wasm_exec.js:406 and syscall/js.go:106
+const GLOBAL_PREDEF_VALUE_ID = 5;
 
 if (!global.TextEncoder) {
   global.TextEncoder = require("util").TextEncoder;
@@ -69,6 +73,16 @@ export class Go {
       }
 
       const id = this.mem.getUint32(addr, true);
+
+      // x1unix: intercept and replace globalThis with custom mock.
+      // See: wasm_exec.js:18
+      //
+      // Replacing "global" with custom mock at init (line: 410)
+      // breaks runtime so it should be done on demand.
+      if (id === GLOBAL_PREDEF_VALUE_ID) {
+        return this.global;
+      }
+
       return this._values[id];
     }
 
@@ -399,6 +413,7 @@ export class Go {
     if (!(instance instanceof WebAssembly.Instance)) {
       throw new Error("Go.run: WebAssembly.Instance expected");
     }
+
     this._inst = instance;
     this.mem = new DataView(this._inst.exports.mem.buffer);
     this._values = [ // JS values that Go currently has references to, indexed by reference id
@@ -491,5 +506,3 @@ export class Go {
     };
   }
 }
-//
-// global.Go = Go;
