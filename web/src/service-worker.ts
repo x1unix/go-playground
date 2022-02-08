@@ -69,6 +69,21 @@ registerRoute(
   })
 );
 
+// Cache WebAssembly and Go assets
+const goWasmAssetsRegExp = new RegExp('^/(wasm_exec.js|worker.wasm)$');
+const DAY_IN_SECONDS = 24 * 60 * 60;
+registerRoute(
+  ({ url }) => url.origin === self.location.origin && goWasmAssetsRegExp.test(url.pathname),
+  new StaleWhileRevalidate({
+    cacheName: 'wasm',
+    plugins: [
+      // Ensure that once this runtime cache reaches a maximum size the
+      // least-recently used images are removed.
+      new ExpirationPlugin({ maxAgeSeconds: 5 * DAY_IN_SECONDS }),
+    ],
+  })
+)
+
 // This allows the web app to trigger skipWaiting via
 // registration.waiting.postMessage({type: 'SKIP_WAITING'})
 self.addEventListener('message', (event) => {
