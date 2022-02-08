@@ -94,4 +94,25 @@ export class FileSystemWrapper {
   fsync(fd, callback) {
     callback(null);
   }
+
+  chmod(path, mode, callback) { callback(enosys()); }
+  chown(path, uid, gid, callback) { callback(enosys()); }
+  close(fd, callback) { callback(enosys()); }
+  fchmod(fd, mode, callback) { callback(enosys()); }
+  fchown(fd, uid, gid, callback) { callback(enosys()); }
+  fstat(fd, callback) { callback(enosys()); }
+  ftruncate(fd, length, callback) { callback(enosys()); }
+  lchown(path, uid, gid, callback) { callback(enosys()); }
+  link(path, link, callback) { callback(enosys()); }
+  lstat(path, callback) { callback(enosys()); }
+  mkdir(path, perm, callback) { callback(enosys()); }
+  readdir(path, callback) { callback(enosys()); }
+  readlink(path, callback) { callback(enosys()); }
+  rename(from, to, callback) { callback(enosys()); }
+  rmdir(path, callback) { callback(enosys()); }
+  stat(path, callback) { callback(enosys()); }
+  symlink(path, link, callback) { callback(enosys()); }
+  truncate(path, length, callback) { callback(enosys()); }
+  unlink(path, callback) { callback(enosys()); }
+  utimes(path, atime, mtime, callback) { callback(enosys()); }
 }
