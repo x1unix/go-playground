@@ -39,7 +39,7 @@ jobs:
           path: "**/node_modules"
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
       - name: Set release version
-        run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF#refs/*/v}
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
       - name: Build Docker image
         run: |
           make docker-image TAG=${{ env.RELEASE_VERSION }} GTAG=${{ secrets.GTAG }}
