@@ -1,12 +1,10 @@
 import React from 'react';
-import { getTheme, MessageBarButton } from '@fluentui/react';
+import { getTheme } from '@fluentui/react';
 import { CommandBar, ICommandBarItemProps } from '@fluentui/react/lib/CommandBar';
-import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 
 import SettingsModal, { SettingsChanges } from '~/components/settings/SettingsModal';
 import AboutModal from '~/components/modals/AboutModal';
 import config from '~/services/config';
-import api from '~/services/api';
 import { getSnippetsMenuItems, SnippetMenuItem } from '~/utils/headerutils';
 import ChangeLogModal from '~/components/modals/ChangeLogModal';
 import SharePopup from '~/components/utils/SharePopup';
@@ -34,7 +32,6 @@ interface HeaderState {
   showAbout?: boolean
   showChangelog?: boolean
   loading?: boolean
-  showUpdateBanner?: boolean
   showShareMessage?: boolean
 }
 
@@ -61,9 +58,7 @@ export class Header extends React.Component<any, HeaderState> {
       showAbout: false,
       showChangelog: false,
       loading: false,
-      showUpdateBanner: false,
-      // showShareMessage: false
-      showShareMessage: true
+      showShareMessage: false
     };
   }
 
@@ -73,13 +68,6 @@ export class Header extends React.Component<any, HeaderState> {
     fileElement.accept = '.go';
     fileElement.addEventListener('change', () => this.onItemSelect(), false);
     this.fileInput = fileElement;
-
-    // show update popover
-    api.getVersion().then(r => {
-      const { version } = r;
-      if (!version) return;
-      this.setState({ showUpdateBanner: version !== config.appVersion });
-    }).catch(err => console.warn('failed to check server API version: ', err));
   }
 
   onItemSelect() {
@@ -249,23 +237,6 @@ export class Header extends React.Component<any, HeaderState> {
     const { snippetName } = this.props;
 
     return <header className='header' style={this.styles}>
-      <MessageBar
-        className={this.state.showUpdateBanner ? 'app__update app__update--visible' : 'app__update'}
-        messageBarType={MessageBarType.warning}
-        onDismiss={() => this.setState({ showUpdateBanner: false })}
-        dismissButtonAriaLabel="Close"
-        isMultiline={false}
-        actions={
-          <div>
-            <MessageBarButton onClick={() => {
-              this.setState({ showUpdateBanner: false });
-              config.forceRefreshPage();
-            }}>Action</MessageBarButton>
-          </div>
-        }
-      >
-        Web application was updated, click <b>Reload</b> to apply changes
-      </MessageBar>
       <img
         src='/go-logo-blue.svg'
         className='header__logo'
