@@ -2,6 +2,7 @@ import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import { editor } from 'monaco-editor';
 import * as monaco from 'monaco-editor';
+
 import { Connect, formatFileDispatcher, newFileChangeAction, runFileDispatcher, newSnippetLoadDispatcher } from '~/store';
 import { Analyzer } from '~/services/analyzer';
 

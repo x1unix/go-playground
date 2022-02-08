@@ -2,7 +2,8 @@ import React from 'react';
 import { getTheme, MessageBarButton } from '@fluentui/react';
 import { CommandBar, ICommandBarItemProps } from '@fluentui/react/lib/CommandBar';
 import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
-import SettingsModal, { SettingsChanges } from '@components/settings/SettingsModal';
+
+import SettingsModal, { SettingsChanges } from '~/components/settings/SettingsModal';
 import AboutModal from '~/components/modals/AboutModal';
 import config from '~/services/config';
 import api from '~/services/api';

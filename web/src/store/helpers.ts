@@ -1,7 +1,7 @@
-import {Action, ActionType} from './actions';
+import { Action, ActionType } from './actions';
 
-export type Reducer<S,T> = (s: S, a: Action<T>) => S;
-export type ActionReducers<T> = {[k in keyof typeof ActionType | string]: Reducer<T, any>};
+export type Reducer<S, T> = (s: S, a: Action<T>) => S;
+export type ActionReducers<T> = { [k in keyof typeof ActionType | string]: Reducer<T, any> };
 
 /**
  * Maps reducers by action type
@@ -9,12 +9,12 @@ export type ActionReducers<T> = {[k in keyof typeof ActionType | string]: Reduce
  * @param initialState Initial state
  */
 export function mapByAction<T>(reducers: ActionReducers<T>, initialState: T): Reducer<T, any> {
-    return (state: T = initialState, action: Action) => {
-        if (reducers[action.type]) {
-            const newState = {...state};
-            return reducers[action.type](newState, action);
-        }
+  return (state: T = initialState, action: Action) => {
+    if (reducers[action.type]) {
+      const newState = { ...state };
+      return reducers[action.type](newState, action);
+    }
 
-        return state;
-    };
+    return state;
+  };
 }

@@ -6,41 +6,41 @@ export const STDOUT: FileDescriptor = 1;
 export const STDERR: FileDescriptor = 2;
 
 export interface IFileSystem {
-    writeSync(fd: FileDescriptor, buf: Uint8Array): number
-    write(fd: FileDescriptor, buf: Uint8Array, offset: number, length: number, position: number, callback: NodeCallback<number>)
-    open(path: string, flags, mode, callback)
-    fsync(fd, callback)
-    chmod(path, mode, callback)
-    chown(path, uid, gid, callback)
-    close(fd, callback)
-    fchmod(fd, mode, callback)
-    fchown(fd, uid, gid, callback)
-    fstat(fd, callback)
-    fsync(fd, callback)
-    ftruncate(fd, length, callback)
-    lchown(path, uid, gid, callback)
-    link(path, link, callback)
-    lstat(path, callback)
-    mkdir(path, perm, callback)
-    open(path, flags, mode, callback)
-    read(fd, buffer, offset, length, position, callback)
-    readdir(path, callback)
-    readlink(path, callback)
-    rename(from, to, callback)
-    rmdir(path, callback)
-    stat(path, callback)
-    symlink(path, link, callback)
-    truncate(path, length, callback)
-    unlink(path, callback)
-    utimes(path, atime, mtime, callback)
+  writeSync(fd: FileDescriptor, buf: Uint8Array): number
+  write(fd: FileDescriptor, buf: Uint8Array, offset: number, length: number, position: number, callback: NodeCallback<number>)
+  open(path: string, flags, mode, callback)
+  fsync(fd, callback)
+  chmod(path, mode, callback)
+  chown(path, uid, gid, callback)
+  close(fd, callback)
+  fchmod(fd, mode, callback)
+  fchown(fd, uid, gid, callback)
+  fstat(fd, callback)
+  fsync(fd, callback)
+  ftruncate(fd, length, callback)
+  lchown(path, uid, gid, callback)
+  link(path, link, callback)
+  lstat(path, callback)
+  mkdir(path, perm, callback)
+  open(path, flags, mode, callback)
+  read(fd, buffer, offset, length, position, callback)
+  readdir(path, callback)
+  readlink(path, callback)
+  rename(from, to, callback)
+  rmdir(path, callback)
+  stat(path, callback)
+  symlink(path, link, callback)
+  truncate(path, length, callback)
+  unlink(path, callback)
+  utimes(path, atime, mtime, callback)
 }
 
 /**
  * IWriter is abstract writer interface
  */
 export interface IWriter {
-    // write writes data and returns written bytes count
-    write(data: Uint8Array): number
+  // write writes data and returns written bytes count
+  write(data: Uint8Array): number
 }
 
 /**
@@ -49,49 +49,49 @@ export interface IWriter {
  * Source: wasm_exec.js:39 in Go 1.14
  */
 export class FileSystemWrapper {
-    descriptors = new Map<FileDescriptor, IWriter>();
-    readonly constants = {
-        O_WRONLY: -1,
-        O_RDWR: -1,
-        O_CREAT: -1,
-        O_TRUNC: -1,
-        O_APPEND: -1,
-        O_EXCL: -1
-    };
+  descriptors = new Map<FileDescriptor, IWriter>();
+  readonly constants = {
+    O_WRONLY: -1,
+    O_RDWR: -1,
+    O_CREAT: -1,
+    O_TRUNC: -1,
+    O_APPEND: -1,
+    O_EXCL: -1
+  };
 
-    constructor(stdout: IWriter, stderr: IWriter) {
-        this.descriptors.set(STDERR, stderr);
-        this.descriptors.set(STDOUT, stdout);
+  constructor(stdout: IWriter, stderr: IWriter) {
+    this.descriptors.set(STDERR, stderr);
+    this.descriptors.set(STDOUT, stdout);
+  }
+
+  writeSync(fd: FileDescriptor, buf: Uint8Array) {
+    const writer = this.descriptors.get(fd);
+    if (!writer) {
+      throw enosys();
     }
 
-    writeSync(fd: FileDescriptor, buf: Uint8Array) {
-        const writer = this.descriptors.get(fd);
-        if (!writer) {
-            throw enosys();
-        }
+    return writer.write(buf);
+  }
 
-        return writer.write(buf);
+  write(fd: FileDescriptor, buf: Uint8Array, offset: number, length: number, position: number, callback: NodeCallback<number>) {
+    if (offset !== 0 || length !== buf.length || position !== null) {
+      callback(enosys(), null);
+      return;
     }
+    const n = this.writeSync(fd, buf);
+    callback(null, n);
+  }
 
-    write(fd: FileDescriptor, buf: Uint8Array, offset: number, length: number, position: number, callback: NodeCallback<number>) {
-        if (offset !== 0 || length !== buf.length || position !== null) {
-            callback(enosys(), null);
-            return;
-        }
-        const n = this.writeSync(fd, buf);
-        callback(null, n);
-    }
+  open(path: string, flags, mode, callback) {
+    // TODO: implement file read-write
+    callback(enosys(), null);
+  }
 
-    open(path: string, flags, mode, callback) {
-        // TODO: implement file read-write
-        callback(enosys(), null);
-    }
+  read(fd: FileDescriptor, buffer, offset: number, length: number, position: number, callback: NodeCallback<any>) {
+    callback(enosys(), null);
+  }
 
-    read(fd: FileDescriptor, buffer, offset: number, length: number, position: number, callback: NodeCallback<any>) {
-        callback(enosys(), null);
-    }
-
-    fsync(fd, callback) {
-        callback(null);
-    }
+  fsync(fd, callback) {
+    callback(null);
+  }
 }

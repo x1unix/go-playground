@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { getTheme } from '@fluentui/react';
 import { Resizable } from 're-resizable';
-import Preview from './Preview';
 
+import Preview from './Preview';
 import './ResizablePreview.css';
 
 const DEFAULT_HEIGHT_PX = 300;

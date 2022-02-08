@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import { EvalEvent } from '../services/api';
-import {MonacoSettings, RuntimeType} from '../services/config';
+import { EvalEvent } from '~/services/api';
+import { MonacoSettings, RuntimeType } from '~/services/config';
 
 export interface UIState {
   shareCreated?: boolean
@@ -8,34 +8,34 @@ export interface UIState {
 }
 
 export interface EditorState {
-    fileName: string,
-    code: string
+  fileName: string,
+  code: string
 }
 
 export interface StatusState {
-    loading: boolean,
-    lastError?: string | null,
-    events?: EvalEvent[]
+  loading: boolean,
+  lastError?: string | null,
+  events?: EvalEvent[]
 }
 
 export interface SettingsState {
-    darkMode: boolean
-    autoFormat: boolean,
-    runtime: RuntimeType,
+  darkMode: boolean
+  autoFormat: boolean,
+  runtime: RuntimeType,
 }
 
 export interface State {
-    editor: EditorState
-    status?: StatusState,
-    settings: SettingsState
-    monaco: MonacoSettings
-    ui?: UIState
+  editor: EditorState
+  status?: StatusState,
+  settings: SettingsState
+  monaco: MonacoSettings
+  ui?: UIState
 }
 
 export function Connect(fn: (state: State) => any) {
-    return function (constructor: Function) {
-        return connect(fn)(constructor as any) as any;
-    }
+  return function (constructor: Function) {
+    return connect(fn)(constructor as any) as any;
+  }
 }
 
 

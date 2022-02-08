@@ -9,16 +9,16 @@ const CWD_STUB = '/';
  * Source: wasm_exec.js:87 in Go 1.14
  */
 const ProcessStub = {
-    getuid() { return PROCID_STUB; },
-    getgid() { return PROCID_STUB; },
-    geteuid() { return PROCID_STUB; },
-    getegid() { return PROCID_STUB; },
-    getgroups() { throw enosys(); },
-    pid: PROCID_STUB,
-    ppid: PROCID_STUB,
-    umask() { throw enosys(); },
-    cwd() { return CWD_STUB },
-    chdir() { throw enosys(); },
+  getuid() { return PROCID_STUB; },
+  getgid() { return PROCID_STUB; },
+  geteuid() { return PROCID_STUB; },
+  getegid() { return PROCID_STUB; },
+  getgroups() { throw enosys(); },
+  pid: PROCID_STUB,
+  ppid: PROCID_STUB,
+  umask() { throw enosys(); },
+  cwd() { return CWD_STUB },
+  chdir() { throw enosys(); },
 } as any
 
 export default ProcessStub as NodeJS.Process;
