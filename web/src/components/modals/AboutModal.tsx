@@ -9,7 +9,7 @@ const TITLE_ID = 'AboutTitle';
 const SUB_TITLE_ID = 'AboutSubtitle';
 
 interface AboutModalProps {
-    isOpen: boolean
+    isOpen?: boolean
     onClose: () => void
 }
 

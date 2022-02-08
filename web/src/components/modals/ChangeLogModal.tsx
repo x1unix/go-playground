@@ -11,7 +11,7 @@ const TITLE_ID = 'ChangeLogTitle';
 const SUB_TITLE_ID = 'ChangeLogSubtitle';
 
 interface ChangeLogModalProps {
-    isOpen: boolean
+    isOpen?: boolean
     onClose: () => void
 }
 

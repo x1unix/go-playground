@@ -12,6 +12,7 @@ import {RunResponse, EvalEvent} from '../services/api';
 import localConfig, {MonacoSettings, RuntimeType} from '../services/config'
 import {mapByAction} from './helpers';
 import config from "../services/config";
+import { UIState } from '.';
 
 const reducers = {
     editor: mapByAction<EditorState>({
@@ -84,7 +85,26 @@ const reducers = {
         [ActionType.MONACO_SETTINGS_CHANGE]: (s: MonacoSettings, a: Action<MonacoParamsChanges>) => {
             return Object.assign({}, s, a.payload);
         }
-    }, config.monacoSettings)
+    }, config.monacoSettings),
+    ui: mapByAction<UIState>({
+      [ActionType.LOADING]: (s: UIState, _: Action<Partial<UIState>>) => {
+        if (!s) {
+          return {shareCreated: false, snippetId: null};
+        }
+
+        return {
+          ...s,
+          shareCreated: false, snippetId: null
+        };
+      },
+      [ActionType.UI_STATE_CHANGE]: (s: UIState, {payload}: Action<Partial<UIState>>) => {
+        if (!s) {
+          return payload as UIState;
+        }
+
+        return { ...s, ...payload};
+      }
+    }, {})
 };
 
 export const getInitialState = (): State => ({
