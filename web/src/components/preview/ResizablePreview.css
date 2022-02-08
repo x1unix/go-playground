@@ -8,7 +8,7 @@
 }
 
 .ResizablePreview__handle--top:before {
-  content: '';
+  content: "";
   position: absolute;
   background: var(--pg-handle-default-color);
   transition: background-color 0.1s ease-in 0s;
@@ -28,7 +28,7 @@
   height: 3px;
 }
 
-@media (hover: none), (pointer:coarse) {
+@media (hover: none), (pointer: coarse) {
   .ResizablePreview__handle--top {
     background: black;
     display: flex;
@@ -47,7 +47,7 @@
   }
 
   .ResizablePreview__handle--top:after {
-    content: '';
+    content: "";
     background: #d3d3d3;
     width: 25%;
     height: 1px;

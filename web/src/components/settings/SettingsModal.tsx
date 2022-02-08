@@ -3,6 +3,7 @@ import { Checkbox, Dropdown, getTheme, IconButton, IDropdownOption, Modal } from
 import { Pivot, PivotItem } from '@fluentui/react/lib/Pivot';
 import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 import { Link } from '@fluentui/react/lib/Link';
+
 import { getContentStyles, getIconButtonStyles } from '~/styles/modal';
 import SettingsProperty from './SettingsProperty';
 import { MonacoSettings, RuntimeType } from '~/services/config';
