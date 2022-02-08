@@ -6,7 +6,7 @@ const CWD_STUB = '/';
 /**
  * Minimal NodeJS.Process implementation for wasm_exec.js
  *
- * Source: wasm_exec.js:87 in Go 1.14
+ * Source: wasm_exec.js:87 in Go 1.17
  */
 const ProcessStub = {
   getuid() { return PROCID_STUB; },
