@@ -45,17 +45,50 @@ func (ts testStorage) CreateLocationAndDo(id storage.ArtifactID, data []byte, cb
 }
 
 func TestBuildService_GetArtifact(t *testing.T) {
-	aid := storage.ArtifactID("test")
-	ts := testStorage{
-		getItem: func(id storage.ArtifactID) (io.ReadCloser, error) {
-			require.Equal(t, aid, id)
-			return &testReadCloser{}, nil
+	cases := map[string]struct {
+		artifactID storage.ArtifactID
+		wantErr    string
+		beforeRun  func(t *testing.T) storage.StoreProvider
+	}{
+		"works": {
+			artifactID: "test",
+			beforeRun: func(t *testing.T) storage.StoreProvider {
+				return testStorage{
+					getItem: func(id storage.ArtifactID) (io.ReadCloser, error) {
+						require.Equal(t, "test", string(id))
+						return &testReadCloser{}, nil
+					},
+				}
+			},
+		},
+		"handle error": {
+			artifactID: "foobar",
+			wantErr:    "test error",
+			beforeRun: func(t *testing.T) storage.StoreProvider {
+				return testStorage{
+					getItem: func(id storage.ArtifactID) (io.ReadCloser, error) {
+						require.Equal(t, "foobar", string(id))
+						return nil, errors.New("test error")
+					},
+				}
+			},
 		},
 	}
-	bs := NewBuildService(zaptest.NewLogger(t).Sugar(), ts)
-	got, err := bs.GetArtifact(aid)
-	require.NoError(t, err)
-	require.NotNil(t, got)
+
+	for k, v := range cases {
+		t.Run(k, func(t *testing.T) {
+			ts := v.beforeRun(t)
+			bs := NewBuildService(zaptest.NewLogger(t).Sugar(), ts)
+			got, err := bs.GetArtifact(v.artifactID)
+			if v.wantErr != "" {
+				require.Error(t, err)
+				require.EqualError(t, err, v.wantErr)
+				return
+			}
+			require.NoError(t, err)
+			require.NotNil(t, got)
+		})
+	}
 }
 
 func TestBuildService_Build(t *testing.T) {
@@ -67,6 +100,7 @@ func TestBuildService_Build(t *testing.T) {
 		data         []byte
 		wantErr      string
 		wantResult   *Result
+		beforeRun    func(t *testing.T)
 		onErrorCheck func(t *testing.T, err error)
 		store        func(t *testing.T) (storage.StoreProvider, func() error)
 	}{
@@ -109,6 +143,17 @@ func TestBuildService_Build(t *testing.T) {
 				require.True(t, ok, "expected compiler error")
 			},
 		},
+		"bad environment": {
+			wantErr: `executable file not found`,
+			store: func(t *testing.T) (storage.StoreProvider, func() error) {
+				t.Setenv("PATH", ".")
+				s, err := storage.NewLocalStorage(zaptest.NewLogger(t).Sugar(), tempDir)
+				require.NoError(t, err)
+				return s, func() error {
+					return os.RemoveAll(tempDir)
+				}
+			},
+		},
 	}
 
 	for n, c := range cases {
@@ -116,6 +161,10 @@ func TestBuildService_Build(t *testing.T) {
 			continue
 		}
 		t.Run(n, func(t *testing.T) {
+			if c.beforeRun != nil {
+				c.beforeRun(t)
+			}
+
 			store, cancel := c.store(t)
 			if cancel != nil {
 				defer func() {
