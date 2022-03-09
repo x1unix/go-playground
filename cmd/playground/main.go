@@ -44,15 +44,15 @@ func main() {
 	flag.StringVar(&args.playgroundUrl, "playground-url", goplay.DefaultPlaygroundURL, "Go Playground URL")
 	flag.BoolVar(&args.debug, "debug", false, "Enable debug mode")
 
-	goRoot, ok := os.LookupEnv("GOROOT")
-	if !ok {
-		fmt.Println("environment variable GOROOT is not defined")
-		os.Exit(1)
-	}
-
-	flag.Parse()
 	l := getLogger(args.debug)
 	defer l.Sync() //nolint:errcheck
+	flag.Parse()
+
+	goRoot, err := compiler.GOROOT()
+	if err != nil {
+		l.Fatal("failed to find GOROOT environment variable value", zap.Error(err))
+	}
+
 	if err := start(goRoot, args); err != nil {
 		l.Sugar().Fatal(err)
 	}

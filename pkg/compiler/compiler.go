@@ -7,7 +7,6 @@ import (
 	"go.uber.org/zap"
 	"io"
 	"os"
-	"os/exec"
 )
 
 var buildArgs = []string{
@@ -38,13 +37,7 @@ func NewBuildService(log *zap.SugaredLogger, store storage.StoreProvider) BuildS
 }
 
 func (s BuildService) buildSource(ctx context.Context, outputLocation, sourceLocation string) error {
-	cmd := exec.CommandContext(ctx, "go",
-		"build",
-		"-o",
-		outputLocation,
-		sourceLocation,
-	)
-
+	cmd := newGoToolCommand(ctx, "build", "-o", outputLocation, sourceLocation)
 	cmd.Env = buildArgs
 	buff := &bytes.Buffer{}
 	cmd.Stderr = buff
