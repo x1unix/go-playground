@@ -27,7 +27,7 @@ type IndexFileServer struct {
 }
 
 // NewIndexFileServer returns handler which serves index.html page from root.
-func NewIndexFileServer(root http.Dir) *IndexFileServer {
+func NewIndexFileServer(root string) *IndexFileServer {
 	return &IndexFileServer{
 		indexFilePath: filepath.Join(string(root), IndexFileName),
 	}
@@ -39,7 +39,7 @@ func (fs IndexFileServer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 // SpaFileServer is a wrapper around http.FileServer for serving SPA contents.
 type SpaFileServer struct {
-	root            http.Dir
+	root            string
 	NotFoundHandler http.Handler
 }
 
@@ -51,7 +51,7 @@ func (fs *SpaFileServer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	//if empty, set current directory
-	dir := string(fs.root)
+	dir := fs.root
 	if dir == "" {
 		dir = "."
 	}
@@ -93,8 +93,8 @@ func containsDotDot(v string) bool {
 func isSlashRune(r rune) bool { return r == '/' || r == '\\' }
 
 // NewSpaFileServer returns SPA handler
-func NewSpaFileServer(root http.Dir) *SpaFileServer {
-	notFoundHandler := NewFileServerWithStatus(filepath.Join(string(root), NotFoundFileName), http.StatusNotFound)
+func NewSpaFileServer(root string) *SpaFileServer {
+	notFoundHandler := NewFileServerWithStatus(filepath.Join(root, NotFoundFileName), http.StatusNotFound)
 	return &SpaFileServer{
 		NotFoundHandler: notFoundHandler,
 		root:            root,
