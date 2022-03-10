@@ -17,7 +17,7 @@ include docker.mk
 
 .PHONY:run
 run:
-	@GOROOT=$(GOROOT) $(GO) run $(PKG) -f ./data/packages.json -debug=$(DEBUG) -addr $(LISTEN_ADDR)
+	@GOROOT=$(GOROOT) $(GO) run $(PKG) -f ./data/packages.json -static-dir="$(UI)/build" -debug=$(DEBUG) -addr $(LISTEN_ADDR)
 
 .PHONY:ui
 ui:
