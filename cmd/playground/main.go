@@ -103,9 +103,20 @@ func start(goRoot string, args appArgs) error {
 
 	r := mux.NewRouter()
 	pg := goplay.NewClient(args.playgroundUrl, goplay.DefaultUserAgent, 15*time.Second)
+
+	// API routes
 	langserver.New(Version, pg, packages, compiler.NewBuildService(zap.S(), store)).
 		Mount(r.PathPrefix("/api").Subrouter())
-	r.PathPrefix("/").Handler(langserver.SpaFileServer("./public"))
+
+	// Web UI routes
+	indexHandler := langserver.NewIndexFileServer("./public")
+	spaHandler := langserver.NewSpaFileServer("./public")
+	r.Path("/").
+		Handler(indexHandler)
+	r.Path("/snippet/{snippetID:[A-Za-z0-9_-]+}").
+		Handler(indexHandler)
+	r.PathPrefix("/").
+		Handler(spaHandler)
 
 	var handler http.Handler
 	if args.debug {
