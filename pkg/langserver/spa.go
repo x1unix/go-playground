@@ -8,16 +8,45 @@ import (
 	"strings"
 )
 
-// Advanced static server
-type spaFileServer struct {
+const (
+	IndexFileName    = "index.html"
+	NotFoundFileName = "404.html"
+)
+
+type httpStatusInterceptor struct {
+	http.ResponseWriter
+	desiredStatus int
+}
+
+func (i httpStatusInterceptor) WriteHeader(_ int) {
+	i.ResponseWriter.WriteHeader(i.desiredStatus)
+}
+
+type IndexFileServer struct {
+	indexFilePath string
+}
+
+// NewIndexFileServer returns handler which serves index.html page from root.
+func NewIndexFileServer(root http.Dir) *IndexFileServer {
+	return &IndexFileServer{
+		indexFilePath: filepath.Join(string(root), IndexFileName),
+	}
+}
+
+func (fs IndexFileServer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+	http.ServeFile(rw, r, fs.indexFilePath)
+}
+
+// SpaFileServer is a wrapper around http.FileServer for serving SPA contents.
+type SpaFileServer struct {
 	root            http.Dir
-	NotFoundHandler func(http.ResponseWriter, *http.Request)
+	NotFoundHandler http.Handler
 }
 
 // ServeHTTP implements http.Handler
-func (fs *spaFileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (fs *SpaFileServer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if containsDotDot(r.URL.Path) {
-		Errorf(http.StatusNotFound, "Not Found").WriteResponse(w)
+		Errorf(http.StatusNotFound, "Not Found").WriteResponse(rw)
 		return
 	}
 
@@ -39,16 +68,14 @@ func (fs *spaFileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	name := path.Join(dir, filepath.FromSlash(upath))
 
 	//check if file exists
-	f, err := os.Open(name)
-	if err != nil {
+	if _, err := os.Stat(name); err != nil {
 		if os.IsNotExist(err) {
-			http.ServeFile(w, r, string(fs.root)+"/index.html")
+			fs.NotFoundHandler.ServeHTTP(rw, r)
 			return
 		}
 	}
-	defer f.Close()
 
-	http.ServeFile(w, r, name)
+	http.ServeFile(rw, r, name)
 }
 
 func containsDotDot(v string) bool {
@@ -65,7 +92,24 @@ func containsDotDot(v string) bool {
 
 func isSlashRune(r rune) bool { return r == '/' || r == '\\' }
 
-// SpaFileServer returns SPA handler
-func SpaFileServer(root http.Dir) http.Handler {
-	return &spaFileServer{root: root}
+// NewSpaFileServer returns SPA handler
+func NewSpaFileServer(root http.Dir) *SpaFileServer {
+	notFoundHandler := NewFileServerWithStatus(filepath.Join(string(root), NotFoundFileName), http.StatusNotFound)
+	return &SpaFileServer{
+		NotFoundHandler: notFoundHandler,
+		root:            root,
+	}
+}
+
+// NewFileServerWithStatus returns http.Handler which serves specified file with desired HTTP status
+func NewFileServerWithStatus(name string, code int) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		ServeFileWithStatus(rw, r, name, code)
+	}
+}
+
+// ServeFileWithStatus serves file in HTTP response with specified HTTP status.
+func ServeFileWithStatus(rw http.ResponseWriter, r *http.Request, name string, code int) {
+	interceptor := httpStatusInterceptor{desiredStatus: code, ResponseWriter: rw}
+	http.ServeFile(interceptor, r, name)
 }
