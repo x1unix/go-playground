@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -29,6 +30,7 @@ type appArgs struct {
 	debug           bool
 	buildDir        string
 	cleanupInterval string
+	assetsDirectory string
 }
 
 func (a appArgs) getCleanDuration() (time.Duration, error) {
@@ -36,6 +38,12 @@ func (a appArgs) getCleanDuration() (time.Duration, error) {
 }
 
 func main() {
+	wd, err := os.Getwd()
+	if err != nil {
+		_, _ = fmt.Fprintln(os.Stderr, "Failed to get current working directory:", err)
+		wd = "."
+	}
+
 	args := appArgs{}
 	flag.StringVar(&args.packagesFile, "f", "packages.json", "Path to packages index JSON file")
 	flag.StringVar(&args.addr, "addr", ":8080", "TCP Listen address")
@@ -43,6 +51,7 @@ func main() {
 	flag.StringVar(&args.cleanupInterval, "clean-interval", "10m", "Build directory cleanup interval")
 	flag.StringVar(&args.playgroundUrl, "playground-url", goplay.DefaultPlaygroundURL, "Go Playground URL")
 	flag.BoolVar(&args.debug, "debug", false, "Enable debug mode")
+	flag.StringVar(&args.assetsDirectory, "static-dir", filepath.Join(wd, "public"), "Path to web page assets (HTML, JS, etc)")
 
 	l := getLogger(args.debug)
 	defer l.Sync() //nolint:errcheck
@@ -86,6 +95,7 @@ func start(goRoot string, args appArgs) error {
 	zap.S().Infof("Playground url: %q", args.playgroundUrl)
 	zap.S().Infof("Packages file is %q", args.packagesFile)
 	zap.S().Infof("Cleanup interval is %s", cleanInterval.String())
+	zap.S().Infof("Serving web page from %q", args.assetsDirectory)
 	analyzer.SetRoot(goRoot)
 	packages, err := analyzer.ReadPackagesFile(args.packagesFile)
 	if err != nil {
@@ -109,8 +119,8 @@ func start(goRoot string, args appArgs) error {
 		Mount(r.PathPrefix("/api").Subrouter())
 
 	// Web UI routes
-	indexHandler := langserver.NewIndexFileServer("./public")
-	spaHandler := langserver.NewSpaFileServer("./public")
+	indexHandler := langserver.NewIndexFileServer(args.assetsDirectory)
+	spaHandler := langserver.NewSpaFileServer(args.assetsDirectory)
 	r.Path("/").
 		Handler(indexHandler)
 	r.Path("/snippet/{snippetID:[A-Za-z0-9_-]+}").
