@@ -47,6 +47,14 @@
     {
       "label": "Errors",
       "snippet": "NiJOpCPO3L0"
+    },
+    {
+      "label": "Defer",
+      "snippet": "5SDVfc_jxbg"
+    },
+    {
+      "label": "Panic & recover",
+      "snippet": "Sk-SVdofEIZ"
     }
   ],
   "Concurrency": [
