@@ -1,0 +1,85 @@
+.errorPage {
+  background: #1f1f1f;
+  color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  font: 11pt system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+.errorPage__inner {
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  position: fixed;
+  inset: 0;
+  flex-direction: row-reverse;
+  background: #1f1f1f;
+  color: #f4f4f4;
+  font-family: inherit;
+}
+.errorPage__container {
+  align-self: center;
+  width: 100%;
+  max-width: 480px;
+  font-family: inherit;
+}
+.errorPage__statusCode {
+  font: bold 6rem SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  margin: 0 0 2rem 0;
+  padding: 0;
+  display: block;
+  -webkit-filter: url(#chromatic-aberration);
+  filter: url(#chromatic-aberration);
+}
+.errorPage__statusText {
+  margin: 0;
+  padding: 0;
+  display: block;
+  font-size: 2rem;
+  font-family: inherit;
+}
+.errorPage__message {
+  margin: 1rem 0;
+  color: #999;
+}
+.errorPage__message p {
+  margin: 0 0 .3rem 0;
+  padding: 0;
+}
+.errorPage__actions {
+  margin-top: 4rem;
+  display: flex;
+  justify-content: flex-end;
+}
+.errorPage__actions>* {
+  margin-left: 1rem;
+}
+.btn--primary, .btn--transparent {
+  border: none;
+  text-decoration: none;
+  padding: .5rem 1rem;
+  font-family: inherit;
+}
+.btn--transparent {
+  color: #777;
+  background: transparent;
+  cursor: pointer;
+}
+.btn--transparent:hover, .btn--transparent:focus {
+  color: inherit;
+}
+.btn--primary {
+  color: #f4f4f4;
+  background: #005A9C;
+  border-radius: 2px;
+}
+.btn--primary:hover, .btn--primary:focus {
+  background: #00498B;
+}
+.gopher {
+  height: 320px;
+  align-self: center;
+  margin-right: 2.5rem;
+}
+.gopher__image {
+  height: 100%;
+}

@@ -10,6 +10,7 @@ import { bootstrapGo } from './services/go';
 import Playground from '~/components/pages/Playground';
 import config from './services/config';
 import './App.css';
+import NotFoundPage from "@components/pages/NotFoundPage";
 
 // Configure store and import config from localStorage
 const store = configureStore();
@@ -25,9 +26,14 @@ function App() {
         <ThemeProvider className="App">
           <Switch>
             <Route
-              path="/(snippet)?/:snippetID?"
+              path={[
+                "/",
+                "/snippet/:snippetID"
+              ]}
+              exact
               component={Playground}
-            />
+            ></Route>
+            <Route path="*" component={NotFoundPage}/>
           </Switch>
         </ThemeProvider>
       </ConnectedRouter>
