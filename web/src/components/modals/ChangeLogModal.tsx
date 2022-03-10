@@ -44,39 +44,23 @@ export default function ChangeLogModal(props: ChangeLogModalProps) {
           <li>
             <Link
               className='ChangeLogModal__issue-url'
-              href='https://github.com/x1unix/go-playground/issues/81'
+              href='https://github.com/x1unix/go-playground/issues/102'
               target='_blank'
             >
-              #81
+              #102
             </Link>
-            <span>Add resizable application output</span>
+            <span>Add snippets for <u>defer</u> and <u>panic + recover</u></span>
           </li>
           <li>
             <Link
               className='ChangeLogModal__issue-url'
-              href='https://github.com/x1unix/go-playground/issues/60'
+              href='https://github.com/x1unix/go-playground/pull/108'
               target='_blank'
             >
-              #60
+              #108
             </Link>
-            <span>Add clear command</span>
+            <span>Fix incorrect router path handling</span>
           </li>
-          <li>
-            <Link
-              className='ChangeLogModal__issue-url'
-              href='https://github.com/x1unix/go-playground/issues/6'
-              target='_blank'
-            >
-              #6
-            </Link>
-            <span>Add share snippet notification</span>
-          </li>
-          <li> Hide text in <i>What's new</i> button to save space on mobile devices.</li>
-          <li>Add PWA support.</li>
-        </ul>
-        <b>Compiler - WebAssembly</b>
-        <ul>
-          <li>Update SDK to Go 1.17.6</li>
         </ul>
         <p>
           And more!
