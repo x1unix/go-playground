@@ -24,13 +24,15 @@ import (
 var Version = "testing"
 
 type appArgs struct {
-	packagesFile    string
-	playgroundUrl   string
-	addr            string
-	debug           bool
-	buildDir        string
-	cleanupInterval string
-	assetsDirectory string
+	packagesFile       string
+	playgroundURL      string
+	goTipPlaygroundURL string
+	addr               string
+	debug              bool
+	buildDir           string
+	cleanupInterval    string
+	assetsDirectory    string
+	connectTimeout     time.Duration
 }
 
 func (a appArgs) getCleanDuration() (time.Duration, error) {
@@ -49,9 +51,11 @@ func main() {
 	flag.StringVar(&args.addr, "addr", ":8080", "TCP Listen address")
 	flag.StringVar(&args.buildDir, "wasm-build-dir", os.TempDir(), "Directory for WASM builds")
 	flag.StringVar(&args.cleanupInterval, "clean-interval", "10m", "Build directory cleanup interval")
-	flag.StringVar(&args.playgroundUrl, "playground-url", goplay.DefaultPlaygroundURL, "Go Playground URL")
+	flag.StringVar(&args.playgroundURL, "playground-url", goplay.DefaultPlaygroundURL, "Go Playground URL")
+	flag.StringVar(&args.goTipPlaygroundURL, "gotip-url", goplay.DefaultGoTipPlaygroundURL, "GoTip Playground URL")
 	flag.BoolVar(&args.debug, "debug", false, "Enable debug mode")
 	flag.StringVar(&args.assetsDirectory, "static-dir", filepath.Join(wd, "public"), "Path to web page assets (HTML, JS, etc)")
+	flag.DurationVar(&args.connectTimeout, "timeout", 15*time.Second, "Go Playground server connect timeout")
 
 	l := getLogger(args.debug)
 	defer l.Sync() //nolint:errcheck
@@ -92,7 +96,7 @@ func start(goRoot string, args appArgs) error {
 
 	zap.S().Info("Server version: ", Version)
 	zap.S().Infof("GOROOT is %q", goRoot)
-	zap.S().Infof("Playground url: %q", args.playgroundUrl)
+	zap.S().Infof("Playground url: %q", args.playgroundURL)
 	zap.S().Infof("Packages file is %q", args.packagesFile)
 	zap.S().Infof("Cleanup interval is %s", cleanInterval.String())
 	zap.S().Infof("Serving web page from %q", args.assetsDirectory)
@@ -112,10 +116,14 @@ func start(goRoot string, args appArgs) error {
 	go store.StartCleaner(ctx, cleanInterval, nil)
 
 	r := mux.NewRouter()
-	pg := goplay.NewClient(args.playgroundUrl, goplay.DefaultUserAgent, 15*time.Second)
-
+	pgClient := goplay.NewClient(args.playgroundURL, goplay.DefaultUserAgent, args.connectTimeout)
+	goTipClient := goplay.NewClient(args.goTipPlaygroundURL, goplay.DefaultUserAgent, args.connectTimeout)
+	clients := &langserver.PlaygroundServices{
+		Default: pgClient,
+		GoTip:   goTipClient,
+	}
 	// API routes
-	langserver.New(Version, pg, packages, compiler.NewBuildService(zap.S(), store)).
+	langserver.New(Version, clients, packages, compiler.NewBuildService(zap.S(), store)).
 		Mount(r.PathPrefix("/api").Subrouter())
 
 	// Web UI routes

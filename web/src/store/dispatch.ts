@@ -1,21 +1,28 @@
-import { saveAs } from 'file-saver';
-import { push } from 'connected-react-router';
+import {saveAs} from 'file-saver';
+import {push} from 'connected-react-router';
 import {
   Action,
-  ActionType, MonacoParamsChanges, newBuildParamsChangeAction,
+  ActionType,
+  MonacoParamsChanges,
+  newBuildParamsChangeAction,
   newBuildResultAction,
   newErrorAction,
   newImportFileAction,
-  newLoadingAction, newMonacoParamsChangeAction,
+  newLoadingAction,
+  newMonacoParamsChangeAction,
   newProgramWriteAction,
   newToggleThemeAction,
   newUIStateChangeAction
 } from './actions';
-import client, { EvalEventKind, instantiateStreaming } from '~/services/api';
-import config, { RuntimeType } from '~/services/config';
-import { DEMO_CODE } from '~/components/editor/props';
-import { getImportObject, goRun } from '~/services/go';
-import { State } from './state';
+import client, {
+  EvalEventKind,
+  instantiateStreaming,
+  PlaygroundBackend
+} from '~/services/api';
+import config, {RuntimeType} from '~/services/config';
+import {DEMO_CODE} from '~/components/editor/props';
+import {getImportObject, goRun} from '~/services/go';
+import {State} from './state';
 
 export type StateProvider = () => State
 export type DispatchFn = (a: Action | any) => any
@@ -120,6 +127,10 @@ export const runFileDispatcher: Dispatcher =
           const res = await client.evaluateCode(editor.code, settings.autoFormat);
           dispatch(newBuildResultAction(res));
           break;
+        case RuntimeType.GoTipPlayground:
+          const rsp = await client.evaluateCode(editor.code, settings.autoFormat, PlaygroundBackend.GoTip);
+          dispatch(newBuildResultAction(rsp));
+          break;
         case RuntimeType.WebAssembly:
           let resp = await client.build(editor.code, settings.autoFormat);
           let wasmFile = await client.getArtifact(resp.fileName);
@@ -143,8 +154,11 @@ export const formatFileDispatcher: Dispatcher =
   async (dispatch: DispatchFn, getState: StateProvider) => {
     dispatch(newLoadingAction());
     try {
-      const { code } = getState().editor;
-      const res = await client.formatCode(code);
+      // Format code using GoTip is enabled to support
+      // any syntax changes from unstable Go specs.
+      const { editor: {code}, settings: { runtime } } = getState();
+      const backend = runtime === RuntimeType.GoTipPlayground ? PlaygroundBackend.GoTip : PlaygroundBackend.Default;
+      const res = await client.formatCode(code, backend);
 
       if (res.formatted) {
         dispatch(newBuildResultAction(res));

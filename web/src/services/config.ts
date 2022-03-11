@@ -9,8 +9,9 @@ const MONACO_SETTINGS = 'ms.monaco.settings';
 
 
 export enum RuntimeType {
-  GoPlayground = 'GO_PLAYGROUND',
-  WebAssembly = 'WASM'
+  GoPlayground    = 'GO_PLAYGROUND',
+  GoTipPlayground = 'GO_TIP_PLAYGROUND',
+  WebAssembly     = 'WASM'
 }
 
 export interface MonacoSettings {

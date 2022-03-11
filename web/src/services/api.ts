@@ -6,6 +6,11 @@ import config from './config';
 const apiAddress = `${config.serverUrl}/api`;
 const axiosClient = axios.default.create({ baseURL: apiAddress });
 
+export enum PlaygroundBackend {
+  Default = '',
+  GoTip = 'gotip'
+}
+
 export enum EvalEventKind {
   Stdout = 'stdout',
   Stderr = 'stderr'
@@ -100,12 +105,12 @@ class Client implements IAPIClient {
     return resp;
   }
 
-  async evaluateCode(code: string, format: boolean): Promise<RunResponse> {
-    return this.post<RunResponse>(`/run?format=${Boolean(format)}`, code);
+  async evaluateCode(code: string, format: boolean, backend = PlaygroundBackend.Default): Promise<RunResponse> {
+    return this.post<RunResponse>(`/run?format=${Boolean(format)}&backend=${backend}`, code);
   }
 
-  async formatCode(code: string): Promise<RunResponse> {
-    return this.post<RunResponse>('/format', code);
+  async formatCode(code: string, backend = PlaygroundBackend.Default): Promise<RunResponse> {
+    return this.post<RunResponse>(`/format?backend=${backend}`, code);
   }
 
   async getSnippet(id: string): Promise<Snippet> {

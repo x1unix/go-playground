@@ -1,19 +1,33 @@
 import React from 'react';
-import { Checkbox, Dropdown, getTheme, IconButton, IDropdownOption, Modal } from '@fluentui/react';
-import { Pivot, PivotItem } from '@fluentui/react/lib/Pivot';
-import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
-import { Link } from '@fluentui/react/lib/Link';
+import {
+  Checkbox,
+  Dropdown,
+  getTheme,
+  IconButton,
+  IDropdownOption,
+  Modal
+} from '@fluentui/react';
+import {Pivot, PivotItem} from '@fluentui/react/lib/Pivot';
+import {MessageBar, MessageBarType} from '@fluentui/react/lib/MessageBar';
+import {Link} from '@fluentui/react/lib/Link';
 
-import { getContentStyles, getIconButtonStyles } from '~/styles/modal';
+import {getContentStyles, getIconButtonStyles} from '~/styles/modal';
 import SettingsProperty from './SettingsProperty';
-import { MonacoSettings, RuntimeType } from '~/services/config';
-import { DEFAULT_FONT, getAvailableFonts } from '~/services/fonts';
-import { BuildParamsArgs, Connect, MonacoParamsChanges, SettingsState } from '~/store';
+import {MonacoSettings, RuntimeType} from '~/services/config';
+import {DEFAULT_FONT, getAvailableFonts} from '~/services/fonts';
+import {
+  BuildParamsArgs,
+  Connect,
+  MonacoParamsChanges,
+  SettingsState
+} from '~/store';
 
 const WASM_SUPPORTED = 'WebAssembly' in window;
 
 const COMPILER_OPTIONS: IDropdownOption[] = [
   { key: RuntimeType.GoPlayground, text: 'Go Playground' },
+  {
+    key: RuntimeType.GoTipPlayground, text: 'Go Playground (Go Tip)' },
   {
     key: RuntimeType.WebAssembly,
     text: `WebAssembly (${WASM_SUPPORTED ? 'Experimental' : 'Unsupported'})`,
@@ -62,6 +76,7 @@ export interface SettingsProps {
 interface SettingsModalState {
   isOpen?: boolean,
   showWarning?: boolean
+  showGoTipMessage?: boolean
 }
 
 @Connect(state => ({
@@ -77,7 +92,8 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
     super(props);
     this.state = {
       isOpen: props.isOpen,
-      showWarning: props.settings.runtime === RuntimeType.WebAssembly
+      showWarning: props.settings.runtime === RuntimeType.WebAssembly,
+      showGoTipMessage: props.settings.runtime === RuntimeType.GoTipPlayground,
     }
   }
 
@@ -94,14 +110,11 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
     this.changes.monaco[key] = val;
   }
 
-  get wasmWarningVisibility() {
-    return this.state.showWarning ? 'visible' : 'hidden'
-  }
-
   render() {
     const theme = getTheme();
     const contentStyles = getContentStyles(theme);
     const iconButtonStyles = getIconButtonStyles(theme);
+    const { showGoTipMessage, showWarning } = this.state;
     return (
       <Modal
         titleAriaId={this.titleID}
@@ -242,19 +255,32 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
                       autoFormat: this.props.settings?.autoFormat ?? true,
                     };
 
-                    this.setState({ showWarning: val?.key === RuntimeType.WebAssembly });
+                    this.setState({
+                      showWarning: val?.key === RuntimeType.WebAssembly,
+                      showGoTipMessage: val?.key === RuntimeType.GoTipPlayground
+                    });
                   }}
                 />}
               />
-              <div style={{ visibility: this.wasmWarningVisibility, marginTop: '10px' }}>
-                <MessageBar isMultiline={true} messageBarType={MessageBarType.warning}>
-                  <b>WebAssembly</b> is a modern runtime that gives you additional features
-                  like possibility to interact with web browser but is unstable.
-                  Use it at your own risk.
-                  <p>
-                    See<Link href='https://github.com/golang/go/wiki/WebAssembly' target='_blank'>documentation</Link> for more details.
-                  </p>
-                </MessageBar>
+              <div style={{ marginTop: '10px' }}>
+                { showWarning && (
+                  <MessageBar isMultiline={true} messageBarType={MessageBarType.warning}>
+                    <b>WebAssembly</b> is a modern runtime that gives you additional features
+                    like possibility to interact with web browser but is unstable.
+                    Use it at your own risk.
+                    <p>
+                      See<Link href='https://github.com/golang/go/wiki/WebAssembly' target='_blank'>documentation</Link> for more details.
+                    </p>
+                  </MessageBar>
+                )}
+                { showGoTipMessage && (
+                  <MessageBar isMultiline={true} messageBarType={MessageBarType.warning}>
+                    <b>Gotip Playground</b> uses the current unstable development build of Go.
+                    <p>
+                      See<Link href='https://pkg.go.dev/golang.org/dl/gotip' target='_blank'>gotip help</Link> for more details.
+                    </p>
+                  </MessageBar>
+                )}
               </div>
               <SettingsProperty
                 key='autoFormat'

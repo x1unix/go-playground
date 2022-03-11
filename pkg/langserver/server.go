@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -23,30 +24,37 @@ const (
 	frameTime               = time.Second
 	maxBuildTimeDuration    = time.Second * 30
 
-	wasmMimeType     = "application/wasm"
-	formatQueryParam = "format"
-	artifactParamVal = "artifactId"
+	wasmMimeType           = "application/wasm"
+	formatQueryParam       = "format"
+	artifactParamVal       = "artifactId"
+	playgroundBackendParam = "backend"
+	playgroundGoTip        = "gotip"
 )
+
+type PlaygroundServices struct {
+	Default *goplay.Client
+	GoTip   *goplay.Client
+}
 
 // Service is language server service
 type Service struct {
-	version    string
-	log        *zap.SugaredLogger
-	index      analyzer.PackageIndex
-	compiler   compiler.BuildService
-	playground *goplay.Client
-	limiter    *rate.Limiter
+	version     string
+	log         *zap.SugaredLogger
+	index       analyzer.PackageIndex
+	compiler    compiler.BuildService
+	playgrounds *PlaygroundServices
+	limiter     *rate.Limiter
 }
 
 // New is Service constructor
-func New(version string, playground *goplay.Client, packages []*analyzer.Package, builder compiler.BuildService) *Service {
+func New(version string, playgrounds *PlaygroundServices, packages []*analyzer.Package, builder compiler.BuildService) *Service {
 	return &Service{
-		compiler:   builder,
-		version:    version,
-		playground: playground,
-		log:        zap.S().Named("langserver"),
-		index:      analyzer.BuildPackageIndex(packages),
-		limiter:    rate.NewLimiter(rate.Every(frameTime), compileRequestsPerFrame),
+		compiler:    builder,
+		version:     version,
+		playgrounds: playgrounds,
+		log:         zap.S().Named("langserver"),
+		index:       analyzer.BuildPackageIndex(packages),
+		limiter:     rate.NewLimiter(rate.Every(frameTime), compileRequestsPerFrame),
 	}
 }
 
@@ -122,7 +130,7 @@ func (s *Service) provideSuggestion(req SuggestionRequest) (*SuggestionsResponse
 }
 
 // HandleGetVersion handles /api/version
-func (s *Service) HandleGetVersion(w http.ResponseWriter, r *http.Request) error {
+func (s *Service) HandleGetVersion(w http.ResponseWriter, _ *http.Request) error {
 	WriteJSON(w, VersionResponse{Version: s.version})
 	return nil
 }
@@ -149,7 +157,7 @@ func (s *Service) HandleFormatCode(w http.ResponseWriter, r *http.Request) error
 		return err
 	}
 
-	formatted, _, err := s.goImportsCode(r.Context(), src)
+	formatted, _, err := s.goImportsCode(r, src)
 	if err != nil {
 		if goplay.IsCompileError(err) {
 			return NewHTTPError(http.StatusBadRequest, err)
@@ -165,7 +173,8 @@ func (s *Service) HandleFormatCode(w http.ResponseWriter, r *http.Request) error
 
 // HandleShare handles snippet share
 func (s *Service) HandleShare(w http.ResponseWriter, r *http.Request) error {
-	shareID, err := s.playground.Share(r.Context(), r.Body)
+	client := s.getPlaygroundClientFromRequest(r)
+	shareID, err := client.Share(r.Context(), r.Body)
 	defer r.Body.Close()
 	if err != nil {
 		if err == goplay.ErrSnippetTooLarge {
@@ -184,7 +193,8 @@ func (s *Service) HandleShare(w http.ResponseWriter, r *http.Request) error {
 func (s *Service) HandleGetSnippet(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	snippetID := vars["id"]
-	snippet, err := s.playground.GetSnippet(r.Context(), snippetID)
+	client := s.getPlaygroundClientFromRequest(r)
+	snippet, err := client.GetSnippet(r.Context(), snippetID)
 	if err != nil {
 		if err == goplay.ErrSnippetNotFound {
 			return Errorf(http.StatusNotFound, "snippet %q not found", snippetID)
@@ -218,7 +228,7 @@ func (s *Service) HandleRunCode(w http.ResponseWriter, r *http.Request) error {
 
 	var changed bool
 	if shouldFormat {
-		src, changed, err = s.goImportsCode(r.Context(), src)
+		src, changed, err = s.goImportsCode(r, src)
 		if err != nil {
 			if goplay.IsCompileError(err) {
 				return NewHTTPError(http.StatusBadRequest, err)
@@ -228,7 +238,8 @@ func (s *Service) HandleRunCode(w http.ResponseWriter, r *http.Request) error {
 		}
 	}
 
-	res, err := s.playground.Compile(r.Context(), src)
+	client := s.getPlaygroundClientFromRequest(r)
+	res, err := client.Compile(r.Context(), src)
 	if err != nil {
 		return err
 	}
@@ -276,6 +287,16 @@ func (s *Service) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) 
 	return nil
 }
 
+func (s *Service) getPlaygroundClientFromRequest(r *http.Request) *goplay.Client {
+	playgroundBackend := strings.TrimSpace(r.URL.Query().Get(playgroundBackendParam))
+	if playgroundBackend == playgroundGoTip {
+		s.log.Debugw("Using goTip backend for request", zap.String("url", r.RequestURI))
+		return s.playgrounds.GoTip
+	}
+
+	return s.playgrounds.Default
+}
+
 // HandleCompile handles WASM build request
 func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) error {
 	// Limit for request timeout
@@ -299,7 +320,7 @@ func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) error {
 
 	var changed bool
 	if shouldFormat {
-		src, changed, err = s.goImportsCode(r.Context(), src)
+		src, changed, err = s.goImportsCode(r, src)
 		if err != nil {
 			if goplay.IsCompileError(err) {
 				return NewHTTPError(http.StatusBadRequest, err)
@@ -333,8 +354,9 @@ func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) error {
 // if any error occurs, it sends error response to client and closes connection
 //
 // if "format" url query param is undefined or set to "false", just returns code as is
-func (s *Service) goImportsCode(ctx context.Context, src []byte) ([]byte, bool, error) {
-	resp, err := s.playground.GoImports(ctx, src)
+func (s *Service) goImportsCode(r *http.Request, src []byte) ([]byte, bool, error) {
+	client := s.getPlaygroundClientFromRequest(r)
+	resp, err := client.GoImports(r.Context(), src)
 	if err != nil {
 		if err == goplay.ErrSnippetTooLarge {
 			return nil, false, NewHTTPError(http.StatusRequestEntityTooLarge, err)
