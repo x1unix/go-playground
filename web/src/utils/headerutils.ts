@@ -4,6 +4,9 @@ import snippets, { Snippet, SnippetType } from '~/services/go/snippets';
 const snippetIconTypeMapping: { [type: string]: IIconProps } = {
   [SnippetType.Test]: {
     iconName: 'TestPlan'
+  },
+  [SnippetType.Experimental]: {
+    iconName: 'ATPLogo'
   }
 }
 

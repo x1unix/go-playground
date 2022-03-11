@@ -57,6 +57,13 @@
       "snippet": "Sk-SVdofEIZ"
     }
   ],
+  "Experimental features": [
+    {
+      "label": "Generics",
+      "snippet": "tktmsniUZXu",
+      "type": "experimental"
+    }
+  ],
   "Concurrency": [
       {
         "label": "Goroutines",

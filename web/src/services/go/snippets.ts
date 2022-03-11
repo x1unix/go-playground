@@ -1,7 +1,8 @@
 import snippets from './snippets.json';
 
 export enum SnippetType {
-  Test = 'test'
+  Test = 'test',
+  Experimental = 'experimental'
 }
 
 export interface Snippet {
