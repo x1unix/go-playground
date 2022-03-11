@@ -104,8 +104,8 @@ class Client implements IAPIClient {
     return this.post<RunResponse>(`/run?format=${Boolean(format)}&gotip=${Boolean(goTip)}`, code);
   }
 
-  async formatCode(code: string): Promise<RunResponse> {
-    return this.post<RunResponse>('/format', code);
+  async formatCode(code: string, goTip=false): Promise<RunResponse> {
+    return this.post<RunResponse>(`/format?gotip=${Boolean(goTip)}`, code);
   }
 
   async getSnippet(id: string): Promise<Snippet> {

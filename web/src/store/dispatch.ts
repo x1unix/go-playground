@@ -1,21 +1,24 @@
-import { saveAs } from 'file-saver';
-import { push } from 'connected-react-router';
+import {saveAs} from 'file-saver';
+import {push} from 'connected-react-router';
 import {
   Action,
-  ActionType, MonacoParamsChanges, newBuildParamsChangeAction,
+  ActionType,
+  MonacoParamsChanges,
+  newBuildParamsChangeAction,
   newBuildResultAction,
   newErrorAction,
   newImportFileAction,
-  newLoadingAction, newMonacoParamsChangeAction,
+  newLoadingAction,
+  newMonacoParamsChangeAction,
   newProgramWriteAction,
   newToggleThemeAction,
   newUIStateChangeAction
 } from './actions';
-import client, { EvalEventKind, instantiateStreaming } from '~/services/api';
-import config, { RuntimeType } from '~/services/config';
-import { DEMO_CODE } from '~/components/editor/props';
-import { getImportObject, goRun } from '~/services/go';
-import { State } from './state';
+import client, {EvalEventKind, instantiateStreaming} from '~/services/api';
+import config, {RuntimeType} from '~/services/config';
+import {DEMO_CODE} from '~/components/editor/props';
+import {getImportObject, goRun} from '~/services/go';
+import {State} from './state';
 
 export type StateProvider = () => State
 export type DispatchFn = (a: Action | any) => any
@@ -147,8 +150,11 @@ export const formatFileDispatcher: Dispatcher =
   async (dispatch: DispatchFn, getState: StateProvider) => {
     dispatch(newLoadingAction());
     try {
-      const { code } = getState().editor;
-      const res = await client.formatCode(code);
+      // Format code using GoTip is enabled to support
+      // any syntax changes from unstable Go specs.
+      const { editor: {code}, settings: { runtime } } = getState();
+      const isGoTip = runtime === RuntimeType.GoTipPlayground;
+      const res = await client.formatCode(code, isGoTip);
 
       if (res.formatted) {
         dispatch(newBuildResultAction(res));
