@@ -299,6 +299,7 @@ func (s *Service) getPlaygroundClientFromRequest(r *http.Request) *goplay.Client
 	}
 
 	if goTipEnabled {
+		s.log.Debugw("Using goTip backend for request", zap.String("url", r.RequestURI))
 		return s.playgrounds.GoTip
 	}
 
