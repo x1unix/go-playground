@@ -120,6 +120,10 @@ export const runFileDispatcher: Dispatcher =
           const res = await client.evaluateCode(editor.code, settings.autoFormat);
           dispatch(newBuildResultAction(res));
           break;
+        case RuntimeType.GoTipPlayground:
+          const rsp = await client.evaluateCode(editor.code, settings.autoFormat, true);
+          dispatch(newBuildResultAction(rsp));
+          break;
         case RuntimeType.WebAssembly:
           let resp = await client.build(editor.code, settings.autoFormat);
           let wasmFile = await client.getArtifact(resp.fileName);
