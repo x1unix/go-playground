@@ -24,10 +24,11 @@ const (
 	frameTime               = time.Second
 	maxBuildTimeDuration    = time.Second * 30
 
-	wasmMimeType     = "application/wasm"
-	formatQueryParam = "format"
-	artifactParamVal = "artifactId"
-	goTipQueryParam  = "gotip"
+	wasmMimeType           = "application/wasm"
+	formatQueryParam       = "format"
+	artifactParamVal       = "artifactId"
+	playgroundBackendParam = "backend"
+	playgroundGoTip        = "gotip"
 )
 
 type PlaygroundServices struct {
@@ -287,18 +288,8 @@ func (s *Service) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) 
 }
 
 func (s *Service) getPlaygroundClientFromRequest(r *http.Request) *goplay.Client {
-	goTipParam := strings.TrimSpace(r.URL.Query().Get(goTipQueryParam))
-	if goTipParam == "" {
-		return s.playgrounds.Default
-	}
-
-	goTipEnabled, err := strconv.ParseBool(goTipParam)
-	if err != nil {
-		s.log.Debugw("invalid goTip query parameter value, fallback to default", zap.Error(err), zap.String("value", goTipParam))
-		return s.playgrounds.Default
-	}
-
-	if goTipEnabled {
+	playgroundBackend := strings.TrimSpace(r.URL.Query().Get(playgroundBackendParam))
+	if playgroundBackend == playgroundGoTip {
 		s.log.Debugw("Using goTip backend for request", zap.String("url", r.RequestURI))
 		return s.playgrounds.GoTip
 	}

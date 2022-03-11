@@ -14,7 +14,11 @@ import {
   newToggleThemeAction,
   newUIStateChangeAction
 } from './actions';
-import client, {EvalEventKind, instantiateStreaming} from '~/services/api';
+import client, {
+  EvalEventKind,
+  instantiateStreaming,
+  PlaygroundBackend
+} from '~/services/api';
 import config, {RuntimeType} from '~/services/config';
 import {DEMO_CODE} from '~/components/editor/props';
 import {getImportObject, goRun} from '~/services/go';
@@ -124,7 +128,7 @@ export const runFileDispatcher: Dispatcher =
           dispatch(newBuildResultAction(res));
           break;
         case RuntimeType.GoTipPlayground:
-          const rsp = await client.evaluateCode(editor.code, settings.autoFormat, true);
+          const rsp = await client.evaluateCode(editor.code, settings.autoFormat, PlaygroundBackend.GoTip);
           dispatch(newBuildResultAction(rsp));
           break;
         case RuntimeType.WebAssembly:
@@ -153,8 +157,8 @@ export const formatFileDispatcher: Dispatcher =
       // Format code using GoTip is enabled to support
       // any syntax changes from unstable Go specs.
       const { editor: {code}, settings: { runtime } } = getState();
-      const isGoTip = runtime === RuntimeType.GoTipPlayground;
-      const res = await client.formatCode(code, isGoTip);
+      const backend = runtime === RuntimeType.GoTipPlayground ? PlaygroundBackend.GoTip : PlaygroundBackend.Default;
+      const res = await client.formatCode(code, backend);
 
       if (res.formatted) {
         dispatch(newBuildResultAction(res));
