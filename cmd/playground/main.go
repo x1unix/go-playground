@@ -52,7 +52,7 @@ func main() {
 	flag.StringVar(&args.buildDir, "wasm-build-dir", os.TempDir(), "Directory for WASM builds")
 	flag.StringVar(&args.cleanupInterval, "clean-interval", "10m", "Build directory cleanup interval")
 	flag.StringVar(&args.playgroundURL, "playground-url", goplay.DefaultPlaygroundURL, "Go Playground URL")
-	flag.StringVar(&args.goTipPlaygroundURL, "gotip-playground-url", goplay.DefaultGoTipPlaygroundURL, "GoTip Playground URL")
+	flag.StringVar(&args.goTipPlaygroundURL, "gotip-url", goplay.DefaultGoTipPlaygroundURL, "GoTip Playground URL")
 	flag.BoolVar(&args.debug, "debug", false, "Enable debug mode")
 	flag.StringVar(&args.assetsDirectory, "static-dir", filepath.Join(wd, "public"), "Path to web page assets (HTML, JS, etc)")
 	flag.DurationVar(&args.connectTimeout, "timeout", 15*time.Second, "Go Playground server connect timeout")
