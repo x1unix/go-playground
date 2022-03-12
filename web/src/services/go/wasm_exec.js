@@ -19,6 +19,11 @@
 // Should be in sync with wasm_exec.js:406 and syscall/js.go:106
 const GLOBAL_PREDEF_VALUE_ID = 5;
 
+// x1unix: checks if called function is globalThis method
+const isGlobalThisMethod = (methodName, method) => {
+  return (methodName in window) && (window[methodName] === method)
+}
+
 if (!global.TextEncoder) {
   global.TextEncoder = require("util").TextEncoder;
 }
@@ -297,9 +302,19 @@ export class Go {
         "syscall/js.valueCall": (sp) => {
           sp >>>= 0;
           try {
-            const v = loadValue(sp + 8);
+            // x1unix: method object can be patched at call. See above.
+            let v = loadValue(sp + 8);
             const m = Reflect.get(v, loadString(sp + 16));
             const args = loadSliceOfValues(sp + 32);
+
+            // x1unix: some built-in functions such as alert() can be called only
+            // with Window context.
+            const methodName = loadString(sp + 16);
+            if (isGlobalThisMethod(methodName, m)) {
+              console.log(`go|syscall/js.valueCall: "${methodName}" is a window method, patching call...`);
+              v = window;
+            }
+
             const result = Reflect.apply(m, v, args);
             sp = this._inst.exports.getsp() >>> 0; // see comment above
             storeValue(sp + 56, result);
