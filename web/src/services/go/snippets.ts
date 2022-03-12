@@ -17,6 +17,11 @@ export interface Snippet {
   type?: SnippetType
 
   /**
+   * Custom icon for snippet. Overrides snippet type.
+   */
+  icon?: string
+
+  /**
    * Snippet is snipped ID to be loaded
    *
    * Presents if snippet is referenced to snippet ID

@@ -34,7 +34,7 @@ export const getSnippetsMenuItems = (handler: (s: SnippetMenuItem) => void) => {
       return {
         key: `${i}-${ii}`,
         text: item.label,
-        iconProps: getSnippetIconProps(item.type),
+        iconProps: item.icon ? { iconName: item.icon } : getSnippetIconProps(item.type),
         onClick: () => handler(item)
       } as IContextualMenuItem;
     })
