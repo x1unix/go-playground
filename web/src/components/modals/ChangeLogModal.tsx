@@ -44,29 +44,55 @@ export default function ChangeLogModal(props: ChangeLogModalProps) {
           <li>
             <Link
               className='ChangeLogModal__issue-url'
-              href='https://github.com/x1unix/go-playground/issues/102'
+              href='https://github.com/x1unix/go-playground/pull/115'
               target='_blank'
             >
-              #102
+              #115
             </Link>
-            <span>Add snippets for <u>defer</u> and <u>panic + recover</u></span>
+            <span>Add base64 images output support</span>
           </li>
           <li>
             <Link
               className='ChangeLogModal__issue-url'
-              href='https://github.com/x1unix/go-playground/pull/108'
+              href='https://github.com/x1unix/go-playground/pull/116'
               target='_blank'
             >
-              #108
+              #116
             </Link>
-            <span>Fix incorrect router path handling</span>
+            <span>Fix <i>fmtprintf</i> snippet</span>
+          </li>
+        </ul>
+        <b>Runtime - WebAssembly</b>
+        <ul>
+          <li>
+            <Link
+              className='ChangeLogModal__issue-url'
+              href='https://github.com/x1unix/go-playground/pull/117'
+              target='_blank'
+            >
+              #117
+            </Link>
+            <span>Fix execution context for <i>Window</i> interface methods</span>
+          </li>
+        </ul>
+        <b>Server - API</b>
+        <ul>
+          <li>
+            <Link
+              className='ChangeLogModal__issue-url'
+              href='https://github.com/x1unix/go-playground/pull/113'
+              target='_blank'
+            >
+              #113
+            </Link>
+            <span>Add GoTip support for Go development versions</span>
           </li>
         </ul>
         <p>
           And more!
         </p>
         <p>
-          Full release notes for are available <Link href={`${config.githubUrl}/releases/latest`} target='_blank'>here</Link>
+          Full release notes are available <Link href={`${config.githubUrl}/releases/latest`} target='_blank'>here</Link>
         </p>
       </div>
     </Modal>
