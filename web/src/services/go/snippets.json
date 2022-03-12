@@ -126,6 +126,13 @@
         "snippet": "0_bu1o8rIBO"
       }
   ],
+  "Playground features": [
+    {
+      "label": "Display image",
+      "snippet": "XN6x3L23Vok",
+      "icon": "FileImage"
+    }
+  ],
   "Other examples": [
     {
       "label": "Random number",
