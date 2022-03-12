@@ -131,6 +131,11 @@
       "label": "Display image",
       "snippet": "XN6x3L23Vok",
       "icon": "FileImage"
+    },
+    {
+      "label": "WebAssembly",
+      "snippet": "NCdgXZrYSk4",
+      "icon": "JS"
     }
   ],
   "Other examples": [
