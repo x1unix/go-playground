@@ -62,7 +62,7 @@ const snippets = [
   },
   {
     label: 'fmtprintf',
-    insertText: 'fmt.Printf("${1:format}\n", $0)',
+    insertText: 'fmt.Printf("${1:format}", $0)',
     documentation: 'fmt.Printf() shorthand'
   },
   {
