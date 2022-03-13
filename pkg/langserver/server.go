@@ -38,7 +38,7 @@ type PlaygroundServices struct {
 
 // Service is language server service
 type Service struct {
-	version     string
+	config      ServiceConfig
 	log         *zap.SugaredLogger
 	index       analyzer.PackageIndex
 	compiler    compiler.BuildService
@@ -46,11 +46,15 @@ type Service struct {
 	limiter     *rate.Limiter
 }
 
+type ServiceConfig struct {
+	Version string
+}
+
 // New is Service constructor
-func New(version string, playgrounds *PlaygroundServices, packages []*analyzer.Package, builder compiler.BuildService) *Service {
+func New(cfg ServiceConfig, playgrounds *PlaygroundServices, packages []*analyzer.Package, builder compiler.BuildService) *Service {
 	return &Service{
+		config:      cfg,
 		compiler:    builder,
-		version:     version,
 		playgrounds: playgrounds,
 		log:         zap.S().Named("langserver"),
 		index:       analyzer.BuildPackageIndex(packages),
@@ -131,7 +135,7 @@ func (s *Service) provideSuggestion(req SuggestionRequest) (*SuggestionsResponse
 
 // HandleGetVersion handles /api/version
 func (s *Service) HandleGetVersion(w http.ResponseWriter, _ *http.Request) error {
-	WriteJSON(w, VersionResponse{Version: s.version})
+	WriteJSON(w, VersionResponse{Version: s.config.Version})
 	return nil
 }
 
