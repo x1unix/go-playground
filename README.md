@@ -26,7 +26,7 @@ And more !
 
 ### Docker
 
-Playground is available via [Docker Hub](https://hub.docker.com/r/x1unix/go-playground).
+Playground is available as Docker image in [Docker Hub](https://hub.docker.com/r/x1unix/go-playground) and [GitHub Container Registry](https://github.com/x1unix/go-playground/pkgs/container/go-playground%2Fgo-playground).
 
 See [wiki](https://github.com/x1unix/go-playground/wiki/Docker) for usage info.
 
