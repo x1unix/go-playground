@@ -39,7 +39,7 @@ func (s EnvironmentVariables) Concat(newItems EnvironmentVariables) EnvironmentV
 	newList := make(EnvironmentVariables, len(s)+len(newItems))
 	newList.Append(s)
 	newList.Append(newItems)
-	return s
+	return newList
 }
 
 // SplitEnvironmentValues splits slice of '='-separated key-value items and returns key-value pair.
