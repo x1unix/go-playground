@@ -132,7 +132,7 @@ func start(goRoot string, args appArgs) error {
 	buildCfg := compiler.BuildEnvironmentConfig{
 		IncludedEnvironmentVariables: osutil.SelectEnvironmentVariables(args.bypassEnvVarsList...),
 	}
-	zap.L().Info("Loaded list of environment variables used by compiler",
+	zap.L().Debug("Loaded list of environment variables used by compiler",
 		zap.Any("vars", buildCfg.IncludedEnvironmentVariables))
 	buildSvc := compiler.NewBuildService(zap.S(), buildCfg, store)
 
