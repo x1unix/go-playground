@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/x1unix/go-playground/pkg/langserver/webutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -135,6 +136,12 @@ func start(goRoot string, args appArgs) error {
 	tplVars := langserver.TemplateArguments{
 		GoogleTagID: args.googleAnalyticsID,
 	}
+	if err := webutil.ValidateGTag(tplVars.GoogleTagID); err != nil {
+		zap.L().Error("invalid GTag ID value, parameter will be ignored",
+			zap.String("gtag", tplVars.GoogleTagID), zap.Error(err))
+		tplVars.GoogleTagID = ""
+	}
+
 	indexHandler := langserver.NewTemplateFileServer(zap.L(), filepath.Join(args.assetsDirectory, langserver.IndexFileName), tplVars)
 	spaHandler := langserver.NewSpaFileServer(args.assetsDirectory, tplVars)
 	r.Path("/").
