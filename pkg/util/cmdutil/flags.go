@@ -22,15 +22,16 @@ func (s StringsListValue) String() string {
 // Set implements flag.Value
 func (s *StringsListValue) Set(s2 string) error {
 	vals := strings.Split(s2, csvSeparator)
-	for i, v := range vals {
+	filteredVals := make([]string, 0, len(vals))
+	for _, v := range vals {
 		v = strings.TrimSpace(v)
 		if v == "" {
 			continue
 		}
-		vals[i] = v
+		filteredVals = append(filteredVals, v)
 	}
 
-	*s = vals
+	*s = filteredVals
 	return nil
 }
 
