@@ -29,10 +29,7 @@ func (a ArtifactID) String() string {
 // GetArtifactID generates new artifact ID from contents
 func GetArtifactID(data []byte) (ArtifactID, error) {
 	h := md5.New()
-	if _, err := h.Write(bytes.TrimSpace(data)); err != nil {
-		return "", err
-	}
-
+	_, _ = h.Write(bytes.TrimSpace(data))
 	fName := hex.EncodeToString(h.Sum(nil))
 	return ArtifactID(fName), nil
 }
