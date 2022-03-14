@@ -17,11 +17,16 @@ include docker.mk
 
 .PHONY:run
 run:
-	@GOROOT=$(GOROOT) $(GO) run $(PKG) -f ./data/packages.json -static-dir="$(UI)/build" -debug=$(DEBUG) -addr $(LISTEN_ADDR)
+	@GOROOT=$(GOROOT) $(GO) run $(PKG) \
+		-f ./data/packages.json \
+		-static-dir="$(UI)/build" \
+		-gtag-id="$(GTAG)" \
+		-debug=$(DEBUG) \
+		-addr $(LISTEN_ADDR)
 
 .PHONY:ui
 ui:
-	@cd $(UI) && REACT_APP_LANG_SERVER=http://$(LISTEN_ADDR) REACT_APP_GTAG=$(GTAG) REACT_APP_VERSION=testing yarn start
+	@cd $(UI) && REACT_APP_LANG_SERVER='//$(LISTEN_ADDR)' REACT_APP_VERSION=testing yarn start
 
 .PHONY: cover
 cover:

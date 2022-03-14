@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/x1unix/go-playground/pkg/langserver/webutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -33,6 +34,7 @@ type appArgs struct {
 	cleanupInterval    string
 	assetsDirectory    string
 	connectTimeout     time.Duration
+	googleAnalyticsID  string
 }
 
 func (a appArgs) getCleanDuration() (time.Duration, error) {
@@ -56,6 +58,7 @@ func main() {
 	flag.BoolVar(&args.debug, "debug", false, "Enable debug mode")
 	flag.StringVar(&args.assetsDirectory, "static-dir", filepath.Join(wd, "public"), "Path to web page assets (HTML, JS, etc)")
 	flag.DurationVar(&args.connectTimeout, "timeout", 15*time.Second, "Go Playground server connect timeout")
+	flag.StringVar(&args.googleAnalyticsID, "gtag-id", "", "Google Analytics tag ID (optional)")
 
 	l := getLogger(args.debug)
 	defer l.Sync() //nolint:errcheck
@@ -123,12 +126,24 @@ func start(goRoot string, args appArgs) error {
 		GoTip:   goTipClient,
 	}
 	// API routes
-	langserver.New(Version, clients, packages, compiler.NewBuildService(zap.S(), store)).
+	svcCfg := langserver.ServiceConfig{
+		Version: Version,
+	}
+	langserver.New(svcCfg, clients, packages, compiler.NewBuildService(zap.S(), store)).
 		Mount(r.PathPrefix("/api").Subrouter())
 
 	// Web UI routes
-	indexHandler := langserver.NewIndexFileServer(args.assetsDirectory)
-	spaHandler := langserver.NewSpaFileServer(args.assetsDirectory)
+	tplVars := langserver.TemplateArguments{
+		GoogleTagID: args.googleAnalyticsID,
+	}
+	if err := webutil.ValidateGTag(tplVars.GoogleTagID); err != nil {
+		zap.L().Error("invalid GTag ID value, parameter will be ignored",
+			zap.String("gtag", tplVars.GoogleTagID), zap.Error(err))
+		tplVars.GoogleTagID = ""
+	}
+
+	indexHandler := langserver.NewTemplateFileServer(zap.L(), filepath.Join(args.assetsDirectory, langserver.IndexFileName), tplVars)
+	spaHandler := langserver.NewSpaFileServer(args.assetsDirectory, tplVars)
 	r.Path("/").
 		Handler(indexHandler)
 	r.Path("/snippet/{snippetID:[A-Za-z0-9_-]+}").

@@ -22,25 +22,11 @@ func (i httpStatusInterceptor) WriteHeader(_ int) {
 	i.ResponseWriter.WriteHeader(i.desiredStatus)
 }
 
-type IndexFileServer struct {
-	indexFilePath string
-}
-
-// NewIndexFileServer returns handler which serves index.html page from root.
-func NewIndexFileServer(root string) *IndexFileServer {
-	return &IndexFileServer{
-		indexFilePath: filepath.Join(string(root), IndexFileName),
-	}
-}
-
-func (fs IndexFileServer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	http.ServeFile(rw, r, fs.indexFilePath)
-}
-
 // SpaFileServer is a wrapper around http.FileServer for serving SPA contents.
 type SpaFileServer struct {
 	root            string
 	NotFoundHandler http.Handler
+	templateVars    TemplateArguments
 }
 
 // ServeHTTP implements http.Handler
@@ -93,11 +79,12 @@ func containsDotDot(v string) bool {
 func isSlashRune(r rune) bool { return r == '/' || r == '\\' }
 
 // NewSpaFileServer returns SPA handler
-func NewSpaFileServer(root string) *SpaFileServer {
+func NewSpaFileServer(root string, tplVars TemplateArguments) *SpaFileServer {
 	notFoundHandler := NewFileServerWithStatus(filepath.Join(root, NotFoundFileName), http.StatusNotFound)
 	return &SpaFileServer{
 		NotFoundHandler: notFoundHandler,
 		root:            root,
+		templateVars:    tplVars,
 	}
 }
 
