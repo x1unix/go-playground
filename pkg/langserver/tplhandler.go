@@ -13,18 +13,6 @@ import (
 	"go.uber.org/zap"
 )
 
-type nopRSeeker struct {
-	size int64
-	io.Reader
-}
-
-func newNopRSeeker(size int, r io.Reader) *nopRSeeker {
-	return &nopRSeeker{
-		size:   int64(size),
-		Reader: r,
-	}
-}
-
 type TemplateArguments struct {
 	GoogleTagID string
 }
@@ -36,16 +24,6 @@ type TemplateFileServer struct {
 	once         *sync.Once
 	buffer       io.ReadSeeker
 	modTime      time.Time
-}
-
-// Seek implements io.Seeker
-func (n nopRSeeker) Seek(_ int64, whence int) (int64, error) {
-	switch whence {
-	case io.SeekStart:
-		return 0, nil
-	default:
-		return n.size, nil
-	}
 }
 
 // NewTemplateFileServer returns handler which compiles and serves HTML page template.
@@ -82,13 +60,14 @@ func (fs *TemplateFileServer) precompileTemplate() {
 		return
 	}
 
-	buff := bytes.NewBuffer(make([]byte, 0, stat.Size()))
+	buff := new(bytes.Buffer)
+	buff.Grow(int(stat.Size()))
 	if err := tpl.Execute(buff, fs.templateVars); err != nil {
 		fs.log.Error("failed to execute page template", zap.Error(err), zap.String("filePath", fs.filePath))
 		return
 	}
 
 	fs.log.Info("successfully compiled page template", zap.String("filePath", fs.filePath))
-	fs.buffer = newNopRSeeker(buff.Len(), buff)
+	fs.buffer = bytes.NewReader(buff.Bytes())
 	fs.modTime = time.Now()
 }
