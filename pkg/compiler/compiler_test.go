@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/x1unix/go-playground/pkg/compiler/storage"
 	"github.com/x1unix/go-playground/pkg/testutil"
+	"github.com/x1unix/go-playground/pkg/util/osutil"
 	"go.uber.org/zap/zaptest"
 )
 
@@ -78,7 +79,7 @@ func TestBuildService_GetArtifact(t *testing.T) {
 	for k, v := range cases {
 		t.Run(k, func(t *testing.T) {
 			ts := v.beforeRun(t)
-			bs := NewBuildService(zaptest.NewLogger(t).Sugar(), ts)
+			bs := NewBuildService(zaptest.NewLogger(t).Sugar(), BuildEnvironmentConfig{}, ts)
 			got, err := bs.GetArtifact(v.artifactID)
 			if v.wantErr != "" {
 				require.Error(t, err)
@@ -176,7 +177,7 @@ func TestBuildService_Build(t *testing.T) {
 				}()
 			}
 
-			bs := NewBuildService(zaptest.NewLogger(t).Sugar(), store)
+			bs := NewBuildService(zaptest.NewLogger(t).Sugar(), BuildEnvironmentConfig{}, store)
 			got, err := bs.Build(context.TODO(), c.data)
 			if c.wantErr != "" {
 				if c.onErrorCheck != nil {
@@ -189,6 +190,42 @@ func TestBuildService_Build(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, got)
 			require.Equal(t, c.wantResult, got)
+		})
+	}
+}
+
+func TestBuildService_getEnvironmentVariables(t *testing.T) {
+	cases := map[string]struct {
+		includedVars osutil.EnvironmentVariables
+		check        func(t *testing.T, included osutil.EnvironmentVariables, result []string)
+	}{
+		"include vars": {
+			includedVars: osutil.EnvironmentVariables{
+				"FOOBAR": "BAZ",
+				"GOOS":   "stub-value",
+			},
+			check: func(t *testing.T, included osutil.EnvironmentVariables, result []string) {
+				got := osutil.SplitEnvironmentValues(result)
+				expect := included.Concat(predefinedBuildVars)
+				require.Equal(t, expect, got)
+			},
+		},
+		"ignore vars if empty": {
+			check: func(t *testing.T, _ osutil.EnvironmentVariables, result []string) {
+				got := osutil.SplitEnvironmentValues(result)
+				require.Equal(t, predefinedBuildVars, got)
+			},
+		},
+	}
+
+	for n, c := range cases {
+		t.Run(n, func(t *testing.T) {
+			cfg := BuildEnvironmentConfig{
+				IncludedEnvironmentVariables: c.includedVars,
+			}
+			svc := NewBuildService(zaptest.NewLogger(t).Sugar(), cfg, nil)
+			got := svc.getEnvironmentVariables()
+			c.check(t, c.includedVars, got)
 		})
 	}
 }

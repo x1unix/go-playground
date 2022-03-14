@@ -39,4 +39,5 @@ ENTRYPOINT /opt/playground/server \
     -playground-url="${APP_PLAYGROUND_URL}" \
     -gotip-url="${APP_GOTIP_URL}" \
     -gtag-id="${APP_GTAG_ID}" \
+    -permit-env-vars="${APP_PERMIT_ENV_VARS}" \
     -addr=:8000

@@ -22,7 +22,8 @@ run:
 		-static-dir="$(UI)/build" \
 		-gtag-id="$(GTAG)" \
 		-debug=$(DEBUG) \
-		-addr $(LISTEN_ADDR)
+		-addr $(LISTEN_ADDR) \
+		$(EXTRA_ARGS)
 
 .PHONY:ui
 ui:

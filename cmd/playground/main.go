@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/x1unix/go-playground/pkg/langserver/webutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -18,6 +17,9 @@ import (
 	"github.com/x1unix/go-playground/pkg/compiler/storage"
 	"github.com/x1unix/go-playground/pkg/goplay"
 	"github.com/x1unix/go-playground/pkg/langserver"
+	"github.com/x1unix/go-playground/pkg/langserver/webutil"
+	"github.com/x1unix/go-playground/pkg/util/cmdutil"
+	"github.com/x1unix/go-playground/pkg/util/osutil"
 	"go.uber.org/zap"
 )
 
@@ -33,8 +35,9 @@ type appArgs struct {
 	buildDir           string
 	cleanupInterval    string
 	assetsDirectory    string
-	connectTimeout     time.Duration
 	googleAnalyticsID  string
+	bypassEnvVarsList  []string
+	connectTimeout     time.Duration
 }
 
 func (a appArgs) getCleanDuration() (time.Duration, error) {
@@ -59,10 +62,11 @@ func main() {
 	flag.StringVar(&args.assetsDirectory, "static-dir", filepath.Join(wd, "public"), "Path to web page assets (HTML, JS, etc)")
 	flag.DurationVar(&args.connectTimeout, "timeout", 15*time.Second, "Go Playground server connect timeout")
 	flag.StringVar(&args.googleAnalyticsID, "gtag-id", "", "Google Analytics tag ID (optional)")
+	flag.Var(cmdutil.NewStringsListValue(&args.bypassEnvVarsList), "permit-env-vars", "Comma-separated allow list of environment variables passed to Go compiler tool")
+	flag.Parse()
 
 	l := getLogger(args.debug)
 	defer l.Sync() //nolint:errcheck
-	flag.Parse()
 
 	goRoot, err := compiler.GOROOT()
 	if err != nil {
@@ -118,18 +122,24 @@ func start(goRoot string, args appArgs) error {
 	wg := &sync.WaitGroup{}
 	go store.StartCleaner(ctx, cleanInterval, nil)
 
-	r := mux.NewRouter()
+	// Initialize services
 	pgClient := goplay.NewClient(args.playgroundURL, goplay.DefaultUserAgent, args.connectTimeout)
 	goTipClient := goplay.NewClient(args.goTipPlaygroundURL, goplay.DefaultUserAgent, args.connectTimeout)
 	clients := &langserver.PlaygroundServices{
 		Default: pgClient,
 		GoTip:   goTipClient,
 	}
-	// API routes
-	svcCfg := langserver.ServiceConfig{
-		Version: Version,
+	buildCfg := compiler.BuildEnvironmentConfig{
+		IncludedEnvironmentVariables: osutil.SelectEnvironmentVariables(args.bypassEnvVarsList...),
 	}
-	langserver.New(svcCfg, clients, packages, compiler.NewBuildService(zap.S(), store)).
+	zap.L().Debug("Loaded list of environment variables used by compiler",
+		zap.Any("vars", buildCfg.IncludedEnvironmentVariables))
+	buildSvc := compiler.NewBuildService(zap.S(), buildCfg, store)
+
+	// Initialize API endpoints
+	r := mux.NewRouter()
+	svcCfg := langserver.ServiceConfig{Version: Version}
+	langserver.New(svcCfg, clients, packages, buildSvc).
 		Mount(r.PathPrefix("/api").Subrouter())
 
 	// Web UI routes
