@@ -6,9 +6,6 @@
   <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
-  <% if (process.env.NODE_ENV === 'production') { %>
-  <meta name="x-gtag" content="{{.GoogleTagID}}" />
-  <% } %>
   <meta name="description" content="Better Go Playground with syntax highlight support" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
@@ -20,21 +17,15 @@
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <div id="root"></div>
   <% if (process.env.NODE_ENV === 'production') { %>
-    <script>
-      (function (d) {
-        var e = d.querySelector('meta[name=x-gtag]');
-        if (!e || !e.content) return;
-        var s = d.createElement('script');
-        s.async = true; s.src = "https://www.googletagmanager.com/gtag/js?id=" + e.content;
-        s.onload = function () {
-          window.dataLayer = window.dataLayer || [];
-          function gtag() { dataLayer.push(arguments); }
-          gtag('js', new Date());
-          gtag('config', e.content);
-        };
-        d.body.appendChild(s);
-      })(document)
-    </script>
+  {{ if .GoogleTagID }}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{.GoogleTagID}}"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{.GoogleTagID}}');
+  </script>
+  {{ end }}
   <% } %>
 </body>
 
