@@ -1,3 +1,5 @@
+[![SWUbanner](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
+
 # Better Go Playground
 
 [![Docker Hub](https://img.shields.io/docker/pulls/x1unix/go-playground.svg)](https://hub.docker.com/r/x1unix/go-playground)
