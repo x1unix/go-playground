@@ -276,6 +276,7 @@ func (s *Service) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) 
 		return err
 	}
 
+	w.Header().Set("Content-Type", wasmMimeType)
 	n, err := io.Copy(w, data)
 	defer data.Close()
 	if err != nil {
@@ -286,7 +287,6 @@ func (s *Service) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) 
 		return err
 	}
 
-	w.Header().Set("Content-Type", wasmMimeType)
 	w.Header().Set("Content-Length", strconv.FormatInt(n, 10))
 	return nil
 }
