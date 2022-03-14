@@ -3,17 +3,20 @@ package compiler
 import (
 	"bytes"
 	"context"
-	"github.com/x1unix/go-playground/pkg/compiler/storage"
-	"go.uber.org/zap"
 	"io"
 	"os"
+
+	"github.com/x1unix/go-playground/pkg/compiler/storage"
+	"github.com/x1unix/go-playground/pkg/util/osutil"
+	"go.uber.org/zap"
 )
 
-var buildArgs = []string{
-	"CGO_ENABLED=0",
-	"GOOS=js",
-	"GOARCH=wasm",
-	"HOME=" + os.Getenv("HOME"),
+// predefinedBuildVars is list of environment vars which contain build values
+var predefinedBuildVars = osutil.EnvironmentVariables{
+	"CGO_ENABLED": "0",
+	"GOOS":        "js",
+	"GOARCH":      "wasm",
+	"HOME":        os.Getenv("HOME"),
 }
 
 // Result is WASM build result
@@ -22,23 +25,31 @@ type Result struct {
 	FileName string
 }
 
+// BuildEnvironmentConfig is BuildService environment configuration.
+type BuildEnvironmentConfig struct {
+	// IncludedEnvironmentVariables is a list included environment variables for build.
+	IncludedEnvironmentVariables osutil.EnvironmentVariables
+}
+
 // BuildService is WASM build service
 type BuildService struct {
 	log     *zap.SugaredLogger
+	config  BuildEnvironmentConfig
 	storage storage.StoreProvider
 }
 
 // NewBuildService is BuildService constructor
-func NewBuildService(log *zap.SugaredLogger, store storage.StoreProvider) BuildService {
+func NewBuildService(log *zap.SugaredLogger, cfg BuildEnvironmentConfig, store storage.StoreProvider) BuildService {
 	return BuildService{
 		log:     log.Named("builder"),
+		config:  cfg,
 		storage: store,
 	}
 }
 
 func (s BuildService) buildSource(ctx context.Context, outputLocation, sourceLocation string) error {
 	cmd := newGoToolCommand(ctx, "build", "-o", outputLocation, sourceLocation)
-	cmd.Env = buildArgs
+	cmd.Env = s.getEnvironmentVariables()
 	buff := &bytes.Buffer{}
 	cmd.Stderr = buff
 
@@ -54,6 +65,14 @@ func (s BuildService) buildSource(ctx context.Context, outputLocation, sourceLoc
 	}
 
 	return nil
+}
+
+func (s BuildService) getEnvironmentVariables() []string {
+	if len(s.config.IncludedEnvironmentVariables) == 0 {
+		return predefinedBuildVars.Join()
+	}
+
+	return s.config.IncludedEnvironmentVariables.Concat(predefinedBuildVars).Join()
 }
 
 // GetArtifact returns artifact by id
