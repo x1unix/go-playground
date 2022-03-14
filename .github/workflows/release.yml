@@ -2,7 +2,7 @@
 # Better Go Playground Docker image deployment workflow
 #
 # Builds and deploys image to Docker hub when a new release created.
-# Uses DOCKER_USER and DOCKER_PASS env vars from GitHub repo secrets.
+# Uses DOCKERHUB_USERNAME and DOCKERHUB_TOKEN env vars from GitHub repo secrets.
 #
 # see: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
 #
@@ -19,21 +19,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - id: go-cache-paths
-        run: |
-          echo "::set-output name=go-build::$(go env GOCACHE)"
-          echo "::set-output name=go-mod::$(go env GOMODCACHE)"
       - uses: actions/checkout@v2
-      - name: Go Build Cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.go-cache-paths.outputs.go-build }}
-          key: ${{ runner.os }}-go-build-${{ hashFiles('**/go.sum') }}
-      - name: Go Mod Cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.go-cache-paths.outputs.go-mod }}
-          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
       - uses: actions/cache@v2
         with:
           path: "**/node_modules"
@@ -42,11 +28,44 @@ jobs:
         run: |
           echo "Release version ${GITHUB_REF#refs/*/v}"
           echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
-      - name: Build Docker image
-        run: |
-          make docker-image TAG=${{ env.RELEASE_VERSION }}
-      - name: Push image to Docker hub
-        run: |
-          make docker-push-image TAG=${{ env.RELEASE_VERSION }} \
-            DOCKER_USER=${{ secrets.DOCKER_USER }} \
-            DOCKER_PASS=${{ secrets.DOCKER_PASS }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract version metadata
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            x1unix/go-playground
+            ghcr.io/x1unix/go-playground/go-playground
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Build and push image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./build/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            APP_VERSION=${{ env.RELEASE_VERSION }}
+          push: true
+      - name: Print image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
