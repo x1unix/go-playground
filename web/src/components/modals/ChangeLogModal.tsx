@@ -39,53 +39,17 @@ export default function ChangeLogModal(props: ChangeLogModalProps) {
         />
       </div>
       <div id={SUB_TITLE_ID} className={contentStyles.body}>
-        <b>Interface - Editor</b>
-        <ul>
-          <li>
-            <Link
-              className='ChangeLogModal__issue-url'
-              href='https://github.com/x1unix/go-playground/pull/115'
-              target='_blank'
-            >
-              #115
-            </Link>
-            <span>Add base64 images output support</span>
-          </li>
-          <li>
-            <Link
-              className='ChangeLogModal__issue-url'
-              href='https://github.com/x1unix/go-playground/pull/116'
-              target='_blank'
-            >
-              #116
-            </Link>
-            <span>Fix <i>fmtprintf</i> snippet</span>
-          </li>
-        </ul>
         <b>Runtime - WebAssembly</b>
         <ul>
           <li>
             <Link
               className='ChangeLogModal__issue-url'
-              href='https://github.com/x1unix/go-playground/pull/117'
+              href='https://github.com/x1unix/go-playground/pull/129'
               target='_blank'
             >
-              #117
+              #129
             </Link>
-            <span>Fix execution context for <i>Window</i> interface methods</span>
-          </li>
-        </ul>
-        <b>Server - API</b>
-        <ul>
-          <li>
-            <Link
-              className='ChangeLogModal__issue-url'
-              href='https://github.com/x1unix/go-playground/pull/113'
-              target='_blank'
-            >
-              #113
-            </Link>
-            <span>Add GoTip support for Go development versions</span>
+            <span>Use Go 1.18</span>
           </li>
         </ul>
         <p>
