@@ -41,7 +41,7 @@ const SharePopup: FC<Props> = ({ visible, snippetId, originUrl, onDismiss, targe
     >
       <span>Your snippet is available at </span>
       <Link
-        href="/foobar"
+        href={`${originUrl}/snippet/${snippetId}`}
         target="_blank"
         underline
         styles={{
