@@ -6,7 +6,7 @@ ARG GITHUB_URL='https://github.com/x1unix/go-playground'
 RUN yarn install --silent && \
     REACT_APP_VERSION=$APP_VERSION NODE_ENV=production REACT_APP_GITHUB_URL=$GITHUB_URL yarn build
 
-FROM golang:1.17-alpine as build
+FROM golang:1.18-alpine as build
 WORKDIR /tmp/playground
 COPY cmd ./cmd
 COPY pkg ./pkg
@@ -18,7 +18,7 @@ RUN echo "Building server with version $APP_VERSION" && \
     GOOS=js GOARCH=wasm go build -o ./worker.wasm ./cmd/webworker && \
     cp $(go env GOROOT)/misc/wasm/wasm_exec.js .
 
-FROM golang:1.17-alpine as production
+FROM golang:1.18-alpine as production
 WORKDIR /opt/playground
 ENV GOROOT /usr/local/go
 ENV APP_CLEAN_INTERVAL=10m
