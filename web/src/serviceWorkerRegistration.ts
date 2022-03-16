@@ -44,11 +44,14 @@ export function register(config?: Config) {
 
         // Add some additional logging to localhost, pointing developers to the
         // service worker/PWA documentation.
-        navigator.serviceWorker.ready.then(() => {
+        navigator.serviceWorker.ready.then((reg) => {
           console.log(
             'This web app is being served cache-first by a service ' +
             'worker. To learn more, visit https://cra.link/PWA'
           );
+          reg.update().catch(err => {
+            console.error('Failed to update service worker: ', err);
+          });
         });
       } else {
         // Is not localhost. Just register service worker

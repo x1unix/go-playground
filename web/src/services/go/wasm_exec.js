@@ -437,7 +437,7 @@ export class Go {
       null,
       true,
       false,
-      global,
+      globalThis,
       this,
     ];
     this._goRefCounts = new Array(this._values.length).fill(Infinity); // number of references that Go has to a JS value, indexed by reference id
@@ -446,7 +446,7 @@ export class Go {
       [null, 2],
       [true, 3],
       [false, 4],
-      [global, 5],
+      [globalThis, 5],
       [this, 6],
     ]);
     this._idPool = [];   // unused ids that have been garbage collected

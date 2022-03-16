@@ -45,6 +45,10 @@
       "snippet": "XJASG4MxBQr"
     },
     {
+      "label": "Generics",
+      "snippet": "-HOv2JpMQih"
+    },
+    {
       "label": "Errors",
       "snippet": "NiJOpCPO3L0"
     },
@@ -57,11 +61,16 @@
       "snippet": "Sk-SVdofEIZ"
     }
   ],
-  "Experimental features": [
+  "Playground features": [
     {
-      "label": "Generics",
-      "snippet": "tktmsniUZXu",
-      "type": "experimental"
+      "label": "Display image",
+      "snippet": "XN6x3L23Vok",
+      "icon": "FileImage"
+    },
+    {
+      "label": "WebAssembly",
+      "snippet": "NCdgXZrYSk4",
+      "icon": "JS"
     }
   ],
   "Concurrency": [
@@ -125,18 +134,6 @@
         "label": "Context",
         "snippet": "0_bu1o8rIBO"
       }
-  ],
-  "Playground features": [
-    {
-      "label": "Display image",
-      "snippet": "XN6x3L23Vok",
-      "icon": "FileImage"
-    },
-    {
-      "label": "WebAssembly",
-      "snippet": "NCdgXZrYSk4",
-      "icon": "JS"
-    }
   ],
   "Other examples": [
     {
