@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import config from '~/services/config';
+import config, {RuntimeType} from '~/services/config';
 import EllipsisText from '~/components/utils/EllipsisText';
 import StatusBarItem from '~/components/core/StatusBar/StatusBarItem';
 import './StatusBar.css';
@@ -8,6 +8,7 @@ import './StatusBar.css';
 interface Props {
   loading?: true
   lastError?: string
+  runtime?: RuntimeType
 }
 
 const getStatusItem = ({loading, lastError}) => {
@@ -35,7 +36,7 @@ const getStatusItem = ({loading, lastError}) => {
   return null;
 }
 
-const StatusBar: React.FC<Props> = ({loading, lastError}) => {
+const StatusBar: React.FC<Props> = ({loading, lastError, runtime}) => {
   const className = loading ? 'StatusBar StatusBar--busy' : 'StatusBar';
   return (
     <div className={className}>
@@ -57,7 +58,7 @@ const StatusBar: React.FC<Props> = ({loading, lastError}) => {
           hideTextOnMobile
           button
         >
-          WebAssembly
+          {RuntimeType.toString(runtime)}
         </StatusBarItem>
         <StatusBarItem
           iconName="Feedback"
@@ -76,6 +77,6 @@ const StatusBar: React.FC<Props> = ({loading, lastError}) => {
   );
 };
 
-export default connect(({status: {loading, lastError}}: any) => (
-  {loading, lastError}
+export default connect(({status: {loading, lastError}, settings: {runtime}}: any) => (
+  {loading, lastError, runtime}
 ))(StatusBar);
