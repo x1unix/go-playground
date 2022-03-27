@@ -1,6 +1,6 @@
 import React from 'react';
 import EllipsisText from '~/components/utils/EllipsisText';
-import StatusBarButton from '~/components/core/StatusBar/StatusBarButton';
+import StatusBarItem from '~/components/core/StatusBar/StatusBarItem';
 import './StatusBar.css';
 
 interface Props {
@@ -11,17 +11,17 @@ const StatusBar: React.FC<Props> = () => {
   return (
     <div className="StatusBar StatusBar--busy">
       <div className="StatusBar__side-left">
-        <StatusBarButton iconName="ErrorBadge">
+        <StatusBarItem iconName="ErrorBadge" button>
           0 Errors
-        </StatusBarButton>
-        <StatusBarButton iconName="NotExecuted">
+        </StatusBarItem>
+        <StatusBarItem iconName="NotExecuted" disabled>
           Build failed
-        </StatusBarButton>
-        <StatusBarButton iconName="Build">
+        </StatusBarItem>
+        <StatusBarItem iconName="Build">
           <EllipsisText>
             Building program
           </EllipsisText>
-        </StatusBarButton>
+        </StatusBarItem>
       </div>
       <div className="StatusBar__side-right">
         {/*<PrimaryButton iconProps={{iconName: 'AddFriend'}}>*/}
