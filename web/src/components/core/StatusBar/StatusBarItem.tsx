@@ -1,6 +1,5 @@
 import React, {CSSProperties, MouseEventHandler} from 'react';
 import { FontIcon } from '@fluentui/react/lib/Icon';
-import {Link} from 'react-router-dom';
 import './StatusBarItem.css';
 
 interface Props {
@@ -12,7 +11,7 @@ interface Props {
   hideTextOnMobile?: boolean
   href?: string
   title?: string
-  onClick?: MouseEventHandler<HTMLButtonElement>
+  onClick?: MouseEventHandler<HTMLButtonElement|HTMLAnchorElement>
   style?: CSSProperties
 }
 
@@ -59,14 +58,14 @@ const StatusBarItem: React.FC<Props> = ({
 
   if (href) {
     return (
-      <Link
+      <a
         href={href}
         target="_blank"
         className={`${className} StatusBarItem--action`}
         {...props}
       >
         { content }
-      </Link>
+      </a>
     )
   }
 

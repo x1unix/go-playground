@@ -37,5 +37,3 @@ export function Connect(fn: (state: State) => any) {
     return connect(fn)(constructor as any) as any;
   }
 }
-
-

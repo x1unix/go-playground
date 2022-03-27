@@ -1,16 +1,44 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import config from '~/services/config';
 import EllipsisText from '~/components/utils/EllipsisText';
 import StatusBarItem from '~/components/core/StatusBar/StatusBarItem';
 import './StatusBar.css';
 
 interface Props {
-  busy?: boolean
+  loading?: true
+  lastError?: string
 }
 
-const StatusBar: React.FC<Props> = () => {
+const getStatusItem = ({loading, lastError}) => {
+  if (loading) {
+    return (
+      <StatusBarItem iconName="Build">
+        <EllipsisText>
+          Building program
+        </EllipsisText>
+      </StatusBarItem>
+    );
+  }
+
+  if (lastError) {
+    return (
+      <StatusBarItem
+        iconName="NotExecuted"
+        hideTextOnMobile
+        disabled
+      >
+      Build failed
+      </StatusBarItem>
+    )
+  }
+  return null;
+}
+
+const StatusBar: React.FC<Props> = ({loading, lastError}) => {
+  const className = loading ? 'StatusBar StatusBar--busy' : 'StatusBar';
   return (
-    <div className="StatusBar StatusBar--busy">
+    <div className={className}>
       <div className="StatusBar__side-left">
         <StatusBarItem
           iconName="ErrorBadge"
@@ -19,23 +47,13 @@ const StatusBar: React.FC<Props> = () => {
         >
           0 Errors
         </StatusBarItem>
-        {/*<StatusBarItem*/}
-        {/*  iconName="NotExecuted"*/}
-        {/*  hideTextOnMobile*/}
-        {/*  disabled*/}
-        {/*>*/}
-        {/*  Build failed*/}
-        {/*</StatusBarItem>*/}
-        <StatusBarItem iconName="Build">
-          <EllipsisText>
-            Building program
-          </EllipsisText>
-        </StatusBarItem>
+        {getStatusItem({loading, lastError})}
       </div>
       <div className="StatusBar__side-right">
         <StatusBarItem
           iconName="Code"
           title="Select runtime"
+          disabled={loading}
           hideTextOnMobile
           button
         >
@@ -58,4 +76,6 @@ const StatusBar: React.FC<Props> = () => {
   );
 };
 
-export default StatusBar;
+export default connect(({status: {loading, lastError}}: any) => (
+  {loading, lastError}
+))(StatusBar);
