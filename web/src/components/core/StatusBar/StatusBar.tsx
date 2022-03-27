@@ -14,16 +14,18 @@ const StatusBar: React.FC<Props> = () => {
       <div className="StatusBar__side-left">
         <StatusBarItem
           iconName="ErrorBadge"
+          title="No Problems"
           button
         >
           0 Errors
         </StatusBarItem>
-        <StatusBarItem
-          iconName="NotExecuted"
-          disabled
-        >
-          Build failed
-        </StatusBarItem>
+        {/*<StatusBarItem*/}
+        {/*  iconName="NotExecuted"*/}
+        {/*  hideTextOnMobile*/}
+        {/*  disabled*/}
+        {/*>*/}
+        {/*  Build failed*/}
+        {/*</StatusBarItem>*/}
         <StatusBarItem iconName="Build">
           <EllipsisText>
             Building program
@@ -32,9 +34,23 @@ const StatusBar: React.FC<Props> = () => {
       </div>
       <div className="StatusBar__side-right">
         <StatusBarItem
+          iconName="Code"
+          title="Select runtime"
+          hideTextOnMobile
+          button
+        >
+          WebAssembly
+        </StatusBarItem>
+        <StatusBarItem
           iconName="Feedback"
           title="Send feedback"
           href={config.issueUrl}
+          iconOnly
+        />
+        <StatusBarItem
+          imageSrc="/github-mark-light-32px.png"
+          title="GitHub"
+          href={config.githubUrl}
           iconOnly
         />
       </div>

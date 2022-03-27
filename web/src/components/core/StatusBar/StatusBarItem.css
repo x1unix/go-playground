@@ -28,12 +28,16 @@
 }
 
 .StatusBarItem__label {
-  margin-left: 0.3em;
+  margin-left: 0.4em;
   font-size: 12px;
 }
 
 .StatusBarItem__icon {
   font-size: 12px;
+}
+
+.StatusBarItem__icon--image {
+  height: 12px;
 }
 
 .StatusBarItem.StatusBarItem--action:not([disabled]):hover {
@@ -47,4 +51,11 @@
 .StatusBarItem.StatusBarItem--action[disabled] {
   cursor: not-allowed;
   opacity: 0.3;
+}
+
+@media (max-width: 640px) {
+  .StatusBarItem.StatusBarItem--hideOnMobile
+  .StatusBarItem__label {
+    display: none;
+  }
 }

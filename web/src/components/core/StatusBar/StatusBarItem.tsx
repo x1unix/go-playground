@@ -6,19 +6,26 @@ import './StatusBarItem.css';
 interface Props {
   iconName?: string
   iconOnly?: boolean
+  imageSrc?: string
   button?: boolean
   disabled?: boolean
+  hideTextOnMobile?: boolean
   href?: string
   title?: string
   onClick?: MouseEventHandler<HTMLButtonElement>
   style?: CSSProperties
 }
 
-const getItemContents = (iconName?: string, iconOnly?: boolean, children?) => (
+const getItemContents = ({iconName, iconOnly, imageSrc, children}) => (
   <>
     {
       iconName && (
         <FontIcon iconName={iconName} className="StatusBarItem__icon"/>
+      )
+    }
+    {
+      imageSrc && (
+        <img src={imageSrc} className="StatusBarItem__icon--image" />
       )
     }
     {
@@ -31,13 +38,18 @@ const getItemContents = (iconName?: string, iconOnly?: boolean, children?) => (
   </>
 )
 
-const StatusBarItem: React.FC<Props> = ({iconName, iconOnly, href, button, children,  ...props}) => {
-  const content = getItemContents(iconName, iconOnly, children);
-
+const StatusBarItem: React.FC<Props> = ({
+  iconName, iconOnly, imageSrc, hideTextOnMobile,
+  href, button, children,  ...props
+}) => {
+  const content = getItemContents({iconName, iconOnly, children, imageSrc});
+  const className = hideTextOnMobile ? (
+    'StatusBarItem StatusBarItem--hideOnMobile'
+  ) : 'StatusBarItem';
   if (button) {
     return (
       <button
-        className="StatusBarItem StatusBarItem--action"
+        className={`${className} StatusBarItem--action`}
         {...props}
       >
         { content }
@@ -50,7 +62,7 @@ const StatusBarItem: React.FC<Props> = ({iconName, iconOnly, href, button, child
       <Link
         href={href}
         target="_blank"
-        className="StatusBarItem StatusBarItem--action"
+        className={`${className} StatusBarItem--action`}
         {...props}
       >
         { content }
@@ -61,7 +73,7 @@ const StatusBarItem: React.FC<Props> = ({iconName, iconOnly, href, button, child
   const { style, title } = props;
   return (
     <div
-      className="StatusBarItem StatusBarItem--text"
+      className={`${className} StatusBarItem--text`}
       title={title}
       style={style}
     >
