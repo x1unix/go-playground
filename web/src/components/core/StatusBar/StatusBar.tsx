@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import {editor} from "monaco-editor";
 import config, {RuntimeType} from '~/services/config';
 import EllipsisText from '~/components/utils/EllipsisText';
 import StatusBarItem from '~/components/core/StatusBar/StatusBarItem';
@@ -9,6 +10,7 @@ interface Props {
   loading?: true
   lastError?: string
   runtime?: RuntimeType
+  markers?: editor.IMarkerData[]
 }
 
 const getStatusItem = ({loading, lastError}) => {
@@ -36,7 +38,9 @@ const getStatusItem = ({loading, lastError}) => {
   return null;
 }
 
-const StatusBar: React.FC<Props> = ({loading, lastError, runtime}) => {
+const StatusBar: React.FC<Props> = ({
+  loading, lastError, runtime, markers
+}) => {
   const className = loading ? 'StatusBar StatusBar--busy' : 'StatusBar';
   return (
     <div className={className}>
@@ -46,7 +50,7 @@ const StatusBar: React.FC<Props> = ({loading, lastError, runtime}) => {
           title="No Problems"
           button
         >
-          0 Errors
+          {markers?.length ?? 0} Errors
         </StatusBarItem>
         {getStatusItem({loading, lastError})}
       </div>
@@ -77,6 +81,6 @@ const StatusBar: React.FC<Props> = ({loading, lastError, runtime}) => {
   );
 };
 
-export default connect(({status: {loading, lastError}, settings: {runtime}}: any) => (
-  {loading, lastError, runtime}
+export default connect(({status: {loading, lastError, markers}, settings: {runtime}}: any) => (
+  {loading, lastError, markers, runtime}
 ))(StatusBar);
