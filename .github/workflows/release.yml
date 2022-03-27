@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
@@ -45,7 +45,7 @@ jobs:
         with:
           images: |
             x1unix/go-playground
-            ghcr.io/x1unix/go-playground/go-playground
+            ghcr.io/x1unix/go-playground/better-go-playground
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
