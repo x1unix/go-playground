@@ -1,0 +1,35 @@
+.StatusBarButton {
+  color: #fff;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  display: flex;
+  height: 100%;
+  padding: 0 5px;
+  white-space: pre;
+  align-items: center;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  outline-width: 0;
+  margin: 0 3px;
+}
+
+.StatusBarButton__label {
+  margin-left: 0.3em;
+  font-size: 12px;
+}
+
+.StatusBarButton__icon {
+  font-size: 12px;
+}
+
+.StatusBarButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.StatusBarButton:active {
+  background: rgba(255, 255, 255, 0.2);
+}

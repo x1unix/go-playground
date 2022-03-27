@@ -7,6 +7,7 @@ import { Header } from '~/components/core/Header';
 import CodeEditor from '~/components/editor/CodeEditor';
 import FlexContainer from '~/components/editor/FlexContainer';
 import ResizablePreview from '~/components/preview/ResizablePreview';
+import StatusBar from '~/components/core/StatusBar';
 
 import './Playground.css';
 
@@ -20,6 +21,7 @@ const Playground = connect()(function (props: any) {
       <CodeEditor />
     </FlexContainer>
     <ResizablePreview />
+    <StatusBar />
   </div>;
 });
 
