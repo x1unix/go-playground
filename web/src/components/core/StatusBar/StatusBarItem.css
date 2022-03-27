@@ -14,9 +14,10 @@
   overflow: hidden;
   outline-width: 0;
   margin: 0 3px;
+  text-decoration: none;
 }
 
-.StatusBarItem.StatusBarItem--button {
+.StatusBarItem.StatusBarItem--action {
   cursor: pointer;
 }
 
@@ -35,15 +36,15 @@
   font-size: 12px;
 }
 
-.StatusBarItem.StatusBarItem--button:not([disabled]):hover {
+.StatusBarItem.StatusBarItem--action:not([disabled]):hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
-.StatusBarItem.StatusBarItem--button:not([disabled]):active {
+.StatusBarItem.StatusBarItem--action:not([disabled]):active {
   background: rgba(255, 255, 255, 0.2);
 }
 
-.StatusBarItem.StatusBarItem--button[disabled] {
+.StatusBarItem.StatusBarItem--action[disabled] {
   cursor: not-allowed;
   opacity: 0.3;
 }

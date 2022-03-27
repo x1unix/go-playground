@@ -1,4 +1,5 @@
 import React from 'react';
+import config from '~/services/config';
 import EllipsisText from '~/components/utils/EllipsisText';
 import StatusBarItem from '~/components/core/StatusBar/StatusBarItem';
 import './StatusBar.css';
@@ -11,10 +12,16 @@ const StatusBar: React.FC<Props> = () => {
   return (
     <div className="StatusBar StatusBar--busy">
       <div className="StatusBar__side-left">
-        <StatusBarItem iconName="ErrorBadge" button>
+        <StatusBarItem
+          iconName="ErrorBadge"
+          button
+        >
           0 Errors
         </StatusBarItem>
-        <StatusBarItem iconName="NotExecuted" disabled>
+        <StatusBarItem
+          iconName="NotExecuted"
+          disabled
+        >
           Build failed
         </StatusBarItem>
         <StatusBarItem iconName="Build">
@@ -24,9 +31,12 @@ const StatusBar: React.FC<Props> = () => {
         </StatusBarItem>
       </div>
       <div className="StatusBar__side-right">
-        {/*<PrimaryButton iconProps={{iconName: 'AddFriend'}}>*/}
-        {/*  0 Errors*/}
-        {/*</PrimaryButton>*/}
+        <StatusBarItem
+          iconName="Feedback"
+          title="Send feedback"
+          href={config.issueUrl}
+          iconOnly
+        />
       </div>
     </div>
   );
