@@ -14,6 +14,7 @@ export enum ActionType {
   MONACO_SETTINGS_CHANGE = 'MONACO_SETTINGS_CHANGE',
   UI_STATE_CHANGE = 'UI_STATE_CHANGE',
   MARKER_CHANGE = 'MARKER_CHANGE',
+  ENVIRONMENT_CHANGE = 'ENVIRONMENT_CHANGE',
 
   // Special actions used by Go WASM bridge
   EVAL_START = 'EVAL_START',
@@ -88,6 +89,12 @@ export const newBuildParamsChangeAction = (runtime: RuntimeType, autoFormat: boo
 ({
   type: ActionType.BUILD_PARAMS_CHANGE,
   payload: { runtime, autoFormat } as BuildParamsArgs
+});
+
+export const newEnvironmentChangeAction = (runtime: RuntimeType) =>
+({
+  type: ActionType.ENVIRONMENT_CHANGE,
+  payload: runtime
 });
 
 export const newMonacoParamsChangeAction = <T>(changes: MonacoParamsChanges<T>) =>

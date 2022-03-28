@@ -11,7 +11,7 @@ import StatusBar from '~/components/core/StatusBar';
 
 import './Playground.css';
 
-const Playground = connect()(function (props: any) {
+const Playground = connect()((props: any) => {
   const { snippetID } = useParams();
   props.dispatch(newSnippetLoadDispatcher(snippetID));
 
