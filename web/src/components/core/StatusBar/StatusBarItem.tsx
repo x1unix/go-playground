@@ -15,7 +15,7 @@ interface Props {
   style?: CSSProperties
 }
 
-const getItemContents = ({iconName, iconOnly, imageSrc, children}) => (
+const getItemContents = ({iconName, iconOnly, imageSrc, title, children}) => (
   <>
     {
       iconName && (
@@ -24,7 +24,7 @@ const getItemContents = ({iconName, iconOnly, imageSrc, children}) => (
     }
     {
       imageSrc && (
-        <img src={imageSrc} className="StatusBarItem__icon--image" />
+        <img src={imageSrc} className="StatusBarItem__icon--image" alt={title} />
       )
     }
     {
@@ -38,10 +38,10 @@ const getItemContents = ({iconName, iconOnly, imageSrc, children}) => (
 )
 
 const StatusBarItem: React.FC<Props> = ({
-  iconName, iconOnly, imageSrc, hideTextOnMobile,
+  title, iconName, iconOnly, imageSrc, hideTextOnMobile,
   href, button, children,  ...props
 }) => {
-  const content = getItemContents({iconName, iconOnly, children, imageSrc});
+  const content = getItemContents({iconName, iconOnly, children, imageSrc, title});
   const className = hideTextOnMobile ? (
     'StatusBarItem StatusBarItem--hideOnMobile'
   ) : 'StatusBarItem';
@@ -49,6 +49,7 @@ const StatusBarItem: React.FC<Props> = ({
     return (
       <button
         className={`${className} StatusBarItem--action`}
+        title={title}
         {...props}
       >
         { content }
@@ -61,7 +62,9 @@ const StatusBarItem: React.FC<Props> = ({
       <a
         href={href}
         target="_blank"
+        rel="noreferrer"
         className={`${className} StatusBarItem--action`}
+        title={title}
         {...props}
       >
         { content }
@@ -69,7 +72,7 @@ const StatusBarItem: React.FC<Props> = ({
     )
   }
 
-  const { style, title } = props;
+  const { style } = props;
   return (
     <div
       className={`${className} StatusBarItem--text`}
