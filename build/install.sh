@@ -3,7 +3,7 @@ set -e
 
 SVC_NAME='better-go-playground'
 SVC_USER='go-playground'
-DST_DIR='/opt/go-playground'
+DST_DIR='/opt/better-go-playground'
 
 if [ "$(uname -s)" != "Linux" ]; then
   echo "ERROR: This installation script doesn't support $(uname -s). Only Linux systems are supported."
