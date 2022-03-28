@@ -62,7 +62,7 @@ const StatusBar: React.FC<Props> = ({
         <div className="StatusBar__side-right">
           <StatusBarItem
             iconName="Code"
-            title="Select runtime"
+            title="Select environment"
             disabled={loading}
             onClick={() => setRunSelectorModalVisible(true)}
             hideTextOnMobile
