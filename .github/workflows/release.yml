@@ -45,7 +45,7 @@ jobs:
         with:
           images: |
             x1unix/go-playground
-            ghcr.io/x1unix/go-playground/better-go-playground
+            ghcr.io/x1unix/go-playground/go-playground
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
