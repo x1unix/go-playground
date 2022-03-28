@@ -34,22 +34,14 @@ See [wiki](https://github.com/x1unix/go-playground/wiki/Docker) for usage info.
 
 ### Local instance
 
-Service can be built and run locally (**Go 1.12+** and **Node.js** required):
-
-```
-$ git clone https://github.com/x1unix/go-playground.git
-$ cd go-playground
-$ make
-```
-
-To run the playground, go to `target` directory and start the server:
+Service can be built and run locally (**Go 1.17+** and **Node.js** required):
 
 ```bash
-$ cd target
-$ ./playground -f ./data/packages.json -debug
+git clone https://github.com/x1unix/go-playground.git
+cd go-playground
+make
+sudo make install
 ```
-
-Use `-help` to get information about command params
 
 ### Third-party credits
 

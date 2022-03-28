@@ -1,0 +1,17 @@
+[Unit]
+Description=Better Go Playground
+After=network.target
+StartLimitIntervalSec=10
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=go-playground
+WorkingDirectory=/opt/better-go-playground
+ExecStart=/opt/better-go-playground/playground -f /opt/better-playground/data/packages.json
+Restart=on-failure
+LimitNOFILE=1048576
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

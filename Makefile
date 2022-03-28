@@ -1,4 +1,5 @@
 GO ?= go
+UID ?= $(shell id -u)
 GOROOT ?= $(shell go env GOROOT)
 GOPATH ?= $(shell go env GOPATH)
 
@@ -33,3 +34,9 @@ ui:
 cover:
 	@cat tools/cover.txt | xargs go test -v -covermode=count -coverprofile=/tmp/cover.out && \
 	go tool cover -html=/tmp/cover.out
+
+.PHONY: install
+install:
+	@if [ ! -d "./target" ]; then echo "ERROR: Please build project first by calling 'make'." && exit 2; fi
+	@if [ "$(UID)" -ne "0" ]; then echo "ERROR: you cannot perform this operation unless you are root." && exit 3; fi
+	@$(SHELL) ./build/install.sh
