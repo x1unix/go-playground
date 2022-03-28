@@ -36,8 +36,12 @@
 }
 
 @media only screen and (max-width: 600px) {
+  .header__commandBar .ms-CommandBar {
+    padding: 0 10px;
+  }
   .header__logo {
     height: 1em;
-    margin-left: 0;
+    margin: 0 10px;
+    display: none;
   }
 }
