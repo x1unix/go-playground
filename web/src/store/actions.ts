@@ -1,3 +1,4 @@
+import {editor} from "monaco-editor";
 import { UIState } from './state';
 import { RunResponse, EvalEvent } from '~/services/api';
 import { MonacoSettings, RuntimeType } from '~/services/config';
@@ -12,6 +13,8 @@ export enum ActionType {
   BUILD_PARAMS_CHANGE = 'BUILD_PARAMS_CHANGE',
   MONACO_SETTINGS_CHANGE = 'MONACO_SETTINGS_CHANGE',
   UI_STATE_CHANGE = 'UI_STATE_CHANGE',
+  MARKER_CHANGE = 'MARKER_CHANGE',
+  ENVIRONMENT_CHANGE = 'ENVIRONMENT_CHANGE',
 
   // Special actions used by Go WASM bridge
   EVAL_START = 'EVAL_START',
@@ -64,6 +67,12 @@ export const newErrorAction = (err: string) =>
   payload: err,
 });
 
+export const newMarkerAction = (markers?: editor.IMarkerData[]) =>
+({
+  type: ActionType.MARKER_CHANGE,
+  payload: markers,
+})
+
 export const newToggleThemeAction = () =>
 ({
   type: ActionType.TOGGLE_THEME,
@@ -80,6 +89,12 @@ export const newBuildParamsChangeAction = (runtime: RuntimeType, autoFormat: boo
 ({
   type: ActionType.BUILD_PARAMS_CHANGE,
   payload: { runtime, autoFormat } as BuildParamsArgs
+});
+
+export const newEnvironmentChangeAction = (runtime: RuntimeType) =>
+({
+  type: ActionType.ENVIRONMENT_CHANGE,
+  payload: runtime
 });
 
 export const newMonacoParamsChangeAction = <T>(changes: MonacoParamsChanges<T>) =>

@@ -14,6 +14,25 @@ export enum RuntimeType {
   WebAssembly     = 'WASM'
 }
 
+export namespace RuntimeType {
+  export function toString(t?: RuntimeType) {
+    if (!t) {
+      return;
+    }
+
+    switch (t) {
+      case RuntimeType.GoTipPlayground:
+        return "Go Playground (GoTip)";
+      case RuntimeType.GoPlayground:
+        return "Go Playground";
+      case RuntimeType.WebAssembly:
+        return "WebAssembly";
+      default:
+        return RuntimeType[t];
+    }
+  }
+}
+
 export interface MonacoSettings {
   fontFamily: string,
   fontLigatures: boolean,

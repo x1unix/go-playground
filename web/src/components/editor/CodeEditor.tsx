@@ -3,7 +3,14 @@ import MonacoEditor from 'react-monaco-editor';
 import { editor } from 'monaco-editor';
 import * as monaco from 'monaco-editor';
 
-import { Connect, formatFileDispatcher, newFileChangeAction, runFileDispatcher, newSnippetLoadDispatcher } from '~/store';
+import {
+  Connect,
+  formatFileDispatcher,
+  newFileChangeAction,
+  runFileDispatcher,
+  newSnippetLoadDispatcher,
+  newMarkerAction
+} from '~/store';
 import { Analyzer } from '~/services/analyzer';
 
 import { LANGUAGE_GOLANG, stateToOptions } from './props';
@@ -91,12 +98,13 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
 
     this._previousTimeout = setTimeout(() => {
       this._previousTimeout = null;
-      this.analyzer?.analyzeCode(code).then(result => {
+      this.analyzer?.analyzeCode(code).then(({markers}) => {
         editor.setModelMarkers(
           this.editorInstance?.getModel() as editor.ITextModel,
           this.editorInstance?.getId() as string,
-          result.markers
+          markers
         );
+        this.props.dispatch(newMarkerAction(markers))
       }).catch(err => console.error('failed to perform code analysis: %s', err));
     }, ANALYZE_DEBOUNCE_TIME);
   }

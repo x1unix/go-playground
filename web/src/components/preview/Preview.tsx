@@ -1,6 +1,5 @@
 import React from 'react';
 import { MessageBar, MessageBarType, getTheme } from '@fluentui/react';
-import { ProgressIndicator } from '@fluentui/react/lib/ProgressIndicator';
 
 import { getDefaultFontFamily } from '~/services/fonts';
 import { Connect } from '~/store';
@@ -59,7 +58,6 @@ export default class Preview extends React.Component<PreviewProps> {
     }
 
     return <div className="app-preview" style={this.styles}>
-      <ProgressIndicator className={this.progressClass} />
       <div className='app-preview__content'>
         {content}
       </div>
