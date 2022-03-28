@@ -3,6 +3,7 @@ import { getTheme, IconButton } from '@fluentui/react';
 import { Modal } from '@fluentui/react/lib/Modal';
 import { Link } from '@fluentui/react/lib/Link';
 
+import changelog from '~/changelog.json';
 import { getContentStyles, getIconButtonStyles } from '~/styles/modal';
 import config from '~/services/config';
 
@@ -39,19 +40,25 @@ export default function ChangeLogModal(props: ChangeLogModalProps) {
         />
       </div>
       <div id={SUB_TITLE_ID} className={contentStyles.body}>
-        <b>Runtime - WebAssembly</b>
-        <ul>
-          <li>
-            <Link
-              className='ChangeLogModal__issue-url'
-              href='https://github.com/x1unix/go-playground/pull/129'
-              target='_blank'
-            >
-              #129
-            </Link>
-            <span>Use Go 1.18</span>
-          </li>
-        </ul>
+        {Object.entries(changelog).map(([section, items]) => (
+          <>
+            <b>{section}</b>
+            <ul>
+              {items.map(({issueId, url, description}) => (
+                <li key={issueId}>
+                  <Link
+                    className='ChangeLogModal__issue-url'
+                    href={`${config.githubUrl}/${url}`}
+                    target='_blank'
+                  >
+                    #{issueId}
+                  </Link>
+                  <span>{description}</span>
+                </li>
+              ))}
+            </ul>
+          </>
+        ))}
         <p>
           And more!
         </p>
