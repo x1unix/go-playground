@@ -7,8 +7,8 @@ StartLimitBurst=5
 [Service]
 Type=simple
 User=go-playground
-WorkingDirectory=/home/go-playground
-ExecStart=/opt/playground -f /opt/playground/data/packages.json
+WorkingDirectory=/opt/better-go-playground
+ExecStart=/opt/better-go-playground/playground -f /opt/better-playground/data/packages.json
 Restart=on-failure
 LimitNOFILE=1048576
 RestartSec=5
