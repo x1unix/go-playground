@@ -20,7 +20,7 @@ chmod +x "$DST_DIR/playground"
 
 echo ":: Installing service..."
 cp -fv "./build/$SVC_NAME.service" /etc/systemd/system
-systemctl daemon reload
+systemctl daemon-reload
 
 echo ":: Starting service..."
 systemctl enable --now "$SVC_NAME"
