@@ -1,0 +1,27 @@
+:root {
+  --color-idle: #007fd4;
+  --color-busy: #cc6633;
+}
+
+.StatusBar {
+  display: flex;
+  flex-direction: row;
+  color: #fff;
+  background-color: var(--color-idle);
+  padding: 0 7px;
+  justify-content: space-between;
+  height: 22px;
+}
+
+.StatusBar.StatusBar--busy {
+  background-color: var(--color-busy);
+}
+
+.StatusBar__side-left,
+.StatusBar__side-right {
+  display: flex;
+  flex-direction: row;
+}
+
+.StatusBar__side-right {
+}

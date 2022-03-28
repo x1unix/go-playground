@@ -1,4 +1,5 @@
 import { connect } from 'react-redux';
+import {editor} from "monaco-editor";
 import { EvalEvent } from '~/services/api';
 import { MonacoSettings, RuntimeType } from '~/services/config';
 
@@ -15,7 +16,8 @@ export interface EditorState {
 export interface StatusState {
   loading: boolean,
   lastError?: string | null,
-  events?: EvalEvent[]
+  events?: EvalEvent[],
+  markers?: editor.IMarkerData[]
 }
 
 export interface SettingsState {
@@ -37,5 +39,3 @@ export function Connect(fn: (state: State) => any) {
     return connect(fn)(constructor as any) as any;
   }
 }
-
-

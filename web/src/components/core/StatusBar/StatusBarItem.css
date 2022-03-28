@@ -1,0 +1,61 @@
+.StatusBarItem {
+  color: #fff;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  display: flex;
+  height: 100%;
+  padding: 0 5px;
+  white-space: pre;
+  align-items: center;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  outline-width: 0;
+  margin: 0 3px;
+  text-decoration: none;
+}
+
+.StatusBarItem.StatusBarItem--action {
+  cursor: pointer;
+}
+
+.StatusBarItem.StatusBarItem--text {
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+}
+
+.StatusBarItem__label {
+  margin-left: 0.4em;
+  font-size: 12px;
+}
+
+.StatusBarItem__icon {
+  font-size: 12px;
+}
+
+.StatusBarItem__icon--image {
+  height: 12px;
+}
+
+.StatusBarItem.StatusBarItem--action:not([disabled]):hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.StatusBarItem.StatusBarItem--action:not([disabled]):active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.StatusBarItem.StatusBarItem--action[disabled] {
+  cursor: not-allowed;
+  opacity: 0.3;
+}
+
+@media (max-width: 640px) {
+  .StatusBarItem.StatusBarItem--hideOnMobile
+  .StatusBarItem__label {
+    display: none;
+  }
+}

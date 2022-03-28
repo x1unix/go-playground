@@ -1,5 +1,6 @@
 import { connectRouter } from 'connected-react-router';
 import { combineReducers } from 'redux';
+import {editor} from "monaco-editor";
 
 import { Action, ActionType, FileImportArgs, BuildParamsArgs, MonacoParamsChanges } from './actions';
 import { RunResponse, EvalEvent } from '~/services/api';
@@ -71,6 +72,12 @@ const reducers = {
 
       return s;
     },
+    [ActionType.MARKER_CHANGE]: (s: StatusState, { payload }: Action<editor.IMarkerData[]>) => {
+      return {
+        ...s,
+        markers: payload,
+      }
+    }
   }, { loading: false }),
   settings: mapByAction<SettingsState>({
     [ActionType.TOGGLE_THEME]: (s: SettingsState, a: Action) => {
@@ -81,6 +88,9 @@ const reducers = {
     [ActionType.BUILD_PARAMS_CHANGE]: (s: SettingsState, a: Action<BuildParamsArgs>) => {
       return Object.assign({}, s, a.payload);
     },
+    [ActionType.ENVIRONMENT_CHANGE]: (s: SettingsState, { payload }: Action<RuntimeType>) => ({
+      ...s, runtime: payload,
+    })
   }, { darkMode: localConfig.darkThemeEnabled, autoFormat: true, runtime: RuntimeType.GoPlayground }),
   monaco: mapByAction<MonacoSettings>({
     [ActionType.MONACO_SETTINGS_CHANGE]: (s: MonacoSettings, a: Action<MonacoParamsChanges>) => {
