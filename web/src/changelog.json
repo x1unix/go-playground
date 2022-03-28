@@ -1,9 +1,21 @@
 {
-  "Runtime - WebAssembly": [
+  "Interface - General": [
     {
-      "issueId": 129,
-      "url": "/pull/129",
-      "description": "Use Go 1.18"
+      "issueId": 140,
+      "url": "/pull/140",
+      "description": "Add status bar with Go environment selection."
+    },
+    {
+      "issueId": 141,
+      "url": "/pull/141",
+      "description": "Improve command bar look on small screens."
+    }
+  ],
+  "Interface - Other": [
+    {
+      "issueId": 142,
+      "url": "/pull/142",
+      "description": "Check service worker updates on startup."
     }
   ]
 }
