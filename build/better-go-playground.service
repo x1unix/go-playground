@@ -1,7 +1,7 @@
 [Unit]
 Description=Better Go Playground
 After=network.target
-StartLimitIntervalSec=10
+StartLimitIntervalSec=600
 StartLimitBurst=5
 
 [Service]
@@ -12,6 +12,7 @@ ExecStart=/opt/better-go-playground/playground -f /opt/better-go-playground/data
 Restart=on-failure
 LimitNOFILE=1048576
 RestartSec=5
+Environment="PATH=$PATH:/usr/local/go/bin"
 
 [Install]
 WantedBy=multi-user.target
