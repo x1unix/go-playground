@@ -11,7 +11,7 @@ if [ "$(uname -s)" != "Linux" ]; then
 fi
 
 echo ":: Creating a user '$SVC_USER'..."
-useradd -m --system go-playground
+useradd -m --system go-playground --home "$DST_DIR"
 
 echo ":: Copying files..."
 cp -rfv ./target "$DST_DIR"
