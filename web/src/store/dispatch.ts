@@ -25,6 +25,7 @@ import config, {RuntimeType} from '~/services/config';
 import {DEMO_CODE} from '~/components/editor/props';
 import {getImportObject, goRun} from '~/services/go';
 import {PanelState, SettingsState, State} from './state';
+import {isDarkModeEnabled} from "~/utils/theme";
 
 export type StateProvider = () => State
 export type DispatchFn = (a: Action | any) => any
@@ -69,6 +70,7 @@ export const newSettingsChangeDispatcher = (changes: Partial<SettingsState>): Di
   (dispatch: DispatchFn, _: StateProvider) => {
     if ('useSystemTheme' in changes) {
       config.useSystemTheme = !!changes.useSystemTheme;
+      changes.darkMode = isDarkModeEnabled();
     }
 
     if ('darkMode' in changes) {

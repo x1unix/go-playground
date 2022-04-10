@@ -26,10 +26,9 @@ const getInitialTheme = ({darkMode, useSystemTheme}: SettingsState) => {
 const ConnectedThemeProvider: React.FunctionComponent<Props> = ({settings, children, dispatch, ...props}) => {
   const { currentTheme, matchMedia } = getInitialTheme(settings as SettingsState);
   const systemTheme = usePrefersColorScheme(currentTheme, matchMedia);
-
   useEffect(() => {
     dispatch?.(newSettingsChangeAction({ darkMode: systemTheme === ThemeVariant.dark}));
-  }, [systemTheme]);
+  }, [systemTheme, dispatch]);
 
   return (
     <ThemeProvider theme={getThemeFromVariant(matchMedia ? systemTheme : currentTheme)} {...props}>
