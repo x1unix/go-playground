@@ -1,6 +1,5 @@
 import React from 'react';
 import './PanelAction.css';
-import {getTheme} from "@fluentui/react";
 
 export interface PanelActionProps {
   hidden?: boolean
@@ -10,9 +9,6 @@ export interface PanelActionProps {
 }
 
 const PanelAction: React.FC<PanelActionProps> = ({hidden, icon, label, onClick}) => {
-  const {
-    palette: { neutralQuaternaryAlt }
-  } = getTheme();
   if (hidden) {
     return null;
   }

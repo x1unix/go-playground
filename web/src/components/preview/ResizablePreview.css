@@ -22,7 +22,7 @@
   background: var(--pg-handle-default-color);
 }
 
-.ResizablePreview.ResizablePreview--collapsed.ResizablePreview--horizontal:before {
+.ResizablePreview.ResizablePreview--collapsed.ResizablePreview--vertical:before {
   top: 0;
   left: 0;
   right: 0;

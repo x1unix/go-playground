@@ -9,6 +9,7 @@ import FlexContainer from '~/components/editor/FlexContainer';
 import ResizablePreview from '~/components/preview/ResizablePreview';
 import Layout from '~/components/core/Layout/Layout';
 import StatusBar from '~/components/core/StatusBar';
+import {LayoutType} from "~/styles/layout";
 
 import './Playground.css';
 
@@ -18,11 +19,11 @@ const Playground = connect()((props: any) => {
 
   return <div className="Playground">
     <Header />
-    <Layout>
+    <Layout layout={LayoutType.Vertical}>
       <FlexContainer>
         <CodeEditor />
       </FlexContainer>
-      <ResizablePreview />
+      <ResizablePreview layout={LayoutType.Vertical} collapsed={false} />
     </Layout>
     <StatusBar />
   </div>;
