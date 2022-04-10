@@ -13,9 +13,12 @@ import {
   Dispatcher,
   dispatchToggleTheme,
   formatFileDispatcher,
-  newBuildParamsChangeDispatcher, newCodeImportDispatcher,
+  newBuildParamsChangeDispatcher,
+  newCodeImportDispatcher,
   newImportFileDispatcher,
-  newMonacoParamsChangeDispatcher, newSnippetLoadDispatcher,
+  newMonacoParamsChangeDispatcher,
+  newSnippetLoadDispatcher,
+  newSettingsChangeDispatcher,
   runFileDispatcher,
   saveFileDispatcher,
   shareSnippetDispatcher
@@ -227,6 +230,10 @@ export class Header extends React.Component<any, HeaderState> {
       // Save runtime settings
       const { runtime, autoFormat } = changes.args;
       this.props.dispatch(newBuildParamsChangeDispatcher(runtime, autoFormat));
+    }
+
+    if (changes.settings) {
+      this.props.dispatch(newSettingsChangeDispatcher(changes.settings));
     }
 
     this.setState({ showSettings: false });

@@ -23,6 +23,7 @@ export interface StatusState {
 
 export interface SettingsState {
   darkMode: boolean
+  useSystemTheme: boolean
   autoFormat: boolean,
   runtime: RuntimeType,
 }

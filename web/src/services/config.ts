@@ -3,8 +3,10 @@ import { DEFAULT_FONT } from './fonts';
 import { DarkTheme, LightTheme } from './colors';
 import {PanelState} from '~/store';
 import { defaultPanelProps } from '~/styles/layout';
+import {supportsPreferColorScheme} from "~/utils/theme";
 
 const DARK_THEME_KEY = 'ui.darkTheme.enabled';
+const USE_SYSTEM_THEME_KEY = 'ui.darkTheme.useSystem';
 const RUNTIME_TYPE_KEY = 'go.build.runtime';
 const AUTOFORMAT_KEY = 'go.build.autoFormat';
 const MONACO_SETTINGS = 'ms.monaco.settings';
@@ -86,6 +88,19 @@ const Config = {
     setThemeStyles(enable);
     this._cache[DARK_THEME_KEY] = enable;
     localStorage.setItem(DARK_THEME_KEY, enable.toString());
+  },
+
+  get useSystemTheme() {
+    if (this._cache[DARK_THEME_KEY]) {
+      return this._cache[DARK_THEME_KEY];
+    }
+
+    return this.getBoolean(USE_SYSTEM_THEME_KEY, supportsPreferColorScheme());
+  },
+
+  set useSystemTheme(val: boolean) {
+    this._cache[USE_SYSTEM_THEME_KEY] = val;
+    localStorage.setItem(USE_SYSTEM_THEME_KEY, val.toString());
   },
 
   get runtimeType(): RuntimeType {
