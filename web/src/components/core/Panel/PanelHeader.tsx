@@ -1,11 +1,11 @@
 import React from 'react';
 import { getTheme } from '@fluentui/react';
-import PanelAction from '@components/core/Panel/PanelAction';
+import PanelAction, {PanelActionProps} from '@components/core/Panel/PanelAction';
 import './PanelHeader.css';
 
 interface Props {
   label: string
-  commands?: {[key: string]: {hidden?: boolean, icon: React.ReactNode, label: string}}
+  commands?: {[key: string]: PanelActionProps},
 }
 
 const PanelHeader: React.FC<Props> = ({label, commands}) => {
@@ -32,8 +32,8 @@ const PanelHeader: React.FC<Props> = ({label, commands}) => {
           Object.entries(commands)
             .map(([key, props]) => ({key, ...props}))
             .filter(({hidden}) => !hidden)
-            .map((props) => (
-              <li key={props.key}>
+            .map(({key, ...props}) => (
+              <li key={key}>
                 <PanelAction {...props} />
               </li>
             ))

@@ -1,7 +1,10 @@
 import React, { useState, useCallback } from 'react';
-import { VscSplitHorizontal, VscSplitVertical } from 'react-icons/vsc';
 import { getTheme } from '@fluentui/react';
 import { Resizable } from 're-resizable';
+import clsx from 'clsx';
+import {
+  VscSplitHorizontal, VscSplitVertical, VscChevronDown, VscChevronUp
+} from 'react-icons/vsc';
 
 import Preview from './Preview';
 import PanelHeader from "@components/core/Panel/PanelHeader";
@@ -9,20 +12,10 @@ import './ResizablePreview.css';
 
 const DEFAULT_HEIGHT_PX = 300;
 const DEFAULT_WIDTH_PX = 400;
+const MIN_HEIGHT = 36;
 const handleClasses = {
-  top: 'ResizablePreview__handle--top'
-}
-
-// re-resizable requires to implicitly mark disabled corners
-const enabledCorners = {
-  top: true,
-  right: false,
-  bottom: false,
-  left: false,
-  topRight: false,
-  bottomRight: false,
-  bottomLeft: false,
-  topLeft: false
+  top: 'ResizablePreview__handle--top',
+  left: 'ResizablePreview__handle--left',
 }
 
 export enum PanelLayout {
@@ -38,6 +31,7 @@ const ResizablePreview: React.FC<Props> = ({layout = PanelLayout.Horizontal}) =>
   const {palette: { accent }, semanticColors: { buttonBorder }} = getTheme();
   const [height, setHeight] = useState(DEFAULT_HEIGHT_PX);
   const [width, setWidth] = useState(DEFAULT_WIDTH_PX);
+  const [collapsed, setCollapsed] = useState(false);
   const onResize = useCallback((e, direction, ref, {height, width}) => {
     switch (layout) {
       case PanelLayout.Horizontal:
@@ -49,7 +43,7 @@ const ResizablePreview: React.FC<Props> = ({layout = PanelLayout.Horizontal}) =>
       default:
         return;
     }
-  }, [setHeight, setWidth]);
+  }, [setHeight, setWidth, layout]);
 
   const size = {
     height: layout === PanelLayout.Horizontal ? height : '100%',
@@ -57,10 +51,10 @@ const ResizablePreview: React.FC<Props> = ({layout = PanelLayout.Horizontal}) =>
   };
 
   const enabledCorners = {
-    top: layout === PanelLayout.Horizontal,
+    top: !collapsed && layout === PanelLayout.Horizontal,
     right: false,
     bottom: false,
-    left: layout === PanelLayout.Vertical,
+    left: !collapsed && layout === PanelLayout.Vertical,
     topRight: false,
     bottomRight: false,
     bottomLeft: false,
@@ -69,11 +63,18 @@ const ResizablePreview: React.FC<Props> = ({layout = PanelLayout.Horizontal}) =>
 
   return (
     <Resizable
-      className='ResizablePreview'
+      className={
+        clsx(
+          'ResizablePreview',
+          collapsed && 'ResizablePreview--collapsed',
+          `ResizablePreview--${layout}`
+        )
+      }
       handleClasses={handleClasses}
       size={size}
       enable={enabledCorners}
       onResizeStop={onResize}
+      minHeight={MIN_HEIGHT}
       style={{
         '--pg-handle-active-color': accent,
         '--pg-handle-default-color': buttonBorder,
@@ -82,6 +83,24 @@ const ResizablePreview: React.FC<Props> = ({layout = PanelLayout.Horizontal}) =>
       <PanelHeader
         label="Output"
         commands={{
+          'collapse': {
+            hidden: collapsed,
+            icon: <VscChevronDown />,
+            label: 'Collapse',
+            onClick: () => {
+              console.log('collapse!');
+              setCollapsed(true);
+            }
+          },
+          'expand': {
+            hidden: !collapsed,
+            icon: <VscChevronUp />,
+            label: 'Expand',
+            onClick: () => {
+              console.log('expand!');
+              setCollapsed(false);
+            }
+          },
           'split-horizontally': {
             hidden: true,
             icon: <VscSplitVertical />,
@@ -94,7 +113,9 @@ const ResizablePreview: React.FC<Props> = ({layout = PanelLayout.Horizontal}) =>
           }
         }}
       />
-      <Preview />
+      { collapsed ? null : (
+        <Preview />
+      )}
     </Resizable>
   );
 };
