@@ -10,6 +10,7 @@ import {
   newImportFileAction,
   newLoadingAction,
   newMonacoParamsChangeAction,
+  newPanelStateChangeAction,
   newProgramWriteAction,
   newToggleThemeAction,
   newUIStateChangeAction
@@ -22,7 +23,7 @@ import client, {
 import config, {RuntimeType} from '~/services/config';
 import {DEMO_CODE} from '~/components/editor/props';
 import {getImportObject, goRun} from '~/services/go';
-import {State} from './state';
+import {PanelState, State} from './state';
 
 export type StateProvider = () => State
 export type DispatchFn = (a: Action | any) => any
@@ -175,6 +176,12 @@ export const dispatchToggleTheme: Dispatcher =
     dispatch(newToggleThemeAction())
   };
 
+export const dispatchPanelLayoutChange = (changes: Partial<PanelState>): Dispatcher => (
+  (dispatch: DispatchFn, _: StateProvider) => {
+    config.panelLayout = changes;
+    dispatch(newPanelStateChangeAction(changes));
+  }
+);
 
 //////////////////////////////////
 //          Adapters            //

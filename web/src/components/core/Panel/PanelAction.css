@@ -1,0 +1,23 @@
+.PanelAction {
+  background: none;
+  font: inherit;
+  color: inherit;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  border-radius: 5px;
+  margin-right: 4px;
+}
+
+.PanelAction:hover {
+  background: var(--pg-panel-action-hover-bg);
+}
+
+@media (max-width: 480px) {
+  .PanelAction--desktopOnly {
+    display: none;
+  }
+}
+

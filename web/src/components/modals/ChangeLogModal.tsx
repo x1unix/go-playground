@@ -41,7 +41,7 @@ export default function ChangeLogModal(props: ChangeLogModalProps) {
       </div>
       <div id={SUB_TITLE_ID} className={contentStyles.body}>
         {Object.entries(changelog).map(([section, items]) => (
-          <>
+          <div key={section}>
             <b>{section}</b>
             <ul>
               {items.map(({issueId, url, description}) => (
@@ -57,7 +57,7 @@ export default function ChangeLogModal(props: ChangeLogModalProps) {
                 </li>
               ))}
             </ul>
-          </>
+          </div>
         ))}
         <p>
           And more!

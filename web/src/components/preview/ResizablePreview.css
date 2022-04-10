@@ -7,6 +7,83 @@
   flex: 1 1 auto;
 }
 
+.ResizablePreview__controls {
+  padding: 10px 15px 0 15px;
+}
+
+/** Collapsed state **/
+.ResizablePreview.ResizablePreview--collapsed {
+  height: auto !important;
+}
+
+.ResizablePreview.ResizablePreview--collapsed:before {
+  content: "";
+  position: absolute;
+  background: var(--pg-handle-default-color);
+}
+
+.ResizablePreview.ResizablePreview--collapsed.ResizablePreview--vertical:before {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+/** Handles - vertical **/
+.ResizablePreview__handle--left:before {
+  content: "";
+  position: absolute;
+  background: var(--pg-handle-default-color);
+  transition: background-color 0.1s ease-in 0s;
+  width: 1px;
+  height: 100%;
+  top: 0;
+  left: 50%;
+}
+
+.ResizablePreview__handle--left {
+  transition: background-color 0.1s ease-in 0s;
+}
+
+.ResizablePreview__handle--left:hover:before,
+.ResizablePreview__handle--left:active:before {
+  background: var(--pg-handle-active-color);
+  width: 3px;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .ResizablePreview__handle--left {
+    background: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+  }
+
+  .ResizablePreview__handle--left:hover,
+  .ResizablePreview__handle--left:active {
+    background: black;
+    color: white;
+  }
+
+  .ResizablePreview__handle--left:before {
+    display: none;
+  }
+
+  .ResizablePreview__handle--left:after {
+    content: "";
+    background: currentColor;
+    height: 20%;
+    max-height: 80px;
+    width: 4px;
+    border-radius: 4px;
+    align-self: center;
+    transition: color 0.15s ease 0s;
+  }
+}
+
+/** Handles - Horizontal **/
 .ResizablePreview__handle--top:before {
   content: "";
   position: absolute;
@@ -35,11 +112,13 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    color: #999;
   }
 
   .ResizablePreview__handle--top:hover,
   .ResizablePreview__handle--top:active {
-    background: var(--pg-handle-active-color);
+    background: black;
+    color: #fff;
   }
 
   .ResizablePreview__handle--top:before {
@@ -48,9 +127,12 @@
 
   .ResizablePreview__handle--top:after {
     content: "";
-    background: #d3d3d3;
-    width: 25%;
-    height: 1px;
+    background: currentColor;
+    width: 20%;
+    max-width: 80px;
+    height: 4px;
+    border-radius: 4px;
     align-self: center;
+    transition: 0.15s ease 0s;
   }
 }

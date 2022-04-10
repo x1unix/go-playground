@@ -1,11 +1,14 @@
 import { loadTheme } from '@fluentui/react';
 import { DEFAULT_FONT } from './fonts';
 import { DarkTheme, LightTheme } from './colors';
+import {PanelState} from '~/store';
+import { defaultPanelProps } from '~/styles/layout';
 
 const DARK_THEME_KEY = 'ui.darkTheme.enabled';
 const RUNTIME_TYPE_KEY = 'go.build.runtime';
 const AUTOFORMAT_KEY = 'go.build.autoFormat';
 const MONACO_SETTINGS = 'ms.monaco.settings';
+const PANEL_SETTINGS = 'ui.layout.panel';
 
 
 export enum RuntimeType {
@@ -133,6 +136,43 @@ const Config = {
   set monacoSettings(m: MonacoSettings) {
     this._cache[MONACO_SETTINGS] = m;
     localStorage.setItem(MONACO_SETTINGS, JSON.stringify(m));
+  },
+
+  get panelLayout(): PanelState {
+    return this.getObject<PanelState>(PANEL_SETTINGS, {
+      ...defaultPanelProps,
+    })
+  },
+
+  set panelLayout(v: PanelState) {
+    this.saveObject(PANEL_SETTINGS, v);
+  },
+
+  saveObject<T>(key: string, value: T) {
+    localStorage.setItem(key, JSON.stringify(value));
+  },
+
+  getObject<T>(key: string, defaultVal: T): T {
+    if (this._cache[key]) {
+      return this._cache[key];
+    }
+
+    const val = localStorage.getItem(key);
+    if (!val) {
+      return defaultVal;
+    }
+
+    try {
+      const parsed = JSON.parse(val);
+      if (!parsed) {
+        return defaultVal;
+      }
+      this._cache[key] = parsed;
+      return parsed;
+
+    } catch (_) {
+      return defaultVal;
+    }
   },
 
   getValue<T>(key: string, defaultVal: T): T {

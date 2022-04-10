@@ -1,50 +1,121 @@
-import React, { useState, useCallback } from 'react';
-import { getTheme } from '@fluentui/react';
-import { Resizable } from 're-resizable';
+import React, {useCallback} from 'react';
+import {getTheme} from '@fluentui/react';
+import {Resizable} from 're-resizable';
+import clsx from 'clsx';
+import {
+  VscChevronDown,
+  VscChevronUp,
+  VscSplitHorizontal,
+  VscSplitVertical
+} from 'react-icons/vsc';
 
 import Preview from './Preview';
+import PanelHeader from '~/components/core/Panel/PanelHeader';
+import {LayoutType, DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_WIDTH} from '~/styles/layout';
 import './ResizablePreview.css';
 
-const DEFAULT_HEIGHT_PX = 300;
-const DEFAULT_WIDTH = '100%';
+const MIN_HEIGHT = 36;
 const handleClasses = {
-  top: 'ResizablePreview__handle--top'
+  top: 'ResizablePreview__handle--top',
+  left: 'ResizablePreview__handle--left',
 }
 
-// re-resizable requires to implicitly mark disabled corners
-const enabledCorners = {
-  top: true,
-  right: false,
-  bottom: false,
-  left: false,
-  topRight: false,
-  bottomRight: false,
-  bottomLeft: false,
-  topLeft: false
+export interface ResizePanelParams {
+  layout?: LayoutType
+  collapsed?: boolean
+  height?: string|number
+  width?: string|number
 }
 
-interface Props { }
+interface Props extends ResizePanelParams {
+  onViewChange?: (changes: ResizePanelParams) => void
+}
 
-const ResizablePreview: React.FC<Props> = () => {
-  const { palette: { accent }, semanticColors: { buttonBorder } } = getTheme();
-  const [height, setHeight] = useState(DEFAULT_HEIGHT_PX);
-  const onResize = useCallback((e, direction, ref, d) => {
-    setHeight(height + d.height);
-  }, [setHeight, height]);
+const ResizablePreview: React.FC<Props> = ({
+  layout = LayoutType.Vertical,
+  height = DEFAULT_PANEL_HEIGHT,
+  width= DEFAULT_PANEL_WIDTH,
+  collapsed,
+  onViewChange
+}) => {
+  const {palette: { accent }, semanticColors: { buttonBorder }} = getTheme();
+  const onResize = useCallback((e, direction, ref, size) => {
+    switch (layout) {
+      case LayoutType.Vertical:
+        onViewChange?.({ height: height + size.height});
+        return;
+      case LayoutType.Horizontal:
+        onViewChange?.({ width: width + size.width});
+        return;
+      default:
+        return;
+    }
+  }, [height, width, layout, onViewChange]);
 
+  const size = {
+    height: layout === LayoutType.Vertical ? height : '100%',
+    width: layout === LayoutType.Horizontal ? width : '100%'
+  };
+
+  const enabledCorners = {
+    top: !collapsed && layout === LayoutType.Vertical,
+    right: false,
+    bottom: false,
+    left: !collapsed && layout === LayoutType.Horizontal,
+    topRight: false,
+    bottomRight: false,
+    bottomLeft: false,
+    topLeft: false
+  };
+
+  const isCollapsed = collapsed && layout === LayoutType.Vertical;
   return (
     <Resizable
-      className='ResizablePreview'
+      className={
+        clsx(
+          'ResizablePreview',
+          isCollapsed && 'ResizablePreview--collapsed',
+          `ResizablePreview--${layout}`
+        )
+      }
       handleClasses={handleClasses}
-      size={{ height, width: DEFAULT_WIDTH }}
+      size={size}
       enable={enabledCorners}
       onResizeStop={onResize}
+      minHeight={MIN_HEIGHT}
       style={{
         '--pg-handle-active-color': accent,
         '--pg-handle-default-color': buttonBorder,
       } as any}
     >
-      <Preview />
+      <PanelHeader
+        label="Output"
+        commands={{
+          'vertical-layout': {
+            hidden: layout === LayoutType.Vertical,
+            icon: <VscSplitVertical />,
+            label: 'Use vertical layout',
+            onClick: () => onViewChange?.({ layout: LayoutType.Vertical })
+          },
+          'horizontal-layout': {
+            desktopOnly: true,
+            hidden: layout === LayoutType.Horizontal,
+            icon: <VscSplitHorizontal />,
+            label: 'Use horizontal layout',
+            onClick: () => onViewChange?.({ layout: LayoutType.Horizontal })
+          },
+          'collapse': {
+            hidden: layout === LayoutType.Horizontal,
+            icon: collapsed ? <VscChevronUp /> : <VscChevronDown />,
+            label: collapsed ? 'Expand' : 'Collapse',
+            onClick: () => onViewChange?.({ collapsed: !collapsed })
+          },
+
+        }}
+      />
+      { isCollapsed ? null : (
+        <Preview />
+      )}
     </Resizable>
   );
 };

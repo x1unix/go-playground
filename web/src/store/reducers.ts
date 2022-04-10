@@ -6,15 +6,16 @@ import { Action, ActionType, FileImportArgs, BuildParamsArgs, MonacoParamsChange
 import { RunResponse, EvalEvent } from '~/services/api';
 import localConfig, { MonacoSettings, RuntimeType } from '~/services/config'
 import { mapByAction } from './helpers';
-import config from "~/services/config";
+import config from '~/services/config';
+import {defaultPanelProps} from '~/styles/layout';
 import {
   EditorState,
   SettingsState,
   State,
   StatusState,
-  UIState
+  PanelState,
+  UIState,
 } from './state';
-
 
 const reducers = {
   editor: mapByAction<EditorState>({
@@ -97,6 +98,11 @@ const reducers = {
       return Object.assign({}, s, a.payload);
     }
   }, config.monacoSettings),
+  panel: mapByAction<PanelState>({
+    [ActionType.PANEL_STATE_CHANGE]: (s: PanelState, {payload}: Action<PanelState>) => ({
+      ...s, ...payload
+    })
+  }, config.panelLayout),
   ui: mapByAction<UIState>({
     [ActionType.LOADING]: (s: UIState, _: Action<Partial<UIState>>) => {
       if (!s) {
@@ -132,6 +138,7 @@ export const getInitialState = (): State => ({
     runtime: localConfig.runtimeType,
   },
   monaco: config.monacoSettings,
+  panel: defaultPanelProps
 });
 
 export const createRootReducer = history => combineReducers({

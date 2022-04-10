@@ -42,13 +42,15 @@ export default class Preview extends React.Component<PreviewProps> {
         </pre>
       </MessageBar>
     } else if (this.props.events) {
-      content = this.props.events.map((e, k) => <EvalEventView
-        key={k}
-        message={e.Message}
-        delay={e.Delay}
-        kind={e.Kind}
-        showDelay={!isWasm}
-      />);
+      content = this.props.events.map(({Message, Delay, Kind}, k) => (
+        <EvalEventView
+          key={k}
+          message={Message}
+          delay={Delay}
+          kind={Kind}
+          showDelay={!isWasm}
+        />
+      ));
 
       if (!isWasm) {
         content.push(<div className="app-preview__epilogue" key="exit">Program exited.</div>)

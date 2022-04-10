@@ -1,0 +1,36 @@
+.PanelHeader {
+  padding: 8px 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  /*justify-content: center;*/
+  justify-content: space-between;
+  background-color: var(--pg-panel-action-background);
+  color: var(--pg-panel-action-color);
+}
+
+.PanelHeader__title {
+  text-transform: uppercase;
+  font-size: 11px;
+  padding: 0 7px;
+}
+
+.PanelHeader__side--left {
+  display: flex;
+  align-items: center;
+  /*background: #ff00aacc;*/
+}
+
+.PanelHeader__commands {
+  display: flex;
+  flex-direction: row;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  /*background: #00ffaacc;*/
+}
+
+.PanelHeader__commands>li {
+  margin: 0;
+  padding: 0;
+}
