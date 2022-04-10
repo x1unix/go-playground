@@ -8,7 +8,7 @@ import PanelHeader from "@components/core/Panel/PanelHeader";
 import './ResizablePreview.css';
 
 const DEFAULT_HEIGHT_PX = 300;
-const DEFAULT_WIDTH = '100%';
+const DEFAULT_WIDTH_PX = 400;
 const handleClasses = {
   top: 'ResizablePreview__handle--top'
 }
@@ -25,20 +25,53 @@ const enabledCorners = {
   topLeft: false
 }
 
-interface Props { }
+export enum PanelLayout {
+  Horizontal = 'horizontal',
+  Vertical = 'vertical'
+}
 
-const ResizablePreview: React.FC<Props> = () => {
+interface Props {
+  layout?: PanelLayout
+}
+
+const ResizablePreview: React.FC<Props> = ({layout = PanelLayout.Horizontal}) => {
   const {palette: { accent }, semanticColors: { buttonBorder }} = getTheme();
   const [height, setHeight] = useState(DEFAULT_HEIGHT_PX);
-  const onResize = useCallback((e, direction, ref, d) => {
-    setHeight(prevValue => prevValue + d.height);
-  }, [setHeight]);
+  const [width, setWidth] = useState(DEFAULT_WIDTH_PX);
+  const onResize = useCallback((e, direction, ref, {height, width}) => {
+    switch (layout) {
+      case PanelLayout.Horizontal:
+        setHeight(prevValue => prevValue + height);
+        return;
+      case PanelLayout.Vertical:
+        setWidth(prevValue => prevValue + width);
+        return;
+      default:
+        return;
+    }
+  }, [setHeight, setWidth]);
+
+  const size = {
+    height: layout === PanelLayout.Horizontal ? height : '100%',
+    width: layout === PanelLayout.Vertical ? width : '100%'
+  };
+
+  const enabledCorners = {
+    top: layout === PanelLayout.Horizontal,
+    right: false,
+    bottom: false,
+    left: layout === PanelLayout.Vertical,
+    topRight: false,
+    bottomRight: false,
+    bottomLeft: false,
+    topLeft: false
+  };
 
   return (
     <Resizable
       className='ResizablePreview'
       handleClasses={handleClasses}
-      size={{ height, width: DEFAULT_WIDTH }}
+      size={size}
       enable={enabledCorners}
       onResizeStop={onResize}
       style={{
