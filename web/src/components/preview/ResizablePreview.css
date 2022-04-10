@@ -105,7 +105,7 @@
   height: 3px;
 }
 
-/*@media (hover: none), (pointer: coarse) {*/
+@media (hover: none), (pointer: coarse) {
   .ResizablePreview__handle--top {
     background: black;
     display: flex;
@@ -135,4 +135,4 @@
     align-self: center;
     transition: 0.15s ease 0s;
   }
-/*}*/
+}
