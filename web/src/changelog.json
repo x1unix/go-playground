@@ -1,21 +1,21 @@
 {
   "Interface - General": [
     {
-      "issueId": 140,
-      "url": "/pull/140",
-      "description": "Add status bar with Go environment selection."
+      "issueId": 150,
+      "url": "/pull/150",
+      "description": "Use system dark mode theme preferences."
     },
     {
-      "issueId": 141,
-      "url": "/pull/141",
-      "description": "Improve command bar look on small screens."
+      "issueId": 147,
+      "url": "/pull/147",
+      "description": "Add vertical and horizontal layout switcher for output panel"
     }
   ],
   "Interface - Other": [
     {
-      "issueId": 142,
-      "url": "/pull/142",
-      "description": "Check service worker updates on startup."
+      "issueId": 147,
+      "url": "/pull/147",
+      "description": "Store output panel settings in local storage."
     }
   ]
 }
