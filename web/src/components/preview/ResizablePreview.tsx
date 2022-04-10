@@ -100,6 +100,7 @@ const ResizablePreview: React.FC<Props> = ({
             onClick: () => onViewChange?.({ layout: LayoutType.Vertical })
           },
           'horizontal-layout': {
+            desktopOnly: true,
             hidden: layout === LayoutType.Horizontal,
             icon: <VscSplitHorizontal />,
             label: 'Use horizontal layout',

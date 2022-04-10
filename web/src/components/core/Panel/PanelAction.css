@@ -14,3 +14,10 @@
 .PanelAction:hover {
   background: var(--pg-panel-action-hover-bg);
 }
+
+@media (max-width: 480px) {
+  .PanelAction--desktopOnly {
+    display: none;
+  }
+}
+
