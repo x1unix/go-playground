@@ -28,14 +28,11 @@ const enabledCorners = {
 interface Props { }
 
 const ResizablePreview: React.FC<Props> = () => {
-  const {
-    palette: { accent },
-    semanticColors: { buttonBorder }
-  } = getTheme();
+  const {palette: { accent }, semanticColors: { buttonBorder }} = getTheme();
   const [height, setHeight] = useState(DEFAULT_HEIGHT_PX);
   const onResize = useCallback((e, direction, ref, d) => {
-    setHeight(height + d.height);
-  }, [setHeight, height]);
+    setHeight(prevValue => prevValue + d.height);
+  }, [setHeight]);
 
   return (
     <Resizable
