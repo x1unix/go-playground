@@ -5,6 +5,8 @@
   align-items: center;
   /*justify-content: center;*/
   justify-content: space-between;
+  background-color: var(--pg-panel-action-background);
+  color: var(--pg-panel-action-color);
 }
 
 .PanelHeader__title {

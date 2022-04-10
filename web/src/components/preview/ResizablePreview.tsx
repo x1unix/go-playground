@@ -11,11 +11,9 @@ import {
 
 import Preview from './Preview';
 import PanelHeader from '~/components/core/Panel/PanelHeader';
-import {LayoutType} from '~/styles/layout';
+import {LayoutType, DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_WIDTH} from '~/styles/layout';
 import './ResizablePreview.css';
 
-const DEFAULT_HEIGHT_PX = 300;
-const DEFAULT_WIDTH_PX = 320;
 const MIN_HEIGHT = 36;
 const handleClasses = {
   top: 'ResizablePreview__handle--top',
@@ -35,8 +33,8 @@ interface Props extends ResizePanelParams {
 
 const ResizablePreview: React.FC<Props> = ({
   layout = LayoutType.Vertical,
-  height = DEFAULT_HEIGHT_PX,
-  width=DEFAULT_WIDTH_PX,
+  height = DEFAULT_PANEL_HEIGHT,
+  width= DEFAULT_PANEL_WIDTH,
   collapsed,
   onViewChange
 }) => {

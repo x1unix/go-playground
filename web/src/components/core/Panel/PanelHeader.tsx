@@ -1,5 +1,5 @@
-import React from 'react';
-import { getTheme } from '@fluentui/react';
+import React, {useContext} from 'react';
+import {ITheme, ThemeContext} from '@fluentui/react';
 import PanelAction, {PanelActionProps} from '@components/core/Panel/PanelAction';
 import './PanelHeader.css';
 
@@ -9,9 +9,10 @@ interface Props {
 }
 
 const PanelHeader: React.FC<Props> = ({label, commands}) => {
+  const theme = useContext(ThemeContext);
   const {
     palette: { neutralLight, neutralDark, neutralQuaternaryAlt }
-  } = getTheme();
+  } = theme as ITheme;
 
   return (
     <div
