@@ -63,6 +63,7 @@ const FONT_OPTS: IDropdownOption[] = [
 export interface SettingsChanges {
   monaco?: MonacoParamsChanges
   args?: BuildParamsArgs,
+  settings?: Partial<SettingsState>
 }
 
 export interface SettingsProps {
@@ -110,6 +111,18 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
     this.changes.monaco[key] = val;
   }
 
+  private touchSettingsProperty(changes: Partial<SettingsState>) {
+    if (!this.changes.settings) {
+      this.changes.settings = changes;
+      return;
+    }
+
+    this.changes.settings = {
+      ...this.changes.settings,
+      ...changes,
+    };
+  }
+
   render() {
     const theme = getTheme();
     const contentStyles = getContentStyles(theme);
@@ -144,6 +157,19 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
                   defaultSelectedKey={this.props.monaco?.fontFamily ?? DEFAULT_FONT}
                   onChange={(_, num) => {
                     this.touchMonacoProperty('fontFamily', num?.key);
+                  }}
+                />}
+              />
+              <SettingsProperty
+                key='autoDetectTheme'
+                title='Use System Theme'
+                control={<Checkbox
+                  label='Follow system dark mode preference instead of manual toggle.'
+                  defaultChecked={this.props.settings?.useSystemTheme}
+                  onChange={(_, val) => {
+                    this.touchSettingsProperty({
+                      useSystemTheme: val
+                    });
                   }}
                 />}
               />
