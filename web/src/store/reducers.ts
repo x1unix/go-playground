@@ -16,6 +16,7 @@ import {
   PanelState,
   UIState,
 } from './state';
+import {supportsPreferColorScheme} from "~/utils/theme";
 
 const reducers = {
   editor: mapByAction<EditorState>({
@@ -91,8 +92,16 @@ const reducers = {
     },
     [ActionType.ENVIRONMENT_CHANGE]: (s: SettingsState, { payload }: Action<RuntimeType>) => ({
       ...s, runtime: payload,
+    }),
+    [ActionType.SETTINGS_CHANGE]: (s: SettingsState, {payload}: Action<Partial<SettingsState>>) => ({
+      ...s, ...payload
     })
-  }, { darkMode: localConfig.darkThemeEnabled, autoFormat: true, runtime: RuntimeType.GoPlayground }),
+  }, {
+    darkMode: localConfig.darkThemeEnabled,
+    autoFormat: true,
+    runtime: RuntimeType.GoPlayground,
+    useSystemTheme: localConfig.useSystemTheme,
+  }),
   monaco: mapByAction<MonacoSettings>({
     [ActionType.MONACO_SETTINGS_CHANGE]: (s: MonacoSettings, a: Action<MonacoParamsChanges>) => {
       return Object.assign({}, s, a.payload);
@@ -136,6 +145,7 @@ export const getInitialState = (): State => ({
     darkMode: localConfig.darkThemeEnabled,
     autoFormat: localConfig.autoFormat,
     runtime: localConfig.runtimeType,
+    useSystemTheme: localConfig.useSystemTheme,
   },
   monaco: config.monacoSettings,
   panel: defaultPanelProps

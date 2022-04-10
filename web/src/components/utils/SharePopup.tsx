@@ -1,7 +1,13 @@
-import React, { FC, useMemo } from 'react';
+import React, {FC, useContext, useMemo} from 'react';
 import copy from 'copy-to-clipboard';
 import { Target } from '@fluentui/react-hooks';
-import { TeachingBubble, Link, getTheme, DirectionalHint, IButtonProps } from '@fluentui/react';
+import {
+  TeachingBubble,
+  Link,
+  DirectionalHint,
+  IButtonProps,
+  useTheme
+} from '@fluentui/react';
 
 interface Props {
   visible?: boolean
@@ -12,6 +18,7 @@ interface Props {
 }
 
 const SharePopup: FC<Props> = ({ visible, snippetId, originUrl, onDismiss, target }) => {
+  const { semanticColors: { bodyBackground } } = useTheme();
   const primaryButtonProps: IButtonProps = useMemo(
     () => ({
       children: 'Copy link',
@@ -28,13 +35,12 @@ const SharePopup: FC<Props> = ({ visible, snippetId, originUrl, onDismiss, targe
     return <></>;
   }
 
-  const { semanticColors: { bodyBackground } } = getTheme();
   return (
     <TeachingBubble
       calloutProps={{ directionalHint: DirectionalHint.bottomCenter }}
       isWide={true}
       hasCloseButton={true}
-      headline="Share successfull"
+      headline="Share successful"
       onDismiss={onDismiss}
       target={target}
       primaryButtonProps={primaryButtonProps}

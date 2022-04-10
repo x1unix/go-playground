@@ -11,6 +11,7 @@ import {
   newLoadingAction,
   newMonacoParamsChangeAction,
   newPanelStateChangeAction,
+  newSettingsChangeAction,
   newProgramWriteAction,
   newToggleThemeAction,
   newUIStateChangeAction
@@ -23,7 +24,8 @@ import client, {
 import config, {RuntimeType} from '~/services/config';
 import {DEMO_CODE} from '~/components/editor/props';
 import {getImportObject, goRun} from '~/services/go';
-import {PanelState, State} from './state';
+import {PanelState, SettingsState, State} from './state';
+import {isDarkModeEnabled} from "~/utils/theme";
 
 export type StateProvider = () => State
 export type DispatchFn = (a: Action | any) => any
@@ -64,6 +66,20 @@ export function newMonacoParamsChangeDispatcher(changes: MonacoParamsChanges): D
   };
 }
 
+export const newSettingsChangeDispatcher = (changes: Partial<SettingsState>): Dispatcher => (
+  (dispatch: DispatchFn, _: StateProvider) => {
+    if ('useSystemTheme' in changes) {
+      config.useSystemTheme = !!changes.useSystemTheme;
+      changes.darkMode = isDarkModeEnabled();
+    }
+
+    if ('darkMode' in changes) {
+      config.darkThemeEnabled = !!changes.darkMode;
+    }
+
+    dispatch(newSettingsChangeAction(changes));
+  }
+);
 
 export function newBuildParamsChangeDispatcher(runtime: RuntimeType, autoFormat: boolean): Dispatcher {
   return (dispatch: DispatchFn, _: StateProvider) => {

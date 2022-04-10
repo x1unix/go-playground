@@ -1,16 +1,41 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {connect} from 'react-redux';
 import {ThemeProvider, ThemeProviderProps} from '@fluentui/react/lib/Theme';
-import { LightTheme, DarkTheme } from '~/services/colors';
+import {
+  getThemeFromVariant,
+  isDarkModeEnabled,
+  supportsPreferColorScheme,
+  ThemeVariant,
+  usePrefersColorScheme
+} from '~/utils/theme';
+import {newSettingsChangeAction, SettingsState} from '~/store';
 
 interface Props extends ThemeProviderProps {
-  darkMode?: boolean
+  settings?: SettingsState
+  dispatch?: Function
 }
 
-const ConnectedThemeProvider: React.FunctionComponent<Props> = ({darkMode, children, ...props}) => (
-  <ThemeProvider theme={darkMode ? DarkTheme : LightTheme} {...props}>
-    {children}
-  </ThemeProvider>
-);
+const getInitialTheme = ({darkMode, useSystemTheme}: SettingsState) => {
+  if (useSystemTheme && supportsPreferColorScheme()) {
+    return { currentTheme: isDarkModeEnabled() ? ThemeVariant.dark : ThemeVariant.light, matchMedia: true};
+  }
 
-export default connect(({settings: {darkMode}}: any) => ({darkMode}))(ConnectedThemeProvider);
+  return { currentTheme: darkMode ? ThemeVariant.dark : ThemeVariant.light, matchMedia: false};
+};
+
+const ConnectedThemeProvider: React.FunctionComponent<Props> = ({settings, children, dispatch, ...props}) => {
+  const { currentTheme, matchMedia } = getInitialTheme(settings as SettingsState);
+  const systemTheme = usePrefersColorScheme(currentTheme, matchMedia);
+  useEffect(() => {
+    dispatch?.(newSettingsChangeAction({ darkMode: systemTheme === ThemeVariant.dark}));
+  }, [systemTheme, dispatch]);
+
+  return (
+    <ThemeProvider theme={getThemeFromVariant(matchMedia ? systemTheme : currentTheme)} {...props}>
+      {children}
+    </ThemeProvider>
+  );
+};
+
+export default connect(({settings, dispatch}: any) =>
+  ({settings, dispatch}))(ConnectedThemeProvider);

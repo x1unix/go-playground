@@ -1,6 +1,6 @@
-import React, {useCallback} from 'react';
-import {getTheme} from '@fluentui/react';
-import {Resizable} from 're-resizable';
+import React, { useCallback } from 'react';
+import { useTheme } from '@fluentui/react';
+import { Resizable } from 're-resizable';
 import clsx from 'clsx';
 import {
   VscChevronDown,
@@ -15,6 +15,7 @@ import {LayoutType, DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_WIDTH} from '~/styles/la
 import './ResizablePreview.css';
 
 const MIN_HEIGHT = 36;
+const MIN_WIDTH = 120;
 const handleClasses = {
   top: 'ResizablePreview__handle--top',
   left: 'ResizablePreview__handle--left',
@@ -38,7 +39,7 @@ const ResizablePreview: React.FC<Props> = ({
   collapsed,
   onViewChange
 }) => {
-  const {palette: { accent }, semanticColors: { buttonBorder }} = getTheme();
+  const {palette: { accent }, semanticColors: { buttonBorder }} = useTheme();
   const onResize = useCallback((e, direction, ref, size) => {
     switch (layout) {
       case LayoutType.Vertical:
@@ -83,6 +84,7 @@ const ResizablePreview: React.FC<Props> = ({
       enable={enabledCorners}
       onResizeStop={onResize}
       minHeight={MIN_HEIGHT}
+      minWidth={MIN_WIDTH}
       style={{
         '--pg-handle-active-color': accent,
         '--pg-handle-default-color': buttonBorder,

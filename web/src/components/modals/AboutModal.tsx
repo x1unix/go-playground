@@ -1,5 +1,11 @@
 import React from 'react';
-import { getTheme, IconButton, FontWeights, FontSizes, mergeStyleSets } from '@fluentui/react';
+import {
+  IconButton,
+  FontWeights,
+  FontSizes,
+  mergeStyleSets,
+  useTheme
+} from '@fluentui/react';
 import { Modal } from '@fluentui/react/lib/Modal';
 import { Link } from '@fluentui/react/lib/Link';
 
@@ -29,7 +35,7 @@ const modalStyles = mergeStyleSets({
 });
 
 export default function AboutModal(props: AboutModalProps) {
-  const theme = getTheme();
+  const theme = useTheme();
   const contentStyles = getContentStyles(theme);
   const iconButtonStyles = getIconButtonStyles(theme);
 

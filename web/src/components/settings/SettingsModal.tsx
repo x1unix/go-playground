@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Checkbox,
   Dropdown,
-  getTheme,
   IconButton,
   IDropdownOption,
   Modal
@@ -11,6 +10,7 @@ import {Pivot, PivotItem} from '@fluentui/react/lib/Pivot';
 import {MessageBar, MessageBarType} from '@fluentui/react/lib/MessageBar';
 import {Link} from '@fluentui/react/lib/Link';
 
+import ThemeableComponent from '@components/utils/ThemeableComponent';
 import {getContentStyles, getIconButtonStyles} from '~/styles/modal';
 import SettingsProperty from './SettingsProperty';
 import {MonacoSettings, RuntimeType} from '~/services/config';
@@ -63,6 +63,7 @@ const FONT_OPTS: IDropdownOption[] = [
 export interface SettingsChanges {
   monaco?: MonacoParamsChanges
   args?: BuildParamsArgs,
+  settings?: Partial<SettingsState>
 }
 
 export interface SettingsProps {
@@ -83,7 +84,7 @@ interface SettingsModalState {
   settings: state.settings,
   monaco: state.monaco,
 }))
-export default class SettingsModal extends React.Component<SettingsProps, SettingsModalState> {
+export default class SettingsModal extends ThemeableComponent<SettingsProps, SettingsModalState> {
   private titleID = 'Settings';
   private subtitleID = 'SettingsSubText';
   private changes: SettingsChanges = {};
@@ -110,10 +111,21 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
     this.changes.monaco[key] = val;
   }
 
+  private touchSettingsProperty(changes: Partial<SettingsState>) {
+    if (!this.changes.settings) {
+      this.changes.settings = changes;
+      return;
+    }
+
+    this.changes.settings = {
+      ...this.changes.settings,
+      ...changes,
+    };
+  }
+
   render() {
-    const theme = getTheme();
-    const contentStyles = getContentStyles(theme);
-    const iconButtonStyles = getIconButtonStyles(theme);
+    const contentStyles = getContentStyles(this.theme);
+    const iconButtonStyles = getIconButtonStyles(this.theme);
     const { showGoTipMessage, showWarning } = this.state;
     return (
       <Modal
@@ -144,6 +156,19 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
                   defaultSelectedKey={this.props.monaco?.fontFamily ?? DEFAULT_FONT}
                   onChange={(_, num) => {
                     this.touchMonacoProperty('fontFamily', num?.key);
+                  }}
+                />}
+              />
+              <SettingsProperty
+                key='autoDetectTheme'
+                title='Use System Theme'
+                control={<Checkbox
+                  label='Follow system dark mode preference instead of manual toggle.'
+                  defaultChecked={this.props.settings?.useSystemTheme}
+                  onChange={(_, val) => {
+                    this.touchSettingsProperty({
+                      useSystemTheme: val
+                    });
                   }}
                 />}
               />
