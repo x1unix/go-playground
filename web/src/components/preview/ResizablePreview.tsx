@@ -7,7 +7,8 @@ import {
 } from 'react-icons/vsc';
 
 import Preview from './Preview';
-import PanelHeader from "@components/core/Panel/PanelHeader";
+import PanelHeader from '~/components/core/Panel/PanelHeader';
+import {LayoutType} from '~/styles/layout';
 import './ResizablePreview.css';
 
 const DEFAULT_HEIGHT_PX = 300;
@@ -18,26 +19,21 @@ const handleClasses = {
   left: 'ResizablePreview__handle--left',
 }
 
-export enum PanelLayout {
-  Horizontal = 'horizontal',
-  Vertical = 'vertical'
-}
-
 interface Props {
-  layout?: PanelLayout
+  layout?: LayoutType
 }
 
-const ResizablePreview: React.FC<Props> = ({layout = PanelLayout.Horizontal}) => {
+const ResizablePreview: React.FC<Props> = ({layout = LayoutType.Horizontal}) => {
   const {palette: { accent }, semanticColors: { buttonBorder }} = getTheme();
   const [height, setHeight] = useState(DEFAULT_HEIGHT_PX);
   const [width, setWidth] = useState(DEFAULT_WIDTH_PX);
   const [collapsed, setCollapsed] = useState(false);
   const onResize = useCallback((e, direction, ref, {height, width}) => {
     switch (layout) {
-      case PanelLayout.Horizontal:
+      case LayoutType.Horizontal:
         setHeight(prevValue => prevValue + height);
         return;
-      case PanelLayout.Vertical:
+      case LayoutType.Vertical:
         setWidth(prevValue => prevValue + width);
         return;
       default:
@@ -46,15 +42,15 @@ const ResizablePreview: React.FC<Props> = ({layout = PanelLayout.Horizontal}) =>
   }, [setHeight, setWidth, layout]);
 
   const size = {
-    height: layout === PanelLayout.Horizontal ? height : '100%',
-    width: layout === PanelLayout.Vertical ? width : '100%'
+    height: layout === LayoutType.Horizontal ? height : '100%',
+    width: layout === LayoutType.Vertical ? width : '100%'
   };
 
   const enabledCorners = {
-    top: !collapsed && layout === PanelLayout.Horizontal,
+    top: !collapsed && layout === LayoutType.Horizontal,
     right: false,
     bottom: false,
-    left: !collapsed && layout === PanelLayout.Vertical,
+    left: !collapsed && layout === LayoutType.Vertical,
     topRight: false,
     bottomRight: false,
     bottomLeft: false,

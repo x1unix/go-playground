@@ -7,6 +7,7 @@ import { Header } from '~/components/core/Header';
 import CodeEditor from '~/components/editor/CodeEditor';
 import FlexContainer from '~/components/editor/FlexContainer';
 import ResizablePreview from '~/components/preview/ResizablePreview';
+import Layout from '~/components/core/Layout/Layout';
 import StatusBar from '~/components/core/StatusBar';
 
 import './Playground.css';
@@ -15,12 +16,14 @@ const Playground = connect()((props: any) => {
   const { snippetID } = useParams();
   props.dispatch(newSnippetLoadDispatcher(snippetID));
 
-  return <div className="playground">
+  return <div className="Playground">
     <Header />
-    <FlexContainer>
-      <CodeEditor />
-    </FlexContainer>
-    <ResizablePreview />
+    <Layout>
+      <FlexContainer>
+        <CodeEditor />
+      </FlexContainer>
+      <ResizablePreview />
+    </Layout>
     <StatusBar />
   </div>;
 });
