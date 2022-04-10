@@ -71,9 +71,10 @@
 
   .ResizablePreview__handle--top:after {
     content: "";
-    background: #d3d3d3;
-    width: 25%;
-    height: 1px;
+    background: #999;
+    width: 86px;
+    height: 4px;
+    border-radius: 4px;
     align-self: center;
   }
 }
