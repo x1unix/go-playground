@@ -42,6 +42,8 @@ export const usePrefersColorScheme = (defaultValue: ThemeVariant, enabled = true
     };
 
     const query = window.matchMedia('(prefers-color-scheme: dark)');
+    setTheme(query.matches ? ThemeVariant.dark : ThemeVariant.light);
+
     query.addEventListener('change', handler);
     return () => {
       query.removeEventListener('change', handler);
