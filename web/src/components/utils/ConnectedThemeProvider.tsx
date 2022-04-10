@@ -8,35 +8,35 @@ import {
   ThemeVariant,
   usePrefersColorScheme
 } from '~/utils/theme';
-import {newSettingsChangeAction} from "~/store";
+import {newSettingsChangeAction, SettingsState} from '~/store';
 
 interface Props extends ThemeProviderProps {
-  darkMode?: boolean
-  useSystemTheme?: boolean
+  settings?: SettingsState
   dispatch?: Function
 }
 
-const getInitialTheme = (userDarkModeEnabled?: boolean, useSystemTheme?: boolean) => {
+const getInitialTheme = ({darkMode, useSystemTheme}: SettingsState) => {
   if (useSystemTheme && supportsPreferColorScheme()) {
     return { currentTheme: isDarkModeEnabled() ? ThemeVariant.dark : ThemeVariant.light, matchMedia: true};
   }
 
-  return { currentTheme: userDarkModeEnabled ? ThemeVariant.dark : ThemeVariant.light, matchMedia: false};
+  return { currentTheme: darkMode ? ThemeVariant.dark : ThemeVariant.light, matchMedia: false};
 };
 
-const ConnectedThemeProvider: React.FunctionComponent<Props> = ({darkMode, useSystemTheme, children, dispatch, ...props}) => {
-  const { currentTheme, matchMedia } = getInitialTheme(darkMode, useSystemTheme);
-  const theme = usePrefersColorScheme(currentTheme, matchMedia);
+const ConnectedThemeProvider: React.FunctionComponent<Props> = ({settings, children, dispatch, ...props}) => {
+  const { currentTheme, matchMedia } = getInitialTheme(settings as SettingsState);
+  const systemTheme = usePrefersColorScheme(currentTheme, matchMedia);
 
   useEffect(() => {
-    dispatch?.(newSettingsChangeAction({ darkMode: theme === ThemeVariant.dark}));
-  }, [theme])
+    dispatch?.(newSettingsChangeAction({ darkMode: systemTheme === ThemeVariant.dark}));
+  }, [systemTheme]);
+
   return (
-    <ThemeProvider theme={getThemeFromVariant(theme)} {...props}>
+    <ThemeProvider theme={getThemeFromVariant(matchMedia ? systemTheme : currentTheme)} {...props}>
       {children}
     </ThemeProvider>
   );
 };
 
-export default connect(({settings: {darkMode, useSystemTheme}, dispatch}: any) =>
-  ({darkMode, useSystemTheme, dispatch}))(ConnectedThemeProvider);
+export default connect(({settings, dispatch}: any) =>
+  ({settings, dispatch}))(ConnectedThemeProvider);
