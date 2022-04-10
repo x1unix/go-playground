@@ -25,7 +25,6 @@ import config, {RuntimeType} from '~/services/config';
 import {DEMO_CODE} from '~/components/editor/props';
 import {getImportObject, goRun} from '~/services/go';
 import {PanelState, SettingsState, State} from './state';
-import {SettingsChanges} from "@components/settings/SettingsModal";
 
 export type StateProvider = () => State
 export type DispatchFn = (a: Action | any) => any
