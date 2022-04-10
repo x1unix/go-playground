@@ -1,6 +1,6 @@
-import React, {useCallback} from 'react';
-import {getTheme} from '@fluentui/react';
-import {Resizable} from 're-resizable';
+import React, { useCallback } from 'react';
+import { useTheme } from '@fluentui/react';
+import { Resizable } from 're-resizable';
 import clsx from 'clsx';
 import {
   VscChevronDown,
@@ -38,7 +38,7 @@ const ResizablePreview: React.FC<Props> = ({
   collapsed,
   onViewChange
 }) => {
-  const {palette: { accent }, semanticColors: { buttonBorder }} = getTheme();
+  const {palette: { accent }, semanticColors: { buttonBorder }} = useTheme();
   const onResize = useCallback((e, direction, ref, size) => {
     switch (layout) {
       case LayoutType.Vertical:

@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Checkbox,
   Dropdown,
-  getTheme,
   IconButton,
   IDropdownOption,
   Modal
@@ -11,6 +10,7 @@ import {Pivot, PivotItem} from '@fluentui/react/lib/Pivot';
 import {MessageBar, MessageBarType} from '@fluentui/react/lib/MessageBar';
 import {Link} from '@fluentui/react/lib/Link';
 
+import ThemeableComponent from '@components/utils/ThemeableComponent';
 import {getContentStyles, getIconButtonStyles} from '~/styles/modal';
 import SettingsProperty from './SettingsProperty';
 import {MonacoSettings, RuntimeType} from '~/services/config';
@@ -84,7 +84,7 @@ interface SettingsModalState {
   settings: state.settings,
   monaco: state.monaco,
 }))
-export default class SettingsModal extends React.Component<SettingsProps, SettingsModalState> {
+export default class SettingsModal extends ThemeableComponent<SettingsProps, SettingsModalState> {
   private titleID = 'Settings';
   private subtitleID = 'SettingsSubText';
   private changes: SettingsChanges = {};
@@ -124,9 +124,8 @@ export default class SettingsModal extends React.Component<SettingsProps, Settin
   }
 
   render() {
-    const theme = getTheme();
-    const contentStyles = getContentStyles(theme);
-    const iconButtonStyles = getIconButtonStyles(theme);
+    const contentStyles = getContentStyles(this.theme);
+    const iconButtonStyles = getIconButtonStyles(this.theme);
     const { showGoTipMessage, showWarning } = this.state;
     return (
       <Modal

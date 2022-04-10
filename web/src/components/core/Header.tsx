@@ -1,8 +1,8 @@
 import React from 'react';
-import { getTheme } from '@fluentui/react';
 import { CommandBar, ICommandBarItemProps } from '@fluentui/react/lib/CommandBar';
 
 import SettingsModal, { SettingsChanges } from '~/components/settings/SettingsModal';
+import ThemeableComponent from '@components/utils/ThemeableComponent';
 import AboutModal from '~/components/modals/AboutModal';
 import config from '~/services/config';
 import { getSnippetsMenuItems, SnippetMenuItem } from '~/utils/headerutils';
@@ -52,7 +52,7 @@ interface Props {
   hideThemeToggle: settings.useSystemTheme,
   snippetName: ui?.shareCreated && ui?.snippetId
 }))
-export class Header extends React.Component<any, HeaderState> {
+export class Header extends ThemeableComponent<any, HeaderState> {
   private fileInput?: HTMLInputElement;
   private snippetMenuItems = getSnippetsMenuItems(i => this.onSnippetMenuItemClick(i));
 
@@ -85,10 +85,9 @@ export class Header extends React.Component<any, HeaderState> {
   }
 
   onSnippetMenuItemClick(item: SnippetMenuItem) {
-    // if (item.snippet) {
-    //   this.setState({ showShareMessage: true });
-    // }
-    const dispatcher = item.snippet ? newSnippetLoadDispatcher(item.snippet) : newCodeImportDispatcher(item.label, item.text as string);
+    const dispatcher = item.snippet ?
+      newSnippetLoadDispatcher(item.snippet) :
+      newCodeImportDispatcher(item.label, item.text as string);
     this.props.dispatch(dispatcher);
   }
 
@@ -215,14 +214,6 @@ export class Header extends React.Component<any, HeaderState> {
     ]
   }
 
-  get styles() {
-    // Apply the same colors as rest of Fabric components
-    const theme = getTheme();
-    return {
-      backgroundColor: theme.palette.white
-    }
-  }
-
   private onSettingsClose(changes: SettingsChanges) {
     if (changes.monaco) {
       // Update monaco state if some of it's settings were changed
@@ -245,30 +236,43 @@ export class Header extends React.Component<any, HeaderState> {
   render() {
     const { showShareMessage } = this.state;
     const { snippetName } = this.props;
-
-    return <header className='header' style={this.styles}>
-      <img
-        src='/go-logo-blue.svg'
-        className='header__logo'
-        alt='Golang Logo'
-      />
-      <CommandBar
-        className='header__commandBar'
-        items={this.menuItems}
-        farItems={this.asideItems.filter(({hidden}) => !hidden)}
-        overflowItems={this.overflowItems}
-        ariaLabel='CodeEditor menu'
-      />
-      <SharePopup
-        visible={!!(showShareMessage && snippetName)}
-        target={`.${BTN_SHARE_CLASSNAME}`}
-        snippetId={snippetName}
-        onDismiss={() => this.setState({ showShareMessage: false })}
-      />
-      <SettingsModal onClose={(args) => this.onSettingsClose(args)} isOpen={this.state.showSettings} />
-      <AboutModal onClose={() => this.setState({ showAbout: false })} isOpen={this.state.showAbout} />
-      <ChangeLogModal onClose={() => this.setState({ showChangelog: false })} isOpen={this.state.showChangelog} />
-    </header>;
+    return (
+      <header
+        className='header'
+        style={{backgroundColor: this.theme.palette.white}}
+      >
+        <img
+          src='/go-logo-blue.svg'
+          className='header__logo'
+          alt='Golang Logo'
+        />
+        <CommandBar
+          className='header__commandBar'
+          items={this.menuItems}
+          farItems={this.asideItems.filter(({hidden}) => !hidden)}
+          overflowItems={this.overflowItems}
+          ariaLabel='CodeEditor menu'
+        />
+        <SharePopup
+          visible={!!(showShareMessage && snippetName)}
+          target={`.${BTN_SHARE_CLASSNAME}`}
+          snippetId={snippetName}
+          onDismiss={() => this.setState({ showShareMessage: false })}
+        />
+        <SettingsModal
+          onClose={(args) => this.onSettingsClose(args)}
+          isOpen={this.state.showSettings}
+        />
+        <AboutModal
+          onClose={() => this.setState({ showAbout: false })}
+          isOpen={this.state.showAbout}
+        />
+        <ChangeLogModal
+          onClose={() => this.setState({ showChangelog: false })}
+          isOpen={this.state.showChangelog}
+        />
+      </header>
+    );
   }
 }
 

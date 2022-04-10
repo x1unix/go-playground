@@ -5,19 +5,19 @@ import {
   ITheme
 } from '@fluentui/react';
 
-export const getIconButtonStyles = (theme: ITheme) => mergeStyleSets({
+export const getIconButtonStyles = (theme?: ITheme) => mergeStyleSets({
   root: {
-    color: theme.palette.neutralPrimary,
+    color: theme?.palette.neutralPrimary,
     marginLeft: 'auto',
     marginTop: '4px',
     marginRight: '2px'
   },
   rootHovered: {
-    color: theme.palette.neutralDark
+    color: theme?.palette.neutralDark
   }
 });
 
-export const getContentStyles = (theme: ITheme) => mergeStyleSets({
+export const getContentStyles = (theme?: ITheme) => mergeStyleSets({
   container: {
     display: 'flex',
     flexFlow: 'column nowrap',
@@ -26,11 +26,11 @@ export const getContentStyles = (theme: ITheme) => mergeStyleSets({
     maxWidth: '480px'
   },
   header: [
-    theme.fonts.xLargePlus,
+    theme?.fonts.xLargePlus,
     {
       flex: '1 1 auto',
-      borderTop: `4px solid ${theme.palette.themePrimary}`,
-      color: theme.palette.neutralPrimary,
+      borderTop: `4px solid ${theme?.palette.themePrimary}`,
+      color: theme?.palette.neutralPrimary,
       display: 'flex',
       fontSize: FontSizes.xLarge,
       alignItems: 'center',

@@ -1,5 +1,5 @@
 import React from 'react';
-import { getTheme, IconButton } from '@fluentui/react';
+import { useTheme, IconButton } from '@fluentui/react';
 import { Modal } from '@fluentui/react/lib/Modal';
 import { Link } from '@fluentui/react/lib/Link';
 
@@ -18,7 +18,7 @@ interface ChangeLogModalProps {
 }
 
 export default function ChangeLogModal(props: ChangeLogModalProps) {
-  const theme = getTheme();
+  const theme = useTheme();
   const contentStyles = getContentStyles(theme);
   const iconButtonStyles = getIconButtonStyles(theme);
 
