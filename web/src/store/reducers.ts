@@ -145,7 +145,7 @@ export const getInitialState = (): State => ({
     darkMode: localConfig.darkThemeEnabled,
     autoFormat: localConfig.autoFormat,
     runtime: localConfig.runtimeType,
-    useSystemTheme: supportsPreferColorScheme(),
+    useSystemTheme: localConfig.useSystemTheme,
   },
   monaco: config.monacoSettings,
   panel: defaultPanelProps
