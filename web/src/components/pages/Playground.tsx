@@ -19,11 +19,11 @@ const Playground = connect()((props: any) => {
 
   return <div className="Playground">
     <Header />
-    <Layout layout={LayoutType.Horizontal}>
+    <Layout layout={LayoutType.Vertical}>
       <FlexContainer>
         <CodeEditor />
       </FlexContainer>
-      <ResizablePreview layout={LayoutType.Horizontal} collapsed={false} />
+      <ResizablePreview layout={LayoutType.Vertical} collapsed={false} />
     </Layout>
     <StatusBar />
   </div>;

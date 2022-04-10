@@ -74,7 +74,8 @@
   .ResizablePreview__handle--left:after {
     content: "";
     background: currentColor;
-    height: 13.3%;
+    height: 20%;
+    max-height: 80px;
     width: 4px;
     border-radius: 4px;
     align-self: center;
@@ -104,18 +105,20 @@
   height: 3px;
 }
 
-@media (hover: none), (pointer: coarse) {
+/*@media (hover: none), (pointer: coarse) {*/
   .ResizablePreview__handle--top {
     background: black;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    color: #999;
   }
 
   .ResizablePreview__handle--top:hover,
   .ResizablePreview__handle--top:active {
-    background: var(--pg-handle-active-color);
+    background: black;
+    color: #fff;
   }
 
   .ResizablePreview__handle--top:before {
@@ -124,10 +127,12 @@
 
   .ResizablePreview__handle--top:after {
     content: "";
-    background: #999;
-    width: 86px;
+    background: currentColor;
+    width: 20%;
+    max-width: 80px;
     height: 4px;
     border-radius: 4px;
     align-self: center;
+    transition: 0.15s ease 0s;
   }
-}
+/*}*/
