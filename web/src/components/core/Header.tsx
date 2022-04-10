@@ -42,12 +42,14 @@ interface Props {
   darkMode: boolean
   loading: boolean
   snippetName?: string
+  hideThemeToggle?: boolean,
   dispatch: (d: Dispatcher) => void
 }
 
 @Connect(({ settings, status, ui }) => ({
   darkMode: settings.darkMode,
   loading: status?.loading,
+  hideThemeToggle: settings.useSystemTheme,
   snippetName: ui?.shareCreated && ui?.snippetId
 }))
 export class Header extends React.Component<any, HeaderState> {
@@ -176,6 +178,7 @@ export class Header extends React.Component<any, HeaderState> {
         text: 'Toggle Dark Mode',
         ariaLabel: 'Toggle Dark Mode',
         iconOnly: true,
+        hidden: this.props.hideThemeToggle,
         iconProps: { iconName: this.props.darkMode ? 'Brightness' : 'ClearNight' },
         onClick: () => {
           this.props.dispatch(dispatchToggleTheme)
@@ -252,7 +255,7 @@ export class Header extends React.Component<any, HeaderState> {
       <CommandBar
         className='header__commandBar'
         items={this.menuItems}
-        farItems={this.asideItems}
+        farItems={this.asideItems.filter(({hidden}) => !hidden)}
         overflowItems={this.overflowItems}
         ariaLabel='CodeEditor menu'
       />
