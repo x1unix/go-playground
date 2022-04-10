@@ -15,7 +15,7 @@ import {LayoutType} from '~/styles/layout';
 import './ResizablePreview.css';
 
 const DEFAULT_HEIGHT_PX = 300;
-const DEFAULT_WIDTH_PX = 400;
+const DEFAULT_WIDTH_PX = 320;
 const MIN_HEIGHT = 36;
 const handleClasses = {
   top: 'ResizablePreview__handle--top',
