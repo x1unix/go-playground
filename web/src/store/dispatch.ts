@@ -195,7 +195,7 @@ export const dispatchToggleTheme: Dispatcher =
 export const dispatchPanelLayoutChange = (changes: Partial<PanelState>): Dispatcher => (
   (dispatch: DispatchFn, getState: StateProvider) => {
     const { panel } = getState();
-    config.panelLayout = { ...config.panelLayout, ...panel };
+    config.panelLayout = { ...panel, ...changes };
     dispatch(newPanelStateChangeAction(changes));
   }
 );
