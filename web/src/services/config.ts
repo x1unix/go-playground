@@ -164,6 +164,7 @@ const Config = {
   },
 
   saveObject<T>(key: string, value: T) {
+    this._cache[key] = value;
     localStorage.setItem(key, JSON.stringify(value));
   },
 

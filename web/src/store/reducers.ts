@@ -148,7 +148,7 @@ export const getInitialState = (): State => ({
     useSystemTheme: localConfig.useSystemTheme,
   },
   monaco: config.monacoSettings,
-  panel: defaultPanelProps
+  panel: localConfig.panelLayout
 });
 
 export const createRootReducer = history => combineReducers({
