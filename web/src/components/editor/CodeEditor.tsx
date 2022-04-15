@@ -75,14 +75,6 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
       }
     ];
 
-    editorInstance.addCommand(
-      monaco.KeyMod.Shift | monaco.KeyCode.Enter,
-      (get) => {
-        const v = editorInstance.getAction('editor.action.insertLineAfter');
-        console.log({v, get: get.get('editor')});
-        v.run();
-      }
-    )
     // Register custom actions
     actions.forEach(action => editorInstance.addAction(action));
     attachCustomCommands(editorInstance);
