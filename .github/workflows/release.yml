@@ -58,7 +58,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: node:lts-gallium
-          options: -v ${{ github.workspace }}/web:/work -e REACT_APP_VERSION=${{ env.RELEASE_VERSION }} -e REACT_APP_GITHUB_URL='https://github.com/x1unix/go-playground' -e NODE_ENV=production
+          options: -v ${{ github.workspace }}/web:/work -e REACT_APP_VERSION=${{ env.RELEASE_VERSION }} -e REACT_APP_GITHUB_URL=https://github.com/x1unix/go-playground -e NODE_ENV=production
           run: |
             yarn --cwd='/work' install --silent && yarn --cwd='/work' build
       - name: Build and push image
