@@ -32,7 +32,7 @@ collect-meta:
 .PHONY:preinstall
 preinstall:
 	@echo ":: Checking and installing dependencies..." && \
-	cd $(UI) && $(YARN) install --silent
+	$(YARN) --cwd="$(UI)" install --silent
 
 .PHONY:build-server
 build-server:
@@ -42,7 +42,7 @@ build-server:
 .PHONY:build-ui
 build-ui:
 	@echo ":: Building UI..." && \
-	cd $(UI) && $(YARN) build
+	$(YARN) --cwd="$(UI)" build
 
 .PHONY:build-webworker
 build-webworker:
