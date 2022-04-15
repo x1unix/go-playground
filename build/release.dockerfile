@@ -28,7 +28,7 @@ ENV APP_PLAYGROUND_URL='https://play.golang.org'
 ENV APP_GOTIP_URL='https://gotipplay.golang.org'
 ENV APP_GTAG_ID=''
 COPY data ./data
-COPY /tmp/web/build ./public
+COPY web/build ./public
 COPY --from=build /tmp/playground/server .
 COPY --from=build /tmp/playground/worker.wasm ./public
 COPY --from=build /tmp/playground/wasm_exec.js ./public
