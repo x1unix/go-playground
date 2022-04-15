@@ -28,7 +28,7 @@ run:
 
 .PHONY:ui
 ui:
-	@cd $(UI) && REACT_APP_LANG_SERVER='//$(LISTEN_ADDR)' REACT_APP_VERSION=testing yarn start
+	@REACT_APP_LANG_SERVER='//$(LISTEN_ADDR)' REACT_APP_VERSION=testing yarn --cwd="$(UI)" start
 
 .PHONY: cover
 cover:
