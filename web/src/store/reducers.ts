@@ -7,7 +7,6 @@ import { RunResponse, EvalEvent } from '~/services/api';
 import localConfig, { MonacoSettings, RuntimeType } from '~/services/config'
 import { mapByAction } from './helpers';
 import config from '~/services/config';
-import {defaultPanelProps} from '~/styles/layout';
 import {
   EditorState,
   SettingsState,
@@ -16,7 +15,6 @@ import {
   PanelState,
   UIState,
 } from './state';
-import {supportsPreferColorScheme} from "~/utils/theme";
 
 const reducers = {
   editor: mapByAction<EditorState>({

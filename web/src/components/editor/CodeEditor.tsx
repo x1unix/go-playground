@@ -2,6 +2,7 @@ import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import { editor } from 'monaco-editor';
 import * as monaco from 'monaco-editor';
+import { attachCustomCommands } from '@components/editor/commands';
 
 import {
   Connect,
@@ -74,8 +75,17 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
       }
     ];
 
+    editorInstance.addCommand(
+      monaco.KeyMod.Shift | monaco.KeyCode.Enter,
+      (get) => {
+        const v = editorInstance.getAction('editor.action.insertLineAfter');
+        console.log({v, get: get.get('editor')});
+        v.run();
+      }
+    )
     // Register custom actions
-    actions.forEach(action => editorInstance.addAction(action))
+    actions.forEach(action => editorInstance.addAction(action));
+    attachCustomCommands(editorInstance);
     editorInstance.focus();
   }
 
