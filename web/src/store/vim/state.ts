@@ -10,6 +10,8 @@ export enum VimSubMode {
   Blockwise = 'blockwise'
 }
 
+export type Dispatch = <V=any,T=string>(v:{type: T, payload?: V}) => void;
+
 /**
  * VimModeState represents current selected mode and sub-mode.
  *

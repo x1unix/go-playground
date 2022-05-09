@@ -2,8 +2,9 @@ import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import { editor } from 'monaco-editor';
 import * as monaco from 'monaco-editor';
-import { initVimMode } from 'monaco-vim';
-import { attachCustomCommands } from '@components/editor/plugins/commands';
+import VimModeKeymap from 'monaco-vim/lib/cm/keymap_vim';
+import { attachCustomCommands } from '~/components/editor/plugins/commands';
+import createVimModeAdapter from './plugins/vim';
 
 import {
   Connect,
@@ -14,7 +15,6 @@ import {
   newMarkerAction
 } from '~/store';
 import { Analyzer } from '~/services/analyzer';
-
 import { LANGUAGE_GOLANG, stateToOptions } from './props';
 
 const ANALYZE_DEBOUNCE_TIME = 500;
@@ -32,12 +32,19 @@ interface CodeEditorState {
   options: s.monaco,
 }))
 export default class CodeEditor extends React.Component<any, CodeEditorState> {
-  analyzer?: Analyzer;
-  _previousTimeout: any;
-  editorInstance?: editor.IStandaloneCodeEditor;
+  private analyzer?: Analyzer;
+  private _previousTimeout: any;
+  private editorInstance?: editor.IStandaloneCodeEditor;
+  private vimAdapter?: VimModeKeymap;
 
   editorDidMount(editorInstance: editor.IStandaloneCodeEditor, _: monaco.editor.IEditorConstructionOptions) {
     this.editorInstance = editorInstance;
+    this.vimAdapter = createVimModeAdapter(this.props.dispatch, editorInstance);
+    if (this.props.vimModeEnabled) {
+      console.log('Vim mode enabled');
+      this.vimAdapter.attach();
+    }
+
     if (Analyzer.supported()) {
       this.analyzer = new Analyzer();
     } else {
@@ -83,11 +90,27 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
     editorInstance.focus();
   }
 
-  componentWillUnmount() {
-    this.analyzer?.dispose();
+  componentDidUpdate(prevProps) {
+    if (prevProps?.vimModeEnabled === this.props.vimModeEnabled) {
+      return
+    }
+
+    if (this.props.vimModeEnabled) {
+      console.log('Vim mode enabled');
+      this.vimAdapter?.attach();
+      return;
+    }
+
+    console.log('Vim mode disabled');
+    this.vimAdapter?.dispose();
   }
 
-  onChange(newValue: string, e: editor.IModelContentChangedEvent) {
+  componentWillUnmount() {
+    this.analyzer?.dispose();
+    this.vimAdapter?.dispose();
+  }
+
+  onChange(newValue: string, _: editor.IModelContentChangedEvent) {
     this.props.dispatch(newFileChangeAction(newValue));
 
     if (this.analyzer) {
