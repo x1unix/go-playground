@@ -109,7 +109,7 @@ const Config = {
       return this._cache[ENABLE_VIM_MODE_KEY];
     }
 
-    return this.getBoolean(ENABLE_VIM_MODE_KEY, supportsPreferColorScheme());
+    return this.getBoolean(ENABLE_VIM_MODE_KEY, false);
   },
 
   set enableVimMode(val: boolean) {
