@@ -113,8 +113,8 @@ const Config = {
   },
 
   set enableVimMode(val: boolean) {
-    this._cache[USE_SYSTEM_THEME_KEY] = val;
-    localStorage.setItem(USE_SYSTEM_THEME_KEY, val.toString());
+    this._cache[ENABLE_VIM_MODE_KEY] = val;
+    localStorage.setItem(ENABLE_VIM_MODE_KEY, val.toString());
   },
 
   get runtimeType(): RuntimeType {
