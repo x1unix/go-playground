@@ -151,7 +151,8 @@ export const getInitialState = (): State => ({
     enableVimMode: config.enableVimMode
   },
   monaco: config.monacoSettings,
-  panel: config.panelLayout
+  panel: config.panelLayout,
+  vim: null
 });
 
 export const createRootReducer = history => combineReducers({
