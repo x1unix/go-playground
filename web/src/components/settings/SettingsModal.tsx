@@ -184,6 +184,19 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                 />}
               />
               <SettingsProperty
+                key='enableVimMode'
+                title='Enable Vim Mode'
+                control={(
+                  <Checkbox
+                    label='Enable Vim emulation (dangerous!)'
+                    defaultChecked={this.props.settings?.enableVimMode}
+                    onChange={(_, val) => {
+                      this.touchSettingsProperty({enableVimMode: val})
+                    }}
+                  />
+                )}
+              />
+              <SettingsProperty
                 key='cursorBlinking'
                 title='Cursor Blinking'
                 description='Set cursor animation style'
