@@ -2,7 +2,8 @@ import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import { editor } from 'monaco-editor';
 import * as monaco from 'monaco-editor';
-import { attachCustomCommands } from '@components/editor/commands';
+import { initVimMode } from 'monaco-vim';
+import { attachCustomCommands } from '@components/editor/plugins/commands';
 
 import {
   Connect,
@@ -26,6 +27,7 @@ interface CodeEditorState {
 @Connect(s => ({
   code: s.editor.code,
   darkMode: s.settings.darkMode,
+  vimModeEnabled: s.settings.enableVimMode,
   loading: s.status?.loading,
   options: s.monaco,
 }))

@@ -24,8 +24,8 @@ export enum ActionType {
   EVAL_FINISH = 'EVAL_FINISH'
 }
 
-export interface Action<T = any> {
-  type: ActionType
+export interface Action<T = any, A = ActionType> {
+  type: A
   payload: T
 }
 
