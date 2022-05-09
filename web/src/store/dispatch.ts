@@ -77,6 +77,10 @@ export const newSettingsChangeDispatcher = (changes: Partial<SettingsState>): Di
       config.darkThemeEnabled = !!changes.darkMode;
     }
 
+    if ('enableVimMode' in changes) {
+      config.enableVimMode = !!changes.enableVimMode;
+    }
+
     dispatch(newSettingsChangeAction(changes));
   }
 );
@@ -88,7 +92,6 @@ export function newBuildParamsChangeDispatcher(runtime: RuntimeType, autoFormat:
     dispatch(newBuildParamsChangeAction(runtime, autoFormat));
   };
 }
-
 
 export function newSnippetLoadDispatcher(snippetID?: string): Dispatcher {
   return async (dispatch: DispatchFn, _: StateProvider) => {
