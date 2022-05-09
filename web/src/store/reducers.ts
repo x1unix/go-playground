@@ -99,6 +99,7 @@ const reducers = {
     autoFormat: true,
     runtime: RuntimeType.GoPlayground,
     useSystemTheme: localConfig.useSystemTheme,
+    enableVimMode: localConfig.enableVimMode
   }),
   monaco: mapByAction<MonacoSettings>({
     [ActionType.MONACO_SETTINGS_CHANGE]: (s: MonacoSettings, a: Action<MonacoParamsChanges>) => {
@@ -144,6 +145,7 @@ export const getInitialState = (): State => ({
     autoFormat: localConfig.autoFormat,
     runtime: localConfig.runtimeType,
     useSystemTheme: localConfig.useSystemTheme,
+    enableVimMode: localConfig.enableVimMode
   },
   monaco: config.monacoSettings,
   panel: localConfig.panelLayout

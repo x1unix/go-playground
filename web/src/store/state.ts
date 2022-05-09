@@ -26,6 +26,7 @@ export interface SettingsState {
   useSystemTheme: boolean
   autoFormat: boolean,
   runtime: RuntimeType,
+  enableVimMode: boolean
 }
 
 export interface PanelState {
