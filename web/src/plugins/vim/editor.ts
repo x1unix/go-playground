@@ -14,14 +14,15 @@ import {
 
 class VimModeKeymapAdapter extends VimModeKeymap {
   constructor(
-    private dispatch: Dispatch,
+    // "dispatch" is reserved method in inner class.
+    private dispatchFunc: Dispatch,
     editorInstance: editor.IStandaloneCodeEditor
   ) {
     super(editorInstance);
   }
 
   attach() {
-    this.dispatch(newVimInitAction());
+    this.dispatchFunc(newVimInitAction());
     super.attach();
   }
 }
