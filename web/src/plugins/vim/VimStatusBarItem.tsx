@@ -12,22 +12,22 @@ interface Props {
 
 const getItemText = (state: Nullable<VimState>): Nullable<string> => {
   if (!state) return null;
-  const { mode, subMode, keyBuffer } = state;
-  if (keyBuffer) {
-    return keyBuffer;
+  const { mode, subMode, keyBuffer, commandStarted } = state;
+  if (commandStarted) {
+    return ':' + keyBuffer;
   }
 
   if (mode !== VimMode.Visual) {
-    return `--${mode.toUpperCase()}--`;
+    return `-- ${mode.toUpperCase()} --`;
   }
 
   switch (subMode) {
     case VimSubMode.Linewise:
-      return '--VISUAL LINE--';
+      return '-- VISUAL LINE --';
     case VimSubMode.Blockwise:
-      return '--VISUAL BLOCK--';
+      return '-- VISUAL BLOCK --';
     default:
-      return '--VISUAL--';
+      return '-- VISUAL --';
   }
 }
 

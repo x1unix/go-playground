@@ -16,4 +16,5 @@ export interface VimState {
   mode: VimMode
   subMode?: VimSubMode
   keyBuffer?: string
+  commandStarted?: boolean
 }
