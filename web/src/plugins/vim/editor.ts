@@ -1,7 +1,7 @@
 import VimModeKeymap from 'monaco-vim/lib/cm/keymap_vim';
 import { editor } from 'monaco-editor';
 
-import { Dispatch } from '~/store/vim/state';
+import { Dispatch } from '@store/vim/state';
 
 import {
   newVimInitAction,
@@ -10,7 +10,7 @@ import {
   newVimKeyPressAction,
   newVimCommandDoneAction,
   VimModeChangeArgs
-} from '~/store/vim/actions';
+} from '@store/vim/actions';
 
 class VimModeKeymapAdapter extends VimModeKeymap {
   constructor(
@@ -26,12 +26,14 @@ class VimModeKeymapAdapter extends VimModeKeymap {
   }
 }
 
+export { VimModeKeymap };
+
 /**
  * Creates a vim-mode adapter attached to state dispatcher and editor instance
  * @param dispatch State dispatch function
  * @param editorInstance Monaco editor instance
  */
-const createVimModeAdapter = (dispatch: Dispatch, editorInstance: editor.IStandaloneCodeEditor): VimModeKeymap => {
+export const createVimModeAdapter = (dispatch: Dispatch, editorInstance: editor.IStandaloneCodeEditor): VimModeKeymap => {
   const vimAdapter: VimModeKeymap = new VimModeKeymapAdapter(dispatch, editorInstance);
 
   vimAdapter.on('vim-mode-change', (mode: VimModeChangeArgs) => {
@@ -52,5 +54,3 @@ const createVimModeAdapter = (dispatch: Dispatch, editorInstance: editor.IStanda
 
   return vimAdapter;
 };
-
-export default createVimModeAdapter;

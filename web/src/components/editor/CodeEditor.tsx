@@ -2,9 +2,8 @@ import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import { editor } from 'monaco-editor';
 import * as monaco from 'monaco-editor';
-import VimModeKeymap from 'monaco-vim/lib/cm/keymap_vim';
-import { attachCustomCommands } from '~/components/editor/plugins/commands';
-import createVimModeAdapter from './plugins/vim';
+import { VimModeKeymap, createVimModeAdapter } from '~/plugins/vim/editor';
+import { attachCustomCommands } from './commands';
 
 import {
   Connect,

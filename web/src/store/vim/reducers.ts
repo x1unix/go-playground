@@ -1,4 +1,5 @@
-import {excludeKeys, mapByAction, Nullable} from '~/store/helpers';
+import { mapByAction} from '~/store/helpers';
+import { Nullable, excludeKeys } from '~/utils/types';
 import { Action } from '~/store/actions';
 import { VimState, VimMode } from './state';
 import { ActionType, VimModeChangeArgs } from './actions';
