@@ -122,8 +122,12 @@ export class StatusBarAdapter {
 
     switch (e.keyCode) {
       case KeyCode.Enter:
+        this.dispatchFn(newVimCommandDoneAction());
         this.onPromptClose(currentData);
         return;
+      case KeyCode.Escape:
+        this.dispatchFn(newVimCommandDoneAction());
+        break;
       case KeyCode.Backspace:
         this.dispatchFn(newVimKeyDeleteAction());
         return;
