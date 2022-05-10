@@ -35,10 +35,4 @@ COPY --from=build /tmp/playground/wasm_exec.js ./public
 EXPOSE 8000
 ENTRYPOINT /opt/playground/server \
     -f='/opt/playground/data/packages.json' \
-    -clean-interval="${APP_CLEAN_INTERVAL}" \
-    -debug="${APP_DEBUG}" \
-    -playground-url="${APP_PLAYGROUND_URL}" \
-    -gotip-url="${APP_GOTIP_URL}" \
-    -gtag-id="${APP_GTAG_ID}" \
-    -permit-env-vars="${APP_PERMIT_ENV_VARS}" \
     -addr=:8000

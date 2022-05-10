@@ -6,9 +6,9 @@ GOPATH ?= $(shell go env GOPATH)
 PKG := ./cmd/playground
 UI := ./web
 TARGET := ./target
-LISTEN_ADDR := 0.0.0.0:8000
 DEBUG ?= true
 GTAG ?=	# Set GTAG to enable Google Analytics
+LISTEN_ADDR := 127.0.0.1:8000
 
 .PHONY:all
 all: build
@@ -28,7 +28,7 @@ run:
 
 .PHONY:ui
 ui:
-	@REACT_APP_LANG_SERVER='//$(LISTEN_ADDR)' REACT_APP_VERSION=testing yarn --cwd="$(UI)" start
+	@LISTEN_ADDR=$(LISTEN_ADDR) yarn --cwd="$(UI)" start
 
 .PHONY: cover
 cover:

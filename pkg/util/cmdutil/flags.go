@@ -1,6 +1,7 @@
 package cmdutil
 
 import (
+	"encoding"
 	"strconv"
 	"strings"
 )
@@ -38,4 +39,34 @@ func (s *StringsListValue) Set(s2 string) error {
 // NewStringsListValue returns a new StringsListValue
 func NewStringsListValue(p *[]string) *StringsListValue {
 	return (*StringsListValue)(p)
+}
+
+// TextUnmarshalerValue is flag.Value adapter for values
+// which implement encoding.TextUnmarshaler interface.
+type TextUnmarshalerValue struct {
+	dest encoding.TextUnmarshaler
+}
+
+func NewTextUnmarshalerValue(dest encoding.TextUnmarshaler) *TextUnmarshalerValue {
+	return &TextUnmarshalerValue{dest: dest}
+}
+
+func (t *TextUnmarshalerValue) WithDefaults(defaultValue string) *TextUnmarshalerValue {
+	_ = t.dest.UnmarshalText([]byte(defaultValue))
+	return t
+}
+
+// Set implements flag.Value
+func (t TextUnmarshalerValue) Set(v string) error {
+	return t.dest.UnmarshalText([]byte(v))
+}
+
+// String implements flag.Value
+func (t TextUnmarshalerValue) String() string {
+	if m, ok := t.dest.(encoding.TextMarshaler); ok {
+		v, _ := m.MarshalText()
+		return strconv.Quote(string(v))
+	}
+
+	return ""
 }
