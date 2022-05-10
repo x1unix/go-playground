@@ -1,4 +1,4 @@
-import { VimState } from '~/store/vim/state';
+import {ConfirmMessage, VimState} from '~/store/vim/state';
 import {Nullable} from "~/utils/types";
 
 export enum ActionType {
@@ -55,7 +55,7 @@ export const newVimCommandDoneAction = () => ({
   type: ActionType.VIM_COMMAND_DONE
 });
 
-export const newVimConfirmAction = (msg: string) => ({
+export const newVimConfirmAction = (payload: ConfirmMessage) => ({
   type: ActionType.VIM_SHOW_CONFIRM,
-  payload: msg
+  payload: payload
 });
