@@ -1,6 +1,6 @@
-import clsx from 'clsx';
 import React, {CSSProperties, MouseEventHandler} from 'react';
 import { FontIcon } from '@fluentui/react/lib/Icon';
+import clsx from 'clsx';
 import './StatusBarItem.css';
 
 export interface StatusBarItemProps {

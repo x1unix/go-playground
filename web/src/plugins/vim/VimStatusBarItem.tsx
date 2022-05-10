@@ -1,4 +1,5 @@
 import React from 'react';
+import clsx from 'clsx';
 import { connect } from 'react-redux';
 import { SiVim } from 'react-icons/si';
 import { State } from '~/store';
@@ -6,7 +7,7 @@ import { Nullable } from '~/utils/types';
 import { VimMode, VimState, VimSubMode } from '~/store/vim/state';
 import StatusBarItem from '~/components/core/StatusBar/StatusBarItem';
 import './VimStatusBarItem.css'
-import clsx from "clsx";
+
 
 interface Props {
   vimState?: Nullable<VimState>
