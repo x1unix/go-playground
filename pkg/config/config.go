@@ -2,27 +2,43 @@ package config
 
 import (
 	"flag"
-	"github.com/x1unix/go-playground/pkg/goplay"
-	"github.com/x1unix/go-playground/pkg/util/cmdutil"
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/kelseyhightower/envconfig"
+	"github.com/x1unix/go-playground/pkg/goplay"
+	"github.com/x1unix/go-playground/pkg/util/cmdutil"
 )
 
 type HTTPConfig struct {
-	DisableCORS bool
-	Addr        string
-	AssetsDir   string
+	// Addr is HTTP server listen address
+	Addr string `envconfig:"APP_HTTP_ADDR"`
+
+	// AssetsDir is directory which contains frontend assets
+	AssetsDir string `envconfig:"APP_ASSETS_DIR"`
 }
 
 func (cfg *HTTPConfig) mountFlagSet(f *flag.FlagSet) {
+	wd, err := os.Getwd()
+	if err != nil {
+		wd = "."
+	}
 
+	f.StringVar(&cfg.Addr, "addr", ":8080", "TCP Listen address")
+	f.StringVar(&cfg.AssetsDir, "static-dir", filepath.Join(wd, "public"), "Path to web page assets (HTML, JS, etc)")
 }
 
 type PlaygroundConfig struct {
-	PlaygroundURL      string
-	GoTipPlaygroundURL string
-	ConnectTimeout     time.Duration
+	// PlaygroundURL is Go playground server URL
+	PlaygroundURL string `envconfig:"APP_PLAYGROUND_URL"`
+
+	// GoTipPlaygroundURL is Go dev playground server URL
+	GoTipPlaygroundURL string `envconfig:"APP_GOTIP_URL"`
+
+	// ConnectTimeout is HTTP request timeout for playground requests
+	ConnectTimeout time.Duration `envconfig:"APP_PLAYGROUND_TIMEOUT"`
 }
 
 func (cfg *PlaygroundConfig) mountFlagSet(f *flag.FlagSet) {
@@ -32,10 +48,20 @@ func (cfg *PlaygroundConfig) mountFlagSet(f *flag.FlagSet) {
 }
 
 type BuildConfig struct {
-	BuildDir          string
-	PackagesFile      string
-	CleanupInterval   time.Duration
-	BypassEnvVarsList []string
+	// BuildDir is path to directory to cache WebAssembly builds
+	BuildDir string `envconfig:"APP_BUILD_DIR"`
+
+	// PackagesFile is path to packages JSON index file
+	PackagesFile string `envconfig:"APP_PKG_FILE"`
+
+	// CleanupInterval is WebAssembly build artifact cache clean interval
+	CleanupInterval time.Duration `envconfig:"APP_CLEAN_INTERVAL"`
+
+	// BypassEnvVarsList is allow-list of environment variables
+	// that will be passed to Go compiler.
+	//
+	// Empty value disables environment variable filter.
+	BypassEnvVarsList []string `envconfig:"APP_PERMIT_ENV_VARS"`
 }
 
 func (cfg *BuildConfig) mountFlagSet(f *flag.FlagSet) {
@@ -46,25 +72,43 @@ func (cfg *BuildConfig) mountFlagSet(f *flag.FlagSet) {
 }
 
 type ServicesConfig struct {
-	GoogleAnalyticsID string
-	SentryDSN         string
+	// GoogleAnalyticsID is Google Analytics tag ID (optional)
+	GoogleAnalyticsID string `envconfig:"APP_GTAG_ID"`
+}
+
+func (cfg *ServicesConfig) mountFlagSet(f *flag.FlagSet) {
+	f.StringVar(&cfg.GoogleAnalyticsID, "gtag-id", "", "Google Analytics tag ID (optional)")
 }
 
 type Config struct {
-	PackagesFile string
-	HTTP         HTTPConfig
-	Playground   PlaygroundConfig
-	Build        BuildConfig
-	Log          LogConfig
+	HTTP       HTTPConfig
+	Playground PlaygroundConfig
+	Build      BuildConfig
+	Log        LogConfig
 }
 
+// FromFlags returns config file which will read values from flags
+// when flag.Parse will be called.
 func FromFlags(f *flag.FlagSet) *Config {
 	var cfg Config
-	f.StringVar(&args.addr, "addr", ":8080", "TCP Listen address")
+	cfg.HTTP.mountFlagSet(f)
 	cfg.Playground.mountFlagSet(f)
-	f.StringVar(&args.assetsDirectory, "static-dir", filepath.Join(wd, "public"), "Path to web page assets (HTML, JS, etc)")
-	f.DurationVar(&args.connectTimeout, "timeout", 15*time.Second, "Go Playground server connect timeout")
-	f.StringVar(&args.googleAnalyticsID, "gtag-id", "", "Google Analytics tag ID (optional)")
-
+	cfg.Build.mountFlagSet(f)
+	cfg.Log.mountFlagSet(f)
 	return &cfg
+}
+
+// FromEnv populates config with values from environment variables.
+//
+// If passed config is nil - a new config will be returned.
+func FromEnv(input *Config) (*Config, error) {
+	if input == nil {
+		input = new(Config)
+	}
+
+	if err := envconfig.Process("APP", &input); err != nil {
+		return nil, fmt.Errorf("failed to load config from environment: %w", err)
+	}
+
+	return input, nil
 }
