@@ -194,7 +194,7 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                 title='Enable Vim Mode'
                 control={(
                   <Checkbox
-                    label='Allows to use Vim key bindings when editing'
+                    label='Allows usage of Vim key bindings when editing'
                     defaultChecked={this.props.settings?.enableVimMode}
                     onChange={(_, val) => {
                       this.touchSettingsProperty({enableVimMode: val})
