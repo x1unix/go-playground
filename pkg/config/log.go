@@ -2,6 +2,7 @@ package config
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"strings"
 
@@ -34,15 +35,20 @@ func (cfg *LogConfig) mountFlagSet(f *flag.FlagSet) {
 
 // ZapLogger constructs a new zap.Logger instance from configuration.
 func (cfg LogConfig) ZapLogger() (*zap.Logger, error) {
-	var logCfg zap.Config
-	if cfg.Debug {
-		logCfg = zap.NewDevelopmentConfig()
-	} else {
-		logCfg = zap.NewProductionConfig()
-	}
-
+	logCfg := zap.NewProductionConfig()
+	logCfg.Development = cfg.Debug
 	logCfg.Level = zap.NewAtomicLevelAt(cfg.Level)
 	logCfg.Encoding = cfg.Format
+
+	switch cfg.Format {
+	case "", "json":
+		logCfg.EncoderConfig = zap.NewProductionEncoderConfig()
+	case "console":
+		logCfg.EncoderConfig = zap.NewDevelopmentEncoderConfig()
+	default:
+		return nil, fmt.Errorf("unsupported log format %q", cfg.Format)
+	}
+
 	log, err := logCfg.Build()
 	if err != nil {
 		return nil, err
