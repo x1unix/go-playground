@@ -60,7 +60,6 @@ const StatusBar: React.FC<Props> = ({
           </StatusBarItem>
           <VimStatusBarItem />
           {getStatusItem({loading, lastError})}
-          <VimStatusBarItem />
         </div>
         <div className="StatusBar__side-right">
           <StatusBarItem
