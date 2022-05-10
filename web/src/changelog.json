@@ -1,21 +1,16 @@
 {
   "Interface - General": [
     {
-      "issueId": 150,
-      "url": "/pull/150",
-      "description": "Use system dark mode theme preferences."
+      "issueId": 169,
+      "url": "/pull/169",
+      "description": "Add Vim mode emulation."
     },
-    {
-      "issueId": 147,
-      "url": "/pull/147",
-      "description": "Add vertical and horizontal layout switcher for output panel"
-    }
   ],
-  "Interface - Other": [
+  "Interface - Bugs": [
     {
-      "issueId": 147,
-      "url": "/pull/147",
-      "description": "Store output panel settings in local storage."
+      "issueId": 178,
+      "url": "/pull/178",
+      "description": "Fix word wrap in alert box on small screens."
     }
   ]
 }
