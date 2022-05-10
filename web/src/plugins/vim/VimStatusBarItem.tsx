@@ -12,9 +12,13 @@ interface Props {
 
 const getItemText = (state: Nullable<VimState>): Nullable<string> => {
   if (!state) return null;
-  const { mode, subMode, keyBuffer, commandStarted } = state;
+  const { mode, subMode, keyBuffer, commandStarted, confirmMessage } = state;
+  if (confirmMessage) {
+    return confirmMessage;
+  }
+
   if (commandStarted) {
-    return ':' + keyBuffer;
+    return keyBuffer!;
   }
 
   if (mode !== VimMode.Visual) {

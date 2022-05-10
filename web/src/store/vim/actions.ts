@@ -1,11 +1,15 @@
 import { VimState } from '~/store/vim/state';
+import {Nullable} from "~/utils/types";
 
 export enum ActionType {
   VIM_INIT = 'VIM_INIT',
   VIM_DISPOSE = 'VIM_DISPOSE',
   VIM_MODE_CHANGE = 'VIM_MODE_CHANGE',
   VIM_KEYPRESS = 'VIM_KEYPRESS',
-  VIM_COMMAND_DONE = 'VIM_COMMAND_DONE'
+  VIM_KEYDEL = 'VIM_KEYDEL',
+  VIM_COMMAND_START = 'VIM_COMMAND_START',
+  VIM_COMMAND_DONE = 'VIM_COMMAND_DONE',
+  VIM_SHOW_CONFIRM = 'VIM_SHOW_CONFIRM'
 }
 
 /**
@@ -14,6 +18,11 @@ export enum ActionType {
  * @see monaco-vim/lib/statusbar.js
  */
 export type VimModeChangeArgs = Pick<VimState, 'mode' | 'subMode'>;
+
+export interface VimKeyPressArgs {
+  key: string
+  replaceContents: boolean
+}
 
 export const newVimInitAction = () => ({
   type: ActionType.VIM_INIT
@@ -28,11 +37,25 @@ export const newVimModeChangeAction = (payload: VimModeChangeArgs) => ({
   payload
 });
 
-export const newVimKeyPressAction = (key: string) => ({
+export const newVimKeyPressAction = (key: string, replaceContents = false) => ({
   type: ActionType.VIM_KEYPRESS,
-  payload: key
+  payload: {key, replaceContents}
 });
+
+export const newVimKeyDeleteAction = () => ({
+  type: ActionType.VIM_KEYDEL
+});
+
+export const newVimCommandStartAction = (commandSuffix?: Nullable<string>) => ({
+  type: ActionType.VIM_COMMAND_START,
+  payload: commandSuffix ?? ''
+})
 
 export const newVimCommandDoneAction = () => ({
   type: ActionType.VIM_COMMAND_DONE
+});
+
+export const newVimConfirmAction = (msg: string) => ({
+  type: ActionType.VIM_SHOW_CONFIRM,
+  payload: msg
 });

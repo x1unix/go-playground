@@ -1,8 +1,12 @@
 import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
-import { editor } from 'monaco-editor';
+import {editor, IKeyboardEvent} from 'monaco-editor';
 import * as monaco from 'monaco-editor';
-import { VimModeKeymap, createVimModeAdapter } from '~/plugins/vim/editor';
+import {
+  VimModeKeymap,
+  createVimModeAdapter,
+  StatusBarAdapter
+} from '~/plugins/vim/editor';
 import { attachCustomCommands } from './commands';
 
 import {
@@ -29,16 +33,25 @@ interface CodeEditorState {
   vimModeEnabled: s.settings.enableVimMode,
   loading: s.status?.loading,
   options: s.monaco,
+  vim: s.vim,
 }))
 export default class CodeEditor extends React.Component<any, CodeEditorState> {
   private analyzer?: Analyzer;
   private _previousTimeout: any;
   private editorInstance?: editor.IStandaloneCodeEditor;
   private vimAdapter?: VimModeKeymap;
+  private vimCommandAdapter?: StatusBarAdapter;
 
   editorDidMount(editorInstance: editor.IStandaloneCodeEditor, _: monaco.editor.IEditorConstructionOptions) {
     this.editorInstance = editorInstance;
-    this.vimAdapter = createVimModeAdapter(this.props.dispatch, editorInstance);
+    editorInstance.onKeyDown(e => this.onKeyDown(e));
+    const [ vimAdapter, statusAdapter ] = createVimModeAdapter(
+      this.props.dispatch,
+      editorInstance
+    );
+    this.vimAdapter = vimAdapter;
+    this.vimCommandAdapter = statusAdapter;
+
     if (this.props.vimModeEnabled) {
       console.log('Vim mode enabled');
       this.vimAdapter.attach();
@@ -135,15 +148,26 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
     }, ANALYZE_DEBOUNCE_TIME);
   }
 
+  private onKeyDown(e: IKeyboardEvent) {
+    const {vimModeEnabled, vim} = this.props;
+    if (!vimModeEnabled || !vim?.commandStarted) {
+      return;
+    }
+
+    this.vimCommandAdapter?.handleKeyDownEvent(e, vim?.keyBuffer);
+  }
+
   render() {
     const options = stateToOptions(this.props.options);
-    return <MonacoEditor
-      language={LANGUAGE_GOLANG}
-      theme={this.props.darkMode ? 'vs-dark' : 'vs-light'}
-      value={this.props.code}
-      options={options}
-      onChange={(newVal, e) => this.onChange(newVal, e)}
-      editorDidMount={(e, m: any) => this.editorDidMount(e, m)}
-    />;
+    return (
+      <MonacoEditor
+        language={LANGUAGE_GOLANG}
+        theme={this.props.darkMode ? 'vs-dark' : 'vs-light'}
+        value={this.props.code}
+        options={options}
+        onChange={(newVal, e) => this.onChange(newVal, e)}
+        editorDidMount={(e, m: any) => this.editorDidMount(e, m)}
+      />
+    );
   }
 }
