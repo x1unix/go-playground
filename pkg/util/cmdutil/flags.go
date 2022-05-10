@@ -65,7 +65,7 @@ func (t TextUnmarshalerValue) Set(v string) error {
 func (t TextUnmarshalerValue) String() string {
 	if m, ok := t.dest.(encoding.TextMarshaler); ok {
 		v, _ := m.MarshalText()
-		return string(v)
+		return strconv.Quote(string(v))
 	}
 
 	return ""
