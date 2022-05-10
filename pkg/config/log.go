@@ -12,16 +12,18 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+type SentryConfig struct {
+	DSN             string        `envconfig:"SENTRY_DSN" json:"dsn"`
+	UseBreadcrumbs  bool          `envconfig:"SENTRY_USE_BREADCRUMBS" json:"useBreadcrumbs"`
+	BreadcrumbLevel zapcore.Level `envconfig:"SENTRY_BREADCRUMB_LEVEL" json:"breadcrumbLevel"`
+}
+
 type LogConfig struct {
 	Debug  bool          `envconfig:"APP_DEBUG" json:"debug"`
 	Level  zapcore.Level `envconfig:"APP_LOG_LEVEL" json:"level"`
 	Format string        `envconfig:"APP_LOG_FORMAT" json:"format"`
 
-	Sentry struct {
-		DSN             string        `envconfig:"SENTRY_DSN" json:"dsn"`
-		UseBreadcrumbs  bool          `envconfig:"SENTRY_USE_BREADCRUMBS" json:"useBreadcrumbs"`
-		BreadcrumbLevel zapcore.Level `envconfig:"SENTRY_BREADCRUMB_LEVEL" json:"breadcrumbLevel"`
-	} `json:"sentry"`
+	Sentry SentryConfig `json:"sentry"`
 }
 
 func (cfg *LogConfig) mountFlagSet(f *flag.FlagSet) {

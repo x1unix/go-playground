@@ -115,7 +115,7 @@ func FromEnv(input *Config) (*Config, error) {
 		input = new(Config)
 	}
 
-	if err := envconfig.Process("APP", input); err != nil {
+	if err := envconfig.Process("", input); err != nil {
 		return nil, fmt.Errorf("failed to load config from environment: %w", err)
 	}
 
