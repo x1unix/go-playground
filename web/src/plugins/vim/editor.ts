@@ -19,6 +19,8 @@ import {Nullable} from "~/utils/types";
 const regularKeyRegex = /^.$/;
 const isPrintableKey = (key: string) => regularKeyRegex.test(key);
 
+const registryOutputPrefix = '----------Registers----------';
+
 interface CommandInputOpts {
   bottom?: boolean,
   selectValueOnOpen?: boolean,
@@ -65,7 +67,22 @@ export class StatusBarAdapter {
    * @param result
    */
   showNotification(result: HTMLElement) {
+    // When registry command appears, library just sends
+    // the same HTML element with error red color and
+    // as a result, registry prompt is unreadable and displayed as error.
+    //
+    // This dirty hack tries to resolve this issue at least partially.
     this.commandResultCallback = null;
+    const message = result.textContent!;
+    if (message.startsWith(registryOutputPrefix)) {
+      // TODO: implement proper registries display
+      this.dispatchFn(newVimConfirmAction({
+        type: 'default',
+        message: message.split('\n').map(v => v.trim()).join(' ')
+      }));
+      return;
+    }
+
     const isError = result.style.color === 'red';
     this.dispatchFn(newVimConfirmAction({
       type: isError ? 'error' : 'default',
@@ -105,8 +122,12 @@ export class StatusBarAdapter {
 
     switch (e.keyCode) {
       case KeyCode.Enter:
+        this.dispatchFn(newVimCommandDoneAction());
         this.onPromptClose(currentData);
         return;
+      case KeyCode.Escape:
+        this.dispatchFn(newVimCommandDoneAction());
+        break;
       case KeyCode.Backspace:
         this.dispatchFn(newVimKeyDeleteAction());
         return;
