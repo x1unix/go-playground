@@ -58,6 +58,7 @@ const StatusBar: React.FC<Props> = ({
           >
             {markers?.length ?? 0} Errors
           </StatusBarItem>
+          <VimStatusBarItem />
           {getStatusItem({loading, lastError})}
           <VimStatusBarItem />
         </div>

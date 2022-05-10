@@ -45,6 +45,10 @@ class VimModeKeymapAdapter extends VimModeKeymap {
 
 export { VimModeKeymap };
 
+/**
+ * StatusBarAdapter is monaco-vim command handler and report status bar
+ * adapter which maps it to application state.
+ */
 export class StatusBarAdapter {
   private commandResultCallback?: Nullable<((val: string) => void)>;
   private currentOpts?: Nullable<CommandInputOpts>;
@@ -60,11 +64,13 @@ export class StatusBarAdapter {
    * Library passes pre-formated styled HTML element for display.
    * @param result
    */
-  showNotification(result: string|HTMLElement) {
-    const msg = result instanceof HTMLElement ? result.innerText : result;
-    console.log('showNotification', msg);
-    this.dispatchFn(newVimConfirmAction(msg));
+  showNotification(result: HTMLElement) {
     this.commandResultCallback = null;
+    const isError = result.style.color === 'red';
+    this.dispatchFn(newVimConfirmAction({
+      type: isError ? 'error' : 'default',
+      message: result.textContent!
+    }));
   }
 
   /**
@@ -88,6 +94,11 @@ export class StatusBarAdapter {
     this.commandResultCallback = null;
   }
 
+  /**
+   * Submits input event to VIM command handler
+   * @param e
+   * @param currentData
+   */
   handleKeyDownEvent(e: IKeyboardEvent, currentData: string) {
     e.preventDefault();
     e.stopPropagation();
@@ -109,11 +120,8 @@ export class StatusBarAdapter {
   }
 
   private closeInput() {
-    console.log('clear input');
-    // this?.inputRef.current?.blur();
     this?.editor?.focus();
     this.currentOpts = null;
-    // this.commandResultCallback = null;
   }
 }
 

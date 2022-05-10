@@ -1,7 +1,7 @@
 import { mapByAction} from '~/store/helpers';
 import { Nullable } from '~/utils/types';
 import { Action } from '~/store/actions';
-import { VimState, VimMode } from './state';
+import {VimState, VimMode, ConfirmMessage} from './state';
 import {ActionType, VimKeyPressArgs, VimModeChangeArgs} from './actions';
 
 const initialState: VimState = { mode: VimMode.Normal }
@@ -45,7 +45,7 @@ const reducers = mapByAction<Nullable<VimState>>({
     const { mode, subMode } = s;
     return { mode, subMode };
   },
-  [ActionType.VIM_SHOW_CONFIRM]: (s: Nullable<VimState>, {payload}: Action<string>) => {
+  [ActionType.VIM_SHOW_CONFIRM]: (s: Nullable<VimState>, {payload}: Action<ConfirmMessage>) => {
     const {mode, subMode} = s ?? initialState;
     return {
       mode, subMode,

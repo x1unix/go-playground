@@ -1,9 +1,11 @@
 import React, {CSSProperties, MouseEventHandler} from 'react';
 import { FontIcon } from '@fluentui/react/lib/Icon';
+import clsx from 'clsx';
 import './StatusBarItem.css';
 
 export interface StatusBarItemProps {
   icon?: string | React.ComponentType,
+  className?: string
   iconOnly?: boolean
   imageSrc?: string
   button?: boolean
@@ -48,6 +50,7 @@ const getItemContents = ({icon, iconOnly, imageSrc, title, children}) => (
 
 const StatusBarItem: React.FC<StatusBarItemProps> = ({
   title,
+  className,
   icon,
   iconOnly,
   imageSrc,
@@ -63,13 +66,13 @@ const StatusBarItem: React.FC<StatusBarItemProps> = ({
   }
 
   const content = getItemContents({icon, iconOnly, children, imageSrc, title});
-  const className = hideTextOnMobile ? (
+  const classValue = hideTextOnMobile ? (
     'StatusBarItem StatusBarItem--hideOnMobile'
   ) : 'StatusBarItem';
   if (button) {
     return (
       <button
-        className={`${className} StatusBarItem--action`}
+        className={clsx(`${classValue} StatusBarItem--action`, className)}
         title={title}
         {...props}
       >
@@ -84,7 +87,7 @@ const StatusBarItem: React.FC<StatusBarItemProps> = ({
         href={href}
         target="_blank"
         rel="noreferrer"
-        className={`${className} StatusBarItem--action`}
+        className={clsx(`${classValue} StatusBarItem--action`, className)}
         title={title}
         {...props}
       >
@@ -96,7 +99,7 @@ const StatusBarItem: React.FC<StatusBarItemProps> = ({
   const { style } = props;
   return (
     <div
-      className={`${className} StatusBarItem--text`}
+      className={clsx(`${classValue} StatusBarItem--text`, className)}
       title={title}
       style={style}
     >

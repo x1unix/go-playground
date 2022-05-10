@@ -1,10 +1,13 @@
 import React from 'react';
+import clsx from 'clsx';
 import { connect } from 'react-redux';
 import { SiVim } from 'react-icons/si';
 import { State } from '~/store';
 import { Nullable } from '~/utils/types';
 import { VimMode, VimState, VimSubMode } from '~/store/vim/state';
 import StatusBarItem from '~/components/core/StatusBar/StatusBarItem';
+import './VimStatusBarItem.css'
+
 
 interface Props {
   vimState?: Nullable<VimState>
@@ -14,7 +17,7 @@ const getItemText = (state: Nullable<VimState>): Nullable<string> => {
   if (!state) return null;
   const { mode, subMode, keyBuffer, commandStarted, confirmMessage } = state;
   if (confirmMessage) {
-    return confirmMessage;
+    return confirmMessage.message;
   }
 
   if (commandStarted) {
@@ -40,10 +43,14 @@ const VimStatusBarItem: React.FC<Props> = ({vimState}) => {
     return null;
   }
 
+  const isError = vimState?.confirmMessage?.type === 'error';
   return (
     <StatusBarItem
       title="Vim Status"
       icon={SiVim}
+      className={clsx({
+        'VimStatusBarItem--error': isError
+      })}
     >
       {getItemText(vimState)}
     </StatusBarItem>

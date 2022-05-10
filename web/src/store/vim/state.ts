@@ -11,11 +11,15 @@ export enum VimSubMode {
 }
 
 export type Dispatch = <V=any,T=string>(v:{type: T, payload?: V}) => void;
+export type ConfirmMessage = VimState['confirmMessage'];
 
 export interface VimState {
   mode: VimMode
   subMode?: VimSubMode
   keyBuffer?: string
   commandStarted?: boolean
-  confirmMessage?: string
+  confirmMessage?: {
+    type: 'error' | 'default',
+    message: string
+  }
 }
