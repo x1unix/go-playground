@@ -12,15 +12,15 @@ import (
 )
 
 type LogConfig struct {
-	Debug  bool          `envconfig:"APP_DEBUG"`
-	Level  zapcore.Level `envconfig:"APP_LOG_LEVEL"`
-	Format string        `envconfig:"APP_LOG_FORMAT"`
+	Debug  bool          `envconfig:"APP_DEBUG" json:"debug"`
+	Level  zapcore.Level `envconfig:"APP_LOG_LEVEL" json:"level"`
+	Format string        `envconfig:"APP_LOG_FORMAT" json:"format"`
 
 	Sentry struct {
-		DSN             string        `envconfig:"SENTRY_DSN"`
-		UseBreadcrumbs  bool          `envconfig:"SENTRY_USE_BREADCRUMBS"`
-		BreadcrumbLevel zapcore.Level `envconfig:"SENTRY_BREADCRUMB_LEVEL"`
-	}
+		DSN             string        `envconfig:"SENTRY_DSN" json:"dsn"`
+		UseBreadcrumbs  bool          `envconfig:"SENTRY_USE_BREADCRUMBS" json:"useBreadcrumbs"`
+		BreadcrumbLevel zapcore.Level `envconfig:"SENTRY_BREADCRUMB_LEVEL" json:"breadcrumbLevel"`
+	} `json:"sentry"`
 }
 
 func (cfg *LogConfig) mountFlagSet(f *flag.FlagSet) {
