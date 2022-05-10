@@ -163,17 +163,9 @@ func start(goRoot string, args appArgs) error {
 	r.PathPrefix("/").
 		Handler(spaHandler)
 
-	var handler http.Handler
-	if args.debug {
-		zap.S().Info("Debug mode enabled, CORS disabled")
-		handler = langserver.NewCORSDisablerWrapper(r)
-	} else {
-		handler = r
-	}
-
 	server := &http.Server{
 		Addr:         args.addr,
-		Handler:      handler,
+		Handler:      r,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  15 * time.Second,
