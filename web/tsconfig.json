@@ -22,6 +22,10 @@
     "noImplicitAny": false,
     "experimentalDecorators": true,
     "noFallthroughCasesInSwitch": true,
+    "typeRoots": [
+      "src/types/monaco-vim",
+      "node_modules/@types"
+    ]
   },
   "include": [
     "src"

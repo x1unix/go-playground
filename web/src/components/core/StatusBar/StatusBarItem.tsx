@@ -2,12 +2,13 @@ import React, {CSSProperties, MouseEventHandler} from 'react';
 import { FontIcon } from '@fluentui/react/lib/Icon';
 import './StatusBarItem.css';
 
-interface Props {
-  iconName?: string
+export interface StatusBarItemProps {
+  icon?: string | React.ComponentType,
   iconOnly?: boolean
   imageSrc?: string
   button?: boolean
   disabled?: boolean
+  hidden?: boolean
   hideTextOnMobile?: boolean
   href?: string
   title?: string
@@ -15,12 +16,20 @@ interface Props {
   style?: CSSProperties
 }
 
-const getItemContents = ({iconName, iconOnly, imageSrc, title, children}) => (
+const getIcon = (icon: string | React.ComponentType) => (
+  typeof icon === 'string' ? (
+    <FontIcon iconName={icon} className="StatusBarItem__icon" />
+  ) : (
+    React.createElement<any>(icon as React.ComponentType, {
+      className: 'StatusBarItem__icon'
+    })
+  )
+)
+
+const getItemContents = ({icon, iconOnly, imageSrc, title, children}) => (
   <>
     {
-      iconName && (
-        <FontIcon iconName={iconName} className="StatusBarItem__icon"/>
-      )
+      icon && getIcon(icon)
     }
     {
       imageSrc && (
@@ -37,11 +46,23 @@ const getItemContents = ({iconName, iconOnly, imageSrc, title, children}) => (
   </>
 )
 
-const StatusBarItem: React.FC<Props> = ({
-  title, iconName, iconOnly, imageSrc, hideTextOnMobile,
-  href, button, children,  ...props
+const StatusBarItem: React.FC<StatusBarItemProps> = ({
+  title,
+  icon,
+  iconOnly,
+  imageSrc,
+  hideTextOnMobile,
+  href,
+  button,
+  children,
+  hidden,
+  ...props
 }) => {
-  const content = getItemContents({iconName, iconOnly, children, imageSrc, title});
+  if (hidden) {
+    return null;
+  }
+
+  const content = getItemContents({icon, iconOnly, children, imageSrc, title});
   const className = hideTextOnMobile ? (
     'StatusBarItem StatusBarItem--hideOnMobile'
   ) : 'StatusBarItem';

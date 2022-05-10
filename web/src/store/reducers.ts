@@ -1,12 +1,14 @@
 import { connectRouter } from 'connected-react-router';
 import { combineReducers } from 'redux';
-import {editor} from "monaco-editor";
+import {editor} from 'monaco-editor';
 
-import { Action, ActionType, FileImportArgs, BuildParamsArgs, MonacoParamsChanges } from './actions';
 import { RunResponse, EvalEvent } from '~/services/api';
-import localConfig, { MonacoSettings, RuntimeType } from '~/services/config'
+import config, { MonacoSettings, RuntimeType } from '~/services/config'
+
+import vimReducers from './vim/reducers';
+import { Action, ActionType, FileImportArgs, BuildParamsArgs, MonacoParamsChanges } from './actions';
 import { mapByAction } from './helpers';
-import config from '~/services/config';
+
 import {
   EditorState,
   SettingsState,
@@ -82,7 +84,7 @@ const reducers = {
   settings: mapByAction<SettingsState>({
     [ActionType.TOGGLE_THEME]: (s: SettingsState, a: Action) => {
       s.darkMode = !s.darkMode;
-      localConfig.darkThemeEnabled = s.darkMode;
+      config.darkThemeEnabled = s.darkMode;
       return s;
     },
     [ActionType.BUILD_PARAMS_CHANGE]: (s: SettingsState, a: Action<BuildParamsArgs>) => {
@@ -95,10 +97,11 @@ const reducers = {
       ...s, ...payload
     })
   }, {
-    darkMode: localConfig.darkThemeEnabled,
+    darkMode: config.darkThemeEnabled,
     autoFormat: true,
     runtime: RuntimeType.GoPlayground,
-    useSystemTheme: localConfig.useSystemTheme,
+    useSystemTheme: config.useSystemTheme,
+    enableVimMode: config.enableVimMode
   }),
   monaco: mapByAction<MonacoSettings>({
     [ActionType.MONACO_SETTINGS_CHANGE]: (s: MonacoSettings, a: Action<MonacoParamsChanges>) => {
@@ -128,7 +131,8 @@ const reducers = {
 
       return { ...s, ...payload };
     }
-  }, {})
+  }, {}),
+  vim: vimReducers
 };
 
 export const getInitialState = (): State => ({
@@ -140,13 +144,15 @@ export const getInitialState = (): State => ({
     code: ''
   },
   settings: {
-    darkMode: localConfig.darkThemeEnabled,
-    autoFormat: localConfig.autoFormat,
-    runtime: localConfig.runtimeType,
-    useSystemTheme: localConfig.useSystemTheme,
+    darkMode: config.darkThemeEnabled,
+    autoFormat: config.autoFormat,
+    runtime: config.runtimeType,
+    useSystemTheme: config.useSystemTheme,
+    enableVimMode: config.enableVimMode
   },
   monaco: config.monacoSettings,
-  panel: localConfig.panelLayout
+  panel: config.panelLayout,
+  vim: null
 });
 
 export const createRootReducer = history => combineReducers({

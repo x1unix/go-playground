@@ -151,122 +151,62 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                 key='fontFamily'
                 title='Font Family'
                 description='Controls editor font family'
-                control={<Dropdown
-                  options={FONT_OPTS}
-                  defaultSelectedKey={this.props.monaco?.fontFamily ?? DEFAULT_FONT}
-                  onChange={(_, num) => {
-                    this.touchMonacoProperty('fontFamily', num?.key);
-                  }}
-                />}
+                control={(
+                  <Dropdown
+                    options={FONT_OPTS}
+                    defaultSelectedKey={this.props.monaco?.fontFamily ?? DEFAULT_FONT}
+                    onChange={(_, num) => {
+                      this.touchMonacoProperty('fontFamily', num?.key);
+                    }}
+                  />
+                )}
               />
               <SettingsProperty
                 key='autoDetectTheme'
                 title='Use System Theme'
-                control={<Checkbox
-                  label='Follow system dark mode preference instead of manual toggle.'
-                  defaultChecked={this.props.settings?.useSystemTheme}
-                  onChange={(_, val) => {
-                    this.touchSettingsProperty({
-                      useSystemTheme: val
-                    });
-                  }}
-                />}
+                control={(
+                  <Checkbox
+                    label='Follow system dark mode preference instead of manual toggle.'
+                    defaultChecked={this.props.settings?.useSystemTheme}
+                    onChange={(_, val) => {
+                      this.touchSettingsProperty({
+                        useSystemTheme: val
+                      });
+                    }}
+                  />
+                )}
               />
               <SettingsProperty
                 key='fontLigatures'
                 title='Font Ligatures'
-                control={<Checkbox
-                  label='Enable programming font ligatures in supported fonts'
-                  defaultChecked={this.props.monaco?.fontLigatures}
-                  onChange={(_, val) => {
-                    this.touchMonacoProperty('fontLigatures', val);
-                  }}
-                />}
+                control={(
+                  <Checkbox
+                    label='Enable programming font ligatures in supported fonts'
+                    defaultChecked={this.props.monaco?.fontLigatures}
+                    onChange={(_, val) => {
+                      this.touchMonacoProperty('fontLigatures', val);
+                    }}
+                  />
+                )}
               />
               <SettingsProperty
-                key='cursorBlinking'
-                title='Cursor Blinking'
-                description='Set cursor animation style'
-                control={<Dropdown
-                  options={CURSOR_BLINK_STYLE_OPTS}
-                  defaultSelectedKey={this.props.monaco?.cursorBlinking}
-                  onChange={(_, num) => {
-                    this.touchMonacoProperty('cursorBlinking', num?.key);
-                  }}
-                />}
-              />
-              <SettingsProperty
-                key='cursorStyle'
-                title='Cursor Style'
-                description='Set the cursor style'
-                control={<Dropdown
-                  options={CURSOR_LINE_OPTS}
-                  defaultSelectedKey={this.props.monaco?.cursorStyle}
-                  onChange={(_, num) => {
-                    this.touchMonacoProperty('cursorStyle', num?.key);
-                  }}
-                />}
-              />
-              <SettingsProperty
-                key='selectOnLineNumbers'
-                title='Select On Line Numbers'
-                control={<Checkbox
-                  label="Select corresponding line on line number click"
-                  defaultChecked={this.props.monaco?.selectOnLineNumbers}
-                  onChange={(_, val) => {
-                    this.touchMonacoProperty('cursorStyle', val);
-                  }}
-                />}
-              />
-              <SettingsProperty
-                key='minimap'
-                title='Mini Map'
-                control={<Checkbox
-                  label="Enable mini map on side"
-                  defaultChecked={this.props.monaco?.minimap}
-                  onChange={(_, val) => {
-                    this.touchMonacoProperty('minimap', val);
-                  }}
-                />}
-              />
-              <SettingsProperty
-                key='contextMenu'
-                title='Context Menu'
-                control={<Checkbox
-                  label="Enable editor context menu (on right click)"
-                  defaultChecked={this.props.monaco?.contextMenu}
-                  onChange={(_, val) => {
-                    this.touchMonacoProperty('contextMenu', val);
-                  }}
-                />}
-              />
-              <SettingsProperty
-                key='smoothScroll'
-                title='Smooth Scrolling'
-                control={<Checkbox
-                  label="Enable that the editor animates scrolling to a position"
-                  defaultChecked={this.props.monaco?.smoothScrolling}
-                  onChange={(_, val) => {
-                    this.touchMonacoProperty('smoothScrolling', val);
-                  }}
-                />}
-              />
-              <SettingsProperty
-                key='mouseWheelZoom'
-                title='Mouse Wheel Zoom'
-                control={<Checkbox
-                  label="Zoom the font in the editor when using the mouse wheel in combination with holding Ctrl"
-                  defaultChecked={this.props.monaco?.mouseWheelZoom}
-                  onChange={(_, val) => {
-                    this.touchMonacoProperty('mouseWheelZoom', val);
-                  }}
-                />}
+                key='enableVimMode'
+                title='Enable Vim Mode'
+                control={(
+                  <Checkbox
+                    label='Allows to use Vim key bindings when editing'
+                    defaultChecked={this.props.settings?.enableVimMode}
+                    onChange={(_, val) => {
+                      this.touchSettingsProperty({enableVimMode: val})
+                    }}
+                  />
+                )}
               />
             </PivotItem>
-            <PivotItem headerText='Build' style={{ paddingBottom: '64px' }}>
+            <PivotItem headerText='Go Environment' style={{ paddingBottom: '64px' }}>
               <SettingsProperty
                 key='runtime'
-                title='Runtime'
+                title='Environment'
                 description='This option lets you choose where your Go code should be executed.'
                 control={<Dropdown
                   options={COMPILER_OPTIONS}
@@ -320,6 +260,101 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                     };
                   }}
                 />}
+              />
+            </PivotItem>
+            <PivotItem headerText='Advanced'>
+              <SettingsProperty
+                key='cursorBlinking'
+                title='Cursor Blinking'
+                description='Set cursor animation style'
+                control={(
+                  <Dropdown
+                    options={CURSOR_BLINK_STYLE_OPTS}
+                    defaultSelectedKey={this.props.monaco?.cursorBlinking}
+                    onChange={(_, num) => {
+                      this.touchMonacoProperty('cursorBlinking', num?.key);
+                    }}
+                  />
+                )}
+              />
+              <SettingsProperty
+                key='cursorStyle'
+                title='Cursor Style'
+                description='Set the cursor style'
+                control={(
+                  <Dropdown
+                    options={CURSOR_LINE_OPTS}
+                    defaultSelectedKey={this.props.monaco?.cursorStyle}
+                    onChange={(_, num) => {
+                      this.touchMonacoProperty('cursorStyle', num?.key);
+                    }}
+                  />
+                )}
+              />
+              <SettingsProperty
+                key='selectOnLineNumbers'
+                title='Select On Line Numbers'
+                control={(
+                  <Checkbox
+                    label="Select corresponding line on line number click"
+                    defaultChecked={this.props.monaco?.selectOnLineNumbers}
+                    onChange={(_, val) => {
+                      this.touchMonacoProperty('cursorStyle', val);
+                    }}
+                  />
+                )}
+              />
+              <SettingsProperty
+                key='minimap'
+                title='Mini Map'
+                control={(
+                  <Checkbox
+                    label="Enable mini map on side"
+                    defaultChecked={this.props.monaco?.minimap}
+                    onChange={(_, val) => {
+                      this.touchMonacoProperty('minimap', val);
+                    }}
+                  />
+                )}
+              />
+              <SettingsProperty
+                key='contextMenu'
+                title='Context Menu'
+                control={(
+                  <Checkbox
+                    label="Enable editor context menu (on right click)"
+                    defaultChecked={this.props.monaco?.contextMenu}
+                    onChange={(_, val) => {
+                      this.touchMonacoProperty('contextMenu', val);
+                    }}
+                  />
+                )}
+              />
+              <SettingsProperty
+                key='smoothScroll'
+                title='Smooth Scrolling'
+                control={(
+                  <Checkbox
+                    label="Enable that the editor animates scrolling to a position"
+                    defaultChecked={this.props.monaco?.smoothScrolling}
+                    onChange={(_, val) => {
+                      this.touchMonacoProperty('smoothScrolling', val);
+                    }}
+                  />
+                )}
+              />
+              <SettingsProperty
+                key='mouseWheelZoom'
+                title='Mouse Wheel Zoom'
+                control={(
+                  <Checkbox
+                    label="Zoom the font in the editor when using the mouse wheel in combination with holding Ctrl"
+                    defaultChecked={this.props.monaco?.mouseWheelZoom}
+                    onChange={(_, val) => {
+                      this.touchMonacoProperty('mouseWheelZoom', val);
+                    }}
+                  />
+                )}
               />
             </PivotItem>
           </Pivot>

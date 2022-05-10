@@ -1,4 +1,4 @@
-import React, {FC, useContext, useMemo} from 'react';
+import React, {FC, useMemo} from 'react';
 import copy from 'copy-to-clipboard';
 import { Target } from '@fluentui/react-hooks';
 import {

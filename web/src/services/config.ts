@@ -8,6 +8,7 @@ import {supportsPreferColorScheme} from "~/utils/theme";
 const DARK_THEME_KEY = 'ui.darkTheme.enabled';
 const USE_SYSTEM_THEME_KEY = 'ui.darkTheme.useSystem';
 const RUNTIME_TYPE_KEY = 'go.build.runtime';
+const ENABLE_VIM_MODE_KEY = 'ms.monaco.vimModeEnabled';
 const AUTOFORMAT_KEY = 'go.build.autoFormat';
 const MONACO_SETTINGS = 'ms.monaco.settings';
 const PANEL_SETTINGS = 'ui.layout.panel';
@@ -101,6 +102,19 @@ const Config = {
   set useSystemTheme(val: boolean) {
     this._cache[USE_SYSTEM_THEME_KEY] = val;
     localStorage.setItem(USE_SYSTEM_THEME_KEY, val.toString());
+  },
+
+  get enableVimMode() {
+    if (this._cache[ENABLE_VIM_MODE_KEY]) {
+      return this._cache[ENABLE_VIM_MODE_KEY];
+    }
+
+    return this.getBoolean(ENABLE_VIM_MODE_KEY, false);
+  },
+
+  set enableVimMode(val: boolean) {
+    this._cache[ENABLE_VIM_MODE_KEY] = val;
+    localStorage.setItem(ENABLE_VIM_MODE_KEY, val.toString());
   },
 
   get runtimeType(): RuntimeType {

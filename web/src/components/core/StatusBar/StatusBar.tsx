@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import {editor} from "monaco-editor";
+import {editor} from 'monaco-editor';
+import {newEnvironmentChangeAction} from '~/store';
 import config, {RuntimeType} from '~/services/config';
 import EllipsisText from '~/components/utils/EllipsisText';
 import StatusBarItem from '~/components/core/StatusBar/StatusBarItem';
 import EnvironmentSelectModal from '~/components/modals/EnvironmentSelectModal';
-import {newEnvironmentChangeAction} from "~/store";
+import VimStatusBarItem from '~/plugins/vim/VimStatusBarItem';
 import './StatusBar.css';
 
 interface Props {
@@ -19,7 +20,7 @@ interface Props {
 const getStatusItem = ({loading, lastError}) => {
   if (loading) {
     return (
-      <StatusBarItem iconName="Build">
+      <StatusBarItem icon="Build">
         <EllipsisText>
           Loading
         </EllipsisText>
@@ -30,7 +31,7 @@ const getStatusItem = ({loading, lastError}) => {
   if (lastError) {
     return (
       <StatusBarItem
-        iconName="NotExecuted"
+        icon="NotExecuted"
         hideTextOnMobile
         disabled
       >
@@ -51,17 +52,18 @@ const StatusBar: React.FC<Props> = ({
       <div className={className}>
         <div className="StatusBar__side-left">
           <StatusBarItem
-            iconName="ErrorBadge"
+            icon="ErrorBadge"
             title="No Problems"
             button
           >
             {markers?.length ?? 0} Errors
           </StatusBarItem>
           {getStatusItem({loading, lastError})}
+          <VimStatusBarItem />
         </div>
         <div className="StatusBar__side-right">
           <StatusBarItem
-            iconName="Code"
+            icon="Code"
             title="Select environment"
             disabled={loading}
             onClick={() => setRunSelectorModalVisible(true)}
@@ -71,7 +73,7 @@ const StatusBar: React.FC<Props> = ({
             {RuntimeType.toString(runtime)}
           </StatusBarItem>
           <StatusBarItem
-            iconName="Feedback"
+            icon="Feedback"
             title="Send feedback"
             href={config.issueUrl}
             iconOnly

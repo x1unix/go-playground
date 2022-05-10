@@ -3,6 +3,7 @@ import {editor} from "monaco-editor";
 import { EvalEvent } from '~/services/api';
 import { MonacoSettings, RuntimeType } from '~/services/config';
 import {LayoutType} from '~/styles/layout';
+import { VimState } from '~/store/vim/state';
 
 export interface UIState {
   shareCreated?: boolean
@@ -26,6 +27,7 @@ export interface SettingsState {
   useSystemTheme: boolean
   autoFormat: boolean,
   runtime: RuntimeType,
+  enableVimMode: boolean
 }
 
 export interface PanelState {
@@ -42,6 +44,7 @@ export interface State {
   monaco: MonacoSettings
   panel: PanelState
   ui?: UIState
+  vim?: VimState | null
 }
 
 export function Connect(fn: (state: State) => any) {
