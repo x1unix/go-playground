@@ -2,10 +2,11 @@ package config
 
 import (
 	"flag"
-	"github.com/stretchr/testify/require"
-	"go.uber.org/zap/zapcore"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
+	"go.uber.org/zap/zapcore"
 )
 
 func TestFromFlags(t *testing.T) {
