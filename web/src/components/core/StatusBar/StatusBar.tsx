@@ -70,7 +70,7 @@ const StatusBar: React.FC<Props> = ({
             hideTextOnMobile
             button
           >
-            {RuntimeType.toString(runtime)}
+            Environment: {RuntimeType.toString(runtime)}
           </StatusBarItem>
           <StatusBarItem
             icon="Feedback"
