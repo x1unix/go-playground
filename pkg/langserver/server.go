@@ -2,6 +2,7 @@ package langserver
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -166,8 +167,6 @@ func (s *Service) HandleFormatCode(w http.ResponseWriter, r *http.Request) error
 		if goplay.IsCompileError(err) {
 			return NewHTTPError(http.StatusBadRequest, err)
 		}
-
-		s.log.Error(err)
 		return err
 	}
 
@@ -181,7 +180,7 @@ func (s *Service) HandleShare(w http.ResponseWriter, r *http.Request) error {
 	shareID, err := client.Share(r.Context(), r.Body)
 	defer r.Body.Close()
 	if err != nil {
-		if err == goplay.ErrSnippetTooLarge {
+		if errors.Is(err, goplay.ErrSnippetTooLarge) {
 			return NewHTTPError(http.StatusRequestEntityTooLarge, err)
 		}
 
@@ -200,7 +199,7 @@ func (s *Service) HandleGetSnippet(w http.ResponseWriter, r *http.Request) error
 	client := s.getPlaygroundClientFromRequest(r)
 	snippet, err := client.GetSnippet(r.Context(), snippetID)
 	if err != nil {
-		if err == goplay.ErrSnippetNotFound {
+		if errors.Is(err, goplay.ErrSnippetNotFound) {
 			return Errorf(http.StatusNotFound, "snippet %q not found", snippetID)
 		}
 
@@ -362,10 +361,11 @@ func (s *Service) goImportsCode(r *http.Request, src []byte) ([]byte, bool, erro
 	client := s.getPlaygroundClientFromRequest(r)
 	resp, err := client.GoImports(r.Context(), src)
 	if err != nil {
-		if err == goplay.ErrSnippetTooLarge {
+		if errors.Is(err, goplay.ErrSnippetTooLarge) {
 			return nil, false, NewHTTPError(http.StatusRequestEntityTooLarge, err)
 		}
 
+		s.log.Error(err)
 		return nil, false, err
 	}
 

@@ -3,6 +3,7 @@ package goplay
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net"
@@ -82,12 +83,16 @@ func (c *Client) doRequest(ctx context.Context, method, url, contentType string,
 	req.Header.Add("Content-Type", contentType)
 	response, err := c.client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to send request to playground server: %w", err)
+	}
+
+	defer response.Body.Close()
+	if response.StatusCode >= 400 {
+		return nil, NewHTTPError(response)
 	}
 
 	bodyBytes := &bytes.Buffer{}
 	_, err = io.Copy(bodyBytes, io.LimitReader(response.Body, maxSnippetSize+1))
-	defer response.Body.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +105,20 @@ func (c *Client) doRequest(ctx context.Context, method, url, contentType string,
 
 func (c *Client) postForm(ctx context.Context, url string, data url.Values) ([]byte, error) {
 	return c.doRequest(
-		ctx, "POST", url,
+		ctx, http.MethodPost, url,
 		"application/x-www-form-urlencoded", strings.NewReader(data.Encode()),
 	)
+}
+
+func (c *Client) postJSON(ctx context.Context, url string, data url.Values, out interface{}) error {
+	rsp, err := c.postForm(ctx, url, data)
+	if err != nil {
+		return err
+	}
+
+	if err := json.Unmarshal(rsp, out); err != nil {
+		return fmt.Errorf("failed to unmarshal JSON response: %w", err)
+	}
+
+	return nil
 }
