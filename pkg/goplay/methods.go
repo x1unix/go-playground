@@ -2,14 +2,10 @@ package goplay
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-
-	"go.uber.org/zap"
 )
 
 // ValidateContentLength validates snippet size
@@ -43,7 +39,7 @@ func (c *Client) GetSnippet(ctx context.Context, snippetID string) (*Snippet, er
 	case http.StatusNotFound:
 		return nil, ErrSnippetNotFound
 	default:
-		return nil, fmt.Errorf("error from Go Playground server - %d %s", resp.StatusCode, resp.Status)
+		return nil, NewHTTPError(resp)
 	}
 }
 
@@ -64,21 +60,9 @@ func (c *Client) GoImports(ctx context.Context, src []byte) (*FmtResponse, error
 	form.Add("imports", "true")
 	form.Add("body", string(src))
 
-	resp, err := c.postForm(ctx, "fmt", form)
-	if err != nil {
-		return nil, fmt.Errorf("failed to contact Go Playground - %s", err)
-	}
-
-	dest := &FmtResponse{}
-	if err := json.Unmarshal(resp, dest); err != nil {
-		zap.S().Errorw("GoImports response is not JSON",
-			"err", err,
-			"resp", string(resp),
-		)
-		return nil, fmt.Errorf("failed to decode upstream server response: %s", err)
-	}
-
-	return dest, nil
+	dest := new(FmtResponse)
+	err := c.postJSON(ctx, "fmt", form, dest)
+	return dest, err
 }
 
 // Compile runs code in goplayground and returns response
@@ -87,16 +71,7 @@ func (c *Client) Compile(ctx context.Context, src []byte) (*CompileResponse, err
 	form.Add("body", string(src))
 	form.Add("version", "2")
 
-	resp, err := c.postForm(ctx, "compile", form)
-	if err != nil {
-		return nil, err
-	}
-
-	dest := &CompileResponse{}
-	if err := json.Unmarshal(resp, dest); err != nil {
-		// return response text as errors
-		return nil, fmt.Errorf("error from %q: %s", c.baseUrl, string(resp))
-	}
-
+	dest := new(CompileResponse)
+	err := c.postJSON(ctx, "compile", form, dest)
 	return dest, err
 }
