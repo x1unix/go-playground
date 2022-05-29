@@ -2,10 +2,10 @@ import React from 'react';
 import { CompoundButton } from '@fluentui/react/lib/Button';
 import { Modal } from '@fluentui/react/lib/Modal';
 import {
-  Stack, IStackTokens, getTheme, IconButton, mergeStyleSets
+  Stack, IStackTokens, IconButton, mergeStyleSets, useTheme
 } from '@fluentui/react';
 import { getContentStyles, getIconButtonStyles } from '~/styles/modal';
-import {RuntimeType} from "~/services/config";
+import {RuntimeType} from '~/services/config';
 
 const options = [
   {
@@ -40,7 +40,7 @@ interface Props {
 const EnvironmentSelectModal: React.FC<Props> = ({
   isOpen, onClose, value
 }) => {
-  const theme = getTheme();
+  const theme = useTheme();
   const contentStyles = getContentStyles(theme);
   const iconButtonStyles = getIconButtonStyles(theme);
   const stackTokens: IStackTokens = { childrenGap: 10 };
