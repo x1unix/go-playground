@@ -27,10 +27,6 @@ export default class Preview extends ThemeableComponent<PreviewProps> {
     }
   }
 
-  get progressClass() {
-    return this.props.loading ? 'app-preview__progress' : 'app-preview__progress--hidden';
-  }
-
   render() {
     // Some content should not be displayed in WASM mode (like delay, etc)
     const isWasm = this.props.runtime === RuntimeType.WebAssembly;
