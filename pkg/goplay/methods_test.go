@@ -59,7 +59,7 @@ func TestClient_Compile(t *testing.T) {
 			payload: []byte("test"),
 		},
 		"bad JSON": {
-			err:     "error from",
+			err:     "failed to unmarshal JSON response",
 			resp:    []byte(`}{`),
 			payload: []byte("test"),
 		},
@@ -129,7 +129,7 @@ func TestClient_GoImports(t *testing.T) {
 			payload: []byte("test"),
 		},
 		"bad JSON": {
-			err:     "failed to decode upstream server response",
+			err:     "failed to unmarshal JSON response",
 			resp:    []byte(`}{`),
 			payload: []byte("test"),
 		},
@@ -240,7 +240,7 @@ func TestClient_GetSnippet(t *testing.T) {
 		},
 		"other error": {
 			snippetID:  "101",
-			err:        "error from Go Playground",
+			err:        "bad response from playground server: 500 Internal Server Error",
 			respStatus: http.StatusInternalServerError,
 			resp:       nil,
 		},
