@@ -110,3 +110,25 @@ func GetModuleExportCallback() (js.Value, error) {
 		return js.Value{}, fmt.Errorf("%q should be callable JS function, but got %d instead", entrypointName, t)
 	}
 }
+
+// ExportAndStart starts a simple worker with single specified
+// function and exports it to JavaScript.
+//
+// For more sophisticated cases, use worker.NewWorker to manually
+// create and register a worker.
+//
+// Also see worker.GetModuleExportCallback for more information
+// about worker registration.
+func ExportAndStart(funcName string, handler Func) {
+	exportFunc, err := GetModuleExportCallback()
+	if err != nil {
+		panic(err)
+	}
+
+	w := NewWorker()
+	w.RegisterFunc(funcName, handler)
+	defer w.Release()
+
+	w.Export(exportFunc)
+	w.Wait()
+}

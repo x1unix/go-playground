@@ -11,17 +11,7 @@ import (
 )
 
 func main() {
-	exportFunc, err := worker.GetModuleExportCallback()
-	if err != nil {
-		panic(err)
-	}
-
-	w := worker.NewWorker()
-	w.RegisterFunc("analyzeCode", analyzeCode)
-	defer w.Release()
-
-	w.Export(exportFunc)
-	w.Wait()
+	worker.ExportAndStart("analyzeCode", analyzeCode)
 }
 
 func analyzeCode(this js.Value, args worker.Args) (interface{}, error) {
