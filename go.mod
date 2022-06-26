@@ -1,6 +1,6 @@
 module github.com/x1unix/go-playground
 
-go 1.13
+go 1.18
 
 require (
 	github.com/TheZeroSlave/zapsentry v1.10.0
@@ -10,6 +10,7 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tevino/abool v0.0.0-20170917061928-9b9efcf221b5
+	github.com/traefik/yaegi v0.13.0 // indirect
 	github.com/x1unix/foundation v1.0.0
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect

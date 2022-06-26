@@ -4,6 +4,7 @@ GOROOT ?= $(shell go env GOROOT)
 TOOLS ?= ./tools
 PUBLIC_DIR ?= $(UI)/public
 WEBWORKER_PKG ?= ./cmd/webworker
+INTERPRETER_PKG ?= ./cmd/interpreter
 
 .PHONY: clean
 clean:
@@ -44,14 +45,25 @@ build-ui:
 	@echo ":: Building UI..." && \
 	$(YARN) --cwd="$(UI)" build
 
+.PHONY:copy-wasm-exec
+copy-wasm-exec:
+	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(PUBLIC_DIR)
+
 .PHONY:build-webworker
 build-webworker:
 	@echo ":: Building Go Webworker module..." && \
-	GOOS=js GOARCH=wasm $(GO) build -o $(PUBLIC_DIR)/worker.wasm $(WEBWORKER_PKG) && \
-	cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(PUBLIC_DIR)
+	GOOS=js GOARCH=wasm $(GO) build -o $(PUBLIC_DIR)/worker.wasm $(WEBWORKER_PKG)
+
+.PHONY:build-interpreter
+build-interpreter:
+	@echo ":: Building Go interpreter module..." && \
+	GOOS=js GOARCH=wasm $(GO) build -o $(PUBLIC_DIR)/go.wasm $(INTERPRETER_PKG)
+
+.PHONY:build-wasm
+build-wasm: copy-wasm-exec build-webworker build-interpreter
 
 .PHONY: build
-build: check-go check-yarn clean preinstall collect-meta build-server build-webworker build-ui
+build: check-go check-yarn clean preinstall collect-meta build-server build-wasm build-ui
 	@echo ":: Copying assets..." && \
 	cp -rfv ./data $(TARGET)/data && \
 	mv -v $(UI)/build $(TARGET)/public && \
