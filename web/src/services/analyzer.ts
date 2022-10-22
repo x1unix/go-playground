@@ -45,6 +45,11 @@ export class Analyzer {
     return this.request<string, AnalyzeResult>(MessageType.Analyze, code);
   }
 
+  async getMarkers(code: string) {
+    const { markers } = await this.analyzeCode(code);
+    return markers;
+  }
+
   dispose() {
     this.terminated = true;
     this.worker.postMessage({ type: MessageType.Exit });

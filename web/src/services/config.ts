@@ -37,6 +37,17 @@ export namespace RuntimeType {
         return RuntimeType[t];
     }
   }
+
+  export function isServerRuntime(t?: RuntimeType) {
+    switch (t) {
+      case RuntimeType.GoPlayground:
+        return true;
+      case RuntimeType.GoTipPlayground:
+        return true;
+      default:
+        return false;
+    }
+  }
 }
 
 export interface MonacoSettings {
