@@ -31,6 +31,7 @@ interface CodeEditorState {
 
 @Connect(s => ({
   code: s.editor.code,
+  fileName: s.editor.fileName,
   darkMode: s.settings.darkMode,
   vimModeEnabled: s.settings.enableVimMode,
   isServerEnvironment: RuntimeType.isServerRuntime(s.settings.runtime),
@@ -105,7 +106,12 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
     editorInstance.focus();
   }
 
-  componentDidUpdate(prevProps) {
+  private isFileOrEnvironmentChanged(prevProps) {
+    return (prevProps.isServerEnvironment !== this.props.isServerEnvironment) ||
+      (prevProps.fileName !== this.props.fileName);
+  }
+
+  private applyVimModeChanges(prevProps) {
     if (prevProps?.vimModeEnabled === this.props.vimModeEnabled) {
       return
     }
@@ -118,6 +124,15 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
 
     console.log('Vim mode disabled');
     this.vimAdapter?.dispose();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.isFileOrEnvironmentChanged(prevProps)) {
+      // Update editor markers on file or environment changes;
+      this.doAnalyze(this.props.code);
+    }
+
+    this.applyVimModeChanges(prevProps);
   }
 
   componentWillUnmount() {
@@ -164,7 +179,6 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
         this.editorInstance?.getId() as string,
         markers
       );
-      console.log({markers});
       this.props.dispatch(newMarkerAction(markers));
     }, ANALYZE_DEBOUNCE_TIME);
   }
