@@ -7,6 +7,9 @@ import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import App from './App';
 import './index.css';
 
+// Polyfills
+import 'core-js/actual/promise/all-settled';
+import 'core-js/actual/array/flat-map';
 
 initializeIcons();
 registerGoLanguageProvider(apiClient);
