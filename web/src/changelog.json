@@ -1,16 +1,16 @@
 {
-  "Interface - General": [
+  "Interface - IDE": [
     {
-      "issueId": 169,
-      "url": "/pull/169",
-      "description": "Add Vim mode emulation."
+      "issueId": 194,
+      "url": "/pull/194",
+      "description": "Notify about time.Now() issues when using server environment."
     }
   ],
-  "Interface - Bugs": [
+  "Interface - Vim": [
     {
-      "issueId": 178,
-      "url": "/pull/178",
-      "description": "Fix word wrap in alert box on small screens."
+      "issueId": 195,
+      "url": "/pull/195",
+      "description": "Implement :w command for Vim mode"
     }
   ]
 }

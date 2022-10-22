@@ -1,24 +1,26 @@
 import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
-import {editor, IKeyboardEvent} from 'monaco-editor';
 import * as monaco from 'monaco-editor';
+import {editor, IKeyboardEvent} from 'monaco-editor';
 import {
-  VimModeKeymap,
   createVimModeAdapter,
-  StatusBarAdapter
+  StatusBarAdapter,
+  VimModeKeymap
 } from '~/plugins/vim/editor';
-import { attachCustomCommands } from './commands';
+import {attachCustomCommands} from './commands';
 
 import {
   Connect,
   formatFileDispatcher,
   newFileChangeAction,
-  runFileDispatcher,
+  newMarkerAction,
   newSnippetLoadDispatcher,
-  newMarkerAction
+  runFileDispatcher,
 } from '~/store';
-import { Analyzer } from '~/services/analyzer';
-import { LANGUAGE_GOLANG, stateToOptions } from './props';
+import {Analyzer} from '~/services/analyzer';
+import {LANGUAGE_GOLANG, stateToOptions} from './props';
+import {getTimeNowUsageMarkers} from './utils';
+import {RuntimeType} from "@services/config";
 
 const ANALYZE_DEBOUNCE_TIME = 500;
 
@@ -29,8 +31,10 @@ interface CodeEditorState {
 
 @Connect(s => ({
   code: s.editor.code,
+  fileName: s.editor.fileName,
   darkMode: s.settings.darkMode,
   vimModeEnabled: s.settings.enableVimMode,
+  isServerEnvironment: RuntimeType.isServerRuntime(s.settings.runtime),
   loading: s.status?.loading,
   options: s.monaco,
   vim: s.vim,
@@ -102,7 +106,12 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
     editorInstance.focus();
   }
 
-  componentDidUpdate(prevProps) {
+  private isFileOrEnvironmentChanged(prevProps) {
+    return (prevProps.isServerEnvironment !== this.props.isServerEnvironment) ||
+      (prevProps.fileName !== this.props.fileName);
+  }
+
+  private applyVimModeChanges(prevProps) {
     if (prevProps?.vimModeEnabled === this.props.vimModeEnabled) {
       return
     }
@@ -117,6 +126,15 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
     this.vimAdapter?.dispose();
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.isFileOrEnvironmentChanged(prevProps)) {
+      // Update editor markers on file or environment changes;
+      this.doAnalyze(this.props.code);
+    }
+
+    this.applyVimModeChanges(prevProps);
+  }
+
   componentWillUnmount() {
     this.analyzer?.dispose();
     this.vimAdapter?.dispose();
@@ -124,10 +142,7 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
 
   onChange(newValue: string, _: editor.IModelContentChangedEvent) {
     this.props.dispatch(newFileChangeAction(newValue));
-
-    if (this.analyzer) {
-      this.doAnalyze(newValue);
-    }
+    this.doAnalyze(newValue);
   }
 
   private doAnalyze(code: string) {
@@ -135,16 +150,36 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
       clearTimeout(this._previousTimeout);
     }
 
-    this._previousTimeout = setTimeout(() => {
+    this._previousTimeout = setTimeout(async () => {
       this._previousTimeout = null;
-      this.analyzer?.analyzeCode(code).then(({markers}) => {
-        editor.setModelMarkers(
-          this.editorInstance?.getModel() as editor.ITextModel,
-          this.editorInstance?.getId() as string,
-          markers
-        );
-        this.props.dispatch(newMarkerAction(markers))
-      }).catch(err => console.error('failed to perform code analysis: %s', err));
+
+      // Code analysis contains 2 steps that run on different conditions:
+      // 1. Run Go worker if it's available and check for errors
+      // 2. Add warnings to `time.Now` calls if code runs on server.
+      const promises = [
+        this.analyzer?.getMarkers(code) ?? null,
+        this.props.isServerEnvironment ? (
+          Promise.resolve(getTimeNowUsageMarkers(code, this.editorInstance!))
+        ) : null
+      ].filter(p => !!p);
+
+      const results = await Promise.allSettled(promises);
+      const markers = results.flatMap(r => {
+        // Can't do in beautiful way due of TS strict checks.
+        if (r.status === 'rejected') {
+          console.error(r.reason);
+          return [];
+        }
+
+        return r.value ?? [];
+      });
+
+      editor.setModelMarkers(
+        this.editorInstance?.getModel() as editor.ITextModel,
+        this.editorInstance?.getId() as string,
+        markers
+      );
+      this.props.dispatch(newMarkerAction(markers));
     }, ANALYZE_DEBOUNCE_TIME);
   }
 

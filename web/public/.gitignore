@@ -1,2 +1,2 @@
-worker.wasm
 wasm_exec.js
+*.wasm

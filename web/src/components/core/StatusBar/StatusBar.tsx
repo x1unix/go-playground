@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { connect } from 'react-redux';
-import {editor} from 'monaco-editor';
-import {newEnvironmentChangeAction} from '~/store';
+import React, {useState} from 'react';
+import {connect} from 'react-redux';
+import {editor, MarkerSeverity} from 'monaco-editor';
+import { newEnvironmentChangeDispatcher } from '~/store';
 import config, {RuntimeType} from '~/services/config';
 import EllipsisText from '~/components/utils/EllipsisText';
 import StatusBarItem from '~/components/core/StatusBar/StatusBarItem';
@@ -16,6 +16,37 @@ interface Props {
   markers?: editor.IMarkerData[]
   dispatch?: Function
 }
+
+const pluralize = (count: number, label: string) => (
+  count === 1 ? (
+    `${count} ${label}`
+  ): (
+    `${count} ${label}s`
+  )
+)
+
+const getMarkerCounters = (markers?: editor.IMarkerData[]) => {
+  let errors = 0;
+  let warnings = 0;
+  if (!markers?.length) {
+    return {errors, warnings};
+  }
+
+  for (let marker of markers) {
+    switch (marker.severity) {
+      case MarkerSeverity.Warning:
+        warnings++;
+        break;
+      case MarkerSeverity.Error:
+        errors++;
+        break;
+      default:
+        break;
+    }
+  }
+
+  return {errors, warnings};
+};
 
 const getStatusItem = ({loading, lastError}) => {
   if (loading) {
@@ -47,17 +78,25 @@ const StatusBar: React.FC<Props> = ({
 }) => {
   const [ runSelectorModalVisible, setRunSelectorModalVisible ] = useState(false);
   const className = loading ? 'StatusBar StatusBar--busy' : 'StatusBar';
+  const {warnings, errors} = getMarkerCounters(markers);
   return (
     <>
       <div className={className}>
         <div className="StatusBar__side-left">
           <StatusBarItem
             icon="ErrorBadge"
-            title="No Problems"
             button
           >
-            {markers?.length ?? 0} Errors
+            {pluralize(errors, 'Error')}
           </StatusBarItem>
+          { warnings > 0 ? (
+            <StatusBarItem
+              icon="Warning"
+              button
+            >
+              {pluralize(warnings, 'Warning')}
+            </StatusBarItem>
+          ) : null }
           <VimStatusBarItem />
           {getStatusItem({loading, lastError})}
         </div>
@@ -92,7 +131,7 @@ const StatusBar: React.FC<Props> = ({
         onClose={val => {
           setRunSelectorModalVisible(false);
           if (val) {
-            dispatch?.(newEnvironmentChangeAction(val));
+            dispatch?.(newEnvironmentChangeDispatcher(val));
           }
         }}
       />
