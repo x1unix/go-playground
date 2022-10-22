@@ -1,3 +1,5 @@
+import {Dispatcher} from '~/store/dispatch';
+
 export enum VimMode {
   Visual = 'visual',
   Normal = 'normal',
@@ -10,7 +12,7 @@ export enum VimSubMode {
   Blockwise = 'blockwise'
 }
 
-export type Dispatch = <V=any,T=string>(v:{type: T, payload?: V}) => void;
+export type Dispatch = <V=any,T=string>(v:{type: T, payload?: V} | Dispatcher) => void;
 export type ConfirmMessage = VimState['confirmMessage'];
 
 export interface VimState {

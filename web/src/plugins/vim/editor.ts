@@ -1,7 +1,10 @@
 import {editor, IKeyboardEvent, KeyCode} from 'monaco-editor';
+import { VimMode } from 'monaco-vim';
 import VimModeKeymap from 'monaco-vim/lib/cm/keymap_vim';
-import {Dispatch} from '~/store/vim/state';
+import type {Nullable} from '~/utils/types';
 
+import {runFileDispatcher, shareSnippetDispatcher} from '~/store';
+import {Dispatch} from '~/store/vim/state';
 import {
   newVimCommandDoneAction,
   newVimCommandStartAction,
@@ -12,7 +15,7 @@ import {
   newVimModeChangeAction,
   VimModeChangeArgs
 } from '~/store/vim/actions';
-import {Nullable} from "~/utils/types";
+
 
 // This implementation is quite hacky, but still better than
 // having a huge list of all possible keys except printable.
@@ -30,7 +33,23 @@ interface CommandInputOpts {
   value: string
 }
 
+// customCommands is list of custom VIM commands that trigger
+// different store actions.
+const customCommands = [
+  {
+    name: 'write',
+    short: 'w',
+    action: runFileDispatcher,
+  },
+  {
+    name: 'share',
+    action: shareSnippetDispatcher,
+  }
+]
+
 class VimModeKeymapAdapter extends VimModeKeymap {
+  private commandsAttached = false;
+
   constructor(
     // "dispatch" is reserved method in inner class.
     private dispatchFunc: Dispatch,
@@ -40,8 +59,21 @@ class VimModeKeymapAdapter extends VimModeKeymap {
   }
 
   attach() {
+    if (!this.commandsAttached) {
+      this.attachCommands();
+      this.commandsAttached = true;
+    }
+
     this.dispatchFunc(newVimInitAction());
     super.attach();
+  }
+
+  private attachCommands() {
+    customCommands.forEach(({name, short, action}) => {
+      VimMode.Vim.defineEx(name, short, () => {
+        this.dispatchFunc(action);
+      })
+    });
   }
 }
 

@@ -15,7 +15,7 @@ import {
   newFileChangeAction,
   runFileDispatcher,
   newSnippetLoadDispatcher,
-  newMarkerAction
+  newMarkerAction,
 } from '~/store';
 import { Analyzer } from '~/services/analyzer';
 import { LANGUAGE_GOLANG, stateToOptions } from './props';
