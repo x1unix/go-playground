@@ -11,17 +11,7 @@ import (
 )
 
 func main() {
-	exportFunc, err := worker.GetModuleExportCallback()
-	if err != nil {
-		panic(err)
-	}
-
-	w := worker.NewWorker()
-	w.RegisterFunc("evalCode", evalCode)
-	defer w.Release()
-
-	w.Export(exportFunc)
-	w.Wait()
+	worker.ExportAndStart("evaluate", evalCode)
 }
 
 func evalCode(this js.Value, args worker.Args) (interface{}, error) {
@@ -31,6 +21,6 @@ func evalCode(this js.Value, args worker.Args) (interface{}, error) {
 	}
 
 	i := interp.New(interp.Options{})
-	_, err := i.Eval(code)
-	return nil, err
+	res, err := i.Eval(code)
+	return js.ValueOf(res), err
 }
