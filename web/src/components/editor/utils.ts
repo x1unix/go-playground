@@ -2,7 +2,7 @@ import {editor, MarkerSeverity, Uri} from 'monaco-editor';
 
 const segmentLength = 'time.Now()'.length;
 
-const timeNowUsageWarning = 'Warning: `time.Now()` will always return fake time.\n' +
+const timeNowUsageWarning = 'Warning: `time.Now()` will always return fake time. ' +
     'Change current environment to WebAssembly in settings to use real date and time.';
 
 const issueUrl = Uri.parse('https://github.com/x1unix/go-playground/issues/104');
