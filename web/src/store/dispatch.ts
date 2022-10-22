@@ -1,5 +1,18 @@
 import {saveAs} from 'file-saver';
 import {push} from 'connected-react-router';
+
+import client, {
+  EvalEventKind,
+  instantiateStreaming,
+  PlaygroundBackend
+} from '~/services/api';
+
+import config, {RuntimeType} from '~/services/config';
+import {DEMO_CODE} from '~/components/editor/props';
+import {getImportObject, goRun} from '~/services/go';
+import {PanelState, SettingsState, State} from './state';
+import {isDarkModeEnabled} from "~/utils/theme";
+
 import {
   Action,
   ActionType,
@@ -14,18 +27,9 @@ import {
   newSettingsChangeAction,
   newProgramWriteAction,
   newToggleThemeAction,
-  newUIStateChangeAction
+  newUIStateChangeAction,
+  newEnvironmentChangeAction
 } from './actions';
-import client, {
-  EvalEventKind,
-  instantiateStreaming,
-  PlaygroundBackend
-} from '~/services/api';
-import config, {RuntimeType} from '~/services/config';
-import {DEMO_CODE} from '~/components/editor/props';
-import {getImportObject, goRun} from '~/services/go';
-import {PanelState, SettingsState, State} from './state';
-import {isDarkModeEnabled} from "~/utils/theme";
 
 export type StateProvider = () => State
 export type DispatchFn = (a: Action | any) => any
@@ -91,6 +95,13 @@ export function newBuildParamsChangeDispatcher(runtime: RuntimeType, autoFormat:
     config.autoFormat = autoFormat;
     dispatch(newBuildParamsChangeAction(runtime, autoFormat));
   };
+}
+
+export function newEnvironmentChangeDispatcher(runtime: RuntimeType): Dispatcher {
+  return (dispatch: DispatchFn, _: StateProvider) => {
+    config.runtimeType = runtime;
+    dispatch(newEnvironmentChangeAction(runtime));
+  }
 }
 
 export function newSnippetLoadDispatcher(snippetID?: string): Dispatcher {

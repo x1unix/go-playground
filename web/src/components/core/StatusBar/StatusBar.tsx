@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
 import {editor, MarkerSeverity} from 'monaco-editor';
-import {newEnvironmentChangeAction} from '~/store';
+import { newEnvironmentChangeDispatcher } from '~/store';
 import config, {RuntimeType} from '~/services/config';
 import EllipsisText from '~/components/utils/EllipsisText';
 import StatusBarItem from '~/components/core/StatusBar/StatusBarItem';
@@ -131,7 +131,7 @@ const StatusBar: React.FC<Props> = ({
         onClose={val => {
           setRunSelectorModalVisible(false);
           if (val) {
-            dispatch?.(newEnvironmentChangeAction(val));
+            dispatch?.(newEnvironmentChangeDispatcher(val));
           }
         }}
       />
