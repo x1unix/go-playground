@@ -111,24 +111,28 @@ func GetModuleExportCallback() (js.Value, error) {
 	}
 }
 
-// ExportAndStart starts a simple worker with single specified
-// function and exports it to JavaScript.
+// Exports is module exports map with key-value pair of name and function.
+type Exports map[string]Func
+
+// ExportAndStart starts a simple worker and exports functions it to JavaScript.
 //
 // For more sophisticated cases, use worker.NewWorker to manually
 // create and register a worker.
 //
 // Also see worker.GetModuleExportCallback for more information
 // about worker registration.
-func ExportAndStart(funcName string, handler Func) {
+func ExportAndStart(exports Exports) {
 	exportFunc, err := GetModuleExportCallback()
 	if err != nil {
 		panic(err)
 	}
 
 	w := NewWorker()
-	w.RegisterFunc(funcName, handler)
-	defer w.Release()
+	for name, fn := range exports {
+		w.RegisterFunc(name, fn)
+	}
 
+	defer w.Release()
 	w.Export(exportFunc)
 	w.Wait()
 }

@@ -11,7 +11,9 @@ import (
 )
 
 func main() {
-	worker.ExportAndStart("analyzeCode", analyzeCode)
+	worker.ExportAndStart(worker.Exports{
+		"analyzeCode": analyzeCode,
+	})
 }
 
 func analyzeCode(this js.Value, args worker.Args) (interface{}, error) {
