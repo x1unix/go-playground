@@ -38,7 +38,7 @@ jobs:
         run: yarn lint
         working-directory: ./web
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3.3.0
+        uses: golangci/golangci-lint-action@v3.3.1
         with:
           version: v1.44.2
       - name: Setup Go
