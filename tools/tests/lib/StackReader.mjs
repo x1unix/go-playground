@@ -77,29 +77,6 @@ export default class StackReader {
       ].join(' '))
     }
 
-
-
-
-    //
-    // const startOffset = this._offset;
-    // const addr = this._sp + this._offset;
-    // const value = typeSpec.read(this._mem, addr);
-    // const readCount = typeSpec.getAreaSize(addr);
-    // this._offset += readCount;
-    //
-    // if (this._debug) {
-    //   console.log(
-    //     [
-    //       `Pop: $${this._popCount}`,
-    //       `(*${typeSpec.type})(${hex(addr)})`,
-    //       `${value}`,
-    //       '\t\t',
-    //       `(${hex(startOffset)} -> ${hex(this._offset)})`,
-    //       `+${readCount}`
-    //     ].join(' ')
-    //   );
-    // }
-
     this._popCount++;
     return value;
   }

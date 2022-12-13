@@ -20,32 +20,6 @@ go.exportFunction('main.multiply', sp => {
   go.setInt64(sp + 24, result);
 })
 
-go.exportFunction('main.testBool', (sp, reader) => {
-  reader.skipHeader();
-  const v0 = reader.pop(Types.Boolean);
-  const v1 = reader.pop(Types.Boolean);
-  const v2 = reader.pop(Types.Boolean);
-  console.log([v0, v1, v2]);
-  console.log(go.inspector.dump(sp, 32, 16));
-})
-
-go.exportFunction('main.testU8', (sp, reader) => {
-  reader.skipHeader();
-  const v1 = reader.pop(Types.Byte);
-  const v2 = reader.pop(Types.Byte);
-  const v3 = reader.pop(Types.Byte);
-  console.log([v1, v2, v3]);
-
-  console.log(go.inspector.dump(sp, 32, 16));
-})
-
-go.exportFunction('main.testU32', (sp, reader) => {
-  reader.skipHeader();
-  const [v1, v2, v3] = reader.popTimes(Types.Uint32, 3);
-  console.log([v1, v2, v3]);
-  console.log(go.inspector.dump(sp, 32, 16));
-})
-
 go.exportFunction('main.testBoolInt32', sp => {
   const val0 = go.mem.getUint8(sp + 4);
   const val1 = go.mem.getUint32(sp + 4);
@@ -76,6 +50,53 @@ go.exportFunction('main.testBoolU8', sp => {
     }
   })
   console.log(go.inspector.dump(sp, 48, 16));
+})
+
+go.exportFunction('main.testBool', (sp, reader) => {
+  reader.skipHeader();
+  const v0 = reader.pop(Types.Boolean);
+  const v1 = reader.pop(Types.Boolean);
+  const v2 = reader.pop(Types.Boolean);
+  console.log([v0, v1, v2]);
+  console.log(go.inspector.dump(sp, 32, 16));
+})
+
+go.exportFunction('main.testU8', (sp, reader) => {
+  reader.skipHeader();
+  const v1 = reader.pop(Types.Byte);
+  const v2 = reader.pop(Types.Byte);
+  const v3 = reader.pop(Types.Byte);
+  console.log([v1, v2, v3]);
+
+  console.log(go.inspector.dump(sp, 32, 16));
+})
+
+go.exportFunction('main.testU32', (sp, reader) => {
+  reader.skipHeader();
+  const [v1, v2, v3] = reader.popTimes(Types.Uint32, 3);
+  console.log([v1, v2, v3]);
+  console.log(go.inspector.dump(sp, 32, 16));
+})
+
+go.exportFunction('main.testI32', (sp, reader) => {
+  reader.skipHeader();
+  const [v1, v2, v3] = reader.popTimes(Types.Int32, 3);
+  console.log([v1, v2, v3]);
+  console.log(go.inspector.dump(sp, 32, 16));
+})
+
+go.exportFunction('main.testU64', (sp, reader) => {
+  reader.skipHeader();
+  const [v1, v2, v3] = reader.popTimes(Types.Uint64, 3);
+  console.log([v1, v2, v3]);
+  console.log(go.inspector.dump(sp, 32, 16));
+});
+
+go.exportFunction('main.testI64', (sp, reader) => {
+  reader.skipHeader();
+  const [v1, v2, v3] = reader.popTimes(Types.Int64, 3);
+  console.log([v1, v2, v3]);
+  console.log(go.inspector.dump(sp, 32, 16));
 })
 
 go.exportFunction('main.dialByFuncRef', sp => {

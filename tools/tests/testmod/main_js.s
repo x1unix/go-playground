@@ -24,3 +24,18 @@ TEXT ·testU8(SB), NOSPLIT, $0
 TEXT ·testU32(SB), NOSPLIT, $0
   CallImport
   RET
+
+// func testI32(a, b, c int32)
+TEXT ·testI32(SB), NOSPLIT, $0
+  CallImport
+  RET
+
+// func testU64(a, b, c uint64)
+TEXT ·testU64(SB), NOSPLIT, $0
+  CallImport
+  RET
+
+// func testI64(a, b, c int64)
+TEXT ·testI64(SB), NOSPLIT, $0
+  CallImport
+  RET

@@ -113,6 +113,9 @@ export const Types = {
   Boolean: new BooleanTypeSpec(),
   Byte: new DataViewableTypeSpec('byte', DataView.prototype.getUint8, 1, 1, 0),
   Uint8: new DataViewableTypeSpec('uint8', DataView.prototype.getUint8, 1, 1, 3),
+  Int8: new DataViewableTypeSpec('int8', DataView.prototype.getInt8, 1, 1, 3),
   Uint32: new DataViewableTypeSpec('uint32', DataView.prototype.getUint32, 4, 4, 0),
   Int32: new DataViewableTypeSpec('int32', DataView.prototype.getInt32, 4, 4, 0),
+  Uint64: new DataViewableTypeSpec('uint64', DataView.prototype.getBigUint64, 8, 8, 0),
+  Int64: new DataViewableTypeSpec('int64', DataView.prototype.getBigInt64, 8, 8, 0),
 }
