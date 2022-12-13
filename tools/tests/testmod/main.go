@@ -16,6 +16,8 @@ func testU64(a, b, c uint64)
 func testI64(a, b, c int64)
 func testF32(a, b, c float32)
 func testF64(a, b, c float64)
+
+func testBool_U32(a bool, b uint32)
 func multiply(a, b int) int
 
 type funcObj struct {
@@ -77,14 +79,20 @@ func testTestI64(a, b, c int64) {
 	fmt.Println(strings.Repeat("-", 80))
 }
 
+func testTestBool_U32(a bool, b uint32) {
+	fmt.Printf("testBool_U32(%[1]T(%[1]v), %[2]T(%[2]v; %[2]x))\n", a, b)
+	testBool_U32(a, b)
+}
+
 func main() {
 	//testTestBool(true, false, true)
-	//testTestU32(0x48, 0x4c, 0x4f)
+	testTestU32(0x48, 0x4c, 0x4f)
+	testTestBool_U32(true, 0xFF)
 	//testTestU64(0xFFFFFFFFFFFF, 0xFFFFFFFF00FF, 0xFFFFFFFFFFFFFFFF)
-	testTestI32(128, -128, 256)
+	//testTestI32(128, -128, 256)
 	//testTestI64(0xFFFFFFFFFFFF, -0xFFFFFFFF00FF, 0x7fffffffffffffff)
-	testTestF32(3.14, 14.16, 3.33)
-	testTestF64(3.14, 14.16, 3.33)
+	//testTestF32(3.14, 14.16, 3.33)
+	//testTestF64(3.14, 14.16, 3.33)
 	//testTestU32(0x48, 65530, 0x4f)
 	//testTestU8(0x48, 0x4c, 0x4f)
 	//testTestU8(255, 128, 255)

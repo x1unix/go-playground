@@ -42,12 +42,32 @@ class AbstractTypeSpec {
   }
 
   /**
+   * Returns type alignment
+   * @returns {number}
+   */
+  get alignment() {
+    return this._align;
+  }
+
+  /**
    * Align pointer address
    * @param {number} addr
    * @returns {AlignedAddress} Normalized address
    */
   alignAddress(addr) {
-    throw new Error('TypeSpec.alignAddress: not implemented');
+    if (addr % this._align === 0) {
+      // Address is aligned
+      return {
+        address: addr,
+        delta: 0
+      };
+    }
+
+    const alignedAddr = alignAddr(addr, this._align);
+    return {
+      address: alignedAddr,
+      delta: alignedAddr - addr
+    }
   }
 
   /**
@@ -74,13 +94,6 @@ class DataViewableTypeSpec extends AbstractTypeSpec {
     this._method = method;
   }
 
-  alignAddress(addr) {
-    return {
-      address: addr,
-      delta: 0,
-    };
-  }
-
   read(view, addr) {
     return this._method.call(view, addr, true);
   }
@@ -89,13 +102,6 @@ class DataViewableTypeSpec extends AbstractTypeSpec {
 class BooleanTypeSpec extends AbstractTypeSpec {
   constructor() {
     super('bool', 1, 1, 0);
-  }
-
-  alignAddress(addr) {
-    return {
-      address: addr,
-      delta: 0,
-    };
   }
 
   read(view, addr) {

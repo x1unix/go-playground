@@ -49,3 +49,8 @@ TEXT ·testF32(SB), NOSPLIT, $0
 TEXT ·testF64(SB), NOSPLIT, $0
   CallImport
   RET
+
+// func testBool_U32(b bool, i uint32)
+TEXT ·testBool_U32(SB), NOSPLIT, $0
+  CallImport
+  RET

@@ -62,7 +62,6 @@ export default class StackReader {
     if (!typeSpec) {
       throw new ReferenceError('StackReader.pop: missing type reader');
     }
-    // console.log('pop', this._offset, hex(this._mem.getUint8(this._sp + this._offset)));
 
     const {address, delta} = typeSpec.alignAddress(this._sp + this._offset);
     const value = typeSpec.read(this._mem, address);

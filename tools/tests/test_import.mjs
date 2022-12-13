@@ -8,8 +8,7 @@ const Sizeof = {
   UINT64: 8
 }
 
-const alignAddr = (addr, align) => ((addr + align - 1) / align) * align;
-
+const hex = v => typeof v === 'number' ? v.toString(16) : parseInt(v, 16);
 const go = new Go({debug: true});
 
 go.exportFunction('main.multiply', sp => {
@@ -112,6 +111,18 @@ go.exportFunction('main.testF64', (sp, reader) => {
   console.log([v1, v2, v3]);
   console.log(go.inspector.dump(sp, 32, 16));
 });
+
+go.exportFunction('main.testBool_U32', (sp, reader) => {
+  reader.skipHeader();
+  const v1 = reader.pop(Types.Boolean);
+  const v2 = reader.pop(Types.Uint32);
+  console.log([v1, v2]);
+  // console.log([
+  //   dump(go.mem, sp + 8, Types.Boolean),
+  //   dump(go.mem, sp + 9, Types.Uint32)
+  // ]);
+  console.log(go.inspector.dump(sp, 32, 16));
+})
 
 go.exportFunction('main.dialByFuncRef', sp => {
   const aligned = alignAddr(sp, 4);
