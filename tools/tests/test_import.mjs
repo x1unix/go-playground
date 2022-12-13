@@ -20,24 +20,12 @@ go.exportFunction('main.multiply', sp => {
   go.setInt64(sp + 24, result);
 })
 
-go.exportFunction('main.testBool', sp => {
-  const val0 = go.mem.getUint8(sp + 1);
-  const val1 = go.mem.getUint8(sp + 2);
-  const val3 = go.mem.getUint8(sp + 3);
-  console.log('main.testBool', {
-    v0: {
-      v: val0,
-      addr: (sp + 1).toString(16),
-    },
-    v1: {
-      v: val1,
-      addr: (sp + 2).toString(16)
-    },
-    v3: {
-      v: val3,
-      addr: (sp + 3).toString(16)
-    }
-  })
+go.exportFunction('main.testBool', (sp, reader) => {
+  reader.skipHeader();
+  const v0 = reader.pop(Types.Boolean);
+  const v1 = reader.pop(Types.Boolean);
+  const v2 = reader.pop(Types.Boolean);
+  console.log([v0, v1, v2]);
   console.log(go.inspector.dump(sp, 32, 16));
 })
 

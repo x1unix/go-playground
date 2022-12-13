@@ -43,10 +43,11 @@ func testTestU32(a, b, c uint32) {
 }
 
 func main() {
-	testTestU32(0x48, 0x4c, 0x4f)
+	testTestBool(true, false, true)
+	testTestU32(0x48, 65530, 0x4f)
+	//testTestU32(0x48, 0x4c, 0x4f)
+	//testTestU8(0x48, 0x4c, 0x4f)
 	//testTestU8(255, 128, 255)
-	testTestU8(0x48, 0x4c, 0x4f)
-	testTestU8(255, 128, 255)
 
 	//testTestBool(true, true, true)
 	//testTestBool(true, true, true)

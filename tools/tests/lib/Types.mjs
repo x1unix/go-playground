@@ -71,7 +71,6 @@ class DataViewableTypeSpec extends AbstractTypeSpec {
 
   constructor(name, method, size, align, skip=0) {
     super(name, size, align, skip);
-    this._type = name;
     this._method = method;
   }
 
@@ -87,15 +86,33 @@ class DataViewableTypeSpec extends AbstractTypeSpec {
   }
 }
 
+class BooleanTypeSpec extends AbstractTypeSpec {
+  constructor() {
+    super('bool', 1, 1, 0);
+  }
+
+  alignAddress(addr) {
+    return {
+      address: addr,
+      delta: 0,
+    };
+  }
+
+  read(view, addr) {
+    const val = view.getUint8(addr);
+    return !!val;
+  }
+}
+
 export const Sizeof = {
   INT32: 4,
   INT64: 8
 }
 
 export const Types = {
+  Boolean: new BooleanTypeSpec(),
   Byte: new DataViewableTypeSpec('byte', DataView.prototype.getUint8, 1, 1, 0),
   Uint8: new DataViewableTypeSpec('uint8', DataView.prototype.getUint8, 1, 1, 3),
   Uint32: new DataViewableTypeSpec('uint32', DataView.prototype.getUint32, 4, 4, 0),
   Int32: new DataViewableTypeSpec('int32', DataView.prototype.getInt32, 4, 4, 0),
-  Bool: new DataViewableTypeSpec('bool', DataView.prototype.getUint8, 1, 1, 3),
 }
