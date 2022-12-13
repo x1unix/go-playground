@@ -14,6 +14,8 @@ func testU32(a, b, c uint32)
 func testI32(a, b, c int32)
 func testU64(a, b, c uint64)
 func testI64(a, b, c int64)
+func testF32(a, b, c float32)
+func testF64(a, b, c float64)
 func multiply(a, b int) int
 
 type funcObj struct {
@@ -57,6 +59,18 @@ func testTestU64(a, b, c uint64) {
 	fmt.Println(strings.Repeat("-", 80))
 }
 
+func testTestF32(a, b, c float32) {
+	fmt.Printf("testF32(%[1]T(%[1]v; %[1]x), %[2]T(%[2]v; %[2]x), %[3]T(%[3]v; %[3]x))\n", a, b, c)
+	testF32(a, b, c)
+	fmt.Println(strings.Repeat("-", 80))
+}
+
+func testTestF64(a, b, c float64) {
+	fmt.Printf("testF64(%[1]T(%[1]v; %[1]x), %[2]T(%[2]v; %[2]x), %[3]T(%[3]v; %[3]x))\n", a, b, c)
+	testF64(a, b, c)
+	fmt.Println(strings.Repeat("-", 80))
+}
+
 func testTestI64(a, b, c int64) {
 	fmt.Printf("testU64(%[1]T(%[1]v; %[1]x), %[2]T(%[2]v; %[2]x), %[3]T(%[3]v; %[3]x))\n", a, b, c)
 	testI64(a, b, c)
@@ -68,7 +82,9 @@ func main() {
 	//testTestU32(0x48, 0x4c, 0x4f)
 	//testTestU64(0xFFFFFFFFFFFF, 0xFFFFFFFF00FF, 0xFFFFFFFFFFFFFFFF)
 	testTestI32(128, -128, 256)
-	testTestI64(0xFFFFFFFFFFFF, -0xFFFFFFFF00FF, 0x7fffffffffffffff)
+	//testTestI64(0xFFFFFFFFFFFF, -0xFFFFFFFF00FF, 0x7fffffffffffffff)
+	testTestF32(3.14, 14.16, 3.33)
+	testTestF64(3.14, 14.16, 3.33)
 	//testTestU32(0x48, 65530, 0x4f)
 	//testTestU8(0x48, 0x4c, 0x4f)
 	//testTestU8(255, 128, 255)

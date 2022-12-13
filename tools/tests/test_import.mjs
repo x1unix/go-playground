@@ -99,6 +99,20 @@ go.exportFunction('main.testI64', (sp, reader) => {
   console.log(go.inspector.dump(sp, 32, 16));
 })
 
+go.exportFunction('main.testF32', (sp, reader) => {
+  reader.skipHeader();
+  const [v1, v2, v3] = reader.popTimes(Types.Float32, 3);
+  console.log([v1, v2, v3]);
+  console.log(go.inspector.dump(sp, 32, 16));
+});
+
+go.exportFunction('main.testF64', (sp, reader) => {
+  reader.skipHeader();
+  const [v1, v2, v3] = reader.popTimes(Types.Float64, 3);
+  console.log([v1, v2, v3]);
+  console.log(go.inspector.dump(sp, 32, 16));
+});
+
 go.exportFunction('main.dialByFuncRef', sp => {
   const aligned = alignAddr(sp, 4);
   const funcId = go.mem.getUint32(aligned + Sizeof.UINT32, true);

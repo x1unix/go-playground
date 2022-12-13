@@ -39,3 +39,13 @@ TEXT ·testU64(SB), NOSPLIT, $0
 TEXT ·testI64(SB), NOSPLIT, $0
   CallImport
   RET
+
+// func testF32(a, b, c float32)
+TEXT ·testF32(SB), NOSPLIT, $0
+  CallImport
+  RET
+
+// func testF64(a, b, c float64)
+TEXT ·testF64(SB), NOSPLIT, $0
+  CallImport
+  RET

@@ -69,7 +69,7 @@ class DataViewableTypeSpec extends AbstractTypeSpec {
    */
   _method;
 
-  constructor(name, method, size, align, skip=0) {
+  constructor(name, size, align, skip, method) {
     super(name, size, align, skip);
     this._method = method;
   }
@@ -111,11 +111,13 @@ export const Sizeof = {
 
 export const Types = {
   Boolean: new BooleanTypeSpec(),
-  Byte: new DataViewableTypeSpec('byte', DataView.prototype.getUint8, 1, 1, 0),
-  Uint8: new DataViewableTypeSpec('uint8', DataView.prototype.getUint8, 1, 1, 3),
-  Int8: new DataViewableTypeSpec('int8', DataView.prototype.getInt8, 1, 1, 3),
-  Uint32: new DataViewableTypeSpec('uint32', DataView.prototype.getUint32, 4, 4, 0),
-  Int32: new DataViewableTypeSpec('int32', DataView.prototype.getInt32, 4, 4, 0),
-  Uint64: new DataViewableTypeSpec('uint64', DataView.prototype.getBigUint64, 8, 8, 0),
-  Int64: new DataViewableTypeSpec('int64', DataView.prototype.getBigInt64, 8, 8, 0),
+  Byte: new DataViewableTypeSpec('byte', 1, 1, 0, DataView.prototype.getUint8),
+  Uint8: new DataViewableTypeSpec('uint8', 1, 1, 3, DataView.prototype.getUint8),
+  Int8: new DataViewableTypeSpec('int8', 1, 1, 3, DataView.prototype.getInt8),
+  Uint32: new DataViewableTypeSpec('uint32', 4, 4, 0, DataView.prototype.getUint32),
+  Int32: new DataViewableTypeSpec('int32', 4, 4, 0, DataView.prototype.getInt32),
+  Uint64: new DataViewableTypeSpec('uint64', 8, 8, 0, DataView.prototype.getBigUint64),
+  Int64: new DataViewableTypeSpec('int64', 8, 8, 0, DataView.prototype.getBigInt64),
+  Float32: new DataViewableTypeSpec('float32', 4, 4, 0, DataView.prototype.getFloat32),
+  Float64: new DataViewableTypeSpec('float64', 8, 8, 0, DataView.prototype.getFloat64),
 }
