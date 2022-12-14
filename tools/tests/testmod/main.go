@@ -21,6 +21,7 @@ func testBool_UintPtr2(a bool, b, c uintptr)
 func testBool_U32(a bool, b uint32)
 func testU8_U32_U8(a uint8, b uint32, c uint8)
 func multiply(a, b int) int
+func testInt2(a, b int)
 
 type funcObj struct {
 	v  js.Value
@@ -31,6 +32,19 @@ func getFuncID(cb js.Func) uint32 {
 	ptr := unsafe.Pointer(&cb)
 	x := (*funcObj)(ptr)
 	return x.id
+}
+
+func test_testInt2(a, b int) {
+	fmt.Printf("testInt2(%[1]T(%[1]v;%[1]x), %[2]T(%[2]v;%[2]x))\n", a, b)
+	testInt2(a, b)
+}
+
+func test_mutiply(a, b int) int {
+	fmt.Printf("mutiply(%[1]T(%[1]v;%[1]x), %[2]T(%[2]v;%[2]x))\n", a, b)
+	res := multiply(a, b)
+	fmt.Printf("Expect: %[1]v;%[1]x\n", a*b)
+	fmt.Printf("Result: %[1]v;%[1]x\n", res)
+	return res
 }
 
 func testTestBool(a, b, c bool) {
@@ -97,7 +111,9 @@ func t_testBool_UintPtr2(a bool, b, c uintptr) {
 }
 
 func main() {
-	t_testBool_UintPtr2(true, 0xdeadbeef, 0xcafebabe)
+	//test_testInt2(0x48, 0x4c)
+	test_mutiply(0x48, 0x4c) // 5472; 1560
+	//t_testBool_UintPtr2(true, 0xdeadbeef, 0xcafebabe)
 	//t_testU8_U32_U8(128, 512, 255)
 	//testTestU8(255, 128, 255)
 	//testTestBool(true, false, true)

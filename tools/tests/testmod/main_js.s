@@ -64,3 +64,8 @@ TEXT ·testU8_U32_U8(SB), NOSPLIT, $0
 TEXT ·testBool_UintPtr2(SB), NOSPLIT, $0
   CallImport
   RET
+
+// func testInt2(a, b int)
+TEXT ·testInt2(SB), NOSPLIT, $0
+  CallImport
+  RET

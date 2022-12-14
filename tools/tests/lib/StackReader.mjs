@@ -1,16 +1,17 @@
-/**
- * @param {number} v
- * @returns {string}
- */
-const hex = v => v.toString(16);
+import { hex } from './common.mjs';
+import StackWriter from './StackWriter.mjs';
 
 const STACK_SKIP_COUNT = 8;
 
+/**
+ * Provides functionality for reading data from Go stack frame.
+ */
 export default class StackReader {
   _sp = 0;
   _offset = 0;
   _popCount = 0;
   _debug = false;
+  _finished = false;
 
   constructor(mem, sp, opts = {}) {
     /**
@@ -61,6 +62,10 @@ export default class StackReader {
       throw new ReferenceError('StackReader.pop: missing type reader');
     }
 
+    if (this._finished) {
+      throw new Error('StackReader.pop: cannot be called after writer()');
+    }
+
     const {address, delta} = typeSpec.alignAddress(this._sp + this._offset);
     const value = typeSpec.read(this._mem, address);
     this._offset += delta + typeSpec.size;
@@ -70,7 +75,6 @@ export default class StackReader {
         `Pop: $${this._popCount}`,
         `(*${typeSpec.type})(${hex(address)})`,
         value,
-        '\t\t'
       ].join(' '))
     }
 
@@ -91,5 +95,20 @@ export default class StackReader {
     }
 
     return results;
+  }
+
+  /**
+   * Finish write and return stack frame writer.
+   *
+   * This method will lock stack frame for writing.
+   *
+   * @returns {StackWriter} Stack frame writer
+   */
+  writer() {
+    if (this._finished) {
+      throw new Error('StackReader.writer: method can be called only once');
+    }
+    this._finished = true;
+    return new StackWriter(this._mem, this._sp + this._offset, this._debug);
   }
 }

@@ -3,20 +3,27 @@ import { promises as fs } from 'fs';
 import { Types } from './lib/Types/types.mjs';
 import Go from './custom-go.mjs';
 
-const Sizeof = {
-  UINT32: 4,
-  UINT64: 8
-}
-
 const hex = v => typeof v === 'number' ? v.toString(16) : parseInt(v, 16);
 const go = new Go({debug: true});
 
-go.exportFunction('main.multiply', sp => {
-  const a1 = go.mem.getInt32(sp + 8, false);  // SP + sizeof(int64)
-  const a2 = go.mem.getInt32(sp + 16, false); // SP + sizeof(int64) * 2
+go.exportFunction('main.multiply', (sp, reader) => {
+  reader.skipHeader();
+  const [a1, a2] = reader.popTimes(Types.Int, 2)
   const result = a1 * a2;
-  console.log('Got call from Go:', {a1, a2, result});
-  go.setInt64(sp + 24, result);
+
+  reader
+    .writer()
+    .write(Types.Int, result);
+
+  console.log(go.inspector.dump(sp, 64, 16));
+})
+
+go.exportFunction('main.testInt2', (sp, reader) => {
+  reader.skipHeader();
+  const v1 = reader.pop(Types.Int);
+  const v2 = reader.pop(Types.Int);
+  console.log([v1, v2]);
+  console.log(go.inspector.dump(sp, 48, 16));
 })
 
 go.exportFunction('main.testBoolInt32', sp => {
@@ -117,10 +124,6 @@ go.exportFunction('main.testBool_U32', (sp, reader) => {
   const v1 = reader.pop(Types.Boolean);
   const v2 = reader.pop(Types.Uint32);
   console.log([v1, v2]);
-  // console.log([
-  //   dump(go.mem, sp + 8, Types.Boolean),
-  //   dump(go.mem, sp + 9, Types.Uint32)
-  // ]);
   console.log(go.inspector.dump(sp, 32, 16));
 })
 
