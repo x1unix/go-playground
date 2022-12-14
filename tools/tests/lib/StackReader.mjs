@@ -1,5 +1,3 @@
-import { Sizeof } from './Types.mjs';
-
 /**
  * @param {number} v
  * @returns {string}

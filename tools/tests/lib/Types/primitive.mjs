@@ -1,3 +1,5 @@
+import { alignAddr } from './common.mjs';
+
 /**
  * @typedef {Object} AlignedAddress
  * @property {number} address
@@ -5,9 +7,9 @@
  * @property {*} value
  */
 
-const alignAddr = (addr, align) => ((addr + align - 1) / align) * align;
+const MAX_INT32 = 4294967296;
 
-class AbstractTypeSpec {
+export class AbstractTypeSpec {
   _size = 0;
   _align = 1;
   _skip = 0;
@@ -82,7 +84,7 @@ class AbstractTypeSpec {
   }
 }
 
-class DataViewableTypeSpec extends AbstractTypeSpec {
+export class DataViewableTypeSpec extends AbstractTypeSpec {
   /**
    * @type {Function}
    * @private
@@ -99,7 +101,7 @@ class DataViewableTypeSpec extends AbstractTypeSpec {
   }
 }
 
-class BooleanTypeSpec extends AbstractTypeSpec {
+export class BooleanTypeSpec extends AbstractTypeSpec {
   constructor() {
     super('bool', 1, 1, 0);
   }
@@ -110,20 +112,20 @@ class BooleanTypeSpec extends AbstractTypeSpec {
   }
 }
 
-export const Sizeof = {
-  INT32: 4,
-  INT64: 8
-}
+export class UInt64TypeSpec extends AbstractTypeSpec {
+  constructor(name) {
+    super(name, 8, 8, 0);
+  }
 
-export const Types = {
-  Boolean: new BooleanTypeSpec(),
-  Byte: new DataViewableTypeSpec('byte', 1, 1, 0, DataView.prototype.getUint8),
-  Uint8: new DataViewableTypeSpec('uint8', 1, 1, 3, DataView.prototype.getUint8),
-  Int8: new DataViewableTypeSpec('int8', 1, 1, 3, DataView.prototype.getInt8),
-  Uint32: new DataViewableTypeSpec('uint32', 4, 4, 0, DataView.prototype.getUint32),
-  Int32: new DataViewableTypeSpec('int32', 4, 4, 0, DataView.prototype.getInt32),
-  Uint64: new DataViewableTypeSpec('uint64', 8, 8, 0, DataView.prototype.getBigUint64),
-  Int64: new DataViewableTypeSpec('int64', 8, 8, 0, DataView.prototype.getBigInt64),
-  Float32: new DataViewableTypeSpec('float32', 4, 4, 0, DataView.prototype.getFloat32),
-  Float64: new DataViewableTypeSpec('float64', 8, 8, 0, DataView.prototype.getFloat64),
+  read(view, addr) {
+    const low = view.getUint32(addr, true);
+    const high = view.getInt32(addr + 4, true);
+
+    return low + high * MAX_INT32;
+  }
+
+  write(view, val, addr) {
+    view.setUint32(addr, val, true);
+    view.setUint32(addr + 4, Math.floor(val / MAX_INT32), true);
+  }
 }

@@ -16,8 +16,10 @@ func testU64(a, b, c uint64)
 func testI64(a, b, c int64)
 func testF32(a, b, c float32)
 func testF64(a, b, c float64)
+func testBool_UintPtr2(a bool, b, c uintptr)
 
 func testBool_U32(a bool, b uint32)
+func testU8_U32_U8(a uint8, b uint32, c uint8)
 func multiply(a, b int) int
 
 type funcObj struct {
@@ -84,10 +86,23 @@ func testTestBool_U32(a bool, b uint32) {
 	testBool_U32(a, b)
 }
 
+func t_testU8_U32_U8(a uint8, b uint32, c uint8) {
+	fmt.Printf("testU8_U32_U8(%[1]T(%[1]v; %[1]x), %[2]T(%[2]v; %[2]x), %[3]T(%[3]v; %[3]x))\n", a, b, c)
+	testU8_U32_U8(a, b, c)
+}
+
+func t_testBool_UintPtr2(a bool, b, c uintptr) {
+	fmt.Printf("testBool_UintPtr2(%[1]T(%[1]v), %[2]T(%[2]v; %[2]x), %[3]T(%[3]v; %[3]x))\n", a, b, c)
+	testBool_UintPtr2(a, b, c)
+}
+
 func main() {
+	t_testBool_UintPtr2(true, 0xdeadbeef, 0xcafebabe)
+	//t_testU8_U32_U8(128, 512, 255)
+	//testTestU8(255, 128, 255)
 	//testTestBool(true, false, true)
-	testTestU32(0x48, 0x4c, 0x4f)
-	testTestBool_U32(true, 0xFF)
+	//testTestU32(0x48, 0x4c, 0x4f)
+	//testTestBool_U32(true, 0xFF)
 	//testTestU64(0xFFFFFFFFFFFF, 0xFFFFFFFF00FF, 0xFFFFFFFFFFFFFFFF)
 	//testTestI32(128, -128, 256)
 	//testTestI64(0xFFFFFFFFFFFF, -0xFFFFFFFF00FF, 0x7fffffffffffffff)
@@ -95,7 +110,6 @@ func main() {
 	//testTestF64(3.14, 14.16, 3.33)
 	//testTestU32(0x48, 65530, 0x4f)
 	//testTestU8(0x48, 0x4c, 0x4f)
-	//testTestU8(255, 128, 255)
 
 	//testTestBool(true, true, true)
 	//testTestBool(true, true, true)

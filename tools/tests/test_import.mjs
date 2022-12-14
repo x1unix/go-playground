@@ -1,6 +1,6 @@
 import './polyfill.js';
 import { promises as fs } from 'fs';
-import { Types } from './lib/Types.mjs';
+import { Types } from './lib/Types/types.mjs';
 import Go from './custom-go.mjs';
 
 const Sizeof = {
@@ -121,6 +121,24 @@ go.exportFunction('main.testBool_U32', (sp, reader) => {
   //   dump(go.mem, sp + 8, Types.Boolean),
   //   dump(go.mem, sp + 9, Types.Uint32)
   // ]);
+  console.log(go.inspector.dump(sp, 32, 16));
+})
+
+go.exportFunction('main.testU8_U32_U8', (sp, reader) => {
+  reader.skipHeader();
+  const v1 = reader.pop(Types.Uint8);
+  const v2 = reader.pop(Types.Uint32);
+  const v3 = reader.pop(Types.Uint8);
+  console.log([v1, v2, v3]);
+  console.log(go.inspector.dump(sp, 32, 16));
+})
+
+go.exportFunction('main.testBool_UintPtr2', (sp, reader) => {
+  reader.skipHeader();
+  const v1 = reader.pop(Types.Boolean);
+  const v2 = reader.pop(Types.UintPtr);
+  const v3 = reader.pop(Types.UintPtr);
+  console.log([v1, v2, v3])
   console.log(go.inspector.dump(sp, 32, 16));
 })
 
