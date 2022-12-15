@@ -3,18 +3,38 @@ import { promises as fs } from 'fs';
 import { Types } from './lib/Types/types.mjs';
 import Go from './custom-go.mjs';
 
-const hex = v => typeof v === 'number' ? v.toString(16) : parseInt(v, 16);
+const num2hex = val => typeof val === 'bigint' ? num2hex(Number(val)) : val.toString(16);
+const hex = v => typeof v === 'string' ? parseInt(v, 16) : num2hex(v);
 const go = new Go({debug: true});
 
-go.exportFunction('main.sum', (sp, reader) => {
+go.exportFunction('main.readJSFunc', (sp, reader) => {
   reader.skipHeader();
-  const [a1, a2] = reader.popTimes(Types.Int, 2)
-  const result = a1 + a2;
+  /*
+    ref = uint64
+    Value:
+      ref: ref
+      gcPtr: uintptr[ref]
+    id: uint32
+   */
+  const func = {
+    value: {
+      ref: reader.pop(Types.Uint64),
+      gcPtr: reader.pop(Types.UintPtr)
+    },
+    id: reader.pop(Types.Uint32)
+  }
 
-  reader
-    .writer()
-    .write(Types.Int, result);
-
+  console.log([
+    '--- GOT: ---',
+    'Func: {',
+    `\tValue: {`,
+    `\t\tref: ${func.value.ref} (${hex(func.value.ref)})`,
+    `\t\tgcPtr: ${hex(func.value.gcPtr)}`,
+    `\t}`,
+    `\tid: ${func.id} (${hex(func.id)})`,
+    '}',
+    '------------',
+  ].join('\n'));
   console.log(go.inspector.dump(sp, 64, 16));
 })
 

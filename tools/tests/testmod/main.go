@@ -10,24 +10,33 @@ func dialByFuncRef(cb, cb2 uint32)
 
 func sum(a, b int) int
 func sum2(a, b int) (int, int)
+func readJSFunc(fn js.Func)
 
 type funcObj struct {
-	v  js.Value
+	value struct {
+		ref   uint64
+		gcPtr uintptr
+	}
 	id uint32
+}
+
+func test_readJSFunc(fn js.Func) {
+	ptr := (*funcObj)(unsafe.Pointer(&fn))
+	fmt.Println("--- WANT: ---")
+	fmt.Println("Func: {\n\tValue: {")
+	fmt.Printf("\t\tref: %[1]d (%[1]x)\n", ptr.value.ref)
+	fmt.Printf("\t\tgcPtr: %x\n", ptr.value.gcPtr)
+	fmt.Println("\t}")
+	fmt.Printf("\tid: %[1]d (%[1]x)\n", ptr.id)
+	fmt.Println("}")
+	fmt.Println("-------------")
+	readJSFunc(fn)
 }
 
 func getFuncID(cb js.Func) uint32 {
 	ptr := unsafe.Pointer(&cb)
 	x := (*funcObj)(ptr)
 	return x.id
-}
-
-func test_sum(a, b int) int {
-	fmt.Printf("sum(%[1]T(%[1]v;%[1]x), %[2]T(%[2]v;%[2]x))\n", a, b)
-	res := sum(a, b)
-	fmt.Printf("Want: %[1]v;%[1]x\n", a+b)
-	fmt.Printf("Got:  %[1]v;%[1]x\n", res)
-	return res
 }
 
 func test_sum2(a, b int) (int, int) {
@@ -40,8 +49,10 @@ func test_sum2(a, b int) (int, int) {
 }
 
 func main() {
-	test_sum2(0x41, 0x42) // 5472; 1560
+	//test_sum2(0x41, 0x42) // 5472; 1560
 
+	testFunc := js.FuncOf(nil)
+	test_readJSFunc(testFunc)
 }
 
 //type handler struct {
