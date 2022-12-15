@@ -6,14 +6,28 @@ import Go from './custom-go.mjs';
 const hex = v => typeof v === 'number' ? v.toString(16) : parseInt(v, 16);
 const go = new Go({debug: true});
 
-go.exportFunction('main.multiply', (sp, reader) => {
+go.exportFunction('main.sum', (sp, reader) => {
   reader.skipHeader();
   const [a1, a2] = reader.popTimes(Types.Int, 2)
-  const result = a1 * a2;
+  const result = a1 + a2;
 
   reader
     .writer()
     .write(Types.Int, result);
+
+  console.log(go.inspector.dump(sp, 64, 16));
+})
+
+go.exportFunction('main.sum2', (sp, reader) => {
+  reader.skipHeader();
+  const [a1, a2] = reader.popTimes(Types.Int, 2)
+  const r1 = a2 + 1;
+  const r2 = a1 + a2;
+
+  reader
+    .writer()
+    .write(Types.Int, r1)
+    .write(Types.Int, r2);
 
   console.log(go.inspector.dump(sp, 64, 16));
 })

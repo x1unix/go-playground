@@ -20,7 +20,8 @@ func testBool_UintPtr2(a bool, b, c uintptr)
 
 func testBool_U32(a bool, b uint32)
 func testU8_U32_U8(a uint8, b uint32, c uint8)
-func multiply(a, b int) int
+func sum(a, b int) int
+func sum2(a, b int) (int, int)
 func testInt2(a, b int)
 
 type funcObj struct {
@@ -39,12 +40,21 @@ func test_testInt2(a, b int) {
 	testInt2(a, b)
 }
 
-func test_mutiply(a, b int) int {
-	fmt.Printf("mutiply(%[1]T(%[1]v;%[1]x), %[2]T(%[2]v;%[2]x))\n", a, b)
-	res := multiply(a, b)
-	fmt.Printf("Expect: %[1]v;%[1]x\n", a*b)
-	fmt.Printf("Result: %[1]v;%[1]x\n", res)
+func test_sum(a, b int) int {
+	fmt.Printf("sum(%[1]T(%[1]v;%[1]x), %[2]T(%[2]v;%[2]x))\n", a, b)
+	res := sum(a, b)
+	fmt.Printf("Want: %[1]v;%[1]x\n", a+b)
+	fmt.Printf("Got:  %[1]v;%[1]x\n", res)
 	return res
+}
+
+func test_sum2(a, b int) (int, int) {
+	fmt.Printf("sum2(%[1]T(%[1]v;%[1]x), %[2]T(%[2]v;%[2]x))\n", a, b)
+	want1, want2 := b+1, a+b
+	got1, got2 := sum2(a, b)
+	fmt.Printf("Want: %[1]v,%[2]v (%[1]x,%[2]x)\n", want1, want2)
+	fmt.Printf("Got:  %[1]v,%[2]v (%[1]x,%[2]x)\n", got1, got2)
+	return got1, got2
 }
 
 func testTestBool(a, b, c bool) {
@@ -112,7 +122,8 @@ func t_testBool_UintPtr2(a bool, b, c uintptr) {
 
 func main() {
 	//test_testInt2(0x48, 0x4c)
-	test_mutiply(0x48, 0x4c) // 5472; 1560
+	//test_sum(0x41, 0x42) // 5472; 1560
+	test_sum2(0x41, 0x42) // 5472; 1560
 	//t_testBool_UintPtr2(true, 0xdeadbeef, 0xcafebabe)
 	//t_testU8_U32_U8(128, 512, 255)
 	//testTestU8(255, 128, 255)
@@ -209,6 +220,6 @@ func main() {
 //}
 
 func main2() {
-	res := multiply(3, 4)
+	res := sum(3, 4)
 	fmt.Println("Multiply result:", res)
 }

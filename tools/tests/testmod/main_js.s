@@ -1,7 +1,12 @@
 #include "textflag.h"
 
-// func multiply(a, b int) int
-TEXT ·multiply(SB), NOSPLIT, $0
+// func sum(a, b int) int
+TEXT ·sum(SB), NOSPLIT, $0
+  CallImport
+  RET
+
+// func sum2(a, b int) (int, int)
+TEXT ·sum2(SB), NOSPLIT, $0
   CallImport
   RET
 
