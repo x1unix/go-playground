@@ -1,4 +1,6 @@
 import { BooleanTypeSpec, DataViewableTypeSpec, UInt64TypeSpec } from './primitive.mjs';
+import { StructTypeSpec } from './complex.mjs';
+
 export * from './common.mjs';
 
 export const Types = {
@@ -48,3 +50,13 @@ export const Types = {
     write: DataView.prototype.setFloat64
   }),
 }
+
+/**
+ * Returns a new struct type
+ * @param {string} name
+ * @param {AttributeDescriptor[]} attrs
+ * @returns {StructTypeSpec}
+ */
+export const Struct = (name, attrs) => (
+  new StructTypeSpec(name, attrs)
+);

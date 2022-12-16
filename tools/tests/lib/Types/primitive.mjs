@@ -35,6 +35,14 @@ export class AbstractTypeSpec {
   }
 
   /**
+   * Number of bytes reserved after value contents.
+   * @returns {number}
+   */
+  get padding() {
+    return this._skip;
+  }
+
+  /**
    * Returns value type size.
    * @returns {number}
    */

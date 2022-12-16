@@ -1,11 +1,20 @@
 import './polyfill.js';
 import { promises as fs } from 'fs';
-import { Types } from './lib/Types/types.mjs';
+import { Types, Struct } from './lib/Types/types.mjs';
 import Go from './custom-go.mjs';
 
 const num2hex = val => typeof val === 'bigint' ? num2hex(Number(val)) : val.toString(16);
 const hex = v => typeof v === 'string' ? parseInt(v, 16) : num2hex(v);
 const go = new Go({debug: true});
+
+const JSValue = Struct('syscall/js.Value', [
+  {key: 'ref', type: Types.Uint64},
+  {key: 'gcPtr', type: Types.UintPtr}
+])
+const JSFunc = Struct('syscall/js.Func', [
+  { key: 'value', type: JSValue },
+  { key: 'id', type: Types.Uint32 }
+]);
 
 go.exportFunction('main.readJSFunc', (sp, reader) => {
   reader.skipHeader();
@@ -16,13 +25,14 @@ go.exportFunction('main.readJSFunc', (sp, reader) => {
       gcPtr: uintptr[ref]
     id: uint32
    */
-  const func = {
-    value: {
-      ref: reader.pop(Types.Uint64),
-      gcPtr: reader.pop(Types.UintPtr)
-    },
-    id: reader.pop(Types.Uint32)
-  }
+  // const func = {
+  //   value: {
+  //     ref: reader.pop(Types.Uint64),
+  //     gcPtr: reader.pop(Types.UintPtr)
+  //   },
+  //   id: reader.pop(Types.Uint32)
+  // }
+  const func = reader.pop(JSFunc);
 
   console.log([
     '--- GOT: ---',

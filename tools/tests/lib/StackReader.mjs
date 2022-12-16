@@ -66,6 +66,7 @@ export default class StackReader {
       throw new Error('StackReader.pop: cannot be called after writer()');
     }
 
+    // TODO: move alignment logic to AbstractTypeSpec
     const {address, delta} = typeSpec.alignAddress(this._sp + this._offset);
     const value = typeSpec.read(this._mem, address);
     this._offset += delta + typeSpec.size;
