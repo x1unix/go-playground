@@ -45,6 +45,7 @@ go.exportFunction('main.readJSFunc', (sp, reader) => {
     '}',
     '------------',
   ].join('\n'));
+  console.log(func);
   console.log(go.inspector.dump(sp, 64, 16));
 })
 
