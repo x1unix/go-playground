@@ -35,19 +35,19 @@ export class AbstractTypeSpec {
   _size = 0;
   _align = 1;
   _skip = 0;
-  _type = '';
+  _name = '';
 
   /**
-   * @param {string} type Original type name.
+   * @param {string} name Original type name.
    * @param {number} size Type size.
    * @param {number} align Type alignment.
    * @param {number} skip Number of bytes to skip.
    */
-  constructor(type, size, align = 1, skip = 0) {
+  constructor(name, size, align = 1, skip = 0) {
     this._size = size;
     this._align = align;
     this._skip = skip;
-    this._type = type;
+    this._name = name;
   }
 
   /**
@@ -69,8 +69,8 @@ export class AbstractTypeSpec {
   /**
    * @type {string}
    */
-  get type() {
-    return this._type;
+  get name() {
+    return this._name;
   }
 
   /**
@@ -84,22 +84,15 @@ export class AbstractTypeSpec {
   /**
    * Align pointer address
    * @param {number} addr
-   * @returns {AlignedAddress} Normalized address
+   * @returns {number} Aligned address
    */
   alignAddress(addr) {
     if (addr % this._align === 0) {
       // Address is aligned
-      return {
-        address: addr,
-        delta: 0
-      };
+      return addr;
     }
 
-    const alignedAddr = alignAddr(addr, this._align);
-    return {
-      address: alignedAddr,
-      delta: alignedAddr - addr
-    }
+    return alignAddr(addr, this._align);
   }
 
   /**
@@ -139,11 +132,11 @@ export class AbstractTypeSpec {
    * Passed offset address will be aligned before read.
    *
    * @param {DataView} view Memory
-   * @param {number} sp Stack pointer
+   * @param {number} addr Stack pointer
    * @returns {ReadResult}
    */
-  read(view, sp) {
-    let { address } = this.alignAddress(sp);
+  read(view, addr) {
+    let address = this.alignAddress(addr);
     const value = this.decode(view, address);
     return {
       value,
@@ -162,7 +155,7 @@ export class AbstractTypeSpec {
    * @returns {WriteResult}
    */
   write(view, addr, val) {
-    const { address } = this.alignAddress(addr);
+    const address = this.alignAddress(addr);
     this.encode(view, address, val);
     return {
       address,

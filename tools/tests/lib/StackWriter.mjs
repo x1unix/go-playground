@@ -57,7 +57,7 @@ export default class StackWriter {
     if (this._debug) {
       console.log([
         `Ret: R${this._retCount}`,
-        `(*${typeSpec.type})(${hex(address)})`,
+        `(*${typeSpec.name})(${hex(address)})`,
         data.toString(),
       ].join(' '))
     }

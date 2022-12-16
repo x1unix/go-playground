@@ -87,7 +87,7 @@ export default class StackReader {
     if (this._debug) {
       console.log([
         `Pop: $${this._popCount}`,
-        `(*${typeSpec.type})(${hex(address)})`,
+        `(*${typeSpec.name})(${hex(address)})`,
         value,
       ].join(' '))
     }

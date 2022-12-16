@@ -1,11 +1,10 @@
-import {AbstractTypeSpec} from './primitive.mjs';
+import {AbstractTypeSpec} from '../primitive.mjs';
 
 /**
  * @typedef {Object} AttributeDescriptor
  * @property {string} key
  * @property {AbstractTypeSpec} type
  */
-
 export class StructTypeSpec extends AbstractTypeSpec {
   /**
    * @type {AttributeDescriptor[]}
@@ -31,7 +30,7 @@ export class StructTypeSpec extends AbstractTypeSpec {
 
     const [ firstElem ] = attrs;
     const totalSize = attrs
-      .map(({type}) => type.size + type._skip)
+      .map(({type}) => type.size + type.padding)
       .reduce((total, size) => total + size, 0);
 
     super(name, totalSize, firstElem.type.alignment, 0);
@@ -40,35 +39,60 @@ export class StructTypeSpec extends AbstractTypeSpec {
     this._firstAttr = firstElem.type;
   }
 
+  get alignment() {
+    return this._firstAttr.alignment;
+  }
+
   alignAddress(addr) {
     return this._firstAttr.alignAddress(addr);
   }
 
   read(view, addr) {
-    let startAddr = addr;
+    const address = this._firstAttr.alignAddress(addr);
+    let offset = address;
+
     const entries = [];
     for (let attr of this._attributes) {
       const {key, type} = attr;
-      const {address} = type.alignAddress(startAddr);
-      const value = type.read(view, address);
+      const fieldAddr = type.alignAddress(offset);
+      const {value, endOffset} = type.read(view, fieldAddr);
       entries.push([key, value]);
-      startAddr = address + type.size + type.padding;
+      offset = endOffset;
     }
 
-    return Object.fromEntries(entries);
+    return {
+      address,
+      endOffset: offset,
+      value: Object.fromEntries(entries)
+    };
   }
 
   write(view, addr, val) {
-    let startAddr = addr;
+    const address = this._firstAttr.alignAddress(addr);
+    let offset = address;
     for (let attr of this._attributes) {
       const {key, type} = attr;
       if (!val[key]) {
         throw new ReferenceError(`${this.constructor.name}.write: missing object property "${key}"`)
       }
 
-      const { address } = type.alignAddress(startAddr);
-      type.write(view, address, val);
-      startAddr = address + type.size + type.padding;
+      const fieldAddr = type.alignAddress(offset)
+      const { endOffset } = type.write(view, fieldAddr, val[key]);
+      offset = endOffset;
     }
+
+    return {
+      address,
+      endOffset: offset
+    };
   }
+
+  encode(view, addr, val) {
+    throw new Error(`${this.constructor.name}.encode: not supported, use write() instead`);
+  }
+
+  decode(view, addr) {
+    throw new Error(`${this.constructor.name}.decode: not supported, use read() instead`);
+  }
+
 }

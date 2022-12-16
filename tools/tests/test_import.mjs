@@ -1,6 +1,6 @@
 import './polyfill.js';
 import { promises as fs } from 'fs';
-import { Types, Struct } from './lib/Types/types.mjs';
+import { Types, Struct, Array } from './lib/Types/types.mjs';
 import Go from './custom-go.mjs';
 
 const num2hex = val => typeof val === 'bigint' ? num2hex(Number(val)) : val.toString(16);
@@ -18,20 +18,6 @@ const JSFunc = Struct('syscall/js.Func', [
 
 go.exportFunction('main.readJSFunc', (sp, reader) => {
   reader.skipHeader();
-  /*
-    ref = uint64
-    Value:
-      ref: ref
-      gcPtr: uintptr[ref]
-    id: uint32
-   */
-  // const func = {
-  //   value: {
-  //     ref: reader.pop(Types.Uint64),
-  //     gcPtr: reader.pop(Types.UintPtr)
-  //   },
-  //   id: reader.pop(Types.Uint32)
-  // }
   const func = reader.pop(JSFunc);
 
   console.log([
@@ -59,6 +45,22 @@ go.exportFunction('main.sum2', (sp, reader) => {
     .writer()
     .write(Types.Int, r1)
     .write(Types.Int, r2);
+
+  console.log(go.inspector.dump(sp, 64, 16));
+})
+
+const Int2 = Array(Types.Int, 2);
+go.exportFunction('main.testSumArr2', (sp, reader) => {
+  reader.skipHeader();
+  const [a1, a2] = reader.pop(Int2)
+  const result = [
+    a2 + 1,
+    a1 + a2,
+  ];
+
+  reader
+    .writer()
+    .write(Int2, result);
 
   console.log(go.inspector.dump(sp, 64, 16));
 })
