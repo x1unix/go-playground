@@ -4,8 +4,7 @@ import { hex } from './common.mjs';
  * StackWriter provides functionality for writing data to Go stack frame.
  */
 export default class StackWriter {
-  _sp = 0;
-  _offset = 0;
+  _addr = 0;
   _debug = false;
   _retCount = 0;
 
@@ -23,16 +22,12 @@ export default class StackWriter {
    */
   constructor(mem, sp, debug = false) {
     this._mem = mem;
-    this._sp = sp;
+    this._addr = sp;
     this._debug = debug;
   }
 
-  get offset() {
-    return this._offset;
-  }
-
   get addr() {
-    return this._sp + this._offset;
+    return this._addr;
   }
 
   /**
@@ -40,7 +35,7 @@ export default class StackWriter {
    * @param {number} count
    */
   skip(count) {
-    this._offset += count;
+    this._addr += count;
   }
 
   /**
@@ -55,9 +50,9 @@ export default class StackWriter {
       throw new ReferenceError('StackReader.pop: missing type reader');
     }
 
-    const {address, delta} = typeSpec.alignAddress(this._sp + this._offset);
+    const {address, delta} = typeSpec.alignAddress(this._addr);
     typeSpec.write(this._mem, address, data);
-    this._offset += delta + typeSpec.size;
+    this._addr += delta + typeSpec.size;
     this._retCount++;
 
     if (this._debug) {

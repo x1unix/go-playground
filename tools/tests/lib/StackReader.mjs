@@ -7,28 +7,29 @@ const STACK_SKIP_COUNT = 8;
  * Provides functionality for reading data from Go stack frame.
  */
 export default class StackReader {
-  _sp = 0;
-  _offset = 0;
+  _addr = 0;
   _popCount = 0;
   _debug = false;
   _finished = false;
 
+  /**
+   *
+   * @param {DataView} mem Memory
+   * @param {number} sp Stack pointer address
+   * @param {Object} opts options
+   */
   constructor(mem, sp, opts = {}) {
     /**
      * @type DataView
      * @private
      */
     this._mem = mem;
-    this._sp = sp;
+    this._addr = sp;
     this._debug = opts.debug;
   }
 
-  get offset() {
-    return this._offset;
-  }
-
   get addr() {
-    return this._sp + this._offset;
+    return this._addr;
   }
 
   /**
@@ -36,7 +37,7 @@ export default class StackReader {
    * @param {number} count
    */
   skip(count) {
-    this._offset += count;
+    this._addr += count;
   }
 
   /**
@@ -48,7 +49,7 @@ export default class StackReader {
       throw new Error('StackReader.skipHeader: should be called once');
     }
 
-    this._offset += STACK_SKIP_COUNT;
+    this._addr += STACK_SKIP_COUNT;
   }
 
   /**
@@ -67,9 +68,9 @@ export default class StackReader {
     }
 
     // TODO: move alignment logic to AbstractTypeSpec
-    const {address, delta} = typeSpec.alignAddress(this._sp + this._offset);
+    const {address, delta} = typeSpec.alignAddress(this._addr);
     const value = typeSpec.read(this._mem, address);
-    this._offset += delta + typeSpec.size;
+    this._addr += delta + typeSpec.size;
 
     if (this._debug) {
       console.log([
@@ -110,6 +111,6 @@ export default class StackReader {
       throw new Error('StackReader.writer: method can be called only once');
     }
     this._finished = true;
-    return new StackWriter(this._mem, this._sp + this._offset, this._debug);
+    return new StackWriter(this._mem, this._addr, this._debug);
   }
 }
