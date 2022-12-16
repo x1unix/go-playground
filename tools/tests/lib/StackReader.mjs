@@ -7,7 +7,7 @@ const STACK_SKIP_COUNT = 8;
  * Provides functionality for reading data from Go stack frame.
  */
 export default class StackReader {
-  _addr = 0;
+  _offset = 0;
   _popCount = 0;
   _debug = false;
   _finished = false;
@@ -24,12 +24,12 @@ export default class StackReader {
      * @private
      */
     this._mem = mem;
-    this._addr = sp;
+    this._offset = sp;
     this._debug = opts.debug;
   }
 
   get addr() {
-    return this._addr;
+    return this._offset;
   }
 
   /**
@@ -37,7 +37,7 @@ export default class StackReader {
    * @param {number} count
    */
   skip(count) {
-    this._addr += count;
+    this._offset += count;
   }
 
   /**
@@ -49,39 +49,7 @@ export default class StackReader {
       throw new Error('StackReader.skipHeader: should be called once');
     }
 
-    this._addr += STACK_SKIP_COUNT;
-  }
-
-  /**
-   * Pops a value from stack using value spec.
-   *
-   * @param {AbstractTypeSpec} typeSpec
-   * @returns {*}
-   */
-  pop(typeSpec) {
-    if (!typeSpec) {
-      throw new ReferenceError('StackReader.pop: missing type reader');
-    }
-
-    if (this._finished) {
-      throw new Error('StackReader.pop: cannot be called after writer()');
-    }
-
-    // TODO: move alignment logic to AbstractTypeSpec
-    const {address, delta} = typeSpec.alignAddress(this._addr);
-    const value = typeSpec.read(this._mem, address);
-    this._addr += delta + typeSpec.size;
-
-    if (this._debug) {
-      console.log([
-        `Pop: $${this._popCount}`,
-        `(*${typeSpec.type})(${hex(address)})`,
-        value,
-      ].join(' '))
-    }
-
-    this._popCount++;
-    return value;
+    this._offset += STACK_SKIP_COUNT;
   }
 
   /**
@@ -100,6 +68,35 @@ export default class StackReader {
   }
 
   /**
+   * Pops a value from stack using value spec.
+   *
+   * @param {AbstractTypeSpec} typeSpec
+   * @returns {*}
+   */
+  pop(typeSpec) {
+    if (!typeSpec) {
+      throw new ReferenceError('StackReader.pop: missing type reader');
+    }
+
+    if (this._finished) {
+      throw new Error('StackReader.pop: cannot be called after writer()');
+    }
+
+    const { value, address, endOffset } = typeSpec.read(this._mem, this._offset);
+    this._offset = endOffset;
+    if (this._debug) {
+      console.log([
+        `Pop: $${this._popCount}`,
+        `(*${typeSpec.type})(${hex(address)})`,
+        value,
+      ].join(' '))
+    }
+
+    this._popCount++;
+    return value;
+  }
+
+  /**
    * Finish write and return stack frame writer.
    *
    * This method will lock stack frame for writing.
@@ -111,6 +108,6 @@ export default class StackReader {
       throw new Error('StackReader.writer: method can be called only once');
     }
     this._finished = true;
-    return new StackWriter(this._mem, this._addr, this._debug);
+    return new StackWriter(this._mem, this._offset, this._debug);
   }
 }
