@@ -28,6 +28,10 @@ export default class StackReader {
     this._debug = opts.debug;
   }
 
+  get dataView() {
+    return this._mem;
+  }
+
   get addr() {
     return this._offset;
   }
@@ -85,11 +89,7 @@ export default class StackReader {
     const { value, address, endOffset } = typeSpec.read(this._mem, this._offset);
     this._offset = endOffset;
     if (this._debug) {
-      console.log([
-        `Pop: $${this._popCount}`,
-        `(*${typeSpec.name})(${hex(address)})`,
-        value,
-      ].join(' '))
+      console.log(`Pop: $${this._popCount} (*${typeSpec.name})(${hex(address)})`, value);
     }
 
     this._popCount++;

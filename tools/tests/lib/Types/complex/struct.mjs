@@ -1,4 +1,4 @@
-import {AbstractTypeSpec} from '../primitive.mjs';
+import {AbstractTypeSpec} from '../spec.mjs';
 
 /**
  * @typedef {Object} AttributeDescriptor

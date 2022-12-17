@@ -10,7 +10,7 @@ func dialByFuncRef(cb, cb2 uint32)
 
 func sum(a, b int) int
 func sum2(a, b int) (int, int)
-func testSumArr2(items [2]int) [2]int
+func testReadSlice(items []int)
 func readJSFunc(fn js.Func)
 
 type funcObj struct {
@@ -49,23 +49,14 @@ func test_sum2(a, b int) (int, int) {
 	return got1, got2
 }
 
-func test_testSumArr2(items [2]int) [2]int {
+func test_testReadSlice(items []int) {
 	fmt.Printf("testSumArr2(%#v)\n", items)
-	want := [2]int{
-		items[1] + 1,
-		items[0] + items[1],
-	}
-
-	got := testSumArr2(items)
-	fmt.Printf("Want: %#v\n", want)
-	fmt.Printf("Got: %#v\n", got)
-
-	return got
+	testReadSlice(items)
 }
 
 func main() {
 	//test_sum2(0x41, 0x42) // 5472; 1560
-	test_testSumArr2([2]int{0x41, 0x42}) // 5472; 1560
+	test_testReadSlice([]int{0x41, 0x42}) // 5472; 1560
 
 	//testFunc := js.FuncOf(nil)
 	//test_readJSFunc(testFunc)

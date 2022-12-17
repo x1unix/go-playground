@@ -1,11 +1,11 @@
-import { AbstractTypeSpec } from '../primitive.mjs';
+import { AbstractTypeSpec } from '../spec.mjs';
 
 export class ArrayTypeSpec extends AbstractTypeSpec {
   /**
    * @type {AbstractTypeSpec}
    * @private
    */
-  _itemType;
+  _elemType;
 
   /**
    * @type {number}
@@ -14,22 +14,22 @@ export class ArrayTypeSpec extends AbstractTypeSpec {
   _length = 0;
 
   /**
-   * @param {AbstractTypeSpec} itemType Array item type
+   * @param {AbstractTypeSpec} elemType Array item type
    * @param {number} length Array size
    */
-  constructor(itemType, length) {
+  constructor(elemType, length) {
     if (length < 0) {
       throw new Error(`ArrayTypeSpec: array item count should be greater than zero`);
     }
 
     super(
-      `[${length}]${itemType.name}`,
-      (itemType.size + itemType.padding) * length,
-      itemType.alignment,
+      `[${length}]${elemType.name}`,
+      (elemType.size + elemType.padding) * length,
+      elemType.alignment,
       0
     );
 
-    this._itemType = itemType;
+    this._elemType = elemType;
     this._length = length;
   }
 
@@ -37,8 +37,8 @@ export class ArrayTypeSpec extends AbstractTypeSpec {
    * Returns array element type.
    * @returns {AbstractTypeSpec}
    */
-  get itemType() {
-    return this._itemType;
+  get elemType() {
+    return this._elemType;
   }
 
   get length() {
@@ -46,21 +46,21 @@ export class ArrayTypeSpec extends AbstractTypeSpec {
   }
 
   get alignment() {
-    return this._itemType.alignment;
+    return this._elemType.alignment;
   }
 
   alignAddress(addr) {
-    return this._itemType.alignAddress(addr);
+    return this._elemType.alignAddress(addr);
   }
 
   read(view, addr) {
-    const address = this._itemType.alignAddress(addr);
+    const address = this._elemType.alignAddress(addr);
     let offset = address;
     const entries = [];
 
     for (let i = 0; i < this._length; i++) {
-      const elemAddr = this._itemType.alignAddress(offset);
-      const { value, endOffset } = this._itemType.read(view, elemAddr);
+      const elemAddr = this._elemType.alignAddress(offset);
+      const { value, endOffset } = this._elemType.read(view, elemAddr);
       entries.push(value);
       offset = endOffset;
     }
@@ -79,12 +79,12 @@ export class ArrayTypeSpec extends AbstractTypeSpec {
       );
     }
 
-    const address = this._itemType.alignAddress(addr);
+    const address = this._elemType.alignAddress(addr);
     let offset = address;
 
     for (let i = 0; i < this._length; i++) {
-      const itemAddr = this._itemType.alignAddress(offset);
-      const { endOffset } = this._itemType.write(view, itemAddr, val[i]);
+      const itemAddr = this._elemType.alignAddress(offset);
+      const { endOffset } = this._elemType.write(view, itemAddr, val[i]);
       offset = endOffset;
     }
 

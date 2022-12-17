@@ -1,10 +1,8 @@
 import './polyfill.js';
 import { promises as fs } from 'fs';
-import { Types, Struct, Array } from './lib/Types/types.mjs';
+import {Types, Struct, hex, SliceHeader, readSlice} from './lib/Types/types.mjs';
 import Go from './custom-go.mjs';
 
-const num2hex = val => typeof val === 'bigint' ? num2hex(Number(val)) : val.toString(16);
-const hex = v => typeof v === 'string' ? parseInt(v, 16) : num2hex(v);
 const go = new Go({debug: true});
 
 const JSValue = Struct('syscall/js.Value', [
@@ -49,19 +47,11 @@ go.exportFunction('main.sum2', (sp, reader) => {
   console.log(go.inspector.dump(sp, 64, 16));
 })
 
-const Int2 = Array(Types.Int, 2);
-go.exportFunction('main.testSumArr2', (sp, reader) => {
+go.exportFunction('main.testReadSlice', (sp, reader) => {
   reader.skipHeader();
-  const [a1, a2] = reader.pop(Int2)
-  const result = [
-    a2 + 1,
-    a1 + a2,
-  ];
-
-  reader
-    .writer()
-    .write(Int2, result);
-
+  const sliceHeader = reader.pop(SliceHeader);
+  const arr = readSlice(reader.dataView, Types.Int, sliceHeader);
+  console.log(arr);
   console.log(go.inspector.dump(sp, 64, 16));
 })
 
