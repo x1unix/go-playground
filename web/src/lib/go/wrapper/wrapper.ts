@@ -1,10 +1,7 @@
 import { StackReader } from "../stack";
 import { MemoryInspector} from "../debug";
-import {
-  GoClass,
-  GoWebAssemblyInstance,
-  PendingEvent
-} from "./interface";
+import { GoClassStub, PendingEvent } from "./interface";
+import { wrapWebAssemblyInstance} from "./instance";
 
 export type CallImportHandler = (sp: number, reader: StackReader) => any;
 
@@ -12,9 +9,13 @@ export interface Options {
   debug?: boolean
 }
 
-export class GoWrapper extends GoClass {
+export class GoWrapper extends GoClassStub {
   private _inspector: MemoryInspector|null = null;
   private _debug = false;
+  private _globalValue: object;
+
+  private encoder = new TextEncoder();
+  private decoder = new TextDecoder("utf-8");
 
   /**
    * Returns WebAssembly memory inspector
@@ -28,23 +29,60 @@ export class GoWrapper extends GoClass {
   }
 
   get stackPointer() {
-    return this._inst.exports.getsp();
+    return this._inst?.exports.getsp();
   }
 
-  constructor(instance: GoWebAssemblyInstance, {debug = false}: Options) {
-    super(instance);
+  constructor(globalValue: object = globalThis, {debug = false}: Options) {
+    super();
     this._debug = debug;
+    this._globalValue = globalValue;
+    this.patchImportObject();
   }
 
-  patchImportObject() {
+  private patchImportObject() {
     this.importObject.go['runtime.resetMemoryDataView'] = (sp) => {
       sp >>>= 0;
-      this.mem = new DataView(this._inst.exports.mem.buffer);
+      this.mem = new DataView(this._inst!.exports.mem.buffer);
       this._inspector = new MemoryInspector(this.mem);
     };
   }
 
-  loadValue(addr) {
+  /**
+   * Replaces 'globalThis' value with desired global object.
+   * @param globalValue
+   * @private
+   */
+  private initReferences(globalValue: object) {
+    // Should be in sync with 'wasm_exec.js';
+    this._values = [
+      NaN,
+      0,
+      null,
+      true,
+      false,
+      globalValue,
+      this,
+    ];
+
+    this._goRefCounts = new Array(this._values.length).fill(Infinity);
+    let items: [any, number][] = [
+      [0, 1],
+      [null, 2],
+      [true, 3],
+      [false, 4],
+      [globalValue, 5],
+      [this, 6],
+    ];
+    this._ids = new Map(items);
+    this._idPool = [];
+    this.exited = false;
+  }
+
+  loadValue(addr: number) {
+    if (!this.mem) {
+      return;
+    }
+
     const f = this.mem.getFloat64(addr, true);
     if (f === 0) {
       return undefined;
@@ -79,23 +117,23 @@ export class GoWrapper extends GoClass {
 
   /**
    * Adds function to import object
-   * @param {string} name symbol name (package.functionName)
-   * @param {CallImportHandler} func handler
+   * @param name symbol name (package.functionName)
+   * @param func handler
    */
-  exportFunction(name, func) {
+  exportFunction(name: string, func: CallImportHandler) {
     this.importObject.go[name] = this._wrapExportHandler(name, func);
   }
 
   /**
    * Register a CallImport handler
-   * @param {string} name method name
-   * @param {CallImportHandler} func
+   * @param name method name
+   * @param func
    * @returns {*}
    * @private
    */
-  _wrapExportHandler(name, func)
+  _wrapExportHandler(name: string, func: CallImportHandler)
   {
-    return (sp) => {
+    return (sp: number) => {
       sp >>>= 0;
       if (this._debug) {
         console.log(`CallImport: ${name} (SP: ${sp.toString(16)})`);
@@ -110,7 +148,14 @@ export class GoWrapper extends GoClass {
    * Start Go program
    */
   async run(instance) {
-    this._inspector = MemoryInspector.fromInstance(instance);
-    return super.run(instance);
+    // Wrap wasm instance to re-initialise import object before run.
+    const wrappedInstance = wrapWebAssemblyInstance(instance, {
+      'run': () => {
+        this.initReferences(this._globalValue);
+      }
+    });
+
+    this._inspector = MemoryInspector.fromInstance(wrappedInstance);
+    return super.run(wrappedInstance);
   }
 }
