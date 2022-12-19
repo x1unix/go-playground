@@ -1,6 +1,9 @@
 import { StackReader } from "../stack";
 import { MemoryInspector} from "../debug";
+import { Bool, GoStringType } from "../types";
 import { GoInstance, ImportObject, PendingEvent } from "./interface";
+import { Ref, RefType } from "../pkg/syscall/js";
+
 import {
   bindPrototype,
   GoWebAssemblyInstance,
@@ -59,12 +62,92 @@ export class GoWrapper {
     this.patchImportObject();
   }
 
+  /**
+   * Stores JS value in values table and returns value ref ID.
+   * @param v
+   * @private
+   */
+  private storeObject(v: any): number {
+    if (!Ref.isReferenceableValue(v)) {
+      return 0;
+    }
+
+    let id = this.go._ids.get(v);
+    if (id === undefined) {
+      id = this.go._idPool.pop();
+      if (id === undefined) {
+        id = this.go._values.length;
+      }
+      this.go._values[id] = v;
+      this.go._goRefCounts[id] = 0;
+      this.go._ids.set(v, id);
+    }
+    this.go._goRefCounts[id]++;
+    return id;
+  }
+
   private patchImportObject() {
-    this.go.importObject.go['runtime.resetMemoryDataView'] = (sp) => {
-      sp >>>= 0;
+    this.exportFunction('runtime.resetMemoryDataView', () => {
       this.go.mem = new DataView(this.exports.mem.buffer);
       this._inspector = new MemoryInspector(this.go.mem);
-    };
+    })
+
+    this.exportFunction('syscall/js.valueCall', (sp, reader) => {
+      this.valueCall(sp, reader);
+    })
+  }
+
+  private valueCall(sp: number, reader: StackReader) {
+    reader.skipHeader();
+    let result: any;
+    let success: boolean;
+
+    try {
+      const obj = reader.nextRef();
+      const methodName = reader.next<string>(GoStringType);
+      const args = reader.nextRefSlice();
+
+      if (this._debug) {
+        console.log(`js.ValueCall: ${obj.constructor.name}.${methodName}`, {
+          obj, methodName, args
+        });
+      }
+
+      const method = Reflect.get(obj, methodName);
+      result = Reflect.apply(method, obj, args);
+      success = true;
+    } catch (err) {
+      result = err;
+      success = false;
+      if (this._debug) {
+        console.error(`js.ValueCall: Error - ${err}`);
+      }
+    }
+
+    const resultRef = Ref.fromValue(result, this.storeObject(result));
+    reader.updateStackPointer(this.go._inst!.exports!.getsp() >>> 0);
+    reader.writer()
+      .write(RefType, resultRef)
+      .write(Bool, success);
+  }
+
+  /**
+   * Loads a JS value from memory
+   * @param addr
+   * @private
+   */
+  private loadValue(addr: number) {
+    const f = this.go.mem.getFloat64(addr, true);
+    if (f === 0) {
+      return;
+    }
+
+    if (!isNaN(f)) {
+      return f;
+    }
+
+    const id = this.go.mem.getUint32(addr, true);
+    return this.go._values[id];
   }
 
   /**
@@ -147,7 +230,13 @@ export class GoWrapper {
         console.log(`CallImport: ${name} (SP: ${sp.toString(16)})`);
       }
 
-      const reader = new StackReader(this.go.mem, sp, {debug: this._debug});
+      const reader = new StackReader(
+        this.go.mem,
+        this.go._values,
+        sp,
+        {debug: this._debug}
+      );
+
       return func(sp, reader);
     }
   }

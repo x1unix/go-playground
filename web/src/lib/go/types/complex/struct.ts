@@ -5,7 +5,7 @@ export interface AttributeDescriptor {
   type: AbstractTypeSpec
 }
 
-export class StructTypeSpec extends AbstractTypeSpec {
+export class StructTypeSpec<T=object> extends AbstractTypeSpec {
   private readonly _attributes: AttributeDescriptor[];
   private readonly _firstAttr: AbstractTypeSpec;
 
@@ -44,7 +44,7 @@ export class StructTypeSpec extends AbstractTypeSpec {
     return this._firstAttr.alignAddress(addr);
   }
 
-  read(view, addr) {
+  read(view, addr, buff: ArrayBufferLike) {
     const address = this._firstAttr.alignAddress(addr);
     let offset = address;
 
@@ -52,19 +52,20 @@ export class StructTypeSpec extends AbstractTypeSpec {
     for (let attr of this._attributes) {
       const {key, type} = attr;
       const fieldAddr = type.alignAddress(offset);
-      const {value, endOffset} = type.read(view, fieldAddr);
+      const {value, endOffset} = type.read(view, fieldAddr, buff);
       entries.push([key, value]);
       offset = endOffset;
     }
 
+    const structObj = Object.fromEntries(entries) as T;
     return {
       address,
       endOffset: offset,
-      value: Object.fromEntries(entries)
+      value: this.valueFromStruct(buff, structObj)
     };
   }
 
-  write(view, addr, val) {
+  write(view, addr, val, buff: ArrayBufferLike) {
     const address = this._firstAttr.alignAddress(addr);
     let offset = address;
     for (let attr of this._attributes) {
@@ -74,7 +75,7 @@ export class StructTypeSpec extends AbstractTypeSpec {
       }
 
       const fieldAddr = type.alignAddress(offset)
-      const { endOffset } = type.write(view, fieldAddr, val[key]);
+      const { endOffset } = type.write(view, fieldAddr, val[key], buff);
       offset = endOffset;
     }
 
@@ -82,6 +83,23 @@ export class StructTypeSpec extends AbstractTypeSpec {
       address,
       endOffset: offset
     };
+  }
+
+  /**
+   * Returns an original value from struct.
+   *
+   * This method can be overloaded to return an original value
+   * pointed by an original struct.
+   *
+   * This is useful for obtaining an original slice or string contents
+   * from `reflect.StringHeader` or `reflect.SliceHeader` structs.
+   *
+   * @param buff Raw memory buffer
+   * @param structVal original struct value
+   * @protected
+   */
+  protected valueFromStruct(buff: ArrayBufferLike, structVal: T): any {
+    return structVal;
   }
 
   encode(view, addr, val) {
@@ -93,3 +111,13 @@ export class StructTypeSpec extends AbstractTypeSpec {
   }
 
 }
+
+/**
+ * Constructs a new struct type
+ * @param name Struct type name
+ * @param fields Array of field definitions
+ * @constructor
+ */
+export const Struct = <T=object>(name: string, fields: AttributeDescriptor[]) => (
+  new StructTypeSpec<T>(name, fields)
+);

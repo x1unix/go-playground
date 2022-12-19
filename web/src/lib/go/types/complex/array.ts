@@ -44,14 +44,14 @@ export class ArrayTypeSpec extends AbstractTypeSpec {
     return this._elemType.alignAddress(addr);
   }
 
-  read(view, addr) {
+  read(view, addr, buff) {
     const address = this._elemType.alignAddress(addr);
     let offset = address;
     const entries: any[] = [];
 
     for (let i = 0; i < this._length; i++) {
       const elemAddr = this._elemType.alignAddress(offset);
-      const { value, endOffset } = this._elemType.read(view, elemAddr);
+      const { value, endOffset } = this._elemType.read(view, elemAddr, buff);
       entries.push(value);
       offset = endOffset;
     }
@@ -63,7 +63,7 @@ export class ArrayTypeSpec extends AbstractTypeSpec {
     };
   }
 
-  write(view, addr, val) {
+  write(view, addr, val, buff) {
     if (val.length !== this._length) {
       throw new Error(
         `${this.constructor.name}.write: array length should be ${this._length} (got: ${val.length})`
@@ -75,7 +75,7 @@ export class ArrayTypeSpec extends AbstractTypeSpec {
 
     for (let i = 0; i < this._length; i++) {
       const itemAddr = this._elemType.alignAddress(offset);
-      const { endOffset } = this._elemType.write(view, itemAddr, val[i]);
+      const { endOffset } = this._elemType.write(view, itemAddr, val[i], buff);
       offset = endOffset;
     }
 

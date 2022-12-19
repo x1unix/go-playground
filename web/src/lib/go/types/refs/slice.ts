@@ -1,13 +1,17 @@
-import { AbstractTypeSpec } from "~/lib/go/types/spec";
-import { StructTypeSpec } from "~/lib/go/types/complex/struct";
-import { ArrayTypeSpec } from "~/lib/go/types/complex/array";
-import { Int, UintPtr } from "~/lib/go/types/basic";
+import { GoStringType } from "./string";
+import { AbstractTypeSpec } from "../spec";
+import { AttributeDescriptor, StructTypeSpec, ArrayTypeSpec } from "../complex";
+import { Bool, Int, Int32, Int64, Uint, Uint32, Uint64, UintPtr } from "../basic";
 
-export const SliceHeaderType = new StructTypeSpec('reflect.SliceHeader', [
+const sliceHeaderAttrs: AttributeDescriptor[] = [
   { key: 'data', type: UintPtr },
   { key: 'len', type: Int },
   { key: 'cap', type: Int }
-]);
+];
+
+export const SliceHeaderType = new StructTypeSpec(
+  'reflect.SliceHeader', sliceHeaderAttrs
+);
 
 /**
  * SliceHeader represents a `reflect.SliceHeader` Go structure.
@@ -30,26 +34,42 @@ export interface SliceHeader {
 }
 
 /**
- * Returns an array from slice header.
- * Returns null if underlying array pointer is zero.
+ * Represents a `[]T` Go slice struct reader.
  *
- * See Go `reflect.SliceHeader` struct.
- *
- * @param view Go memory
- * @param elemType Array element type
- * @param header Slice header
+ * Returns an array of items during decode.
  */
-export const readSlice = <T=any>(view: DataView, elemType: AbstractTypeSpec, header: SliceHeader): T[]|null => {
-  const { data, len } = header;
-  if (!data) {
-    return null;
+class SliceTypeSpec<T=number> extends StructTypeSpec<SliceHeader> {
+  constructor(private elemType: AbstractTypeSpec) {
+    super(`[]${elemType.name}`, sliceHeaderAttrs)
   }
 
-  if (!len) {
-    return [];
-  }
+  protected valueFromStruct(buff: ArrayBufferLike, header: SliceHeader): T[] {
+    let { data, len } = header;
+    if (!data || !len) {
+      return [] as T[];
+    }
 
-  const typeReader = new ArrayTypeSpec(elemType, len);
-  const { value } = typeReader.read(view, data);
-  return value as T[];
+    let t = new ArrayTypeSpec(this.elemType, len);
+    const { value } = t.read(new DataView(buff), data, buff);
+    return value as T[];
+  }
 }
+
+/**
+ * Constructs a new slice type.
+ * @param itemType Slice item type
+ * @constructor
+ */
+export const SliceOf = <T=number>(itemType: AbstractTypeSpec) => (
+  new SliceTypeSpec<T>(itemType)
+);
+
+export const StringSlice = SliceOf<string>(GoStringType);
+export const IntSlice = SliceOf<number>(Int);
+export const Int32Slice = SliceOf<number>(Int32);
+export const Int64Slice = SliceOf<number>(Int64);
+export const UintSlice = SliceOf<number>(Uint);
+export const Uint32Slice = SliceOf<number>(Uint32);
+export const Uint64Slice = SliceOf<number>(Uint64);
+export const UintPtrSlice = SliceOf<number>(UintPtr);
+export const BoolSlice = SliceOf<boolean>(Bool);

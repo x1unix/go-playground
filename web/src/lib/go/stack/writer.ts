@@ -41,7 +41,10 @@ export class StackWriter {
       throw new ReferenceError('StackReader.pop: missing type reader');
     }
 
-    const { address, endOffset } = typeSpec.write(this._mem, this._offset, data);
+    const { address, endOffset } = typeSpec.write(
+      this._mem, this._offset, data, this._mem.buffer
+    );
+
     this._offset = endOffset;
     this._retCount++;
 

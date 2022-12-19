@@ -1,5 +1,7 @@
 import { GoWebAssemblyInstance } from "./instance";
 
+export type JSValuesTable = any[];
+
 export interface PendingEvent {
   this: any
   id: number
@@ -34,7 +36,7 @@ export interface GoInstance {
    * JS values that Go currently has references to, indexed by reference id
    * @protected
    */
-  _values: any[];
+  _values: JSValuesTable;
 
   /**
    * Number of references that Go has to a JS value, indexed by reference id

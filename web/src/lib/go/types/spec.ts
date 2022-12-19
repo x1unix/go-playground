@@ -99,8 +99,8 @@ export abstract class AbstractTypeSpec<T=any> {
    * Please consider `read()` for general-purpose use.
    *
    * @abstract
-   * @param {DataView} view
-   * @param {number} addr
+   * @param view Memory view
+   * @param addr Address
    * @returns {*}
    */
   decode(view: DataView, addr: number): T {
@@ -114,8 +114,8 @@ export abstract class AbstractTypeSpec<T=any> {
    * Please consider `write()` for general-purpose use.
    *
    * @abstract
-   * @param {DataView} view
-   * @param {number} addr
+   * @param view Memory view
+   * @param addr Address
    * @param {*} val
    */
   encode(view: DataView, addr: number, val: T) {
@@ -128,11 +128,12 @@ export abstract class AbstractTypeSpec<T=any> {
    *
    * Passed offset address will be aligned before read.
    *
-   * @param {DataView} view Memory
-   * @param {number} addr Stack pointer
+   * @param view Memory
+   * @param addr Stack pointer
+   * @param buff Original memory buffer
    * @returns {ReadResult}
    */
-  read(view: DataView, addr: number): ReadResult<T> {
+  read(view: DataView, addr: number, buff: ArrayBufferLike): ReadResult<T> {
     let address = this.alignAddress(addr);
     const value = this.decode(view, address);
     return {
@@ -146,12 +147,13 @@ export abstract class AbstractTypeSpec<T=any> {
    * Encodes and writes a value to DataView at specifying address.
    * Passed address will be aligned before write.
    *
-   * @param {DataView} view
-   * @param {number} addr
-   * @param {*} val
+   * @param view
+   * @param addr
+   * @param val
+   * @param buff Original memory buffer
    * @returns {WriteResult}
    */
-  write(view: DataView, addr: number, val: T): WriteResult {
+  write(view: DataView, addr: number, val: T, buff: ArrayBufferLike): WriteResult {
     const address = this.alignAddress(addr);
     this.encode(view, address, val);
     return {
