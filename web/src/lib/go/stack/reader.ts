@@ -52,6 +52,10 @@ export class StackReader {
    * @param newSp New stack pointer
    */
   updateStackPointer(newSp: number) {
+    if (newSp === this._initialOffset) {
+      return;
+    }
+
     const delta = this._offset - this._initialOffset;
     const newOffset = newSp + delta;
 
