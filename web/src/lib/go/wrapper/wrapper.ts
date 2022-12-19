@@ -1,7 +1,11 @@
 import { StackReader } from "../stack";
 import { MemoryInspector} from "../debug";
-import { GoClassStub, PendingEvent } from "./interface";
-import { wrapWebAssemblyInstance} from "./instance";
+import { GoInstance, ImportObject, PendingEvent } from "./interface";
+import {
+  bindPrototype,
+  GoWebAssemblyInstance,
+  wrapWebAssemblyInstance
+} from "./instance";
 
 export type CallImportHandler = (sp: number, reader: StackReader) => any;
 
@@ -9,13 +13,11 @@ export interface Options {
   debug?: boolean
 }
 
-export class GoWrapper extends GoClassStub {
+export class GoWrapper {
   private _inspector: MemoryInspector|null = null;
   private _debug = false;
   private _globalValue: object;
-
-  private encoder = new TextEncoder();
-  private decoder = new TextDecoder("utf-8");
+  private go: GoInstance;
 
   /**
    * Returns WebAssembly memory inspector
@@ -24,26 +26,44 @@ export class GoWrapper extends GoClassStub {
     return this._inspector;
   }
 
+  get _pendingEvent() {
+    return this.go._pendingEvent;
+  }
+
+  set _pendingEvent(value) {
+    this.go._pendingEvent = value;
+  }
+
   get memory() {
-    return this.mem;
+    return this.go.mem;
+  }
+
+  get importObject(): ImportObject {
+    return this.go.importObject;
+  }
+
+  private get exports() {
+    return this.go._inst!.exports;
   }
 
   get stackPointer() {
-    return this._inst?.exports.getsp();
+    return this.exports.getsp();
   }
 
-  constructor(globalValue: object = globalThis, {debug = false}: Options) {
-    super();
+  constructor(parent: GoInstance, globalValue: object, {debug = false}: Options = {}) {
+    this.go = parent;
     this._debug = debug;
-    this._globalValue = globalValue;
+    this._globalValue = bindPrototype({
+      Go: GoWrapper
+    }, globalValue);
     this.patchImportObject();
   }
 
   private patchImportObject() {
-    this.importObject.go['runtime.resetMemoryDataView'] = (sp) => {
+    this.go.importObject.go['runtime.resetMemoryDataView'] = (sp) => {
       sp >>>= 0;
-      this.mem = new DataView(this._inst!.exports.mem.buffer);
-      this._inspector = new MemoryInspector(this.mem);
+      this.go.mem = new DataView(this.exports.mem.buffer);
+      this._inspector = new MemoryInspector(this.go.mem);
     };
   }
 
@@ -54,7 +74,7 @@ export class GoWrapper extends GoClassStub {
    */
   private initReferences(globalValue: object) {
     // Should be in sync with 'wasm_exec.js';
-    this._values = [
+    this.go._values = [
       NaN,
       0,
       null,
@@ -64,7 +84,7 @@ export class GoWrapper extends GoClassStub {
       this,
     ];
 
-    this._goRefCounts = new Array(this._values.length).fill(Infinity);
+    this.go._goRefCounts = new Array(this.go._values.length).fill(Infinity);
     let items: [any, number][] = [
       [0, 1],
       [null, 2],
@@ -73,26 +93,14 @@ export class GoWrapper extends GoClassStub {
       [globalValue, 5],
       [this, 6],
     ];
-    this._ids = new Map(items);
-    this._idPool = [];
-    this.exited = false;
+    this.go._ids = new Map(items);
+    this.go._idPool = [];
+    this.go.exited = false;
   }
 
-  loadValue(addr: number) {
-    if (!this.mem) {
-      return;
-    }
-
-    const f = this.mem.getFloat64(addr, true);
-    if (f === 0) {
-      return undefined;
-    }
-    if (!isNaN(f)) {
-      return f;
-    }
-
-    const id = this.mem.getUint32(addr, true);
-    return this._values[id];
+  setGlobalObject(newGlobalThis: object) {
+    this._globalValue = newGlobalThis;
+    this.patchImportObject();
   }
 
   /**
@@ -110,8 +118,8 @@ export class GoWrapper extends GoClassStub {
       args
     };
 
-    this._pendingEvent = event;
-    this._resume();
+    this.go._pendingEvent = event;
+    this.go._resume();
     return event.result;
   }
 
@@ -121,7 +129,7 @@ export class GoWrapper extends GoClassStub {
    * @param func handler
    */
   exportFunction(name: string, func: CallImportHandler) {
-    this.importObject.go[name] = this._wrapExportHandler(name, func);
+    this.go.importObject.go[name] = this._wrapExportHandler(name, func);
   }
 
   /**
@@ -131,7 +139,7 @@ export class GoWrapper extends GoClassStub {
    * @returns {*}
    * @private
    */
-  _wrapExportHandler(name: string, func: CallImportHandler)
+  private _wrapExportHandler(name: string, func: CallImportHandler)
   {
     return (sp: number) => {
       sp >>>= 0;
@@ -139,15 +147,24 @@ export class GoWrapper extends GoClassStub {
         console.log(`CallImport: ${name} (SP: ${sp.toString(16)})`);
       }
 
-      const reader = new StackReader(this.mem, sp, {debug: this._debug});
+      const reader = new StackReader(this.go.mem, sp, {debug: this._debug});
       return func(sp, reader);
+    }
+  }
+
+  _makeFuncWrapper(id: number) {
+    return (...args): any => {
+     const event: any = { id, this: this.go, args }
+     this.go._pendingEvent = event;
+     this.go._resume();
+     return event.result;
     }
   }
 
   /**
    * Start Go program
    */
-  async run(instance) {
+  async run(instance: GoWebAssemblyInstance) {
     // Wrap wasm instance to re-initialise import object before run.
     const wrappedInstance = wrapWebAssemblyInstance(instance, {
       'run': () => {
@@ -156,6 +173,14 @@ export class GoWrapper extends GoClassStub {
     });
 
     this._inspector = MemoryInspector.fromInstance(wrappedInstance);
-    return super.run(wrappedInstance);
+    return this.go.run(wrappedInstance);
+  }
+
+  exit(code: number) {
+    return this.go.exit(code);
+  }
+
+  _resume() {
+    return this.go._resume();
   }
 }

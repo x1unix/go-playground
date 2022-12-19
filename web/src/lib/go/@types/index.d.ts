@@ -1,20 +1,8 @@
-import { GoWebAssemblyInstance } from "./instance";
+import { ImportObject, PendingEvent} from "../wrapper/interface";
+import { GoWebAssemblyInstance } from "../wrapper/instance";
+export {};
 
-export interface PendingEvent {
-  this: any
-  id: number
-  args?: any[]
-  result?: any
-}
-
-type ImportFunction = (sp: number) => any;
-type FuncWrapper = () => PendingEvent['result'];
-
-export interface ImportObject {
-  go: {[k: string]: ImportFunction}
-}
-
-export interface GoInstance {
+declare class Go {
   mem: DataView;
   argv: string[];
   env: {[k: string]: string};
@@ -58,4 +46,13 @@ export interface GoInstance {
   run(instance: GoWebAssemblyInstance): Promise<void>;
   exit(code: number);
   _resume();
+}
+
+declare global {
+  interface Window {
+    /**
+     * Go class provided by `wasm_exec.js` file.
+     */
+    Go: typeof Go
+  }
 }

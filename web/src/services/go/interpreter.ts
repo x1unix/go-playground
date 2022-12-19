@@ -1,27 +1,11 @@
-import {EvalEventKind, instantiateStreaming} from "@services/api";
-import {bootstrapGoWithInstance} from "@services/go/index";
-
-const logger = {
-  log: (eventType: EvalEventKind, message: string) => {
-    if (eventType === EvalEventKind.Stdout) {
-      console.log(message);
-      return;
-    }
-    console.error(message);
-  }
-}
-
-const go = bootstrapGoWithInstance(logger);
-go['argv'] = ['js', 'onFooInit'];
-
-window['onFooInit'] = obj => {
-  console.log(obj);
-  obj.exit();
-}
-
+import { instantiateStreaming } from "@services/api";
+// import { createGoGlobals } from "@services/go/index";
+import {GoWebAssemblyInstance, GoWrapper} from '~/lib/go';
 
 export async function foo() {
-  const {instance, module} = await instantiateStreaming(fetch('/go.wasm'), go.importObject);
-  console.log('Got instance', instance);
-  go.run(instance).catch(console.error);
+  const go = new GoWrapper(new window.Go(), window, {debug: true});
+  const {instance} = await instantiateStreaming(fetch('/go.wasm'), go.importObject);
+  go.run(instance as GoWebAssemblyInstance)
+    .then(() => console.log('execution finished'))
+    .catch(console.error);
 }

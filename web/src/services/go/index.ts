@@ -64,3 +64,22 @@ export const bootstrapGoWithInstance = (logger:ConsoleLogger) => {
 
   return new Go(globalWrapper);
 }
+
+export const createGoGlobals = (logger: ConsoleLogger) => {
+  // Wrap Go's calls to os.Stdout and os.Stderr
+  const wrapper = new StdioWrapper(logger);
+
+  // global overlay
+  const mocks = {
+    fs: new FileSystemWrapper(wrapper.stdoutPipe, wrapper.stderrPipe),
+    process: ProcessStub,
+  };
+
+  // Wrap global object to make it accessible to Go's wasm bridge
+  const globalWrapper = new Proxy<Global>(window as any, {
+    has: (obj, prop) => prop in obj || prop in mocks,
+    get: (obj, prop) => prop in obj ? obj[prop] : mocks[prop]
+  });
+
+  return globalWrapper;
+};

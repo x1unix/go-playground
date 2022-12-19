@@ -69,6 +69,26 @@ export default class CustomGo extends global.Go {
   }
 
   /**
+   * Call exported Go function by event ID.
+   *
+   * See `syscall/js.funcs` map.
+   *
+   * @param id Event ID
+   * @param args Arguments
+   */
+  callEventById(id, ...args) {
+    const event = {
+      id,
+      this: this,
+      args
+    };
+
+    this._pendingEvent = event;
+    this._resume();
+    return event.result;
+  }
+
+  /**
    * Adds function to import object
    * @param {string} name symbol name (package.functionName)
    * @param {CallImportHandler} func handler

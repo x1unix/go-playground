@@ -4,7 +4,7 @@ GOROOT ?= $(shell go env GOROOT)
 TOOLS ?= ./tools
 PUBLIC_DIR ?= $(UI)/public
 WEBWORKER_PKG ?= ./cmd/webworker
-INTERPRETER_PKG ?= ./cmd/interpreter
+INTERPRETER_PKG ?= ./cmd/go-repl
 
 .PHONY: clean
 clean:
@@ -54,14 +54,13 @@ build-webworker:
 	@echo ":: Building Go Webworker module..." && \
 	GOOS=js GOARCH=wasm $(GO) build -o $(PUBLIC_DIR)/worker.wasm $(WEBWORKER_PKG)
 
-.PHONY:build-interpreter
-build-interpreter:
+.PHONY:go-repl
+go-repl:
 	@echo ":: Building Go interpreter module..." && \
-	GOOS=js GOARCH=wasm $(GO) build -o tools/tests/go.wasm $(INTERPRETER_PKG)
-	#GOOS=js GOARCH=wasm $(GO) build -o $(PUBLIC_DIR)/go.wasm $(INTERPRETER_PKG)
+	GOOS=js GOARCH=wasm $(GO) build -o $(PUBLIC_DIR)/go.wasm $(INTERPRETER_PKG)
 
 .PHONY:build-wasm
-build-wasm: copy-wasm-exec build-webworker build-interpreter
+build-wasm: copy-wasm-exec build-webworker go-repl
 
 .PHONY: build
 build: check-go check-yarn clean preinstall collect-meta build-server build-wasm build-ui

@@ -12,6 +12,10 @@ export interface GoWebAssemblyInstance extends WebAssembly.Instance {
 
 type WebAssemblyInstanceExport = {[k in keyof GoWebAssemblyInstance['exports']]?: (...args) => void};
 
+export const bindPrototype = (obj: object, proto: object) => {
+  return Object.setPrototypeOf(obj, proto);
+};
+
 /**
  * Wrap Go's WebAssembly instance with hooks to intercept module export function calls.
  *
@@ -19,23 +23,27 @@ type WebAssemblyInstanceExport = {[k in keyof GoWebAssemblyInstance['exports']]?
  * @param hooks Key-value pair of export name and hook function
  */
 export const wrapWebAssemblyInstance = (instance: GoWebAssemblyInstance, hooks: WebAssemblyInstanceExport = {}): GoWebAssemblyInstance => {
-  // Wrap necessary export methods with hooks
   const wrappedExports = Object.fromEntries(
     Object.entries(instance.exports)
       .filter(([key, val]) => typeof val === 'function' && key in hooks)
       .map(([key, val]) => [
         key,
         (...args) => {
-          hooks[key](args);
+          hooks[key](args)
           return (val as Function).apply(instance.exports, args)
         }
       ])
   );
 
-  return {
-    exports: {
+  const WrappedWebAssemblyInstance = class implements GoWebAssemblyInstance {
+    exports = {
       ...instance.exports,
       ...wrappedExports
     }
   };
+
+  Object.setPrototypeOf(WrappedWebAssemblyInstance, instance);
+  let inst = new WrappedWebAssemblyInstance();
+  inst = Object.setPrototypeOf(inst, instance);
+  return inst;
 }

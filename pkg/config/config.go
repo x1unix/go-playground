@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"fmt"
+	"github.com/x1unix/go-playground/pkg/goproxy"
 	"os"
 	"path/filepath"
 	"time"
@@ -39,12 +40,16 @@ type PlaygroundConfig struct {
 
 	// ConnectTimeout is HTTP request timeout for playground requests
 	ConnectTimeout time.Duration `envconfig:"APP_PLAYGROUND_TIMEOUT" json:"connectTimeout"`
+
+	// ModuleProxyURL is Go modules proxy URL that will be used for fetching third-pary packages.
+	ModuleProxyURL string `envconfig:"APP_GOPROXY" json:"goModuleProxyUrl"`
 }
 
 func (cfg *PlaygroundConfig) mountFlagSet(f *flag.FlagSet) {
 	f.StringVar(&cfg.PlaygroundURL, "playground-url", goplay.DefaultPlaygroundURL, "Go Playground URL")
 	f.StringVar(&cfg.GoTipPlaygroundURL, "gotip-url", goplay.DefaultGoTipPlaygroundURL, "GoTip Playground URL")
 	f.DurationVar(&cfg.ConnectTimeout, "timeout", 15*time.Second, "Go Playground server connect timeout")
+	f.StringVar(&cfg.ModuleProxyURL, "goproxy-url", goproxy.DefaultProxyURL, "Go modules proxy URL")
 }
 
 type BuildConfig struct {
