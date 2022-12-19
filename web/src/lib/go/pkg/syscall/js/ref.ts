@@ -1,7 +1,6 @@
-import {SliceOf, Uint32} from "../../../types";
-import { DataViewableTypeSpec } from "../../../types/basic/dataview";
+import { SliceOf, Uint32 } from "../../../types";
 import { JSValuesTable } from "../../../wrapper/interface";
-import {AbstractTypeSpec} from "~/lib/go/types/spec";
+import { AbstractTypeSpec } from "~/lib/go/types/spec";
 
 export const NAN_HEAD = 0x7FF80000;
 
@@ -30,10 +29,6 @@ const getTypeFlag = (v: any): TypeFlag => {
     default:
       return TypeFlag.Empty;
   }
-}
-
-enum ValType {
-
 }
 
 /**
@@ -147,7 +142,7 @@ class RefTypeSpec extends AbstractTypeSpec<Ref> {
       return new Ref(RefKind.Value, value);
     }
 
-    const id = view.getUint32(value, true);
+    const id = view.getUint32(addr, true);
     return new Ref(RefKind.ID, id);
   }
 

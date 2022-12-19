@@ -1,9 +1,8 @@
 import { hex, DebugOptions } from '../common';
-import {AbstractTypeSpec} from "../types/spec";
-import {JSValuesTable} from "../wrapper/interface";
+import { AbstractTypeSpec } from "../types/spec";
+import { JSValuesTable } from "../wrapper/interface";
 import { StackWriter } from "./writer";
-import {Value, ValueType, Ref, RefType, RefSlice} from "../pkg/syscall/js";
-import {SliceHeader, SliceHeaderType, SliceOf} from "~/lib/go/types";
+import { Ref, RefType, RefSlice } from "../pkg/syscall/js";
 
 const STACK_SKIP_COUNT = 8;
 
@@ -146,17 +145,6 @@ export class StackReader {
     const refsSlice = this.next<Ref[]>(RefSlice);
     return refsSlice.map(ref => ref.toValue(this._values)) as T[];
   }
-
-  // popJSValue<T=any>(): T|undefined {
-  //   const { ref } = this.next<Value>(ValueType);
-  //   if (isNaN(ref)) {
-  //     throw new Error(
-  //       `${this.constructor.name}.popValueRef: js.Value.ref value is NaN`
-  //     );
-  //   }
-  //
-  //   return this._values[ref] as T|undefined;
-  // }
 
   /**
    * Finish write and return stack frame writer.
