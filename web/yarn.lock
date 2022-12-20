@@ -3768,6 +3768,11 @@ detective@^5.2.0:
     defined "^1.0.0"
     minimist "^1.1.1"
 
+dexie@^3.2.2:
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/dexie/-/dexie-3.2.2.tgz#fa6f2a3c0d6ed0766f8d97a03720056f88fe0e01"
+  integrity sha512-q5dC3HPmir2DERlX+toCBbHQXW5MsyrFqPFcovkH9N2S/UW/H3H5AWAB6iEOExeraAu+j+zRDG+zg/D7YhH0qg==
+
 didyoumean@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/didyoumean/-/didyoumean-1.2.2.tgz#989346ffe9e839b4555ecf5666edea0d3e8ad037"
