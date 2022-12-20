@@ -36,7 +36,7 @@ export class StackWriter {
   /**
    * Push a value
    */
-  write(typeSpec: AbstractTypeSpec, data): StackWriter {
+  write<T=any>(typeSpec: AbstractTypeSpec, data: T): StackWriter {
     if (!typeSpec) {
       throw new ReferenceError('StackReader.pop: missing type reader');
     }

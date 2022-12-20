@@ -4,6 +4,7 @@ import { DataViewableTypeSpec } from "~/lib/go/types/basic/dataview";
 
 // Common type aliases
 export const Bool = new BooleanTypeSpec();
+// FIXME: fix Int and UInt spec definitions
 export const Int = new UInt64TypeSpec('int');
 export const Uint = new UInt64TypeSpec('uint');
 export const UintPtr = new UInt64TypeSpec('uintptr');
@@ -33,6 +34,7 @@ export const Int32 = new DataViewableTypeSpec('int32', 4, 4, 0, {
   write: DataView.prototype.setInt32
 });
 
+// FIXME: replace BigInt decoding with manual
 export const Uint64 = new DataViewableTypeSpec('uint64', 8, 8, 0, {
   read: DataView.prototype.getBigUint64,
   write: DataView.prototype.setBigUint64

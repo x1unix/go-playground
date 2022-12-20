@@ -2,7 +2,7 @@ import { StackReader } from "../stack";
 import { MemoryInspector} from "../debug";
 import { Bool, GoStringType } from "../types";
 import { GoInstance, ImportObject, PendingEvent } from "./interface";
-import { Ref, RefType } from "../pkg/syscall/js";
+import {Func, Ref, RefType} from "../pkg/syscall/js";
 
 import {
   GoWebAssemblyInstance,
@@ -228,7 +228,7 @@ export class GoWrapper {
    * @param id Event ID
    * @param args Arguments
    */
-  callEventById(id, ...args) {
+  callEventById(id, args: any[]) {
     const event: PendingEvent = {
       id,
       this: this,
@@ -238,6 +238,15 @@ export class GoWrapper {
     this.go._pendingEvent = event;
     this.go._resume();
     return event.result;
+  }
+
+  /**
+   * Call exported `js.Func` callback
+   * @param fn
+   * @param args
+   */
+  callFunc(fn: Func, args: any[]) {
+    return this.callEventById(fn.value.ref, args);
   }
 
   /**
@@ -277,6 +286,11 @@ export class GoWrapper {
 
   _makeFuncWrapper(id: number) {
     return (...args): any => {
+
+      if (this._debug) {
+       console.log('Go._makeFuncWrapper:', { id, args });
+     }
+
      const event: any = { id, this: this.go, args }
      this.go._pendingEvent = event;
      this.go._resume();
