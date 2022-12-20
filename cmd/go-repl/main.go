@@ -11,12 +11,29 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/x1unix/go-playground/internal/gorepl/storage"
 	"github.com/x1unix/go-playground/pkg/goproxy"
 	"io"
 	"net/http"
+	"time"
 )
 
 func main() {
+	now := time.Now().UnixMilli()
+	w := storage.JSStorageWriter{}
+	w.Create(storage.FileEntry{
+		PathName: "/foo/bar.go",
+		FileInfo: storage.FileInfo{
+			Name:    "bar.go",
+			Size:    102400,
+			IsDir:   false,
+			Mode:    0644,
+			ModTime: now,
+		},
+	})
+}
+
+func main2() {
 	if err := testModDownload(); err != nil {
 		fmt.Println("ERR:", err)
 	}
@@ -44,7 +61,10 @@ func testModDownload() error {
 		return fmt.Errorf("zip.NewReader: %w", err)
 	}
 	for _, file := range zf.File {
-		fmt.Println("* ", file.Name)
+		fi := file.FileInfo()
+		fi.Mode()
+		//fi.ModTime().Unix()
+		fmt.Println("* ", file.Name, fi.Name(), fi.Size())
 	}
 
 	return nil
