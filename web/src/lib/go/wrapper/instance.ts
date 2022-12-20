@@ -12,10 +12,6 @@ export interface GoWebAssemblyInstance extends WebAssembly.Instance {
 
 type WebAssemblyInstanceExport = {[k in keyof GoWebAssemblyInstance['exports']]?: (...args) => void};
 
-export const bindPrototype = (obj: object, proto: object) => {
-  return Object.setPrototypeOf(obj, proto);
-};
-
 /**
  * Wrap Go's WebAssembly instance with hooks to intercept module export function calls.
  *
