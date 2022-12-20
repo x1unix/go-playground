@@ -52,7 +52,10 @@ export enum RefKind {
 }
 
 /**
- * Ref represents `syscall/js.ref` type wrapper.
+ * Ref is wrapper type around `syscall/js.ref` value.
+ *
+ * `js.ref` is a pointer to JavaScript value registered
+ * in Go values mapping table (`Go._values`).
  */
 export class Ref {
   /**

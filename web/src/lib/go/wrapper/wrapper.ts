@@ -5,15 +5,52 @@ import { GoInstance, ImportObject, PendingEvent } from "./interface";
 import { Ref, RefType } from "../pkg/syscall/js";
 
 import {
-  bindPrototype,
   GoWebAssemblyInstance,
   wrapWebAssemblyInstance
 } from "./instance";
+
+/**
+ * Wraps global namespace with specified overlay and replaces Go class instance
+ * with a correct one.
+ *
+ * @param overlay Overlay object
+ * @param globalValue global namespace
+ */
+export const wrapGlobal = (overlay: object = {}, globalValue: object = window || globalThis) => {
+  const mockObject = {
+    ...overlay,
+    Go: GoWrapper,
+  };
+
+  for (let key in globalValue) {
+    if (key === 'Go') {
+      continue;
+    }
+
+    const prop = globalValue[key];
+    if (typeof prop !== 'function') {
+      mockObject[key] = prop;
+      continue;
+    }
+
+    mockObject[key] = (...args) => (
+      Reflect.apply(
+        Reflect.get(globalValue, key),
+        globalValue,
+        args
+      )
+    );
+  }
+
+  Object.setPrototypeOf(mockObject, globalValue);
+  return mockObject;
+}
 
 export type CallImportHandler = (sp: number, reader: StackReader) => any;
 
 export interface Options {
   debug?: boolean
+  globalValue?: any
 }
 
 export class GoWrapper {
@@ -49,16 +86,13 @@ export class GoWrapper {
     return this.go._inst!.exports;
   }
 
-  get stackPointer() {
-    return this.exports.getsp();
-  }
-
-  constructor(parent: GoInstance, globalValue: object, {debug = false}: Options = {}) {
+  constructor(parent: GoInstance, {debug = false, globalValue}: Options = {}) {
     this.go = parent;
     this._debug = debug;
-    this._globalValue = bindPrototype({
-      Go: GoWrapper
-    }, globalValue);
+    this._globalValue = globalValue?.Go === GoWrapper ? globalValue : (
+      wrapGlobal()
+    );
+
     this.patchImportObject();
   }
 
