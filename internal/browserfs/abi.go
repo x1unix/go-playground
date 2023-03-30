@@ -20,7 +20,9 @@ type sizedFileName struct {
 
 func newSizedFileName(str string) sizedFileName {
 	var data [maxFileNameLen]byte
-	count := copy(data[:], str[:maxFileNameLen])
+	count := copy(data[:], str[:mathx.Min(
+		maxFileNameLen, len(str),
+	)])
 	return sizedFileName{
 		len:  uint8(count),
 		data: data,

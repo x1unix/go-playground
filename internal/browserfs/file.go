@@ -21,13 +21,13 @@ func newFile(name string, attrs inode) *file {
 }
 
 func (f *file) Stat() (fs.FileInfo, error) {
-	fmt.Printf("file.Stat: STUB - %q\n", f.name)
+	fmt.Printf("file.Stat: STUB - %q (%s)\n", f.name, f.attrs.name.string())
 	return newFileInfo(f.attrs), nil
 }
 
 func (f *file) Read(dst []byte) (int, error) {
 	//TODO implement me
-	fmt.Printf("file.Read: STUB - %q\n", f.name)
+	fmt.Printf("file.Read: STUB - %q (%s)\n", f.name, f.attrs.name.string())
 	return 0, errors.New("File.Read: STUB")
 }
 

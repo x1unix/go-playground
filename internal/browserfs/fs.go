@@ -12,8 +12,8 @@ var _ fs.ReadDirFS = (*FS)(nil)
 type FS struct{}
 
 func (s FS) ReadDir(name string) ([]fs.DirEntry, error) {
-	//TODO implement me
-	panic("implement me")
+	fmt.Printf("fs.ReadDir - %q\n", name)
+	return nil, nil
 }
 
 func (s FS) Open(name string) (fs.File, error) {
@@ -33,5 +33,6 @@ func (s FS) Open(name string) (fs.File, error) {
 		id:       1,
 		parentId: 0,
 		fileType: fileTypeDirectory,
+		name:     newSizedFileName(filepath.Base(name)),
 	}), nil
 }
