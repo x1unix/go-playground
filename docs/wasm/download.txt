@@ -1,0 +1,90 @@
+{
+  "Version": "v0.5.1",
+  "Time": "2022-05-10T13:46:14Z"
+}
+wasm_exec.js:22 Uncompressed: 33468 bytes
+wasm_exec.js:22 Header: 504b0304
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/.gitlab-ci.yml
+BaseName: .gitlab-ci.yml
+Size: 1192
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/LICENSE
+BaseName: LICENSE
+Size: 1054
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/README.md
+BaseName: README.md
+Size: 11873
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/db.go
+BaseName: db.go
+Size: 2872
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/doc_test.go
+BaseName: doc_test.go
+Size: 3416
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/driver.go
+BaseName: driver.go
+Size: 2937
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/go.mod
+BaseName: go.mod
+Size: 604
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/go.sum
+BaseName: go.sum
+Size: 3011
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/mssql.go
+BaseName: mssql.go
+Size: 367
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/mssql_test.go
+BaseName: mssql_test.go
+Size: 2762
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/mysql.go
+BaseName: mysql.go
+Size: 1236
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/mysql_test.go
+BaseName: mysql_test.go
+Size: 2558
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/postgresql.go
+BaseName: postgresql.go
+Size: 435
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/postgresql_test.go
+BaseName: postgresql_test.go
+Size: 3486
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/slice_test.go
+BaseName: slice_test.go
+Size: 3184
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/sqlite.go
+BaseName: sqlite.go
+Size: 319
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/sqlite_test.go
+BaseName: sqlite_test.go
+Size: 1862
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/squalus.go
+BaseName: squalus.go
+Size: 6470
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/squalus_test.go
+BaseName: squalus_test.go
+Size: 13733
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/struct.go
+BaseName: struct.go
+Size: 2467
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/struct_convert_test.go
+BaseName: struct_convert_test.go
+Size: 4290
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/struct_test.go
+BaseName: struct_test.go
+Size: 5396
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/test/docker-compose.yml
+BaseName: docker-compose.yml
+Size: 583
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/test/gitlab-ci/Dockerfile
+BaseName: Dockerfile
+Size: 780
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/test/gitlab-ci/revive.toml
+BaseName: revive.toml
+Size: 987
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/test/test.sh
+BaseName: test.sh
+Size: 1138
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/tx.go
+BaseName: tx.go
+Size: 1675
+wasm_exec.js:22 * Name: gitlab.com/qosenergy/squalus@v0.5.1/tx_test.go
+BaseName: tx_test.go
+Size: 2716
