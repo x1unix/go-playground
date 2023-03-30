@@ -30,10 +30,8 @@ func (s FS) Open(name string) (fs.File, error) {
 	//fs.FileInfoToDirEntry()
 
 	return newFile(name, inode{
-		id:        1,
-		parentId:  0,
-		fileType:  fileTypeDirectory,
-		size:      0,
-		createdAt: 0,
+		id:       1,
+		parentId: 0,
+		fileType: fileTypeDirectory,
 	}), nil
 }
