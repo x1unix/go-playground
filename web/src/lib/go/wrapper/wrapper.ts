@@ -50,12 +50,14 @@ export type CallImportHandler = (sp: number, reader: StackReader) => any;
 
 export interface Options {
   debug?: boolean
+  debugSkipCalls?: string[]
   globalValue?: any
 }
 
 export class GoWrapper {
   private _inspector: MemoryInspector|null = null;
   private _debug = false;
+  private _debugSkipCalls: Set<string>;
   private _globalValue: object;
   private go: GoInstance;
 
@@ -86,9 +88,10 @@ export class GoWrapper {
     return this.go._inst!.exports;
   }
 
-  constructor(parent: GoInstance, {debug = false, globalValue}: Options = {}) {
+  constructor(parent: GoInstance, {debug = false, debugSkipCalls, globalValue}: Options = {}) {
     this.go = parent;
     this._debug = debug;
+    this._debugSkipCalls = new Set(debugSkipCalls ?? []);
     this._globalValue = globalValue?.Go === GoWrapper ? globalValue : (
       wrapGlobal()
     );
@@ -142,7 +145,8 @@ export class GoWrapper {
       const args = reader.nextRefSlice();
 
       if (this._debug) {
-        console.log(`js.ValueCall: ${obj.constructor.name}.${methodName}`, {
+        const funcName = `${obj.constructor.name}.${methodName}`;
+        console.log(`js.ValueCall: ${funcName}`, {
           obj, methodName, args
         });
       }
@@ -269,7 +273,8 @@ export class GoWrapper {
   {
     return (sp: number) => {
       sp >>>= 0;
-      if (this._debug) {
+      const isDebug = this._debug && !this._debugSkipCalls.has(name);
+      if (isDebug) {
         console.log(`CallImport: ${name} (SP: ${sp.toString(16)})`);
       }
 
@@ -277,7 +282,7 @@ export class GoWrapper {
         this.go.mem,
         this.go._values,
         sp,
-        {debug: this._debug}
+        {debug: isDebug}
       );
 
       return func(sp, reader);

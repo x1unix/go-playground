@@ -10,6 +10,12 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const PROXY_HOST = process.env.LISTEN_ADDR || '127.0.0.1:8000';
 
 module.exports = function(app) {
+  app.use((req, res, next) => {
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+    next();
+  });
+
   app.use(
     '/api',
     createProxyMiddleware({

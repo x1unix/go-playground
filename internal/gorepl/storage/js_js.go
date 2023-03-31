@@ -3,20 +3,17 @@
 package storage
 
 import (
-	"fmt"
 	"syscall/js"
 )
 
-func fileCreate(entry FileEntry) fileTx
-func fileWrite(txId uint32, data []byte) int
-func fileCommit(txId uint32, awaitFunc js.Func)
-
-// func fileRollback(txId uint32, awaitFunc js.Func)
-
-type fileTx struct {
-	id         uint32
-	bufferSize int32
+type PackageInfo struct {
+	Name    string
+	Path    string
+	Version string
 }
+
+func packageCreate(pkgInfo PackageInfo, cb js.Func)
+func fileCreate(pkgInfo PackageInfo, name string, data []byte, cb js.Func)
 
 type FileInfo struct {
 	Name    string
@@ -31,17 +28,17 @@ type FileEntry struct {
 	FileInfo FileInfo
 }
 
-type JSStorageWriter struct{}
-
-func (w JSStorageWriter) Create(fi FileEntry) {
-	tx := fileCreate(fi)
-	fmt.Println("Ref:", tx.id, "BuffSize:", tx.bufferSize)
-
-	awaitFn, ch := createAwait()
-	go fileCommit(32, awaitFn)
-	rsp := <-ch
-	fmt.Println("FileCommit Rsp:", rsp)
-}
+//type JSStorageWriter struct{}
+//
+//func (w JSStorageWriter) Create(fi FileEntry) {
+//	tx := fileCreate(fi)
+//	fmt.Println("Ref:", tx.id, "BuffSize:", tx.bufferSize)
+//
+//	awaitFn, ch := createAwait()
+//	go fileCommit(32, awaitFn)
+//	rsp := <-ch
+//	fmt.Println("FileCommit Rsp:", rsp)
+//}
 
 type evalResult struct {
 	value int

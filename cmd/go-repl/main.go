@@ -10,27 +10,29 @@ import (
 	"archive/zip"
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
-	"github.com/x1unix/go-playground/internal/gorepl/storage"
+	"github.com/x1unix/go-playground/internal/gorepl/tests"
 	"github.com/x1unix/go-playground/pkg/goproxy"
 	"io"
 	"net/http"
-	"time"
 )
 
 func main() {
-	now := time.Now().UnixMilli()
-	w := storage.JSStorageWriter{}
-	w.Create(storage.FileEntry{
-		PathName: "/foo/bar.go",
-		FileInfo: storage.FileInfo{
-			Name:    "bar.go",
-			Size:    102400,
-			IsDir:   false,
-			Mode:    0644,
-			ModTime: now,
-		},
-	})
+	//tests.RunInterp()
+	tests.RunTestAsync()
+	//now := time.Now().UnixMilli()
+	//w := storage.JSStorageWriter{}
+	//w.Create(storage.FileEntry{
+	//	PathName: "/foo/bar.go",
+	//	fileInfo: storage.fileInfo{
+	//		Name:    "bar.go",
+	//		Size:    102400,
+	//		IsDir:   false,
+	//		Mode:    0644,
+	//		ModTime: now,
+	//	},
+	//})
 }
 
 func main2() {
@@ -45,6 +47,9 @@ func testModDownload() error {
 	if err != nil {
 		return fmt.Errorf("GetLatestVersion: %w", err)
 	}
+
+	data, _ := json.MarshalIndent(v, "", "  ")
+	fmt.Println(string(data))
 
 	src, err := client.GetModuleSource(context.Background(), "gitlab.com/qosenergy/squalus", v.Version)
 	if err != nil {
@@ -64,7 +69,7 @@ func testModDownload() error {
 		fi := file.FileInfo()
 		fi.Mode()
 		//fi.ModTime().Unix()
-		fmt.Println("* ", file.Name, fi.Name(), fi.Size())
+		fmt.Println("* Name:", file.Name, "\nBaseName:", fi.Name(), "\nSize:", fi.Size())
 	}
 
 	return nil
