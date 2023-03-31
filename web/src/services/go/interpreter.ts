@@ -69,7 +69,6 @@ class MessageAwaiter {
 
 export async function foo() {
   const w = new Worker(new URL('../../workers/go.worker.ts', import.meta.url));
-  w.onmessage = msg => console.log('worker reply', msg);
 }
 
 async function run() {
