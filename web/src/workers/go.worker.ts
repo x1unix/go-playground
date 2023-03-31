@@ -8,97 +8,53 @@ import {
   Struct,
   Uint32,
   js, UintPtr,
-  instantiateStreaming
+  instantiateStreaming,
+  StackReader,
+  wrapGlobal,
 } from '~/lib/go';
-import { wrapGlobal } from "~/lib/go/wrapper/wrapper";
+
+import {
+  Package,
+  PackageBinding,
+  ExportFunction,
+  registerExportObject
+} from '~/lib/gowasm';
+
+import SyscallHelper from '~/lib/gowasm/syscall';
 
 declare const self: DedicatedWorkerGlobalScope;
 export default {} as typeof Worker & { new (): Worker };
 
 const DEBUG = false;
 
-self.importScripts('/wasm_exec.js')
+@Package("github.com/x1unix/go-playground/internal/gorepl/tests")
+class Test extends PackageBinding {
+  constructor(private helper: SyscallHelper) {
+    super();
+  }
 
-const withPrefix = pfx => str => `${pfx}.${str}`;
-
-const gowasmPfx = withPrefix('github.com/x1unix/go-playground/internal/gowasm');
-const pkgPrefix = 'github.com/x1unix/go-playground/internal/gorepl/storage';
-const mainPfx = withPrefix('github.com/x1unix/go-playground/internal/gorepl/tests');
-const storagePfx = withPrefix(pkgPrefix);
-
-
-
-// const TFileTx = Struct<FileTx>(storagePfx('fileTx'), [
-//   {key: 'id', type: Uint32},
-//   {key: 'bufferSize', type: Int32},
-// ]);
-//
-// const TFileInfo = Struct<FileInfo>(storagePfx('FileInfo'), [
-//   {key: 'name', type: GoStringType},
-//   {key: 'size', type: Int64},
-//   {key: 'isDir', type: Bool},
-//   {key: 'mode', type: Uint32},
-//   {key: 'modTime', type: Int64},
-// ]);
-//
-// const TFileEntry = Struct<FileEntry>(storagePfx('FileEntry'), [
-//   {key: 'pathName', type: GoStringType},
-//   {key: 'fileInfo', type: TFileInfo}
-// ]);
-
-async function run() {
-  let handler: js.Func|null = null;
-  const go = new GoWrapper(new self.Go(), {
-    debug: DEBUG,
-    globalValue: wrapGlobal({}, self)
-  });
-
-  go.exportFunction(mainPfx('foobar'), (sp, reader) => {
-    reader.skipHeader();
-    const goFn = reader.next<js.Func>(js.FuncType);
-    console.log('js: received a callback!', goFn);
-    console.log('js: calling a callback!', goFn);
-    go.callFunc(goFn, []);
-  })
-
-  go.exportFunction(gowasmPfx('registerCallbackHandler'), (sp, reader) => {
-    reader.skipHeader();
-    const goFn = reader.next<js.Func>(js.FuncType);
-    console.log('js: received a func', goFn);
-    handler = goFn;
-  })
-
-  go.exportFunction(mainPfx('doABarrelRoll'), (sp, reader) => {
+  @ExportFunction("doABarrelRoll")
+  doABarrelRoll(sp: number, reader: StackReader) {
     reader.skipHeader();
     const cbid = reader.next<number>(Int32);
     console.log('js: doABarellRoll - ', cbid)
     setTimeout(() => {
       console.log('js: pushing result', cbid);
-      go.callFunc(handler!, [cbid, 255])
+      this.helper.sendCallbackResult(cbid, 255);
     }, 1000);
-  })
+  }
+}
 
-  go.exportFunction(storagePfx('fileCreate'), (sp, reader) => {
-    // reader.skipHeader();
-    // const entry = reader.next<FileEntry>(TFileEntry);
-    // console.log('got entry', entry);
-    // reader.writer().write<FileTx>(TFileTx, {
-    //   id: 255,
-    //   bufferSize: 1024
-    // })
+async function run() {
+  self.importScripts('/wasm_exec.js')
+  const go = new GoWrapper(new self.Go(), {
+    debug: DEBUG,
+    globalValue: wrapGlobal({}, self)
   });
 
-  go.exportFunction(storagePfx('fileWrite'), (sp, reader) => {
-  })
-
-  go.exportFunction(storagePfx('fileCommit'), (sp, reader) => {
-    // const txId = reader.next<number>(Uint32);
-    // const awaitFunc = reader.next<js.Func>(js.FuncType);
-    // console.log('fileWrite', txId);
-    // setTimeout(() => {
-    //   go.callFunc(awaitFunc, [2345, null]);
-    // }, 1000);
-  })
+  const helper = new SyscallHelper(go);
+  registerExportObject(go, helper);
+  registerExportObject(go, new Test(helper));
 
   const {instance} = await instantiateStreaming(fetch('/go.wasm'), go.importObject);
   go.run(instance as GoWebAssemblyInstance)

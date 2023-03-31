@@ -59,9 +59,8 @@ export const Package = (pkgName: string): ClassDecorator => (
 export const ExportFunction = (funcName: string): MethodDecorator => (
   (target, propertyKey, descriptor) => {
     const func = (descriptor.value! as unknown) as CallImportHandler;
+    const meta = getGoExportMetadata(target);
 
-    console.log({target, propertyKey, descriptor});
-    let meta = getGoExportMetadata(target);
     if (meta) {
       meta.symbols.push([
         funcName, func
@@ -92,6 +91,7 @@ export const registerExportObject = (go: GoWrapper, srcObj: PackageBinding) => {
 
   const { packageName, symbols } = meta;
   for (const [funcName, func] of symbols) {
+    // console.log(`register: ${packageName}.${funcName} - `, func, srcObj);
     go.exportFunction(`${packageName}.${funcName}`, (sp, reader) => (
       func.call(srcObj, sp, reader)
     ))
