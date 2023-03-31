@@ -1,4 +1,3 @@
-import {instantiateStreaming} from "@services/api";
 import {
   Bool,
   GoStringType,
@@ -10,6 +9,20 @@ import {
   Uint32,
   js, UintPtr
 } from '~/lib/go';
+import {wrapGlobal} from "~/lib/go/wrapper/wrapper";
+
+declare const self: DedicatedWorkerGlobalScope;
+export default {} as typeof Worker & { new (): Worker };
+
+self.importScripts('/wasm_exec.js')
+export const instantiateStreaming = async (resp, importObject) => {
+  if ('instantiateStreaming' in WebAssembly) {
+    return await WebAssembly.instantiateStreaming(resp, importObject);
+  }
+
+  const source = await (await resp).arrayBuffer();
+  return await WebAssembly.instantiate(source, importObject);
+};
 
 const withPrefix = pfx => str => `${pfx}.${str}`;
 
@@ -53,25 +66,6 @@ const TFileEntry = Struct<FileEntry>(storagePfx('FileEntry'), [
   {key: 'fileInfo', type: TFileInfo}
 ]);
 
-class MessageAwaiter {
-  subscriptions = new Map<number, Worker['onmessage']>();
-  constructor(worker: Worker) {
-    worker.onmessage = ((w, msg: MessageEvent<any>) => {
-      this.handleMessage(w, msg);
-    }) as Worker['onmessage'];
-  }
-
-  private handleMessage(w: Worker, msg: MessageEvent<any>) {
-    console.log(msg);
-  }
-
-}
-
-export async function foo() {
-  const w = new Worker(new URL('../../workers/go.worker.ts', import.meta.url));
-  w.onmessage = msg => console.log('worker reply', msg);
-}
-
 async function run() {
   const slotCount = 10;
   const slotPool = Array.from(Array(slotCount).keys());
@@ -104,8 +98,9 @@ async function run() {
     }
   }
 
-  const go = new GoWrapper(new window.Go(), {
-    debug: true
+  const go = new GoWrapper(new self.Go(), {
+    debug: true,
+    globalValue: wrapGlobal({}, self)
   });
   go.exportFunction(storagePfx('fileCreate'), (sp, reader) => {
     reader.skipHeader();
@@ -180,3 +175,5 @@ async function run() {
     .then(() => console.log('execution finished'))
     .catch(console.error);
 }
+
+run().then(() => console.log('RUN OK')).catch(err => console.error('RUN ERR-', err))

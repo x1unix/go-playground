@@ -55,4 +55,8 @@ declare global {
      */
     Go: typeof Go
   }
+
+  interface DedicatedWorkerGlobalScope {
+    Go: typeof Go
+  }
 }

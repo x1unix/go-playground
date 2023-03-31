@@ -16,7 +16,7 @@ import {
  * @param overlay Overlay object
  * @param globalValue global namespace
  */
-export const wrapGlobal = (overlay: object = {}, globalValue: object = window || globalThis) => {
+export const wrapGlobal = (overlay: object = {}, globalValue: object = window || globalThis || DedicatedWorkerGlobalScope) => {
   const mockObject = {
     ...overlay,
     Go: GoWrapper,
