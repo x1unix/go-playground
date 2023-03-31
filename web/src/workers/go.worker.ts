@@ -16,7 +16,7 @@ import {
 import {
   Package,
   PackageBinding,
-  ExportFunction,
+  ExportMethod,
   registerExportObject
 } from '~/lib/gowasm';
 
@@ -33,7 +33,7 @@ class Test extends PackageBinding {
     super();
   }
 
-  @ExportFunction("doABarrelRoll")
+  @ExportMethod("doABarrelRoll")
   doABarrelRoll(sp: number, reader: StackReader) {
     reader.skipHeader();
     const cbid = reader.next<number>(Int32);

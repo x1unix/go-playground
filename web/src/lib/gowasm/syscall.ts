@@ -1,4 +1,4 @@
-import {ExportFunction, Package, PackageBinding} from '~/lib/gowasm/binder';
+import {ExportMethod, Package, PackageBinding} from '~/lib/gowasm/binder';
 import {GoWrapper, js, StackReader} from '~/lib/go';
 
 /**
@@ -14,7 +14,7 @@ export default class SyscallHelper extends PackageBinding {
     super();
   }
 
-  @ExportFunction('registerCallbackHandler')
+  @ExportMethod('registerCallbackHandler')
   private registerCallbackHandler(sp: number, reader: StackReader) {
     reader.skipHeader();
     const callbackFunc = reader.next<js.Func>(js.FuncType);

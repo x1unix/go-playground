@@ -24,3 +24,8 @@ TEXT ·writeFile(SB), NOSPLIT, $0
 TEXT ·makeDir(SB), NOSPLIT, $0
   CallImport
   RET
+
+// func unlink(name string, cb int)
+TEXT ·unlink(SB), NOSPLIT, $0
+  CallImport
+  RET

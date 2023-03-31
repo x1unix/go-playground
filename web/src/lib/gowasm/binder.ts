@@ -52,11 +52,11 @@ export const Package = (pkgName: string): ClassDecorator => (
 )
 
 /**
- * ExportFunction decorator adds class method to exports with given symbol name.
+ * ExportMethod decorator adds class method to exports with given symbol name.
  * @param funcName Go function name to be linked with.
  * @constructor
  */
-export const ExportFunction = (funcName: string): MethodDecorator => (
+export const ExportMethod = (funcName: string): MethodDecorator => (
   (target, propertyKey, descriptor) => {
     const func = (descriptor.value! as unknown) as CallImportHandler;
     const meta = getGoExportMetadata(target);
