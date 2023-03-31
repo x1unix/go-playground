@@ -7,9 +7,10 @@ import {
   Int64,
   Struct,
   Uint32,
-  js, UintPtr
+  js, UintPtr,
+  instantiateStreaming
 } from '~/lib/go';
-import {wrapGlobal} from "~/lib/go/wrapper/wrapper";
+import { wrapGlobal } from "~/lib/go/wrapper/wrapper";
 
 declare const self: DedicatedWorkerGlobalScope;
 export default {} as typeof Worker & { new (): Worker };
@@ -17,17 +18,10 @@ export default {} as typeof Worker & { new (): Worker };
 const DEBUG = false;
 
 self.importScripts('/wasm_exec.js')
-export const instantiateStreaming = async (resp, importObject) => {
-  if ('instantiateStreaming' in WebAssembly) {
-    return await WebAssembly.instantiateStreaming(resp, importObject);
-  }
-
-  const source = await (await resp).arrayBuffer();
-  return await WebAssembly.instantiate(source, importObject);
-};
 
 const withPrefix = pfx => str => `${pfx}.${str}`;
 
+const gowasmPfx = withPrefix('github.com/x1unix/go-playground/internal/gowasm');
 const pkgPrefix = 'github.com/x1unix/go-playground/internal/gorepl/storage';
 const mainPfx = withPrefix('github.com/x1unix/go-playground/internal/gorepl/tests');
 const storagePfx = withPrefix(pkgPrefix);
@@ -59,7 +53,15 @@ async function run() {
     globalValue: wrapGlobal({}, self)
   });
 
-  go.exportFunction(mainPfx('registerCallbackHandler'), (sp, reader) => {
+  go.exportFunction(mainPfx('foobar'), (sp, reader) => {
+    reader.skipHeader();
+    const goFn = reader.next<js.Func>(js.FuncType);
+    console.log('js: received a callback!', goFn);
+    console.log('js: calling a callback!', goFn);
+    go.callFunc(goFn, []);
+  })
+
+  go.exportFunction(gowasmPfx('registerCallbackHandler'), (sp, reader) => {
     reader.skipHeader();
     const goFn = reader.next<js.Func>(js.FuncType);
     console.log('js: received a func', goFn);

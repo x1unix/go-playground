@@ -21,3 +21,20 @@ export const hex = (v: number|bigint|string) => {
 export interface DebugOptions {
   debug?: boolean
 }
+
+export const instantiateStreaming = async (resp: Response | PromiseLike<Response>, importObject) => {
+  const r: Response = resp instanceof Promise ? await resp : resp;
+  if (r.status !== 200) {
+    throw new Error(
+      'Cannot instantiate WebAssembly streaming, invalid HTTP response: ' +
+      `'${r.status} ${r.statusText}' (URL: ${r.url})`
+    );
+  }
+
+  if ('instantiateStreaming' in WebAssembly) {
+    return await WebAssembly.instantiateStreaming(r, importObject);
+  }
+
+  const source = await r.arrayBuffer();
+  return await WebAssembly.instantiate(source, importObject);
+};

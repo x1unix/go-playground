@@ -3,9 +3,9 @@ import {push} from 'connected-react-router';
 
 import client, {
   EvalEventKind,
-  instantiateStreaming,
   PlaygroundBackend
 } from '~/services/api';
+import { instantiateStreaming } from '~/lib/go';
 
 import config, {RuntimeType} from '~/services/config';
 import {DEMO_CODE} from '~/components/editor/props';

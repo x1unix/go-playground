@@ -1,4 +1,3 @@
-import {instantiateStreaming} from "@services/api";
 import {
   Bool,
   GoStringType,
@@ -8,7 +7,8 @@ import {
   Int64,
   Struct,
   Uint32,
-  js, UintPtr
+  js, UintPtr,
+  instantiateStreaming,
 } from '~/lib/go';
 
 const withPrefix = pfx => str => `${pfx}.${str}`;
