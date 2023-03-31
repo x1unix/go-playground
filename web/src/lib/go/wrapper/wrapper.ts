@@ -250,7 +250,7 @@ export class GoWrapper {
    * @param args
    */
   callFunc(fn: Func, args: any[]) {
-    return this.callEventById(fn.value.ref, args);
+    return this.callEventById(fn.id, args);
   }
 
   /**
