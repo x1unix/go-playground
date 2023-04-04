@@ -7,8 +7,11 @@ package {{ .PackageName }}
 
 
 // List of built-in Go packages
-var builtinPackages = map[string]struct{}{
-{{ range $index, $pkg := .Packages }}
-    "{{$pkg}}": {},
-{{ end }}
+var builtinPackages = map[string]struct{}{ {{ range $index, $pkg := .Packages }}
+    "{{$pkg}}": {},{{ end }}
+}
+
+func isStandardGoPackage(pkgName string) bool {
+    _, ok := builtinPackages[pkgName]
+    return ok
 }

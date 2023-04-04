@@ -1,13 +1,18 @@
 package browserfs
 
 import (
+	"errors"
 	"fmt"
+	"github.com/x1unix/go-playground/internal/gorepl/storage"
 	"io/fs"
 	"path/filepath"
 	"strings"
 )
 
-var _ fs.ReadDirFS = (*FS)(nil)
+var (
+	_ fs.ReadDirFS        = (*FS)(nil)
+	_ storage.ReadWriteFS = (*FS)(nil)
+)
 
 type FS struct{}
 
@@ -35,4 +40,14 @@ func (s FS) Open(name string) (fs.File, error) {
 		fileType: fileTypeDirectory,
 		name:     newSizedFileName(filepath.Base(name)),
 	}), nil
+
+}
+
+func (s FS) WriteFile(name string, data []byte) error {
+	fmt.Printf("fs.CreateFile: %q", name)
+	return &fs.PathError{
+		Op:   "write",
+		Path: name,
+		Err:  errors.New("not implemented"),
+	}
 }

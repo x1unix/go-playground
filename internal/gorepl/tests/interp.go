@@ -37,7 +37,7 @@ func (h *Handler) handleEvalCode(this js.Value, args worker.Args) (any, error) {
 
 func (h *Handler) evalCode(code string) (any, error) {
 	vm := interp.New(interp.Options{
-		GoPath:               "",
+		GoPath:               "/go",
 		SourcecodeFilesystem: h.cache,
 	})
 	if err := vm.Use(stdlib.Symbols); err != nil {
