@@ -26,3 +26,31 @@ func (s Set[T]) Has(item T) bool {
 func (s Set[T]) Add(item T) {
 	s.m.Store(item, void{})
 }
+
+type Map[K comparable, V any] struct {
+	m *sync.Map
+}
+
+func NewMap[K comparable, V any]() Map[K, V] {
+	return Map[K, V]{
+		m: new(sync.Map),
+	}
+}
+
+func (m Map[K, V]) Add(key K, val V) {
+	m.m.Store(key, val)
+}
+
+func (m Map[K, V]) Delete(item K) {
+	m.m.Delete(item)
+}
+
+func (m Map[K, V]) Has(item K) bool {
+	_, ok := m.m.Load(item)
+	return ok
+}
+
+func (m Map[K, V]) Get(item K) (V, bool) {
+	v, ok := m.m.Load(item)
+	return v.(V), ok
+}
