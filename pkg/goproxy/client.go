@@ -53,8 +53,8 @@ func (c Client) get(ctx context.Context, segments ...string) (*http.Response, er
 	}
 
 	if rsp.StatusCode >= 400 {
-		_ = rsp.Body.Close()
-		return nil, fmt.Errorf("%q: %s", uri, rsp.Status)
+		defer rsp.Body.Close()
+		return nil, buildHTTPError(req, rsp)
 	}
 
 	return rsp, nil
