@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go/parser"
 	"go/token"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -18,6 +19,11 @@ var (
 	versionBranchRegEx = regexp.MustCompile(`^v\d(.\d+)?(.\d+)?$`)
 	goPkgInPackage     = regexp.MustCompile(`^[\w\d]+\.v\d(.\d+)?(.\d+)?$`)
 )
+
+type packageInfo struct {
+	importPath string
+	version    string
+}
 
 type PackageManager struct {
 	goModProxy  *goproxy.Client
@@ -46,7 +52,7 @@ func (mgr *PackageManager) CheckDependencies(ctx context.Context, code []byte) e
 
 	fmt.Println(newProjectPackages)
 	for _, pkg := range newProjectPackages {
-		if err := mgr.requestPackage(ctx, pkg, ""); err != nil {
+		if err := mgr.requestPackageByImportPath(ctx, pkg); err != nil {
 			return err
 		}
 	}
@@ -87,8 +93,9 @@ func parseFileImports(filename, moduleUrl string, code []byte) ([]string, error)
 }
 
 func (mgr *PackageManager) requestPackage(ctx context.Context, pkgUrl, version string) error {
-	fmt.Printf("Downloading package %q...", pkgUrl)
+	fmt.Printf("Finding package %q...", pkgUrl)
 	if version == "" {
+
 		verInfo, err := mgr.goModProxy.GetLatestVersion(ctx, pkgUrl)
 		if err != nil {
 			return fmt.Errorf("failed to get latest version of package %q: %w", pkgUrl, err)
@@ -103,6 +110,55 @@ func (mgr *PackageManager) requestPackage(ctx context.Context, pkgUrl, version s
 
 	fmt.Println(goMod)
 	return nil
+}
+
+func (mgr *PackageManager) requestPackageByImportPath(ctx context.Context, importPath string) error {
+	log.Printf("resolving import %q...", importPath)
+	pkgInfo, err := mgr.findPackageByImport(ctx, importPath)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("found package %q %s", pkgInfo.importPath, pkgInfo.version)
+	return nil
+}
+
+func (mgr *PackageManager) findPackageByImport(ctx context.Context, pkgUrl string) (*packageInfo, error) {
+	// Try to guess package import path
+	importPath, ok := detectPackageNameFromImport(pkgUrl)
+	if ok {
+		fmt.Printf("Detected package %q from import path, trying to request...\n", importPath)
+		verInfo, err := mgr.goModProxy.GetLatestVersion(ctx, importPath)
+		if err != nil {
+			return nil, err
+		}
+
+		return &packageInfo{
+			importPath: importPath,
+			version:    verInfo.Version,
+		}, nil
+	}
+
+	// Otherwise - try to locate the longest valid queryable package name
+	// in the same manner as "go get" does.
+	segments := strings.Split(pkgUrl, "/")
+	var (
+		verInfo *goproxy.VersionInfo
+		err     error
+	)
+	for i := len(segments) - 1; i > 0; i-- {
+		pkgUrl := strings.Join(segments[:i+1], "/")
+		log.Printf("Trying to find %q...", pkgUrl)
+		verInfo, err = mgr.goModProxy.GetLatestVersion(ctx, pkgUrl)
+		if err == nil {
+			return &packageInfo{
+				importPath: pkgUrl,
+				version:    verInfo.Version,
+			}, nil
+		}
+	}
+
+	return nil, err
 }
 
 func isSelfModulePackage(goModulePath, importUrl string) bool {

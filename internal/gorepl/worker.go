@@ -25,5 +25,5 @@ func (w *Worker) Evaluate(code []byte) error {
 }
 
 func (w *Worker) checkNewImports(ctx context.Context, code []byte) error {
-	return w.checkNewImports(ctx, code)
+	return w.pkgMgr.CheckDependencies(ctx, code)
 }
