@@ -16,7 +16,7 @@ type Worker struct {
 func NewWorker(pkgCache storage.ReadWriteFS, client *goproxy.Client) *Worker {
 	return &Worker{
 		pkgCache: pkgCache,
-		pkgMgr:   NewPackageManager(client),
+		pkgMgr:   NewPackageManager(client, nil),
 	}
 }
 
@@ -25,5 +25,10 @@ func (w *Worker) Evaluate(code []byte) error {
 }
 
 func (w *Worker) checkNewImports(ctx context.Context, code []byte) error {
-	return w.pkgMgr.CheckDependencies(ctx, code)
+	rootImports, err := parseFileImports("main.go", "", code)
+	if err != nil {
+		return err
+	}
+
+	return w.pkgMgr.CheckDependencies(ctx, rootImports)
 }

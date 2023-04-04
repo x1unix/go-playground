@@ -138,13 +138,15 @@ func (c Client) GetVersionInfo(ctx context.Context, pkgUrl, version string) (*Ve
 }
 
 // GetModuleFile returns go.mod file of specific version of a module.
-func (c Client) GetModuleFile(ctx context.Context, pkgUrl, version string) (io.ReadCloser, error) {
+func (c Client) GetModuleFile(ctx context.Context, pkgUrl, version string) ([]byte, error) {
 	rsp, err := c.getBody(ctx, pkgUrl, "@v", version+".mod")
 	if err != nil {
 		return nil, err
 	}
 
-	return rsp, nil
+	defer rsp.Close()
+	data, err := io.ReadAll(rsp)
+	return data, err
 }
 
 // GetModuleSource returns zip archive stream for that version of the given module.

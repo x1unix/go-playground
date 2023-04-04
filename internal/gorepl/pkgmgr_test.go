@@ -1,12 +1,60 @@
 package gorepl
 
 import (
+	"context"
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/x1unix/go-playground/pkg/goproxy"
 )
 
-func TestDetectPackageNameFromImport(t *testing.T) {
+type testdataFileWriter struct {
+	testDir string
+}
+
+func (w testdataFileWriter) RemoveAll(name string) error {
+	return os.RemoveAll(filepath.Join(w.testDir, "pkg", name))
+}
+
+func (w testdataFileWriter) WriteFile(name string, data io.Reader) error {
+	filePath := filepath.Join(w.testDir, "pkg", name)
+	if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
+		return err
+	}
+
+	f, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+	_, err = io.Copy(f, data)
+	return err
+}
+
+func TestPackageManager_CheckDependencies(t *testing.T) {
+	cwd, err := os.Getwd()
+	require.NoError(t, err)
+
+	client := goproxy.NewClient(http.DefaultClient, "https://proxy.golang.org")
+	ctx := context.Background()
+	pkgmgr := NewPackageManager(client, testdataFileWriter{
+		testDir: filepath.Join(cwd, "testdata"),
+	})
+
+	err = pkgmgr.CheckDependencies(ctx, []string{
+		"go.uber.org/zap",
+		"golang.org/x/tools/internal/imports",
+	})
+
+	require.NoError(t, err)
+}
+
+func TestGuessPackageNameFromImport(t *testing.T) {
 	cases := map[string]struct {
 		path   string
 		expect string
@@ -67,7 +115,7 @@ func TestDetectPackageNameFromImport(t *testing.T) {
 
 	for n, c := range cases {
 		t.Run(n, func(t *testing.T) {
-			got, ok := detectPackageNameFromImport(c.path)
+			got, ok := guessPackageNameFromImport(c.path)
 			if c.expect == "" {
 				require.False(t, ok)
 				return

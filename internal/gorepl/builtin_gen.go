@@ -131,7 +131,7 @@ var builtinPackages = map[string]struct{}{
 	"index":                {},
 	"index/suffixarray":    {},
 	"io":                   {},
-	"io/fs":                {},
+	"io/fileStore":         {},
 	"io/ioutil":            {},
 	"log":                  {},
 	"log/syslog":           {},

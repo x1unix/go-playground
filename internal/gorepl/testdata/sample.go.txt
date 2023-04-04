@@ -1,12 +1,12 @@
 package main
 
-/*import (
+import (
 	"go.uber.org/zap"
 	"testing"
 	_ "golang.org/x/tools/internal/imports"
-)*/
+)
 
-import "golang.org/x/tools/internal/imports"
+//import "golang.org/x/tools/internal/imports"
 
 func main() {
 	logger, err := zap.NewProduction()

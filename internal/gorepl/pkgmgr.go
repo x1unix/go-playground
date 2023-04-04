@@ -1,10 +1,13 @@
 package gorepl
 
 import (
+	"archive/zip"
+	"bytes"
 	"context"
 	"fmt"
 	"go/parser"
 	"go/token"
+	"io"
 	"log"
 	"regexp"
 	"strconv"
@@ -13,6 +16,7 @@ import (
 	"github.com/samber/lo"
 	"github.com/x1unix/go-playground/internal/util/syncx"
 	"github.com/x1unix/go-playground/pkg/goproxy"
+	"golang.org/x/mod/modfile"
 )
 
 var (
@@ -20,30 +24,36 @@ var (
 	goPkgInPackage     = regexp.MustCompile(`^[\w\d]+\.v\d(.\d+)?(.\d+)?$`)
 )
 
+type FileWriter interface {
+	RemoveAll(name string) error
+	WriteFile(name string, data io.Reader) error
+}
+
 type packageInfo struct {
-	importPath string
-	version    string
+	packageName string
+	version     string
+}
+
+func (pkg packageInfo) String() string {
+	return pkg.packageName + "@" + pkg.version
 }
 
 type PackageManager struct {
 	goModProxy  *goproxy.Client
 	cachedPaths syncx.Set[string]
+	fileStore   FileWriter
 }
 
-func NewPackageManager(modProxy *goproxy.Client) *PackageManager {
+func NewPackageManager(modProxy *goproxy.Client, fs FileWriter) *PackageManager {
 	return &PackageManager{
+		fileStore:   fs,
 		goModProxy:  modProxy,
 		cachedPaths: syncx.NewSet[string](),
 	}
 }
 
-func (mgr *PackageManager) CheckDependencies(ctx context.Context, code []byte) error {
-	rootImports, err := parseFileImports("main.go", "", code)
-	if err != nil {
-		return err
-	}
-
-	newProjectPackages := lo.Filter(rootImports, func(item string, _ int) bool {
+func (mgr *PackageManager) CheckDependencies(ctx context.Context, importPaths []string) error {
+	newProjectPackages := lo.Filter(importPaths, func(item string, _ int) bool {
 		return !mgr.cachedPaths.Has(item)
 	})
 	if len(newProjectPackages) == 0 {
@@ -92,26 +102,6 @@ func parseFileImports(filename, moduleUrl string, code []byte) ([]string, error)
 	return imports, nil
 }
 
-func (mgr *PackageManager) requestPackage(ctx context.Context, pkgUrl, version string) error {
-	fmt.Printf("Finding package %q...", pkgUrl)
-	if version == "" {
-
-		verInfo, err := mgr.goModProxy.GetLatestVersion(ctx, pkgUrl)
-		if err != nil {
-			return fmt.Errorf("failed to get latest version of package %q: %w", pkgUrl, err)
-		}
-		version = verInfo.Version
-	}
-
-	goMod, err := mgr.goModProxy.GetModuleFile(ctx, pkgUrl, version)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(goMod)
-	return nil
-}
-
 func (mgr *PackageManager) requestPackageByImportPath(ctx context.Context, importPath string) error {
 	log.Printf("resolving import %q...", importPath)
 	pkgInfo, err := mgr.findPackageByImport(ctx, importPath)
@@ -119,13 +109,123 @@ func (mgr *PackageManager) requestPackageByImportPath(ctx context.Context, impor
 		return err
 	}
 
-	log.Printf("found package %q %s", pkgInfo.importPath, pkgInfo.version)
+	if mgr.cachedPaths.Has(pkgInfo.packageName) {
+		log.Printf("%s already cached, skip", pkgInfo)
+		return nil
+	}
+
+	return mgr.requestModule(ctx, pkgInfo)
+}
+
+func (mgr *PackageManager) requestModule(ctx context.Context, pkgInfo *packageInfo) error {
+	log.Printf("Finding module %s...", pkgInfo)
+	deps, err := mgr.getModuleDependencies(ctx, pkgInfo.packageName, pkgInfo.version)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Module %s has %d dependencies", pkgInfo, len(deps))
+	for _, dep := range deps {
+		if mgr.cachedPaths.Has(dep.packageName) {
+			log.Printf("%s already cached, skip", dep)
+			continue
+		}
+
+		if err := mgr.requestModule(ctx, dep); err != nil {
+			return err
+		}
+	}
+
+	if mgr.cachedPaths.Has(pkgInfo.packageName) {
+		log.Printf("%s already cached, skip", pkgInfo)
+		return nil
+	}
+
+	if err := mgr.downloadModule(ctx, pkgInfo); err != nil {
+		return fmt.Errorf("failed to download module %s@%s: %w",
+			pkgInfo.packageName, pkgInfo.version, err)
+	}
+
+	mgr.cachedPaths.Add(pkgInfo.packageName)
 	return nil
+}
+
+func (mgr *PackageManager) downloadModule(ctx context.Context, pkgInfo *packageInfo) error {
+	r, err := mgr.goModProxy.GetModuleSource(ctx, pkgInfo.packageName, pkgInfo.version)
+	if err != nil {
+		return err
+	}
+
+	defer r.Close()
+
+	log.Printf("Downloading %s...", pkgInfo)
+
+	buff := bufferFromPoolWithSize(int(r.Size))
+	defer buff.Close()
+
+	if _, err := io.Copy(buff, r); err != nil {
+		return fmt.Errorf("failed to download module %s: %w", pkgInfo, err)
+	}
+
+	zr, err := zip.NewReader(bytes.NewReader(buff.Bytes()), r.Size)
+	if err != nil {
+		return fmt.Errorf("failed to open module archive %s: %w", pkgInfo, err)
+	}
+
+	for _, file := range zr.File {
+		// TODO: ignore non-go files
+		log.Printf("Extracting %s...", file.Name)
+
+		// TODO: remove module dir on error
+		fileReader, err := file.Open()
+		if err != nil {
+			return fmt.Errorf("failed to read %s: %w", file.Name, err)
+		}
+
+		if err := mgr.fileStore.WriteFile(file.Name, fileReader); err != nil {
+			_ = fileReader.Close()
+			return fmt.Errorf("failed to save file %s: %w", file.Name, err)
+		}
+		_ = fileReader.Close()
+	}
+
+	return nil
+}
+
+func (mgr *PackageManager) getModuleDependencies(ctx context.Context, pkg, version string) ([]*packageInfo, error) {
+	// Module proxy still returns empty go.mod even if package doesn't have it.
+	modFileContents, err := mgr.goModProxy.GetModuleFile(ctx, pkg, version)
+	if err != nil {
+		return nil, err
+	}
+
+	mod, err := modfile.ParseLax("go.mod", modFileContents, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse go.mod file of package %s@%s: %w", pkg, version, err)
+	}
+
+	// TODO: handle old packages without "go.mod"
+	if len(mod.Require) == 0 {
+		if mod.Go == nil {
+			log.Printf("Warning: package %s@%s doesn't have go.mod dependencies, pre-go.mod packages are not supported yet!",
+				pkg, version)
+		}
+
+		return nil, nil
+	}
+
+	// TODO: handle replaces
+	return lo.Map(mod.Require, func(item *modfile.Require, _ int) *packageInfo {
+		return &packageInfo{
+			packageName: item.Mod.Path,
+			version:     item.Mod.Version,
+		}
+	}), nil
 }
 
 func (mgr *PackageManager) findPackageByImport(ctx context.Context, pkgUrl string) (*packageInfo, error) {
 	// Try to guess package import path
-	importPath, ok := detectPackageNameFromImport(pkgUrl)
+	importPath, ok := guessPackageNameFromImport(pkgUrl)
 	if ok {
 		fmt.Printf("Detected package %q from import path, trying to request...\n", importPath)
 		verInfo, err := mgr.goModProxy.GetLatestVersion(ctx, importPath)
@@ -134,8 +234,8 @@ func (mgr *PackageManager) findPackageByImport(ctx context.Context, pkgUrl strin
 		}
 
 		return &packageInfo{
-			importPath: importPath,
-			version:    verInfo.Version,
+			packageName: importPath,
+			version:     verInfo.Version,
 		}, nil
 	}
 
@@ -152,8 +252,8 @@ func (mgr *PackageManager) findPackageByImport(ctx context.Context, pkgUrl strin
 		verInfo, err = mgr.goModProxy.GetLatestVersion(ctx, pkgUrl)
 		if err == nil {
 			return &packageInfo{
-				importPath: pkgUrl,
-				version:    verInfo.Version,
+				packageName: pkgUrl,
+				version:     verInfo.Version,
 			}, nil
 		}
 	}
@@ -169,11 +269,13 @@ func isSelfModulePackage(goModulePath, importUrl string) bool {
 	return strings.HasPrefix(importUrl, goModulePath)
 }
 
-// detectPackageNameFromImport tries to detect package URL from import path
+// guessPackageNameFromImport tries to detect package URL from import path
 // by checking if it's first section match popular hostnames like GitHub, Gitlab, etc.
 //
+// Used to speed-up package name lookup and reduce proxy.golang.org calls count.
+//
 // Returns package URL to request in case of success.
-func detectPackageNameFromImport(importPath string) (string, bool) {
+func guessPackageNameFromImport(importPath string) (string, bool) {
 	segments := strings.Split(importPath, "/")
 	if len(segments) < 2 {
 		return importPath, false
