@@ -2,9 +2,11 @@ package pacman
 
 import (
 	"context"
+	"encoding/json"
 	"golang.org/x/mod/module"
 	"io"
 	"io/fs"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -15,15 +17,64 @@ import (
 )
 
 type testdataPkgCache struct {
-	testDir string
+	testDir  string
+	pkgFile  string
+	pkgCache map[string]*module.Version
 }
 
-func (w testdataPkgCache) RemovePackage(pkg *module.Version) error {
-	return os.RemoveAll(filepath.Join(w.testDir, "pkg", pkg.Path))
+func newTestdataPkgCache(testDir string) *testdataPkgCache {
+	return &testdataPkgCache{
+		testDir: testDir,
+		pkgFile: filepath.Join(testDir, "index.json"),
+	}
 }
 
-func (w testdataPkgCache) TestImportPath(name string) error {
-	filePath := filepath.Join(w.testDir, "pkg", name)
+func (w *testdataPkgCache) pullPackages() {
+	if w.pkgCache != nil {
+		return
+	}
+
+	w.pkgCache = make(map[string]*module.Version)
+	data, err := os.ReadFile(filepath.Join(filepath.Join(w.testDir, "pkg", "")))
+	if os.IsNotExist(err) {
+		return
+	}
+	if err != nil {
+		log.Println("Readfile error:", err)
+	}
+
+	_ = json.Unmarshal(data, &w.pkgCache)
+	return
+}
+
+func (w *testdataPkgCache) commitPackages() {
+	data, _ := json.MarshalIndent(w.pkgCache, "", "  ")
+	_ = os.WriteFile(w.pkgFile, data, 0644)
+}
+
+func (w *testdataPkgCache) RegisterPackage(pkg *module.Version) error {
+	w.pullPackages()
+	w.pkgCache[pkg.Path] = pkg
+	return nil
+}
+
+func (w *testdataPkgCache) LookupPackage(pkgName string) (*module.Version, error) {
+	w.pullPackages()
+	pkg, ok := w.pkgCache[pkgName]
+	if !ok {
+		return nil, fs.ErrNotExist
+	}
+
+	return pkg, nil
+}
+
+func (w *testdataPkgCache) RemovePackage(pkg *module.Version) error {
+	return os.RemoveAll(filepath.Join(w.testDir, pkg.Path))
+}
+
+func (w *testdataPkgCache) TestImportPath(name string) error {
+	filePath := filepath.Join(w.testDir, name)
+	log.Println("TestImportPath", filePath)
 	_, err := os.Stat(filePath)
 	if err != nil {
 		return err
@@ -32,12 +83,12 @@ func (w testdataPkgCache) TestImportPath(name string) error {
 	return nil
 }
 
-func (w testdataPkgCache) WritePackageFile(pkg *module.Version, filePath string, src fs.File) error {
+func (w *testdataPkgCache) WritePackageFile(pkg *module.Version, filePath string, src fs.File) error {
 	// Keep packages in the same structure as GOPATH without version suffix.
 	// Same packages of different versions are not supported.
 	filePath = removeVersionFromPath(pkg, filePath)
 
-	absFilePath := filepath.Join(w.testDir, "pkg", filePath)
+	absFilePath := filepath.Join(w.testDir, filePath)
 	if err := os.MkdirAll(filepath.Dir(absFilePath), 0755); err != nil {
 		return err
 	}
@@ -58,10 +109,12 @@ func TestPackageManager_CheckDependencies(t *testing.T) {
 
 	client := goproxy.NewClient(http.DefaultClient, "https://proxy.golang.org")
 	ctx := context.Background()
-	pkgmgr := NewPackageManager(client, testdataPkgCache{
-		testDir: filepath.Join(cwd, "testdata"),
+	pkgCache := newTestdataPkgCache(filepath.Join(cwd, "testdata", "pkg"))
+	t.Cleanup(func() {
+		pkgCache.commitPackages()
 	})
 
+	pkgmgr := NewPackageManager(client, pkgCache)
 	err = pkgmgr.CheckDependencies(ctx, []string{
 		"go.uber.org/zap",
 		"golang.org/x/tools/internal/imports",

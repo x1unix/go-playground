@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -30,6 +31,14 @@ type PackageCache interface {
 	//
 	// Returns fs.ErrNotExists in case of cache miss.
 	TestImportPath(importPath string) error
+
+	// LookupPackage checks if package is cached and returns its version.
+	//
+	// Returns fs.ErrNotExists if package is not cached.
+	LookupPackage(pkgName string) (*module.Version, error)
+
+	// RegisterPackage registers package in index
+	RegisterPackage(pkg *module.Version) error
 
 	// WritePackageFile writes a single file of package to the storage.
 	WritePackageFile(pkg *module.Version, filePath string, f fs.File) error
@@ -100,13 +109,36 @@ func (mgr *PackageManager) CheckDependencies(ctx context.Context, importPaths []
 	}
 
 	for pkgName, ver := range modsJar {
+		// Some indirect dependencies might require update.
+		// Update them if necessary.
+		if !mgr.shouldUpdatePackage(ver) {
+			log.Printf("Package %s is already up to date, skip download...", ver)
+			continue
+		}
+
 		if err := mgr.downloadModule(ctx, ver); err != nil {
 			return err
 		}
+
 		mgr.cachedPaths.Add(pkgName, ver)
 	}
 
 	return nil
+}
+
+// shouldUpdatePackage checks if cached package version is outdated.
+// Used to check the status of cached indirect dependencies (deps of deps).
+func (mgr *PackageManager) shouldUpdatePackage(pkg *module.Version) bool {
+	gotVer, err := mgr.pkgCache.LookupPackage(pkg.Path)
+	if errors.Is(err, fs.ErrNotExist) {
+		return true
+	}
+	if err != nil {
+		log.Printf("LookupPackage failed for %q: %v", pkg.Path, err)
+		return true
+	}
+
+	return isPackageOutdated(pkg, gotVer)
 }
 
 func (mgr *PackageManager) requestPackageByImportPath(ctx context.Context, importPath string, out dependenciesJar) error {
@@ -162,8 +194,14 @@ func (mgr *PackageManager) downloadModule(ctx context.Context, pkgInfo *module.V
 		log.Printf("Extracting %s...", file.Name)
 
 		if err := mgr.pkgCache.WritePackageFile(pkgInfo, file.Name, newZipFSFile(file)); err != nil {
+			// clean corrupted installation
+			_ = mgr.pkgCache.RemovePackage(pkgInfo)
 			return err
 		}
+	}
+
+	if err := mgr.pkgCache.RegisterPackage(pkgInfo); err != nil {
+		return fmt.Errorf("failed to register package %s: %w", pkgInfo, err)
 	}
 
 	return nil
@@ -244,8 +282,7 @@ func (mgr *PackageManager) isPackageCached(pkg *module.Version) bool {
 	}
 
 	// Always prefer most recent version
-	result := semver.Compare(pkg.Version, cachedPkg.Version)
-	return result != -1
+	return !isPackageOutdated(pkg, cachedPkg)
 }
 
 func isSelfModulePackage(goModulePath, importUrl string) bool {
@@ -331,4 +368,9 @@ func guessPackageNameFromImport(importPath string) (string, bool) {
 // Example: foo/bar@v1.2.3/baz -> foo/bar/baz
 func removeVersionFromPath(module *module.Version, fpath string) string {
 	return strings.Replace(fpath, "@"+module.Version, "", 1)
+}
+
+func isPackageOutdated(newPkg, oldPkg *module.Version) bool {
+	result := semver.Compare(newPkg.Version, oldPkg.Version)
+	return result != -1
 }
