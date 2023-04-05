@@ -85,7 +85,6 @@ func (mgr *PackageManager) CheckDependencies(ctx context.Context, importPaths []
 		}
 
 		err := mgr.pkgCache.TestImportPath(item)
-		log.Printf("Stat %q: %v", item, err)
 		if err != nil {
 			if !os.IsNotExist(fs.ErrNotExist) {
 				log.Printf("Warning: can't stat %q: %s", item, err)
@@ -361,13 +360,6 @@ func guessPackageNameFromImport(importPath string) (string, bool) {
 	}
 
 	return importPath, false
-}
-
-// removeVersionFromPath removes package version segment from path.
-//
-// Example: foo/bar@v1.2.3/baz -> foo/bar/baz
-func removeVersionFromPath(module *module.Version, fpath string) string {
-	return strings.Replace(fpath, "@"+module.Version, "", 1)
 }
 
 func isPackageOutdated(newPkg, oldPkg *module.Version) bool {
