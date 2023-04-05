@@ -1,4 +1,4 @@
-package gorepl
+package pacman
 
 import (
 	"bytes"

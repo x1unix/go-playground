@@ -1,8 +1,10 @@
-package gorepl
+package pacman
 
 import (
 	"context"
+	"golang.org/x/mod/module"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -12,27 +14,41 @@ import (
 	"github.com/x1unix/go-playground/pkg/goproxy"
 )
 
-type testdataFileWriter struct {
+type testdataPkgCache struct {
 	testDir string
 }
 
-func (w testdataFileWriter) RemoveAll(name string) error {
-	return os.RemoveAll(filepath.Join(w.testDir, "pkg", name))
+func (w testdataPkgCache) RemovePackage(pkg *module.Version) error {
+	return os.RemoveAll(filepath.Join(w.testDir, "pkg", pkg.Path))
 }
 
-func (w testdataFileWriter) WriteFile(name string, data io.Reader) error {
+func (w testdataPkgCache) TestImportPath(name string) error {
 	filePath := filepath.Join(w.testDir, "pkg", name)
-	if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
+	_, err := os.Stat(filePath)
+	if err != nil {
 		return err
 	}
 
-	f, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	return nil
+}
+
+func (w testdataPkgCache) WritePackageFile(pkg *module.Version, filePath string, src fs.File) error {
+	// Keep packages in the same structure as GOPATH without version suffix.
+	// Same packages of different versions are not supported.
+	filePath = removeVersionFromPath(pkg, filePath)
+
+	absFilePath := filepath.Join(w.testDir, "pkg", filePath)
+	if err := os.MkdirAll(filepath.Dir(absFilePath), 0755); err != nil {
+		return err
+	}
+
+	f, err := os.OpenFile(absFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
 
 	defer f.Close()
-	_, err = io.Copy(f, data)
+	_, err = io.Copy(f, src)
 	return err
 }
 
@@ -42,7 +58,7 @@ func TestPackageManager_CheckDependencies(t *testing.T) {
 
 	client := goproxy.NewClient(http.DefaultClient, "https://proxy.golang.org")
 	ctx := context.Background()
-	pkgmgr := NewPackageManager(client, testdataFileWriter{
+	pkgmgr := NewPackageManager(client, testdataPkgCache{
 		testDir: filepath.Join(cwd, "testdata"),
 	})
 

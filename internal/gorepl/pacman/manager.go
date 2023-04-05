@@ -1,16 +1,15 @@
-package gorepl
+package pacman
 
 import (
 	"archive/zip"
 	"bytes"
 	"context"
 	"fmt"
-	"go/parser"
-	"go/token"
 	"io"
+	"io/fs"
 	"log"
+	"os"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/samber/lo"
@@ -26,9 +25,17 @@ var (
 	goPkgInPackage     = regexp.MustCompile(`^[\w\d]+\.v\d(.\d+)?(.\d+)?$`)
 )
 
-type FileWriter interface {
-	RemoveAll(name string) error
-	WriteFile(name string, data io.Reader) error
+type PackageCache interface {
+	// TestImportPath tests if specified import path is accessible in cache.
+	//
+	// Returns fs.ErrNotExists in case of cache miss.
+	TestImportPath(importPath string) error
+
+	// WritePackageFile writes a single file of package to the storage.
+	WritePackageFile(pkg *module.Version, filePath string, f fs.File) error
+
+	// RemovePackage removes all cached package files.
+	RemovePackage(pkg *module.Version) error
 }
 
 type dependenciesJar map[string]*module.Version
@@ -46,25 +53,41 @@ func (j dependenciesJar) compareAndStore(m *module.Version) {
 	}
 }
 
+// PackageManager checks and stores program dependencies.
 type PackageManager struct {
 	goModProxy  *goproxy.Client
 	cachedPaths syncx.Map[string, *module.Version]
-	fileStore   FileWriter
+	pkgCache    PackageCache
 }
 
-func NewPackageManager(modProxy *goproxy.Client, fs FileWriter) *PackageManager {
+func NewPackageManager(modProxy *goproxy.Client, pkgCache PackageCache) *PackageManager {
 	return &PackageManager{
-		fileStore:   fs,
+		pkgCache:    pkgCache,
 		goModProxy:  modProxy,
 		cachedPaths: syncx.NewMap[string, *module.Version](),
 	}
 }
 
+// CheckDependencies checks if import paths are solvable and downloads dependencies if necessary.
 func (mgr *PackageManager) CheckDependencies(ctx context.Context, importPaths []string) error {
 	newProjectPackages := lo.Filter(importPaths, func(item string, _ int) bool {
-		return !mgr.cachedPaths.Has(item)
+		if mgr.cachedPaths.Has(item) {
+			return false
+		}
+
+		err := mgr.pkgCache.TestImportPath(item)
+		log.Printf("Stat %q: %v", item, err)
+		if err != nil {
+			if !os.IsNotExist(fs.ErrNotExist) {
+				log.Printf("Warning: can't stat %q: %s", item, err)
+			}
+			return true
+		}
+
+		return false
 	})
 
+	log.Println("New packages:", len(newProjectPackages))
 	if len(newProjectPackages) == 0 {
 		return nil
 	}
@@ -138,17 +161,9 @@ func (mgr *PackageManager) downloadModule(ctx context.Context, pkgInfo *module.V
 		// TODO: ignore non-go files
 		log.Printf("Extracting %s...", file.Name)
 
-		// TODO: remove module dir on error
-		fileReader, err := file.Open()
-		if err != nil {
-			return fmt.Errorf("failed to read %s: %w", file.Name, err)
+		if err := mgr.pkgCache.WritePackageFile(pkgInfo, file.Name, newZipFSFile(file)); err != nil {
+			return err
 		}
-
-		if err := mgr.fileStore.WriteFile(file.Name, fileReader); err != nil {
-			_ = fileReader.Close()
-			return fmt.Errorf("failed to save file %s: %w", file.Name, err)
-		}
-		_ = fileReader.Close()
 	}
 
 	return nil
@@ -311,34 +326,9 @@ func guessPackageNameFromImport(importPath string) (string, bool) {
 	return importPath, false
 }
 
-func parseFileImports(filename, moduleUrl string, code []byte) ([]string, error) {
-	fset := token.NewFileSet()
-	p, err := parser.ParseFile(fset, filename, code, parser.ImportsOnly)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(p.Imports) == 0 {
-		return nil, nil
-	}
-
-	imports := make([]string, 0, len(p.Imports))
-	for _, importDecl := range p.Imports {
-		importPath, err := strconv.Unquote(importDecl.Path.Value)
-		if err != nil {
-			importPath = importDecl.Path.Value
-		}
-
-		if isStandardGoPackage(importPath) {
-			continue
-		}
-
-		if isSelfModulePackage(moduleUrl, importPath) {
-			continue
-		}
-
-		imports = append(imports, importPath)
-	}
-
-	return imports, nil
+// removeVersionFromPath removes package version segment from path.
+//
+// Example: foo/bar@v1.2.3/baz -> foo/bar/baz
+func removeVersionFromPath(module *module.Version, fpath string) string {
+	return strings.Replace(fpath, "@"+module.Version, "", 1)
 }

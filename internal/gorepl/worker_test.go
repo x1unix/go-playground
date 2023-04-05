@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/x1unix/go-playground/internal/gorepl/pacman"
 	"github.com/x1unix/go-playground/pkg/goproxy"
 )
 
@@ -27,7 +28,7 @@ func TestParseFileImports(t *testing.T) {
 	}
 	sample := readTestdata(t, "sample.go.txt")
 
-	v, err := parseFileImports("sample.go.txt", "", sample)
+	v, err := pacman.ParseFileImports("sample.go.txt", "", sample)
 	require.NoError(t, err)
 	require.Equal(t, want, v)
 }
