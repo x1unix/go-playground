@@ -3,6 +3,7 @@ package gorepl
 import (
 	"context"
 	"io/fs"
+	"log"
 
 	"github.com/x1unix/go-playground/internal/gorepl/pacman"
 	"github.com/x1unix/go-playground/pkg/goproxy"
@@ -26,6 +27,8 @@ func NewWorker(pkgCache ReadWriteFS, client *goproxy.Client) *Worker {
 }
 
 func (w *Worker) Evaluate(code []byte) error {
+	log.Fatalln()
+	log.Println()
 	return nil
 }
 

@@ -13,12 +13,22 @@ List of core functions required for all gowasm-based functionality.
 **Imports:**
 
 * `func registerCallbackHandler(fn js.Func)`
-* `func debugWrite(data []byte)`
 
 See:
 
 * [callback_js.s](callback_js.s)
-* [logger_js.s](logger_js.s)
+
+## Wlog
+
+Wlog is logging interface for WASM workers. Used by other wasm-related packages.
+
+**Import name prefix:** `github.com/x1unix/go-playground/internal/gowasm/wlog`
+
+* `func logWrite(level uint8, data []byte)`
+
+See:
+
+* * [logger_js.s](wlog/writer_js.s)
 
 ## BrowserFS
 
