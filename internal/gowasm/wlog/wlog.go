@@ -1,7 +1,11 @@
 // Package wlog implements a simple logging package for internal WASM workers use.
 package wlog
 
-import "log"
+import (
+	"log"
+	"os"
+	"strconv"
+)
 
 var (
 	// stdLog is standard wasm workers logger.
@@ -9,6 +13,8 @@ var (
 
 	// debugLog is a separate logger for debug messages.
 	debugLog = log.New(StdDebug, "[DEBUG] ", log.LstdFlags|log.Lshortfile|log.Lmsgprefix)
+
+	debugLogEnabled = checkDebugLogParam()
 )
 
 // L returns standard log instance.
@@ -22,14 +28,26 @@ func D() *log.Logger {
 }
 
 func Debugf(format string, v ...any) {
+	if !debugLogEnabled {
+		return
+	}
+
 	debugLog.Printf(format, v...)
 }
 
 func Debugln(v ...any) {
+	if !debugLogEnabled {
+		return
+	}
+
 	debugLog.Println(v...)
 }
 
 func Debug(v ...any) {
+	if !debugLogEnabled {
+		return
+	}
+
 	debugLog.Print(v...)
 }
 
@@ -67,4 +85,23 @@ func Panicln(v ...any) {
 
 func Panicf(format string, v ...any) {
 	stdLog.Panicf(format, v...)
+}
+
+func checkDebugLogParam() bool {
+	val, ok := os.LookupEnv("WASM_DEBUG")
+	if !ok {
+		return false
+	}
+
+	if val == "" {
+		return false
+	}
+
+	isEnabled, err := strconv.ParseBool(val)
+	if err != nil {
+		Printf("Warning: failed to parse WASM_DEBUG environment variable: %s", err)
+		return false
+	}
+
+	return isEnabled
 }
