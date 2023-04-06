@@ -2,18 +2,23 @@ package gorepl
 
 import (
 	"context"
+	"io/fs"
 
 	"github.com/x1unix/go-playground/internal/gorepl/pacman"
-	"github.com/x1unix/go-playground/internal/gorepl/storage"
 	"github.com/x1unix/go-playground/pkg/goproxy"
 )
 
+type ReadWriteFS interface {
+	fs.ReadDirFS
+	pacman.WritableFS
+}
+
 type Worker struct {
-	pkgCache storage.ReadWriteFS
+	pkgCache ReadWriteFS
 	pkgMgr   *pacman.PackageManager
 }
 
-func NewWorker(pkgCache storage.ReadWriteFS, client *goproxy.Client) *Worker {
+func NewWorker(pkgCache ReadWriteFS, client *goproxy.Client) *Worker {
 	return &Worker{
 		pkgCache: pkgCache,
 		pkgMgr:   pacman.NewPackageManager(client, nil),

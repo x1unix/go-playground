@@ -2,6 +2,7 @@ package gowasm
 
 import (
 	"fmt"
+	"syscall"
 	"syscall/js"
 )
 
@@ -9,7 +10,7 @@ const initSeats = 1024
 
 type (
 	CallbackID = int
-	Result     = int32
+	Result     = int
 )
 
 // registerCallbackHandler registers a global callback
@@ -30,13 +31,12 @@ var (
 
 		cbId := args[0].Int()
 		result := args[0].Int()
-
 		ch, ok := callbacks[cbId]
 		if !ok {
 			panic(fmt.Sprint("gowasm: invalid callback ID: ", cbId))
 		}
 
-		ch <- int32(result)
+		ch <- result
 		return nil
 	})
 )
@@ -55,18 +55,32 @@ func RequestCallback() CallbackID {
 }
 
 // AwaitCallback await for async operation to complete using callback ID.
-func AwaitCallback(cbId CallbackID) Result {
-	ch, ok := callbacks[cbId]
+func AwaitCallback(cbID CallbackID) error {
+	res, err := AwaitResult(cbID)
+	if err != nil {
+		return err
+	}
+
+	if res == 0 {
+		return nil
+	}
+
+	return syscall.Errno(res)
+}
+
+// AwaitResult awaits for callback completion and returns raw result.
+func AwaitResult(cbID CallbackID) (Result, error) {
+	ch, ok := callbacks[cbID]
 	if !ok {
-		panic("invalid callback ID")
+		return 0, ErrCallbackInvalid
 	}
 
 	v, ok := <-ch
 	if !ok {
-		panic("callback channel is already closed")
+		return 0, ErrCallbackUsed
 	}
 
-	return v
+	return v, nil
 }
 
 // ReleaseCallback releases acquired callback.

@@ -1,14 +1,13 @@
 package browserfs
 
 import (
-	"fmt"
 	"io/fs"
+	"log"
 	"syscall"
 )
 
 var (
 	_ fs.File = (*dirFile)(nil)
-	//_ fs.ReadDirFile (*dirFile)(nil)
 )
 
 type dirFile struct {
@@ -17,13 +16,12 @@ type dirFile struct {
 }
 
 func (f dirFile) Stat() (fs.FileInfo, error) {
-	fmt.Printf("dirFile.Stat: STUB - %q\n", f.name)
+	log.Printf("dirFile.Stat: %q", f.name)
 	return newFileInfo(f.attrs), nil
 }
 
 func (f dirFile) Read(_ []byte) (int, error) {
-	//TODO implement me
-	fmt.Printf("dirFile.Read: STUB - %q\n", f.name)
+	log.Printf("dirFile.Read: %q", f.name)
 	return 0, &fs.PathError{
 		Op:   "read",
 		Path: f.name,
@@ -32,7 +30,6 @@ func (f dirFile) Read(_ []byte) (int, error) {
 }
 
 func (f dirFile) Close() error {
-	//TODO implement me
-	fmt.Printf("dirFile.Close: STUB - %q\n", f.name)
+	log.Printf("dirFile.Close: %q", f.name)
 	return nil
 }

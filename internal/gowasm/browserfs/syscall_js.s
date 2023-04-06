@@ -5,7 +5,7 @@ TEXT ·stat(SB), NOSPLIT, $0
   CallImport
   RET
 
-// func readDir(name string, out []dirEntry, cb int)
+// func readDir(name string, out []inode, cb int)
 TEXT ·readDir(SB), NOSPLIT, $0
   CallImport
   RET

@@ -14,12 +14,15 @@ import (
 	"strings"
 
 	"github.com/samber/lo"
+	"github.com/x1unix/go-playground/internal/util/buffutil"
 	"github.com/x1unix/go-playground/internal/util/syncx"
 	"github.com/x1unix/go-playground/pkg/goproxy"
 	"golang.org/x/mod/modfile"
 	"golang.org/x/mod/module"
 	"golang.org/x/mod/semver"
 )
+
+var buffPool = buffutil.NewBufferPool()
 
 var (
 	versionBranchRegEx = regexp.MustCompile(`^v\d(.\d+)?(.\d+)?$`)
@@ -181,7 +184,8 @@ func (mgr *PackageManager) downloadModule(ctx context.Context, pkgInfo *module.V
 
 	log.Printf("Downloading %s...", pkgInfo)
 
-	buff := bufferFromPoolWithSize(int(r.Size))
+	buff := buffPool.Get()
+	buff.Grow(int(r.Size))
 	defer buff.Close()
 
 	if _, err := io.Copy(buff, r); err != nil {
