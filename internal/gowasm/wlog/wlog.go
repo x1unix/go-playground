@@ -17,16 +17,6 @@ var (
 	debugLogEnabled = checkDebugLogParam()
 )
 
-// L returns standard log instance.
-func L() *log.Logger {
-	return stdLog
-}
-
-// D returns debug log instance.
-func D() *log.Logger {
-	return debugLog
-}
-
 func Debugf(format string, v ...any) {
 	if !debugLogEnabled {
 		return

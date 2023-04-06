@@ -6,6 +6,7 @@ import (
 
 	"github.com/x1unix/go-playground/internal/gorepl/pacman"
 	"github.com/x1unix/go-playground/internal/gowasm"
+	"github.com/x1unix/go-playground/internal/gowasm/wlog"
 	"golang.org/x/mod/module"
 )
 
@@ -24,6 +25,7 @@ const maxPackageVersionLength = 50
 type PackageIndex struct{}
 
 func (p PackageIndex) LookupPackage(pkgName string) (*module.Version, error) {
+	wlog.Debugln("LookupPackage: ", pkgName)
 	cb := gowasm.RequestCallback()
 
 	// Since JS host can't access Go memory allocator,
@@ -46,6 +48,7 @@ func (p PackageIndex) LookupPackage(pkgName string) (*module.Version, error) {
 }
 
 func (p PackageIndex) RegisterPackage(pkg *module.Version) error {
+	wlog.Debugln("RegisterPackage: ", pkg)
 	cb := gowasm.RequestCallback()
 	go registerPackage(pkg.Path, pkg.Version, cb)
 	if err := gowasm.AwaitCallback(cb); err != nil {
@@ -56,6 +59,7 @@ func (p PackageIndex) RegisterPackage(pkg *module.Version) error {
 }
 
 func (p PackageIndex) RemovePackage(pkg *module.Version) error {
+	wlog.Debugln("RemovePackage: ", pkg)
 	cb := gowasm.RequestCallback()
 	go removePackage(pkg.Path, cb)
 	if err := gowasm.AwaitCallback(cb); err != nil {

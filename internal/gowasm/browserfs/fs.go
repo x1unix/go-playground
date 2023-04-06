@@ -3,12 +3,12 @@ package browserfs
 import (
 	"io"
 	"io/fs"
-	"log"
 	"syscall"
 
 	"github.com/samber/lo"
 	"github.com/x1unix/go-playground/internal/gorepl/pacman"
 	"github.com/x1unix/go-playground/internal/gowasm"
+	"github.com/x1unix/go-playground/internal/gowasm/wlog"
 	"github.com/x1unix/go-playground/internal/util/buffutil"
 )
 
@@ -25,7 +25,7 @@ var (
 type FS struct{}
 
 func (s FS) Stat(name string) (fs.FileInfo, error) {
-	log.Printf("fs.Stat - %q\n", name)
+	wlog.Debugf("fs.Stat - %q\n", name)
 	cb := gowasm.RequestCallback()
 	inode := new(inode)
 	go stat(name, inode, cb)
@@ -42,7 +42,7 @@ func (s FS) Stat(name string) (fs.FileInfo, error) {
 }
 
 func (s FS) WriteFile(name string, src io.Reader, _ fs.FileMode) error {
-	log.Printf("fs.WriteFile - %q\n", name)
+	wlog.Debugf("fs.WriteFile - %q\n", name)
 	buff := buffPool.Get()
 	defer buff.Close()
 
@@ -65,7 +65,7 @@ func (s FS) WriteFile(name string, src io.Reader, _ fs.FileMode) error {
 }
 
 func (s FS) Mkdir(name string, _ fs.FileMode) error {
-	log.Printf("fs.Mkdir - %q\n", name)
+	wlog.Debugf("fs.Mkdir - %q\n", name)
 	cb := gowasm.RequestCallback()
 	go makeDir(name, cb)
 	if err := awaitCallback(cb); err != nil {
@@ -80,7 +80,7 @@ func (s FS) Mkdir(name string, _ fs.FileMode) error {
 }
 
 func (s FS) Remove(name string) error {
-	log.Printf("fs.Remove - %q\n", name)
+	wlog.Debugf("fs.Remove - %q\n", name)
 	cb := gowasm.RequestCallback()
 	go unlink(name, cb)
 	if err := awaitCallback(cb); err != nil {
@@ -95,7 +95,7 @@ func (s FS) Remove(name string) error {
 }
 
 func (s FS) ReadDir(name string) ([]fs.DirEntry, error) {
-	log.Printf("fs.ReadDir - %q\n", name)
+	wlog.Debugf("fs.ReadDir - %q\n", name)
 	cb := gowasm.RequestCallback()
 
 	// Since it's impossible to access to Go's memory allocator at JS side,
@@ -121,7 +121,7 @@ func (s FS) ReadDir(name string) ([]fs.DirEntry, error) {
 }
 
 func (s FS) Open(name string) (fs.File, error) {
-	log.Printf("fs.Open - %q\n", name)
+	wlog.Debugf("fs.Open - %q\n", name)
 	cb := gowasm.RequestCallback()
 	attrs := inode{}
 	go stat(name, &attrs, cb)

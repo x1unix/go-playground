@@ -3,10 +3,10 @@ package browserfs
 import (
 	"io"
 	"io/fs"
-	"log"
 	"sync"
 
 	"github.com/x1unix/go-playground/internal/gowasm"
+	"github.com/x1unix/go-playground/internal/gowasm/wlog"
 )
 
 var _ fs.File = (*file)(nil)
@@ -29,12 +29,12 @@ func newFile(name string, attrs inode) *file {
 }
 
 func (f *file) Stat() (fs.FileInfo, error) {
-	log.Printf("file.Stat: %q", f.name)
+	wlog.Debugf("file.Stat: %q", f.name)
 	return newFileInfo(f.attrs), nil
 }
 
 func (f *file) Read(dst []byte) (int, error) {
-	log.Printf("file.Read: %q", f.name)
+	wlog.Debugf("file.Read: %q", f.name)
 	if err := f.prefetchData(); err != nil {
 		return 0, err
 	}
@@ -104,7 +104,7 @@ func (f *file) prefetchData() error {
 }
 
 func (f *file) Close() error {
-	log.Printf("file.Close: %q", f.name)
+	wlog.Debugf("file.Close: %q", f.name)
 	f.lock.Lock()
 	defer f.lock.Unlock()
 

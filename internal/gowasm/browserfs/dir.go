@@ -2,8 +2,9 @@ package browserfs
 
 import (
 	"io/fs"
-	"log"
 	"syscall"
+
+	"github.com/x1unix/go-playground/internal/gowasm/wlog"
 )
 
 var (
@@ -16,12 +17,12 @@ type dirFile struct {
 }
 
 func (f dirFile) Stat() (fs.FileInfo, error) {
-	log.Printf("dirFile.Stat: %q", f.name)
+	wlog.Debugf("dirFile.Stat: %q", f.name)
 	return newFileInfo(f.attrs), nil
 }
 
 func (f dirFile) Read(_ []byte) (int, error) {
-	log.Printf("dirFile.Read: %q", f.name)
+	wlog.Debugf("dirFile.Read: %q", f.name)
 	return 0, &fs.PathError{
 		Op:   "read",
 		Path: f.name,
@@ -30,6 +31,6 @@ func (f dirFile) Read(_ []byte) (int, error) {
 }
 
 func (f dirFile) Close() error {
-	log.Printf("dirFile.Close: %q", f.name)
+	wlog.Debugf("dirFile.Close: %q", f.name)
 	return nil
 }
