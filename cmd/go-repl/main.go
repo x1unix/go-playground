@@ -19,7 +19,8 @@ import (
 )
 
 func main() {
-	tests.RunInterp()
+	//tests.RunInterp()
+	tests.TestStable()
 	//tests.RunTestAsync()
 	//now := time.Now().UnixMilli()
 	//w := storage.JSStorageWriter{}

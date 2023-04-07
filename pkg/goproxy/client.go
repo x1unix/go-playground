@@ -1,3 +1,4 @@
+// Package goproxy provides Go modules proxy API client.
 package goproxy
 
 import (
@@ -28,6 +29,12 @@ func NewClient(client *http.Client, baseURL string) *Client {
 		url:    baseURL,
 		client: client,
 	}
+}
+
+// NewClientWithDefaults returns a new go modules proxy client with default http client
+// and official Go Modules proxy server.
+func NewClientWithDefaults() *Client {
+	return NewClient(http.DefaultClient, DefaultProxyURL)
 }
 
 func (c Client) getURL(segments ...string) string {

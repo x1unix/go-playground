@@ -24,6 +24,10 @@ var (
 
 type FS struct{}
 
+func NewFS() FS {
+	return FS{}
+}
+
 func (s FS) Stat(name string) (fs.FileInfo, error) {
 	wlog.Debugf("fs.Stat - %q\n", name)
 	cb := gowasm.RequestCallback()

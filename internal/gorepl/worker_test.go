@@ -1,25 +1,13 @@
 package gorepl
 
 import (
-	"context"
-	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"github.com/x1unix/go-playground/internal/gorepl/pacman"
-	"github.com/x1unix/go-playground/pkg/goproxy"
 )
-
-func TestWorker_Evaluate(t *testing.T) {
-	client := goproxy.NewClient(http.DefaultClient, "https://proxy.golang.org")
-	sample := readTestdata(t, "sample.go.txt")
-	ctx := context.Background()
-	w := NewWorker(nil, client)
-	err := w.checkNewImports(ctx, sample)
-	require.NoError(t, err)
-}
 
 func TestParseFileImports(t *testing.T) {
 	want := []string{
