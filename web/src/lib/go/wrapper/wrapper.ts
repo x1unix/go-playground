@@ -3,7 +3,7 @@ import { MemoryInspector} from "../debug";
 import { Bool, GoStringType } from "../types";
 import { GoInstance, ImportObject, PendingEvent } from "./interface";
 import {Func, Ref, RefType} from "../pkg/syscall/js";
-import MemoryView from '../memory/view';
+import { MemoryView } from '../memory/view';
 
 import {
   GoWebAssemblyInstance,

@@ -6,7 +6,7 @@ import {JSValuesTable} from "~/lib/go/wrapper/interface";
 /**
  * MemoryView provides functionality to read or write into Go program memory.
  */
-export default class MemoryView {
+export class MemoryView {
   private readonly debug;
   constructor(
     private mem: DataView,
