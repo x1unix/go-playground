@@ -5,12 +5,13 @@ package tests
 import (
 	_ "embed"
 	"fmt"
+	"io/fs"
+	"syscall/js"
+
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
 	"github.com/x1unix/go-playground/internal/gowasm/browserfs"
 	"github.com/x1unix/go-playground/pkg/worker"
-	"io/fs"
-	"syscall/js"
 )
 
 //go:embed testdata/sample.go
