@@ -3,6 +3,7 @@ import { MemoryInspector} from "../debug";
 import { Bool, GoStringType } from "../types";
 import { GoInstance, ImportObject, PendingEvent } from "./interface";
 import {Func, Ref, RefType} from "../pkg/syscall/js";
+import MemoryView from '../memory/view';
 
 import {
   GoWebAssemblyInstance,
@@ -46,7 +47,7 @@ export const wrapGlobal = (overlay: object = {}, globalValue: object = window ||
   return mockObject;
 }
 
-export type CallImportHandler = (sp: number, reader: StackReader) => any;
+export type CallImportHandler = (sp: number, stack: StackReader, mem: MemoryView) => any;
 
 export interface Options {
   debug?: boolean
@@ -56,6 +57,7 @@ export interface Options {
 
 export class GoWrapper {
   private _inspector: MemoryInspector|null = null;
+  private _memView: MemoryView|null = null;
   private _debug = false;
   private _debugSkipCalls: Set<string>;
   private _globalValue: object;
@@ -126,6 +128,7 @@ export class GoWrapper {
   private patchImportObject() {
     this.exportFunction('runtime.resetMemoryDataView', () => {
       this.go.mem = new DataView(this.exports.mem.buffer);
+      this._memView?.reset(this.go.mem);
       this._inspector = new MemoryInspector(this.go.mem);
     })
 
@@ -285,7 +288,7 @@ export class GoWrapper {
         {debug: isDebug}
       );
 
-      return func(sp, reader);
+      return func(sp, reader, this._memView!);
     }
   }
 
@@ -315,6 +318,13 @@ export class GoWrapper {
     });
 
     this._inspector = MemoryInspector.fromInstance(wrappedInstance);
+    this._memView = MemoryView.fromInstance(
+      wrappedInstance,
+      this.go._values, {
+        debug: this._debug
+      }
+    );
+
     return this.go.run(wrappedInstance);
   }
 

@@ -1,5 +1,5 @@
-import { UintPtr, Int } from "../basic";
-import { StructTypeSpec } from "../complex";
+import { UintPtr, Int } from '../basic';
+import { StructTypeSpec } from '../complex';
 
 const encoder = new TextDecoder('utf-8');
 const decoder = new TextDecoder('utf-8');
