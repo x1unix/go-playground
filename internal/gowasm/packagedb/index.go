@@ -24,6 +24,10 @@ const maxPackageVersionLength = 50
 // with IndexDB-based package registry on browser side.
 type PackageIndex struct{}
 
+func NewPackageIndex() PackageIndex {
+	return PackageIndex{}
+}
+
 func (p PackageIndex) LookupPackage(pkgName string) (*module.Version, error) {
 	wlog.Debugln("LookupPackage: ", pkgName)
 	cb := gowasm.RequestCallback()
