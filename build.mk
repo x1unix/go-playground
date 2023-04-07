@@ -68,3 +68,7 @@ build: check-go check-yarn clean preinstall collect-meta build-server build-wasm
 	cp -rfv ./data $(TARGET)/data && \
 	mv -v $(UI)/build $(TARGET)/public && \
 	echo ":: Build done - $(TARGET)"
+
+.PHONY:gen
+gen:
+	@find . -name '*_js.go' -print0 | xargs -0 -n1 go generate
