@@ -52,11 +52,11 @@ export const Package = (pkgName: string): ClassDecorator => (
 )
 
 /**
- * ExportMethod decorator adds class method to exports with given symbol name.
+ * WasmExport decorator adds class method to exports with given symbol name.
  * @param funcName Go function name to be linked with.
  * @constructor
  */
-export const ExportMethod = (funcName: string): MethodDecorator => (
+export const WasmExport = (funcName: string): MethodDecorator => (
   (target, propertyKey, descriptor) => {
     const func = (descriptor.value! as unknown) as CallImportHandler;
     const meta = getGoExportMetadata(target);
@@ -91,9 +91,8 @@ export const registerExportObject = (go: GoWrapper, srcObj: PackageBinding) => {
 
   const { packageName, symbols } = meta;
   for (const [funcName, func] of symbols) {
-    // console.log(`register: ${packageName}.${funcName} - `, func, srcObj);
-    go.exportFunction(`${packageName}.${funcName}`, (sp, reader) => (
-      func.call(srcObj, sp, reader)
-    ))
+    go.exportFunction(`${packageName}.${funcName}`, (sp, reader, mem) => (
+      func.call(srcObj, sp, reader, mem)
+    ));
   }
 }

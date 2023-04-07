@@ -1,5 +1,6 @@
-import {ExportMethod, Package, PackageBinding} from '~/lib/gowasm/binder';
+import {WasmExport, Package, PackageBinding} from '~/lib/gowasm/binder';
 import {GoWrapper, js, StackReader} from '~/lib/go';
+import {Errno, SyscallError} from '~/lib/go/pkg/syscall';
 
 /**
  * SyscallHelper contains extensions required for "gowasm" package.
@@ -14,7 +15,7 @@ export default class SyscallHelper extends PackageBinding {
     super();
   }
 
-  @ExportMethod('registerCallbackHandler')
+  @WasmExport('registerCallbackHandler')
   private registerCallbackHandler(sp: number, reader: StackReader) {
     reader.skipHeader();
     const callbackFunc = reader.next<js.Func>(js.FuncType);
@@ -33,5 +34,40 @@ export default class SyscallHelper extends PackageBinding {
     }
 
     this.go.callFunc(this.callbackFunc, [callbackId, result]);
+  }
+
+  /**
+   * Reports async error back to Go caller.
+   *
+   * If passed error is SyscallError, it will use its origin error code.
+   * @param callbackId
+   * @param err
+   */
+  sendErrorResult(callbackId: number, err: Error | Errno) {
+    const sysErr = SyscallError.fromError(err);
+    console.error(`gowasm: async callback thrown an error: ${err} (errno: ${sysErr.errno})`);
+    this.sendCallbackResult(callbackId, sysErr.errno);
+  }
+
+  /**
+   * Perform async operation and return result to the Go worker by callback ID.
+   *
+   * Any throw error will be sent as error code back to Go worker.
+   *
+   * @param callbackId Callback ID
+   * @param fn Async function
+   */
+  doAsync(callbackId: number, fn: () => Promise<void>) {
+    try {
+      fn()
+        .then(() => {
+          this.sendCallbackResult(callbackId, 0);
+        })
+        .catch((err: Error) => {
+          this.sendErrorResult(callbackId, err);
+        });
+    } catch (err) {
+      this.sendErrorResult(callbackId, err as Error);
+    }
   }
 }
