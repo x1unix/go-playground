@@ -13,6 +13,7 @@ List of core functions required for all gowasm-based functionality.
 **Imports:**
 
 * `func registerCallbackHandler(fn js.Func)`
+* `func wasmConsoleWrite(fd int, data []byte)`
 
 See:
 
