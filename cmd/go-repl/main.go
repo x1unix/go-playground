@@ -7,85 +7,28 @@
 package main
 
 import (
-	"archive/zip"
-	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
-	"github.com/x1unix/go-playground/internal/gorepl/tests"
+	_ "embed"
+
+	"github.com/x1unix/go-playground/internal/gorepl"
+	"github.com/x1unix/go-playground/internal/gowasm/browserfs"
+	"github.com/x1unix/go-playground/internal/gowasm/packagedb"
+	"github.com/x1unix/go-playground/internal/gowasm/wlog"
 	"github.com/x1unix/go-playground/pkg/goproxy"
-	"io"
-	"net/http"
 )
 
+//go:embed sample.txt
+var sample []byte
+
 func main() {
-	//tests.RunInterp()
-	tests.TestStable()
-	//tests.RunTestAsync()
-	//now := time.Now().UnixMilli()
-	//w := storage.JSStorageWriter{}
-	//w.Create(storage.FileEntry{
-	//	PathName: "/foo/bar.go",
-	//	fileInfo: storage.fileInfo{
-	//		Name:    "bar.go",
-	//		Size:    102400,
-	//		IsDir:   false,
-	//		Mode:    0644,
-	//		ModTime: now,
-	//	},
-	//})
-}
+	vendorFS := browserfs.NewFS()
+	pkgIndex := packagedb.NewPackageIndex()
+	client := goproxy.NewClientWithDefaults()
 
-func main2() {
-	if err := testModDownload(); err != nil {
-		fmt.Println("ERR:", err)
+	ctx := context.Background()
+	worker := gorepl.NewWorker(vendorFS, pkgIndex, client)
+	if err := worker.Evaluate(ctx, sample); err != nil {
+		wlog.Println("Eval error:", err)
 	}
-}
-
-func testModDownload() error {
-	client := goproxy.NewClient(http.DefaultClient, "https://proxy.golang.org")
-	v, err := client.GetLatestVersion(context.Background(), "gitlab.com/qosenergy/squalus")
-	if err != nil {
-		return fmt.Errorf("GetLatestVersion: %w", err)
-	}
-
-	data, _ := json.MarshalIndent(v, "", "  ")
-	fmt.Println(string(data))
-
-	src, err := client.GetModuleSource(context.Background(), "gitlab.com/qosenergy/squalus", v.Version)
-	if err != nil {
-		return fmt.Errorf("GetModuleSource: %w", err)
-	}
-
-	reader, err := readBuff(src)
-	if err != nil {
-		return err
-	}
-
-	zf, err := zip.NewReader(reader, reader.Size())
-	if err != nil {
-		return fmt.Errorf("zip.NewReader: %w", err)
-	}
-	for _, file := range zf.File {
-		fi := file.FileInfo()
-		fi.Mode()
-		//fi.ModTime().Unix()
-		fmt.Println("* Name:", file.Name, "\nBaseName:", fi.Name(), "\nSize:", fi.Size())
-	}
-
-	return nil
-}
-
-func readBuff(src *goproxy.ArchiveReadCloser) (*bytes.Reader, error) {
-	buff := bytes.NewBuffer(make([]byte, 0, src.Size))
-	defer src.Close()
-
-	if _, err := io.Copy(buff, src); err != nil {
-		return nil, fmt.Errorf("io.Copy: %w", err)
-	}
-
-	data := buff.Bytes()
-	fmt.Printf("Uncompressed: %d bytes\n", len(data))
-	fmt.Printf("Header: %x\n", data[0:4])
-	return bytes.NewReader(data), nil
+	wlog.Println("Eval ok")
 }
