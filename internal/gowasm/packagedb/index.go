@@ -35,7 +35,7 @@ func (p PackageIndex) LookupPackage(pkgName string) (*module.Version, error) {
 	// Since JS host can't access Go memory allocator,
 	// preallocate enough memory for result.
 	buff := make([]byte, 0, maxPackageVersionLength)
-	go lookupPackage(pkgName, buff, cb)
+	go lookupPackage(pkgName, &buff, cb)
 	err := gowasm.AwaitCallback(cb)
 	if err == syscall.ENOENT {
 		return nil, fs.ErrNotExist

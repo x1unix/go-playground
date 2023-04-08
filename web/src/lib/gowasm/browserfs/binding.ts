@@ -11,10 +11,10 @@ import {
   stringEncoder,
 } from '~/lib/go';
 import {Errno, SyscallError} from '~/lib/go/pkg/syscall';
-import {Package, PackageBinding, WasmExport} from '~/lib/gowasm/binder';
-import {Inode, MAX_FILE_NAME_LEN, TInode} from "~/lib/gowasm/browserfs/go";
-import SyscallHelper from '~/lib/gowasm/syscall';
-import {FileStore} from './types';
+import {Package, PackageBinding, WasmExport} from '../binder';
+import {Inode, MAX_FILE_NAME_LEN, TInode} from "./types";
+import SyscallHelper from '../syscall';
+import {FileStore} from './filestore';
 
 const checkFileNameLimit = (strLen: number) => {
   if (!strLen) {
@@ -28,7 +28,11 @@ const checkFileNameLimit = (strLen: number) => {
 
 const validateFileName = (name: string) => checkFileNameLimit(name.length);
 
-
+/**
+ * WASM imports binding for emulated package cache filesystem.
+ *
+ * @see internal/gowasm/browserfs/syscall_js.go
+ */
 @Package('github.com/x1unix/go-playground/internal/gowasm/browserfs')
 export default class BrowserFSBinding extends PackageBinding {
   constructor(private helper: SyscallHelper, private store: FileStore) {
@@ -49,10 +53,6 @@ export default class BrowserFSBinding extends PackageBinding {
 
     this.helper.doAsync(cbId, async () => {
       validateFileName(fileName);
-
-      if (!fileName.length) {
-        throw new SyscallError(Errno.EINVAL);
-      }
 
       if (!outPtr) {
         throw new SyscallError(Errno.EFAULT);

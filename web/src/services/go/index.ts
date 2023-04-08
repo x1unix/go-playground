@@ -4,7 +4,7 @@ import { Global } from './go';
 import { Go } from './wasm_exec';
 import { StdioWrapper, ConsoleLogger } from './stdio';
 
-// TODO: Uncomment, when "go.ts" will be fixed
+// TODO: Uncomment, when "types.ts" will be fixed
 // import { Go, Global } from './go';
 
 let instance: Go;
