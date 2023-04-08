@@ -1,8 +1,8 @@
 import { UintPtr, Int } from '../basic';
 import { StructTypeSpec } from '../complex';
 
-const encoder = new TextDecoder('utf-8');
-const decoder = new TextDecoder('utf-8');
+export const stringEncoder = new TextEncoder();
+export const stringDecoder = new TextDecoder('utf-8');
 
 const stringStructDescriptor = [
   { key: 'data', type: UintPtr },
@@ -21,7 +21,7 @@ class GoStringTypeSpec extends StructTypeSpec<StringHeader> {
 
   protected valueFromStruct(mem: ArrayBufferLike, structVal: StringHeader) {
     const { data, len } = structVal;
-    return decoder.decode(new DataView(mem, data, len));
+    return stringDecoder.decode(new DataView(mem, data, len));
   }
 }
 
@@ -29,4 +29,3 @@ export const GoStringType = new GoStringTypeSpec();
 export const StringHeaderType = new StructTypeSpec(
   'reflect.StringHeader', stringStructDescriptor
 );
-

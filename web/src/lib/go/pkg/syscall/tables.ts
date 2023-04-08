@@ -4,243 +4,615 @@
  * See: /go/src/syscall/tables_js.go
  */
 export enum Errno {
-  /* Operation not permitted */
+
+  /**
+   * Operation not permitted
+   */
   EPERM = 1,
-  /* No such file or directory */
+
+  /**
+   * No such file or directory
+   */
   ENOENT = 2,
-  /* No such process */
+
+  /**
+   * No such process
+   */
   ESRCH = 3,
-  /* Interrupted system call */
+
+  /**
+   * Interrupted system call
+   */
   EINTR = 4,
-  /* I/O error */
+
+  /**
+   * I/O error
+   */
   EIO = 5,
-  /* No such device or address */
+
+  /**
+   * No such device or address
+   */
   ENXIO = 6,
-  /* Argument list too long */
+
+  /**
+   * Argument list too long
+   */
   E2BIG = 7,
-  /* Exec format error */
+
+  /**
+   * Exec format error
+   */
   ENOEXEC = 8,
-  /* Bad file number */
+
+  /**
+   * Bad file number
+   */
   EBADF = 9,
-  /* No child processes */
+
+  /**
+   * No child processes
+   */
   ECHILD = 10,
-  /* Try again */
+
+  /**
+   * Try again
+   */
   EAGAIN = 11,
-  /* Out of memory */
+
+  /**
+   * Out of memory
+   */
   ENOMEM = 12,
-  /* Permission denied */
+
+  /**
+   * Permission denied
+   */
   EACCES = 13,
-  /* Bad address */
+
+  /**
+   * Bad address
+   */
   EFAULT = 14,
-  /* Device or resource busy */
+
+  /**
+   * Device or resource busy
+   */
   EBUSY = 16,
-  /* File exists */
+
+  /**
+   * File exists
+   */
   EEXIST = 17,
-  /* Cross-device link */
+
+  /**
+   * Cross-device link
+   */
   EXDEV = 18,
-  /* No such device */
+
+  /**
+   * No such device
+   */
   ENODEV = 19,
-  /* Not a directory */
+
+  /**
+   * Not a directory
+   */
   ENOTDIR = 20,
-  /* Is a directory */
+
+  /**
+   * Is a directory
+   */
   EISDIR = 21,
-  /* Invalid argument */
+
+  /**
+   * Invalid argument
+   */
   EINVAL = 22,
-  /* File table overflow */
+
+  /**
+   * File table overflow
+   */
   ENFILE = 23,
-  /* Too many open files */
+
+  /**
+   * Too many open files
+   */
   EMFILE = 24,
-  /* Not a typewriter */
+
+  /**
+   * Not a typewriter
+   */
   ENOTTY = 25,
-  /* File too large */
+
+  /**
+   * File too large
+   */
   EFBIG = 27,
-  /* No space left on device */
+
+  /**
+   * No space left on device
+   */
   ENOSPC = 28,
-  /* Illegal seek */
+
+  /**
+   * Illegal seek
+   */
   ESPIPE = 29,
-  /* Read-only file system */
+
+  /**
+   * Read-only file system
+   */
   EROFS = 30,
-  /* Too many links */
+
+  /**
+   * Too many links
+   */
   EMLINK = 31,
-  /* Broken pipe */
+
+  /**
+   * Broken pipe
+   */
   EPIPE = 32,
-  /* File name too long */
+
+  /**
+   * File name too long
+   */
   ENAMETOOLONG = 36,
-  /* Function not implemented */
+
+  /**
+   * Function not implemented
+   */
   ENOSYS = 38,
-  /* Quota exceeded */
+
+  /**
+   * Quota exceeded
+   */
   EDQUOT = 122,
-  /* Math arg out of domain of func */
+
+  /**
+   * Math arg out of domain of func
+   */
   EDOM = 33,
-  /* Math result not representable */
+
+  /**
+   * Math result not representable
+   */
   ERANGE = 34,
-  /* Deadlock condition */
+
+  /**
+   * Deadlock condition
+   */
   EDEADLK = 35,
-  /* No record locks available */
+
+  /**
+   * No record locks available
+   */
   ENOLCK = 37,
-  /* Directory not empty */
+
+  /**
+   * Directory not empty
+   */
   ENOTEMPTY = 39,
-  /* Too many symbolic links */
+
+  /**
+   * Too many symbolic links
+   */
   ELOOP = 40,
-  /* No message of desired type */
+
+  /**
+   * No message of desired type
+   */
   ENOMSG = 42,
-  /* Identifier removed */
+
+  /**
+   * Identifier removed
+   */
   EIDRM = 43,
-  /* Channel number out of range */
+
+  /**
+   * Channel number out of range
+   */
   ECHRNG = 44,
-  /* Level 2 not synchronized */
+
+  /**
+   * Level 2 not synchronized
+   */
   EL2NSYNC = 45,
-  /* Level 3 halted */
+
+  /**
+   * Level 3 halted
+   */
   EL3HLT = 46,
-  /* Level 3 reset */
+
+  /**
+   * Level 3 reset
+   */
   EL3RST = 47,
-  /* Link number out of range */
+
+  /**
+   * Link number out of range
+   */
   ELNRNG = 48,
-  /* Protocol driver not attached */
+
+  /**
+   * Protocol driver not attached
+   */
   EUNATCH = 49,
-  /* No CSI structure available */
+
+  /**
+   * No CSI structure available
+   */
   ENOCSI = 50,
-  /* Level 2 halted */
+
+  /**
+   * Level 2 halted
+   */
   EL2HLT = 51,
-  /* Invalid exchange */
+
+  /**
+   * Invalid exchange
+   */
   EBADE = 52,
-  /* Invalid request descriptor */
+
+  /**
+   * Invalid request descriptor
+   */
   EBADR = 53,
-  /* Exchange full */
+
+  /**
+   * Exchange full
+   */
   EXFULL = 54,
-  /* No anode */
+
+  /**
+   * No anode
+   */
   ENOANO = 55,
-  /* Invalid request code */
+
+  /**
+   * Invalid request code
+   */
   EBADRQC = 56,
-  /* Invalid slot */
+
+  /**
+   * Invalid slot
+   */
   EBADSLT = 57,
-  /* File locking deadlock error */
+
+  /**
+   * File locking deadlock error
+   */
   EDEADLOCK = EDEADLK,
-  /* Bad font file fmt */
+
+  /**
+   * Bad font file fmt
+   */
   EBFONT = 59,
-  /* Device not a stream */
+
+  /**
+   * Device not a stream
+   */
   ENOSTR = 60,
-  /* No data (for no delay io) */
+
+  /**
+   * No data (for no delay io)
+   */
   ENODATA = 61,
-  /* Timer expired */
+
+  /**
+   * Timer expired
+   */
   ETIME = 62,
-  /* Out of streams resources */
+
+  /**
+   * Out of streams resources
+   */
   ENOSR = 63,
-  /* Machine is not on the network */
+
+  /**
+   * Machine is not on the network
+   */
   ENONET = 64,
-  /* Package not installed */
+
+  /**
+   * Package not installed
+   */
   ENOPKG = 65,
-  /* The object is remote */
+
+  /**
+   * The object is remote
+   */
   EREMOTE = 66,
-  /* The link has been severed */
+
+  /**
+   * The link has been severed
+   */
   ENOLINK = 67,
-  /* Advertise error */
+
+  /**
+   * Advertise error
+   */
   EADV = 68,
-  /* Srmount error */
+
+  /**
+   * Srmount error
+   */
   ESRMNT = 69,
-  /* Communication error on send */
+
+  /**
+   * Communication error on send
+   */
   ECOMM = 70,
-  /* Protocol error */
+
+  /**
+   * Protocol error
+   */
   EPROTO = 71,
-  /* Multihop attempted */
+
+  /**
+   * Multihop attempted
+   */
   EMULTIHOP = 72,
-  /* Cross mount point (not really error) */
+
+  /**
+   * Cross mount point (not really error)
+   */
   EDOTDOT = 73,
-  /* Trying to read unreadable message */
+
+  /**
+   * Trying to read unreadable message
+   */
   EBADMSG = 74,
-  /* Value too large for defined data type */
+
+  /**
+   * Value too large for defined data type
+   */
   EOVERFLOW = 75,
-  /* Given log. name not unique */
+
+  /**
+   * Given log. name not unique
+   */
   ENOTUNIQ = 76,
-  /* f.d. invalid for this operation */
+
+  /**
+   * f.d. invalid for this operation
+   */
   EBADFD = 77,
-  /* Remote address changed */
+
+  /**
+   * Remote address changed
+   */
   EREMCHG = 78,
-  /* Can't access a needed shared lib */
+
+  /**
+   * Can't access a needed shared lib
+   */
   ELIBACC = 79,
-  /* Accessing a corrupted shared lib */
+
+  /**
+   * Accessing a corrupted shared lib
+   */
   ELIBBAD = 80,
-  /* .lib section in a.out corrupted */
+
+  /**
+   * .lib section in a.out corrupted
+   */
   ELIBSCN = 81,
-  /* Attempting to link in too many libs */
+
+  /**
+   * Attempting to link in too many libs
+   */
   ELIBMAX = 82,
-  /* Attempting to exec a shared library */
+
+  /**
+   * Attempting to exec a shared library
+   */
   ELIBEXEC = 83,
+
+  /**
+   * Illegal byte sequence.
+   */
   EILSEQ = 84,
+
+  /**
+   * Too many users.
+   */
   EUSERS = 87,
-  /* Socket operation on non-socket */
+
+  /**
+   * Socket operation on non-socket
+   */
   ENOTSOCK = 88,
-  /* Destination address required */
+
+  /**
+   * Destination address required
+   */
   EDESTADDRREQ = 89,
-  /* Message too long */
+
+  /**
+   * Message too long
+   */
   EMSGSIZE = 90,
-  /* Protocol wrong type for socket */
+
+  /**
+   * Protocol wrong type for socket
+   */
   EPROTOTYPE = 91,
-  /* Protocol not available */
+
+  /**
+   * Protocol not available
+   */
   ENOPROTOOPT = 92,
-  /* Unknown protocol */
+
+  /**
+   * Unknown protocol
+   */
   EPROTONOSUPPORT = 93,
-  /* Socket type not supported */
+
+  /**
+   * Socket type not supported
+   */
   ESOCKTNOSUPPORT = 94,
-  /* Operation not supported on transport endpoint */
+
+  /**
+   * Operation not supported on transport endpoint
+   */
   EOPNOTSUPP = 95,
-  /* Protocol family not supported */
+
+  /**
+   * Protocol family not supported
+   */
   EPFNOSUPPORT = 96,
-  /* Address family not supported by protocol family */
+
+  /**
+   * Address family not supported by protocol family
+   */
   EAFNOSUPPORT = 97,
-  /* Address already in use */
+
+  /**
+   * Address already in use
+   */
   EADDRINUSE = 98,
-  /* Address not available */
+
+  /**
+   * Address not available
+   */
   EADDRNOTAVAIL = 99,
-  /* Network interface is not configured */
+
+  /**
+   * Network interface is not configured
+   */
   ENETDOWN = 100,
-  /* Network is unreachable */
+
+  /**
+   * Network is unreachable
+   */
   ENETUNREACH = 101,
+
+  /**
+   * Network dropped connection on reset.
+   */
   ENETRESET = 102,
-  /* Connection aborted */
+
+  /**
+   * Connection aborted
+   */
   ECONNABORTED = 103,
-  /* Connection reset by peer */
+
+  /**
+   * Connection reset by peer
+   */
   ECONNRESET = 104,
-  /* No buffer space available */
+
+  /**
+   * No buffer space available
+   */
   ENOBUFS = 105,
-  /* Socket is already connected */
+
+  /**
+   * Socket is already connected
+   */
   EISCONN = 106,
-  /* Socket is not connected */
+
+  /**
+   * Socket is not connected
+   */
   ENOTCONN = 107,
-  /* Can't send after socket shutdown */
+
+  /**
+   * Can't send after socket shutdown
+   */
   ESHUTDOWN = 108,
+
+  /**
+   * Too many references: can’t splice.
+   */
   ETOOMANYREFS = 109,
-  /* Connection timed out */
+
+  /**
+   * Connection timed out
+   */
   ETIMEDOUT = 110,
-  /* Connection refused */
+
+  /**
+   * Connection refused
+   */
   ECONNREFUSED = 111,
-  /* Host is down */
+
+  /**
+   * Host is down
+   */
   EHOSTDOWN = 112,
-  /* Host is unreachable */
+
+  /**
+   * Host is unreachable
+   */
   EHOSTUNREACH = 113,
-  /* Socket already connected */
+
+  /**
+   * Socket already connected
+   */
   EALREADY = 114,
-  /* Connection already in progress */
+
+  /**
+   * Connection already in progress
+   */
   EINPROGRESS = 115,
+
+  /**
+   * Stale NFS file handle.
+   */
   ESTALE = 116,
-  /* Not supported */
+
+  /**
+   * Not supported
+   */
   ENOTSUP = EOPNOTSUPP,
-  /* No medium (in tape drive) */
+
+  /**
+   * No medium (in tape drive)
+   */
   ENOMEDIUM = 123,
-  /* Operation canceled. */
+
+  /**
+   * Operation canceled.
+   */
   ECANCELED = 125,
-  /* Inode is remote (not really error) */
+
+  /**
+   * Inode is remote (not really error)
+   */
   ELBIN = 2048,
-  /* Inappropriate file type or format */
+
+  /**
+   * Inappropriate file type or format
+   */
   EFTYPE = 2049,
-  /* No more files */
+
+  /**
+   * No more files
+   */
   ENMFILE = 2050,
+
+  /**
+   * Quotas & mush. Too many processes.
+   */
   EPROCLIM = 2051,
-  /* No such host or network path */
+
+  /**
+   * No such host or network path
+   */
   ENOSHARE = 2052,
-  /* Filename exists with different case */
+
+  /**
+   * Filename exists with different case
+   */
   ECASECLASH = 2053,
-  /* Operation would block */
+
+  /**
+   * Operation would block
+   */
   EWOULDBLOCK = EAGAIN,
 }
 

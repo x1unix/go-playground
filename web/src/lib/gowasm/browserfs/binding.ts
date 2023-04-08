@@ -1,8 +1,33 @@
-import {GoStringType, Int, StackReader, UintPtr} from '~/lib/go';
+import {
+  Int,
+  UintPtr,
+  ArrayTypeSpec,
+  GoStringType,
+  MemoryView,
+  SliceHeader,
+  SliceHeaderType,
+  StackReader,
+  stringDecoder,
+  stringEncoder,
+} from '~/lib/go';
+import {Errno, SyscallError} from '~/lib/go/pkg/syscall';
 import {Package, PackageBinding, WasmExport} from '~/lib/gowasm/binder';
+import {Inode, MAX_FILE_NAME_LEN, TInode} from "~/lib/gowasm/browserfs/go";
 import SyscallHelper from '~/lib/gowasm/syscall';
 import {FileStore} from './types';
-import {Errno, SyscallError} from "~/lib/go/pkg/syscall";
+
+const checkFileNameLimit = (strLen: number) => {
+  if (!strLen) {
+    throw new SyscallError(Errno.EINVAL);
+  }
+
+  if (strLen > MAX_FILE_NAME_LEN) {
+    throw new SyscallError(Errno.ENAMETOOLONG);
+  }
+};
+
+const validateFileName = (name: string) => checkFileNameLimit(name.length);
+
 
 @Package('github.com/x1unix/go-playground/internal/gowasm/browserfs')
 export default class BrowserFSBinding extends PackageBinding {
@@ -12,50 +37,173 @@ export default class BrowserFSBinding extends PackageBinding {
 
   // func stat(name string, out *inode, cb int)
   @WasmExport('stat')
-  stat(sp: number, reader: StackReader) {
+  stat(sp: number, reader: StackReader, mem: MemoryView) {
     reader.skipHeader();
     const fileName = reader.next<string>(GoStringType);
-    const out = reader.next<number>(UintPtr);
+    const outPtr = reader.next<number>(UintPtr);
     const cbId = reader.next<number>(Int);
 
-    if (!out || !fileName.length) {
-      this.helper.sendErrorResult(cbId, Errno.EINVAL);
-      return;
+    if (!cbId) {
+      throw new SyscallError(Errno.EBADSLT);
     }
 
     this.helper.doAsync(cbId, async () => {
-      const result = this.store.stat(fileName);
+      validateFileName(fileName);
 
+      if (!fileName.length) {
+        throw new SyscallError(Errno.EINVAL);
+      }
+
+      if (!outPtr) {
+        throw new SyscallError(Errno.EFAULT);
+      }
+
+      const result = this.store.stat(fileName);
+      mem.write(outPtr, TInode, result);
     });
   }
 
-  // func readDir(name string, out []inode, cb int)
+  // func readDir(name string, out *[]inode, cb int)
   @WasmExport('readDir')
-  readDir(sp: number, reader: StackReader) {
+  readDir(sp: number, reader: StackReader, mem: MemoryView) {
     reader.skipHeader();
+    const dirName = reader.next<string>(GoStringType);
+    const outSlicePtr = reader.next<number>(UintPtr);
+    const cbId = reader.next<number>(Int);
+
+    if (!cbId) {
+      throw new SyscallError(Errno.EBADSLT);
+    }
+
+    this.helper.doAsync(cbId, async () => {
+      validateFileName(dirName);
+
+      if (!outSlicePtr) {
+        throw new SyscallError(Errno.EFAULT);
+      }
+
+      const outSlice = mem.read<SliceHeader>(outSlicePtr, SliceHeaderType);
+      const items = await this.store.readDir(dirName);
+      if (items.length > outSlice.cap) {
+        throw new SyscallError(Errno.ENOMEM);
+      }
+
+      const inodes = items.map(({name, ...props}) => {
+        const encodedName = stringEncoder.encode(name);
+        return {
+          ...props,
+          name: {
+            len: encodedName.length,
+            data: encodedName,
+          }
+        };
+      });
+
+      // Update slice length
+      outSlice.len = items.length;
+      mem.write<SliceHeader>(outSlicePtr, SliceHeaderType, outSlice);
+      mem.write<Inode[]>(
+        outSlice.data,
+        new ArrayTypeSpec(TInode, items.length),
+        inodes,
+      );
+    });
   }
 
-  // func readFile(f inode, out []byte, cb int)
+  // func readFile(f inode, out *[]byte, cb int)
   @WasmExport('readFile')
-  readFile(sp: number, reader: StackReader) {
+  readFile(sp: number, reader: StackReader, mem: MemoryView) {
     reader.skipHeader();
+    const inode = reader.next<Inode>(TInode);
+    const slicePtr = reader.next<number>(UintPtr);
+    const cbId = reader.next<number>(Int);
+
+    if (!cbId) {
+      throw new SyscallError(Errno.EBADSLT);
+    }
+
+    this.helper.doAsync(cbId, async () => {
+      checkFileNameLimit(inode.name.len);
+
+      if (!slicePtr) {
+        throw new SyscallError(Errno.EFAULT);
+      }
+
+      const data = await this.store.readFile({
+        ...inode,
+        name: stringDecoder.decode(inode.name.data.slice(0, inode.name.len)),
+      });
+
+      const dstSlice = mem.read<SliceHeader>(slicePtr, SliceHeaderType);
+      if (data.length > dstSlice.cap) {
+        throw new SyscallError(Errno.ENOMEM);
+      }
+
+      // Update slice length
+      dstSlice.len = data.length;
+      mem.write<SliceHeader>(slicePtr, SliceHeaderType, dstSlice);
+      mem.set(dstSlice.data, data);
+    });
   }
 
   // func writeFile(name string, data []byte, cb int)
   @WasmExport('writeFile')
-  writeFile(sp: number, reader: StackReader) {
+  writeFile(sp: number, reader: StackReader, mem: MemoryView) {
     reader.skipHeader();
+    const fname = reader.next<string>(GoStringType);
+    const srcSlice = reader.next<SliceHeader>(SliceHeaderType);
+    const cbId = reader.next<number>(Int);
+
+    if (!cbId) {
+      throw new SyscallError(Errno.EBADSLT);
+    }
+
+    this.helper.doAsync(cbId, async () => {
+      validateFileName(fname);
+      let data: Uint8Array
+      if (srcSlice.len > 0) {
+        if (!srcSlice.data) {
+          throw new SyscallError(Errno.EFAULT);
+        }
+
+        data = mem.get(srcSlice.data, srcSlice.len);
+      } else {
+        data = new Uint8Array();
+      }
+
+      await this.store.writeFile(fname, data);
+    });
   }
 
   // func makeDir(name string, cb int)
   @WasmExport('makeDir')
   makeDir(sp: number, reader: StackReader) {
     reader.skipHeader();
+    const fname = reader.next<string>(GoStringType);
+    const cbId = reader.next<number>(Int);
+    if (!cbId) {
+      throw new SyscallError(Errno.EBADSLT);
+    }
+
+    this.helper.doAsync(cbId, async () => {
+      validateFileName(fname);
+      await this.store.makeDir(fname);
+    });
   }
 
   // func unlink(name string, cb int)
   @WasmExport('unlink')
   unlink(sp: number, reader: StackReader) {
     reader.skipHeader();
+    const fname = reader.next<string>(GoStringType);
+    const cbId = reader.next<number>(Int);
+    if (!cbId) {
+      throw new SyscallError(Errno.EBADSLT);
+    }
+
+    this.helper.doAsync(cbId, async () => {
+      validateFileName(fname);
+      await this.store.unlink(fname);
+    });
   }
 }

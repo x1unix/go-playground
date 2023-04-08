@@ -6,10 +6,10 @@ package browserfs
 func stat(name string, out *inode, cb int)
 
 //gowasm:import
-func readDir(name string, out []inode, cb int)
+func readDir(name string, out *[]inode, cb int)
 
 //gowasm:import
-func readFile(f inode, out []byte, cb int)
+func readFile(f inode, out *[]byte, cb int)
 
 //gowasm:import
 func writeFile(name string, data []byte, cb int)

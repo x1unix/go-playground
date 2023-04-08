@@ -109,7 +109,7 @@ func (s FS) ReadDir(name string) ([]fs.DirEntry, error) {
 	// Basically we follow the same rules as for CGO.
 	results := dirEntryPool.Get()
 	defer dirEntryPool.Put(results)
-	go readDir(name, results, cb)
+	go readDir(name, &results, cb)
 
 	if err := awaitCallback(cb); err != nil {
 		return nil, &fs.PathError{

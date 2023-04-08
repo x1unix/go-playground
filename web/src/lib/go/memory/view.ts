@@ -3,6 +3,9 @@ import {DebugOptions, hex} from '~/lib/go/common';
 import {Ref, RefSlice, RefType} from "~/lib/go/pkg/syscall/js";
 import {JSValuesTable} from "~/lib/go/wrapper/interface";
 
+type TypedArray =
+  Uint8Array | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array
+
 /**
  * MemoryView provides functionality to read or write into Go program memory.
  */
@@ -56,6 +59,26 @@ export class MemoryView {
     }
 
     return endOffset;
+  }
+
+  /**
+   * Copies contents from typed array into memory.
+   *
+   * @param address Target offset.
+   * @param src Data source.
+   */
+  set(address: number, src: Uint8Array) {
+    new Uint8Array(this.mem.buffer).set(src, address);
+  }
+
+  /**
+   * Returns a reference to a chunk of memory of given size and offset.
+   *
+   * @param address Offset
+   * @param length Length
+   */
+  get(address: number, length: number) {
+    return new Uint8Array(this.mem.buffer, address, length);
   }
 
   /**

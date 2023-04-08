@@ -89,7 +89,7 @@ func (f *file) prefetchData() error {
 	// Fetch file contents into internal buffer
 	f.data = make([]byte, 0, f.attrs.size)
 	cb := gowasm.RequestCallback()
-	go readFile(f.attrs, f.data, cb)
+	go readFile(f.attrs, &f.data, cb)
 	err := awaitCallback(cb)
 	if err != nil {
 		return &fs.PathError{

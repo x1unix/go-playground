@@ -8,11 +8,11 @@ func stat(name string, out *inode, cb int) {
 	panic("not implemented")
 }
 
-func readDir(name string, out []inode, cb int) {
+func readDir(name string, out *[]inode, cb int) {
 	panic("not implemented")
 }
 
-func readFile(f inode, out []byte, cb int) {
+func readFile(f inode, out *[]byte, cb int) {
 	panic("not implemented")
 }
 

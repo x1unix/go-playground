@@ -1,4 +1,4 @@
-import { ArrayTypeSpec, Int64, Struct, Uint64, Uint8 } from '~/lib/go';
+import { UInt8ArrayTypeSpec, Int64, Struct, Uint64, Uint8 } from '~/lib/go';
 import { newPackageSymbolFunc } from '../utils';
 
 export const MAX_FILE_NAME_LEN = 128;
@@ -8,7 +8,7 @@ export const sym = newPackageSymbolFunc(PKG_NAME);
 
 export interface SizedFileName {
   len: number
-  data: number[]
+  data: Uint8Array
 }
 
 export enum FileType {
@@ -18,7 +18,7 @@ export enum FileType {
   SymLink = 3,
 }
 
-export interface INode {
+export interface Inode {
   id: number
   parentId: number
   fileType: FileType
@@ -28,10 +28,10 @@ export interface INode {
 
 export const TSizedFileName = Struct<SizedFileName>(sym('sizedFileName'), [
   { key: 'len', type: Uint8 },
-  { key: 'data', type: new ArrayTypeSpec(Uint8, MAX_FILE_NAME_LEN) }
+  { key: 'data', type: new UInt8ArrayTypeSpec(MAX_FILE_NAME_LEN) }
 ]);
 
-export const TInode = Struct<INode>(sym('inode'), [
+export const TInode = Struct<Inode>(sym('inode'), [
   { key: 'id', type: Uint64},
   { key: 'parentId', type: Uint64 },
   { key: 'fileType', type: Uint8 },
