@@ -11,9 +11,9 @@ import {
   stringEncoder,
 } from '~/lib/go';
 import {Errno, SyscallError} from '~/lib/go/pkg/syscall';
-import {Package, PackageBinding, WasmExport} from '../binder';
+import {Package, PackageBinding, WasmExport} from '../../binder';
 import {Inode, MAX_FILE_NAME_LEN, TInode} from "./types";
-import SyscallHelper from '../syscall';
+import SyscallHelper from '../../syscall';
 import {FileStore} from './filestore';
 
 const checkFileNameLimit = (strLen: number) => {

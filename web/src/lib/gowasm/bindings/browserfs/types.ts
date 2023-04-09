@@ -1,5 +1,5 @@
 import { UInt8ArrayTypeSpec, Int64, Struct, Uint64, Uint8 } from '~/lib/go';
-import { newPackageSymbolFunc } from '../utils';
+import { newPackageSymbolFunc } from '../../utils';
 
 export const MAX_FILE_NAME_LEN = 128;
 export const PKG_NAME = 'github.com/x1unix/go-playground/internal/gowasm/browserfs';

@@ -1,5 +1,5 @@
-import {Package, PackageBinding, WasmExport} from '../binder';
-import SyscallHelper from '../syscall';
+import {Package, PackageBinding, WasmExport} from '../../binder';
+import SyscallHelper from '../../syscall';
 import {PackageIndex} from './pkgindex';
 import {Errno, SyscallError} from '~/lib/go/pkg/syscall';
 import {
