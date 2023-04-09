@@ -25,7 +25,7 @@ export class PackageCacheDB extends Dexie {
   /**
    * Table to store file contents.
    */
-  fileData!: Dexie.Table<FileData, number>;
+  fileContents!: Dexie.Table<FileData, number>;
 
   /**
    * Installed packages index.
@@ -36,7 +36,7 @@ export class PackageCacheDB extends Dexie {
     super('PackageCache');
     this.version(1).stores({
       inodes: `++id, parentId, absolutePath`,
-      data: `&inodeId`,
+      fileContents: `&inodeId`,
       packageIndex: '&name',
     });
   }

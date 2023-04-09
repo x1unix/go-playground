@@ -7,7 +7,7 @@ import {baseName, dirName, trimSlash} from "./utils";
  * PackageFileStore implements FileStore interface for Go packages cache.
  */
 export class PackageFileStore implements FileStore {
-  constructor(private db: PackageCacheDB) {}
+  constructor(private db: PackageCacheDB, private debug = false) {}
 
   async stat(name: string): Promise<FileInfo> {
     const result = await this.lookupFile(trimSlash(name));
@@ -19,6 +19,7 @@ export class PackageFileStore implements FileStore {
   }
 
   async readDir(name: string): Promise<FileInfo[]> {
+    if (this.debug) console.log('readDir', name);
     const inode = await this.stat(trimSlash(name));
     if (inode.fileType !== FileType.Directory) {
       throw new SyscallError(Errno.ENOTDIR);
@@ -32,7 +33,8 @@ export class PackageFileStore implements FileStore {
   }
 
   async readFile(fileId: number) {
-    const data = await this.db.fileData.get(fileId);
+    if (this.debug) console.log('readFile', fileId);
+    const data = await this.db.fileContents.get(fileId);
     if (!data) {
       throw new SyscallError(Errno.ENOENT);
     }
@@ -42,6 +44,7 @@ export class PackageFileStore implements FileStore {
 
   async writeFile(name: string, data: Uint8Array) {
     // Overwrite file if it already exists
+    if (this.debug) console.log('writeFile', name);
     const normFileName = trimSlash(name);
     const inode = await this.lookupFile(normFileName);
     if (!inode) {
@@ -59,16 +62,17 @@ export class PackageFileStore implements FileStore {
     });
 
     // Replace old file contents
-    await this.db.fileData.update(inode.id, {
+    await this.db.fileContents.update(inode.id, {
       data: data,
     });
   }
 
   private async createFile(name: string, data: Uint8Array) {
+    if (this.debug) console.log('createFile', name);
     let parentId = 0;
     const parentDirName = dirName(name);
     if (parentDirName.length) {
-      const parentNode = await this.lookupFile(name);
+      const parentNode = await this.lookupFile(parentDirName);
       if (!parentNode) {
         throw new SyscallError(Errno.ENOENT);
       }
@@ -87,13 +91,14 @@ export class PackageFileStore implements FileStore {
       size: data.length,
       createdAt: Date.now(),
     });
-    await this.db.fileData.add({
+    await this.db.fileContents.add({
       inodeId: createdId,
       data: data,
     }, createdId);
   }
 
   async makeDir(name: string) {
+    if (this.debug) console.log('makeDir', name);
     name = trimSlash(name);
     const node = await this.lookupFile(name);
     if (node) {
@@ -115,6 +120,7 @@ export class PackageFileStore implements FileStore {
   }
 
   async unlink(name: string) {
+    if (this.debug) console.log('unlink', name);
     name = trimSlash(name);
     const node = await this.lookupFile(name);
     if (!node) {
@@ -125,6 +131,7 @@ export class PackageFileStore implements FileStore {
   }
 
   private async unlinkNode(node: FileNode) {
+    if (this.debug) console.log('unlinkNode', node.id);
     switch (node.fileType) {
       case FileType.Directory:
         const children = await this.db.inodes.where({
@@ -135,7 +142,7 @@ export class PackageFileStore implements FileStore {
         }
         break;
       case FileType.Regular:
-        await this.db.fileData.delete(node.id);
+        await this.db.fileContents.delete(node.id);
         break;
       default:
         break;
@@ -145,6 +152,11 @@ export class PackageFileStore implements FileStore {
   }
 
   private async mkdirAll(name: string): Promise<number> {
+    if (this.debug) console.log('mkDirAll', name);
+    if (name === '') {
+      return 0;
+    }
+
     const node = await this.lookupFile(name);
     if (node) {
       if (node.fileType !== FileType.Directory) {
@@ -172,6 +184,7 @@ export class PackageFileStore implements FileStore {
   }
 
   private async createInode(inode: Omit<FileNode, 'id'>): Promise<number> {
+    if (this.debug) console.log('createInode', inode);
     return this.db.inodes.add((inode as unknown) as FileNode);
   }
 }

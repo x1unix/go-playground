@@ -167,7 +167,6 @@ export class BrowserFSBinding extends PackageBinding {
       }
 
       await this.store.writeFile(fname, data);
-      console.log('written:', fname);
     });
   }
 
@@ -184,7 +183,6 @@ export class BrowserFSBinding extends PackageBinding {
     this.helper.doAsync(cbId, async () => {
       validateFileName(fname);
       await this.store.makeDir(fname);
-      console.log('Created dir:', fname);
     });
   }
 
