@@ -72,13 +72,19 @@ export class MemoryView {
   }
 
   /**
-   * Returns a reference to a chunk of memory of given size and offset.
+   * Returns a chunk of bytes from memory of given size and offset.
+   * Bytes can be returned as a copy or as a reference to original memory array (slice).
    *
    * @param address Offset
    * @param length Length
+   * @param copy Return copy of data instead of reference to original memory.
    */
-  get(address: number, length: number) {
-    return new Uint8Array(this.mem.buffer, address, length);
+  get(address: number, length: number, copy=true) {
+    if (!copy) {
+      return new Uint8Array(this.mem.buffer, address, length);
+    }
+
+    return new Uint8Array(this.mem.buffer.slice(address, address + length));
   }
 
   /**
