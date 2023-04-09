@@ -3,20 +3,23 @@ import {
   GoWrapper,
   instantiateStreaming,
   wrapGlobal,
-} from '~/lib/go';
-
-import {registerExportObject} from '~/lib/gowasm';
-
-import SyscallHelper from '~/lib/gowasm/syscall';
+} from "~/lib/go";
+import {
+  PackageCacheDB,
+  PackageFileStore,
+  PackageIndex
+} from "~/services/gorepl/pkgcache";
+import {registerExportObject} from "~/lib/gowasm";
+import SyscallHelper from "~/lib/gowasm/syscall";
 import {LoggerBinding} from "~/lib/gowasm/bindings/wlog";
 import {ConsoleBinding, ConsoleStreamType} from "~/lib/gowasm/bindings/stdio";
-import BrowserFSBinding from "~/lib/gowasm/bindings/browserfs/binding";
+import {BrowserFSBinding} from "~/lib/gowasm/bindings/browserfs";
+import {PackageDBBinding} from "~/lib/gowasm/bindings/packagedb";
 
 declare const self: DedicatedWorkerGlobalScope;
 export default {} as typeof Worker & { new (): Worker };
 
 const DEBUG = false;
-
 
 async function run() {
   self.importScripts('/wasm_exec.js')
@@ -25,10 +28,19 @@ async function run() {
     globalValue: wrapGlobal({}, self)
   });
 
+  go.setEnv('GOPATH', '/go');
+  go.setEnv('WASM_DEBUG', '1');
+
   const helper = new SyscallHelper(go);
+
+  const pkgDb = new PackageCacheDB();
+  const pkgIndex = new PackageIndex(pkgDb)
+  const fs = new PackageFileStore(pkgDb);
+
   registerExportObject(go, helper);
-  registerExportObject(go, new LoggerBinding())
-  registerExportObject(go, new BrowserFSBinding(helper, ))
+  registerExportObject(go, new LoggerBinding());
+  registerExportObject(go, new BrowserFSBinding(helper, fs));
+  registerExportObject(go, new PackageDBBinding(helper, pkgIndex));
   registerExportObject(go, new ConsoleBinding({
     write(fd: ConsoleStreamType, msg: string) {
       if (fd === ConsoleStreamType.Stderr) {
@@ -39,7 +51,6 @@ async function run() {
       console.log(msg);
     }
   }));
-  registerExportObject(go, new Test(helper));
 
   const {instance} = await instantiateStreaming(fetch('/go.wasm'), go.importObject);
   go.run(instance as GoWebAssemblyInstance)

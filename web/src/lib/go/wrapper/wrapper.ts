@@ -307,6 +307,16 @@ export class GoWrapper {
   }
 
   /**
+   * Set environment variable
+   *
+   * @param key
+   * @param value
+   */
+  setEnv(key: string, value: string) {
+    this.go.env[key] = value;
+  }
+
+  /**
    * Start Go program
    */
   async run(instance: GoWebAssemblyInstance) {

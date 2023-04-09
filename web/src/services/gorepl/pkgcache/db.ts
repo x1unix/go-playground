@@ -11,6 +11,11 @@ export interface FileNode extends FileInfo {
   absolutePath: string;
 }
 
+export interface PackageInfo {
+  name: string;
+  version: string;
+}
+
 export class PackageCacheDB extends Dexie {
   /**
    * Table to store file attributes (inodes).
@@ -20,13 +25,19 @@ export class PackageCacheDB extends Dexie {
   /**
    * Table to store file contents.
    */
-  fileData!: Dexie.Table<FileData>;
+  fileData!: Dexie.Table<FileData, number>;
+
+  /**
+   * Installed packages index.
+   */
+  packageIndex!: Dexie.Table<PackageInfo, string>;
 
   constructor() {
     super('PackageCache');
     this.version(1).stores({
       inodes: `++id, parentId, absolutePath`,
       data: `&inodeId`,
+      packageIndex: '&name',
     });
   }
 }

@@ -7,7 +7,7 @@ import {baseName, dirName, trimSlash} from "./utils";
  * PackageFileStore implements FileStore interface for Go packages cache.
  */
 export class PackageFileStore implements FileStore {
-  private db = new PackageCacheDB();
+  constructor(private db: PackageCacheDB) {}
 
   async stat(name: string): Promise<FileInfo> {
     const result = await this.lookupFile(trimSlash(name));

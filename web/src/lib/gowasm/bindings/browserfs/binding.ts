@@ -34,7 +34,7 @@ const validateFileName = (name: string) => checkFileNameLimit(name.length);
  * @see internal/gowasm/browserfs/syscall_js.go
  */
 @Package('github.com/x1unix/go-playground/internal/gowasm/browserfs')
-export default class BrowserFSBinding extends PackageBinding {
+export class BrowserFSBinding extends PackageBinding {
   constructor(private helper: SyscallHelper, private store: FileStore) {
     super();
   }
