@@ -14,7 +14,7 @@ export const Byte = new DataViewableTypeSpec('byte', 1, 1, 0, {
 });
 
 // Go stores int8 with padding because minimal supported data type by assembly is uint32.
-export const Uint8 = new DataViewableTypeSpec('uint8', 1, 1, 3, {
+export const Uint8 = new DataViewableTypeSpec('uint8', 1, 1, 0, {
   read: DataView.prototype.getUint8,
   write: DataView.prototype.setUint8
 });
