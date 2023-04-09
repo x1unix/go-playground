@@ -1,15 +1,15 @@
 import {Package, PackageBinding, WasmExport} from "~/lib/gowasm";
 import {
-  ConsoleHandler,
-  ConsoleStreamType
-} from "~/lib/gowasm/bindings/stdio/console";
-import {
   Int,
   MemoryView,
   SliceHeader,
   SliceHeaderType,
   StackReader, stringDecoder
 } from "~/lib/go";
+import {
+  ConsoleHandler,
+  ConsoleStreamType
+} from "./console";
 
 /**
  * WASM imports binding to console input/output.
