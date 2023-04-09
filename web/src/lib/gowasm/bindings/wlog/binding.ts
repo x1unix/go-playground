@@ -21,6 +21,7 @@ export class LoggerBinding extends PackageBinding {
 
   @WasmExport('logWrite')
   logWrite(sp: number, stack: StackReader, mem: MemoryView) {
+    stack.skipHeader();
     const level = stack.next<LogLevel>(Uint8);
     const msgSlice = stack.next<SliceHeader>(SliceHeaderType);
     const msg = stringDecoder.decode(
