@@ -58,7 +58,7 @@ export class BrowserFSBinding extends PackageBinding {
         throw new SyscallError(Errno.EFAULT);
       }
 
-      const result = this.store.stat(fileName);
+      const result = await this.store.stat(fileName);
       mem.write(outPtr, TInode, result);
     });
   }
@@ -167,6 +167,7 @@ export class BrowserFSBinding extends PackageBinding {
       }
 
       await this.store.writeFile(fname, data);
+      console.log('written:', fname);
     });
   }
 
@@ -183,6 +184,7 @@ export class BrowserFSBinding extends PackageBinding {
     this.helper.doAsync(cbId, async () => {
       validateFileName(fname);
       await this.store.makeDir(fname);
+      console.log('Created dir:', fname);
     });
   }
 

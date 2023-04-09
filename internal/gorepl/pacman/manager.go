@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/samber/lo"
+	"github.com/x1unix/go-playground/internal/gowasm/wlog"
 	"github.com/x1unix/go-playground/internal/util/buffutil"
 	"github.com/x1unix/go-playground/internal/util/syncx"
 	"github.com/x1unix/go-playground/pkg/goproxy"
@@ -208,6 +209,8 @@ func (mgr *PackageManager) downloadModule(ctx context.Context, pkgInfo *module.V
 
 		if err := mgr.pkgCache.WritePackageFile(pkgInfo, file.Name, newZipFSFile(file)); err != nil {
 			// clean corrupted installation
+			wlog.Debugf("Failed to write file %q, removing package %q (err: %s)",
+				file.Name, pkgInfo, err)
 			_ = mgr.pkgCache.RemovePackage(pkgInfo)
 			return err
 		}

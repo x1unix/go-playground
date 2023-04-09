@@ -11,7 +11,7 @@ import {Errno, SyscallError} from '~/lib/go/pkg/syscall';
 export default class SyscallHelper extends PackageBinding {
   private callbackFunc?: js.Func
 
-  constructor(private go: GoWrapper) {
+  constructor(private go: GoWrapper, private debug = false) {
     super();
   }
 
@@ -31,6 +31,10 @@ export default class SyscallHelper extends PackageBinding {
   sendCallbackResult(callbackId: number, result: number) {
     if (!this.callbackFunc) {
       throw new Error('SyscallHelper: callback handler not registered.');
+    }
+
+    if (this.debug) {
+      console.log('SyscallHelper: sendCallbackResult', { callbackId, result});
     }
 
     this.go.callFunc(this.callbackFunc, [callbackId, result]);

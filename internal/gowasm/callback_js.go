@@ -1,6 +1,7 @@
 package gowasm
 
 import (
+	"github.com/x1unix/go-playground/internal/gowasm/wlog"
 	"syscall/js"
 )
 
@@ -21,8 +22,9 @@ var callbackHandler = js.FuncOf(func(_ js.Value, args []js.Value) any {
 	}
 
 	cbId := args[0].Int()
-	result := args[0].Int()
+	result := args[1].Int()
 
+	wlog.Debugf("NotifyResult: CbID=%d Result=%d", cbId, result)
 	NotifyResult(cbId, result)
 	return nil
 })
