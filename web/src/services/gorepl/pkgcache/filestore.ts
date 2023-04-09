@@ -1,7 +1,7 @@
 import {FileInfo, FileStore, FileType} from "~/lib/gowasm/bindings/browserfs";
 import {Errno, SyscallError} from "~/lib/go/pkg/syscall";
 import {FileNode, PackageCacheDB} from "./db";
-import {baseName, dirName, trimSlash} from "@services/gorepl/pkgcache/utils";
+import {baseName, dirName, trimSlash} from "./utils";
 
 /**
  * PackageFileStore implements FileStore interface for Go packages cache.
