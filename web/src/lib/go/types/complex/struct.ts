@@ -71,7 +71,7 @@ export class StructTypeSpec<T=object> extends AbstractTypeSpec {
     for (let attr of this._attributes) {
       const {key, type} = attr;
       if (!val[key]) {
-        throw new ReferenceError(`${this.constructor.name}.write: missing object property "${key}"`)
+        throw new ReferenceError(`${this.constructor.name}.write: missing object property "${key}" (struct ${this.name})`)
       }
 
       const fieldAddr = type.alignAddress(offset)
