@@ -14,7 +14,7 @@ TEXT ·readDir(SB), NOSPLIT, $0
   CallImport
   RET
 
-// func readFile(f inode, out *[]byte, cb int)
+// func readFile(fid uint64, out *[]byte, cb int)
 TEXT ·readFile(SB), NOSPLIT, $0
   CallImport
   RET

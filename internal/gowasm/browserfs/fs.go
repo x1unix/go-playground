@@ -3,6 +3,8 @@ package browserfs
 import (
 	"io"
 	"io/fs"
+	"path"
+	"strings"
 	"syscall"
 
 	"github.com/samber/lo"
@@ -32,7 +34,7 @@ func (s FS) Stat(name string) (fs.FileInfo, error) {
 	wlog.Debugf("fs.Stat - %q\n", name)
 	cb := gowasm.RequestCallback()
 	inode := new(inode)
-	go stat(name, inode, cb)
+	go stat(cleanPath(name), inode, cb)
 
 	if err := awaitCallback(cb); err != nil {
 		return nil, &fs.PathError{
@@ -56,7 +58,7 @@ func (s FS) WriteFile(name string, src io.Reader, _ fs.FileMode) error {
 	}
 
 	cb := gowasm.RequestCallback()
-	go writeFile(name, buff.Bytes(), cb)
+	go writeFile(cleanPath(name), buff.Bytes(), cb)
 	if err := awaitCallback(cb); err != nil {
 		return &fs.PathError{
 			Op:   "create",
@@ -71,7 +73,7 @@ func (s FS) WriteFile(name string, src io.Reader, _ fs.FileMode) error {
 func (s FS) Mkdir(name string, _ fs.FileMode) error {
 	wlog.Debugf("fs.Mkdir - %q\n", name)
 	cb := gowasm.RequestCallback()
-	go makeDir(name, cb)
+	go makeDir(cleanPath(name), cb)
 	if err := awaitCallback(cb); err != nil {
 		return &fs.PathError{
 			Op:   "mkdir",
@@ -86,7 +88,7 @@ func (s FS) Mkdir(name string, _ fs.FileMode) error {
 func (s FS) Remove(name string) error {
 	wlog.Debugf("fs.Remove - %q\n", name)
 	cb := gowasm.RequestCallback()
-	go unlink(name, cb)
+	go unlink(cleanPath(name), cb)
 	if err := awaitCallback(cb); err != nil {
 		return &fs.PathError{
 			Op:   "unlink",
@@ -178,4 +180,8 @@ func awaitCallback(cb gowasm.CallbackID) error {
 	}
 
 	return mapSyscallError(syscallErr)
+}
+
+func cleanPath(p string) string {
+	return strings.TrimPrefix(path.Clean(p), "/")
 }
