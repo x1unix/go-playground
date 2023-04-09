@@ -28,9 +28,9 @@ export interface FileStore {
    * Returns file contents.
    *
    * @throws SyscallError(Errno.ENOENT) if file doesn't exist.
-   * @param fileInfo
+   * @param fileId
    */
-  readFile(fileInfo: FileInfo): Promise<Uint8Array>
+  readFile(fileId: number): Promise<Uint8Array>
 
   /**
    * Creates a new or overwrites an existing file with specified contents.
@@ -41,7 +41,7 @@ export interface FileStore {
   writeFile(name: string, data: Uint8Array): Promise<void>
 
   /**
-   * Creates a new directory, including its subdirectories.
+   * Creates a new directory, including its parent.
    *
    * @param name Directory name.
    */

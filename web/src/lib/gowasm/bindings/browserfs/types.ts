@@ -23,6 +23,7 @@ export interface Inode {
   parentId: number
   fileType: FileType
   size: number
+  createdAt: number,
   name: SizedFileName
 }
 

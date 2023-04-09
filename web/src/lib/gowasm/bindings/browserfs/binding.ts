@@ -114,7 +114,7 @@ export default class BrowserFSBinding extends PackageBinding {
   @WasmExport('readFile')
   readFile(sp: number, reader: StackReader, mem: MemoryView) {
     reader.skipHeader();
-    const inode = reader.next<Inode>(TInode);
+    const fileId = reader.next<number>(UintPtr);
     const slicePtr = reader.next<number>(UintPtr);
     const cbId = reader.next<number>(Int);
 
@@ -123,16 +123,11 @@ export default class BrowserFSBinding extends PackageBinding {
     }
 
     this.helper.doAsync(cbId, async () => {
-      checkFileNameLimit(inode.name.len);
-
       if (!slicePtr) {
         throw new SyscallError(Errno.EFAULT);
       }
 
-      const data = await this.store.readFile({
-        ...inode,
-        name: stringDecoder.decode(inode.name.data.slice(0, inode.name.len)),
-      });
+      const data = await this.store.readFile(fileId);
 
       const dstSlice = mem.read<SliceHeader>(slicePtr, SliceHeaderType);
       if (data.length > dstSlice.cap) {

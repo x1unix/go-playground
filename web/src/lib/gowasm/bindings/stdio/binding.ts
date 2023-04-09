@@ -4,7 +4,8 @@ import {
   MemoryView,
   SliceHeader,
   SliceHeaderType,
-  StackReader, stringDecoder
+  StackReader,
+  stringDecoder
 } from "~/lib/go";
 import {
   ConsoleHandler,
