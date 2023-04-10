@@ -9,7 +9,7 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/stretchr/testify v1.8.2
 	github.com/tevino/abool v0.0.0-20170917061928-9b9efcf221b5
-	github.com/traefik/yaegi v0.13.0
+	github.com/traefik/yaegi v0.15.1
 	github.com/x1unix/foundation v1.0.0
 	go.uber.org/zap v1.21.0
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324

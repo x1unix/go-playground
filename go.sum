@@ -49,6 +49,8 @@ github.com/tevino/abool v0.0.0-20170917061928-9b9efcf221b5 h1:hNna6Fi0eP1f2sMBe/
 github.com/tevino/abool v0.0.0-20170917061928-9b9efcf221b5/go.mod h1:f1SCnEOt6sc3fOJfPQDRDzHOtSXuTtnz0ImG9kPRDV0=
 github.com/traefik/yaegi v0.13.0 h1:dNwyGNSLHuRw5xswpbuW1TlzzGDciiK6uAighR1tMsc=
 github.com/traefik/yaegi v0.13.0/go.mod h1:RuCwD8/wsX7b6KoQHOaIFUfuH3gQIK4KWnFFmJMw5VA=
+github.com/traefik/yaegi v0.15.1 h1:YA5SbaL6HZA0Exh9T/oArRHqGN2HQ+zgmCY7dkoTXu4=
+github.com/traefik/yaegi v0.15.1/go.mod h1:AVRxhaI2G+nUsaM1zyktzwXn69G3t/AuTDrCiTds9p0=
 github.com/x1unix/foundation v1.0.0 h1:tG0dG1sbiF9TGrjwns+wtX5feBprRD5iTvpmgQDnacA=
 github.com/x1unix/foundation v1.0.0/go.mod h1:y9E4igeUWi+njm4xCM48NItLhVH/Jj1KGE069I3J5Hc=
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
