@@ -20,6 +20,7 @@ declare const self: DedicatedWorkerGlobalScope;
 export default {} as typeof Worker & { new (): Worker };
 
 const DEBUG = false;
+// const DEBUG = true;
 
 async function run() {
   self.importScripts('/wasm_exec.js')
@@ -31,7 +32,7 @@ async function run() {
   go.setEnv('GOPATH', '/go');
   go.setEnv('WASM_DEBUG', '1');
 
-  const helper = new SyscallHelper(go);
+  const helper = new SyscallHelper(go, false);
 
   const pkgDb = new PackageCacheDB();
   const pkgIndex = new PackageIndex(pkgDb)
@@ -58,4 +59,4 @@ async function run() {
     .catch(console.error);
 }
 
-run().then(() => console.log('RUN OK')).catch(err => console.error('RUN ERR-', err))
+run().then(() => console.log('Worker started...')).catch(err => console.error('RUN ERR-', err))
