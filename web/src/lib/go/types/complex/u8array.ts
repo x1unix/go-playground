@@ -7,7 +7,7 @@ import { Uint8} from '~/lib/go/types/basic';
  * This spec introduces less overhead than using regular ArrayTypeSpec.
  */
 export class UInt8ArrayTypeSpec extends AbstractTypeSpec<Uint8Array> {
-  private readonly _length = 0;
+  private readonly _length;
 
   constructor(length: number) {
     super(
@@ -20,6 +20,8 @@ export class UInt8ArrayTypeSpec extends AbstractTypeSpec<Uint8Array> {
     if (length < 0) {
       throw new Error(`${this.constructor.name}: array item count should be greater than zero`);
     }
+
+    this._length = length;
   }
 
   get elemType() {
@@ -56,14 +58,15 @@ export class UInt8ArrayTypeSpec extends AbstractTypeSpec<Uint8Array> {
       );
     }
 
-    if (val.length !== this._length) {
+    if (val.length > this._length) {
+      // Still allow arrays that are smaller than source array.
       throw new Error(
-        `${this.constructor.name}.write: array length should be ${this._length} (got: ${val.length})`
+        `${this.constructor.name}.write: source array is too big (got: ${val.length}, max: ${this._length})`
       );
     }
 
     const offset = Uint8.alignAddress(addr);
-    const endOffset = offset + Uint8.size * val.length;
+    const endOffset = offset + Uint8.size * this._length;
     new Uint8Array(buff).set(val, offset);
     return {
       address: offset,
