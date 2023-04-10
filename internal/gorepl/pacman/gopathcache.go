@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"log"
 	"path"
 	"strings"
 
@@ -63,7 +62,6 @@ func NewSimpleFSCache(location string, fs WritableFS, index PackageIndex) *Simpl
 func (c SimpleFSCache) TestImportPath(importPath string) error {
 	p := path.Join(c.location, importPath)
 	_, err := c.fs.Stat(p)
-	log.Printf("Stat %q: %v", p, err)
 	if err != nil {
 		return err
 	}
