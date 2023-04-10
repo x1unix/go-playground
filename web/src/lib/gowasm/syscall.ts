@@ -52,7 +52,7 @@ export default class SyscallHelper extends PackageBinding {
    * @param callbackId
    * @param err
    */
-  sendErrorResult(callbackId: number, err: Error | Errno) {
+  sendErrorResult(callbackId: number, err: Error | DOMException | Errno) {
     const sysErr = SyscallError.fromError(err);
     if (!suppressedErrors.has(sysErr.errno)) {
       console.error(`gowasm: async callback thrown an error: ${err} (errno: ${sysErr.errno})`);

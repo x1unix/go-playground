@@ -1,6 +1,21 @@
 import {Errno, errorMessages} from './tables';
 
 /**
+ * Key-value mapping to DOM exception name and syscall error code.
+ */
+const codeSyscallMap: {[k: string]: Errno} = {
+  'QuotaExceededError': Errno.ENOSPC,
+  'SecurityError': Errno.EPERM,
+  'NetworkError': Errno.ENETRESET,
+  'TimeoutError': Errno.ETIMEDOUT,
+  'DataCloneError': Errno.EPIPE
+}
+
+const unwrapError = (err: Error): Error => (
+  err['inner'] ?? err
+);
+
+/**
  * SyscallError is syscall execution error which contains error code.
  *
  * Usually passed back to a callback handler.
@@ -41,6 +56,8 @@ export class SyscallError extends Error {
       return err;
     }
 
-    return new SyscallError(Errno.EIO);
+    const unwrapped = unwrapError(err);
+    const errCode = codeSyscallMap[unwrapped.name] ?? Errno.EIO;
+    return new SyscallError(errCode);
   }
 }
