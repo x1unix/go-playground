@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path"
 
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
@@ -26,7 +27,11 @@ type Worker struct {
 
 func NewWorker(vendorFs ReadWriteFS, pkgIndex pacman.PackageIndex, client *goproxy.Client) *Worker {
 	goPath := getGoPath()
-	cache := pacman.NewSimpleFSCache(goPath, vendorFs, pkgIndex)
+	cache := pacman.NewSimpleFSCache(
+		path.Join(goPath, "src/vendor"),
+		vendorFs,
+		pkgIndex,
+	)
 
 	return &Worker{
 		vendorFs: vendorFs,
