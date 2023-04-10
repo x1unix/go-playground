@@ -2,6 +2,11 @@ import {WasmExport, Package, PackageBinding} from '~/lib/gowasm/binder';
 import {GoWrapper, js, StackReader} from '~/lib/go';
 import {Errno, SyscallError} from '~/lib/go/pkg/syscall';
 
+// list of syscall errors which should not be logged.
+const suppressedErrors = new Set([
+  Errno.ENOENT
+]);
+
 /**
  * SyscallHelper contains extensions required for "gowasm" package.
  *
@@ -49,7 +54,9 @@ export default class SyscallHelper extends PackageBinding {
    */
   sendErrorResult(callbackId: number, err: Error | Errno) {
     const sysErr = SyscallError.fromError(err);
-    console.error(`gowasm: async callback thrown an error: ${err} (errno: ${sysErr.errno})`);
+    if (!suppressedErrors.has(sysErr.errno)) {
+      console.error(`gowasm: async callback thrown an error: ${err} (errno: ${sysErr.errno})`);
+    }
     this.sendCallbackResult(callbackId, sysErr.errno);
   }
 
