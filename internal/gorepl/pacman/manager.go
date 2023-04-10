@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -96,7 +95,7 @@ func (mgr *PackageManager) CheckDependencies(ctx context.Context, importPaths []
 		err := mgr.pkgCache.TestImportPath(item)
 		if err != nil {
 			if !os.IsNotExist(fs.ErrNotExist) {
-				log.Printf("Warning: can't stat %q: %s", item, err)
+				wlog.Printf("Warning: can't stat %q: %s", item, err)
 			}
 			return true
 		}
@@ -104,7 +103,7 @@ func (mgr *PackageManager) CheckDependencies(ctx context.Context, importPaths []
 		return false
 	})
 
-	log.Println("New packages:", len(newProjectPackages))
+	wlog.Println("New packages:", len(newProjectPackages))
 	if len(newProjectPackages) == 0 {
 		return nil
 	}
@@ -120,7 +119,7 @@ func (mgr *PackageManager) CheckDependencies(ctx context.Context, importPaths []
 		// Some indirect dependencies might require update.
 		// Update them if necessary.
 		if !mgr.shouldUpdatePackage(ver) {
-			log.Printf("Package %s is already up to date, skip download...", ver)
+			wlog.Printf("Package %s is already up to date, skip download...", ver)
 			continue
 		}
 
@@ -142,7 +141,7 @@ func (mgr *PackageManager) shouldUpdatePackage(pkg *module.Version) bool {
 		return true
 	}
 	if err != nil {
-		log.Printf("LookupPackage failed for %q: %v", pkg.Path, err)
+		wlog.Printf("LookupPackage failed for %q: %v", pkg.Path, err)
 		return true
 	}
 
@@ -150,7 +149,7 @@ func (mgr *PackageManager) shouldUpdatePackage(pkg *module.Version) bool {
 }
 
 func (mgr *PackageManager) requestPackageByImportPath(ctx context.Context, importPath string, out dependenciesJar) error {
-	log.Printf("resolving import %q...", importPath)
+	wlog.Printf("resolving import %q...", importPath)
 	pkgInfo, err := mgr.findPackageByImport(ctx, importPath)
 	if err != nil {
 		return err
@@ -160,13 +159,13 @@ func (mgr *PackageManager) requestPackageByImportPath(ctx context.Context, impor
 }
 
 func (mgr *PackageManager) requestModule(ctx context.Context, pkgInfo *module.Version, out dependenciesJar) error {
-	log.Printf("Finding module %s...", pkgInfo)
+	wlog.Printf("Finding module %s...", pkgInfo)
 	deps, err := mgr.getModuleDependencies(ctx, pkgInfo, out)
 	if err != nil {
 		return err
 	}
 
-	log.Printf("Module %s has %d dependencies", pkgInfo, len(deps))
+	wlog.Printf("Module %s has %d dependencies", pkgInfo, len(deps))
 	for _, dep := range deps {
 		out.compareAndStore(dep)
 	}
@@ -183,7 +182,7 @@ func (mgr *PackageManager) downloadModule(ctx context.Context, pkgInfo *module.V
 
 	defer r.Close()
 
-	log.Printf("Downloading %s...", pkgInfo)
+	wlog.Printf("Downloading %s...", pkgInfo)
 
 	buff := buffPool.Get()
 	buff.Grow(int(r.Size))
@@ -201,11 +200,11 @@ func (mgr *PackageManager) downloadModule(ctx context.Context, pkgInfo *module.V
 	for _, file := range zr.File {
 		// TODO: ignore non-go files
 		if shouldSkipFile(file.Name) {
-			log.Printf("File %s is ignored, skip", file.Name)
+			wlog.Printf("File %s is ignored, skip", file.Name)
 			continue
 		}
 
-		log.Printf("Extracting %s...", file.Name)
+		wlog.Printf("Extracting %s...", file.Name)
 
 		if err := mgr.pkgCache.WritePackageFile(pkgInfo, file.Name, newZipFSFile(file)); err != nil {
 			// clean corrupted installation
@@ -238,7 +237,7 @@ func (mgr *PackageManager) getModuleDependencies(ctx context.Context, mod *modul
 	// TODO: handle old packages without "go.mod"
 	if len(modFile.Require) == 0 {
 		if modFile.Go == nil {
-			log.Printf("Warning: package %s doesn't have go.mod dependencies, pre-go.mod packages are not supported yet!", mod)
+			wlog.Printf("Warning: package %s doesn't have go.mod dependencies, pre-go.mod packages are not supported yet!", mod)
 		}
 
 		return nil, nil
@@ -257,7 +256,7 @@ func (mgr *PackageManager) findPackageByImport(ctx context.Context, pkgUrl strin
 	// Try to guess package import path
 	importPath, ok := guessPackageNameFromImport(pkgUrl)
 	if ok {
-		log.Printf("Detected package %q from import path, trying to request...", importPath)
+		wlog.Printf("Detected package %q from import path, trying to request...", importPath)
 		verInfo, err := mgr.goModProxy.GetLatestVersion(ctx, importPath)
 		if err != nil {
 			return nil, err
@@ -278,7 +277,7 @@ func (mgr *PackageManager) findPackageByImport(ctx context.Context, pkgUrl strin
 	)
 	for i := len(segments) - 1; i > 0; i-- {
 		pkgUrl := strings.Join(segments[:i+1], "/")
-		log.Printf("Trying to find %q...", pkgUrl)
+		wlog.Printf("Trying to find %q...", pkgUrl)
 		verInfo, err = mgr.goModProxy.GetLatestVersion(ctx, pkgUrl)
 		if err == nil {
 			return &module.Version{
@@ -323,7 +322,7 @@ func guessPackageNameFromImport(importPath string) (string, bool) {
 
 	switch segments[0] {
 	case "github.com", "gitlab.com":
-		// All Github and most of a public Gitlab repo packages
+		// All GitHub and most of a public Gitlab repo packages
 		// contain username and project name + optional "v" version suffix.
 		//
 		// ^gitlab.com/username/package(/v[\d])?$
