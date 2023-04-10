@@ -2,6 +2,7 @@
 package wlog
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -17,12 +18,14 @@ var (
 	debugLogEnabled = checkDebugLogParam()
 )
 
+const callerSkip = 2
+
 func Debugf(format string, v ...any) {
 	if !debugLogEnabled {
 		return
 	}
 
-	debugLog.Printf(format, v...)
+	_ = debugLog.Output(callerSkip, fmt.Sprintf(format, v...))
 }
 
 func Debugln(v ...any) {
@@ -30,7 +33,7 @@ func Debugln(v ...any) {
 		return
 	}
 
-	debugLog.Println(v...)
+	_ = debugLog.Output(callerSkip, fmt.Sprintln(v...))
 }
 
 func Debug(v ...any) {
@@ -38,43 +41,52 @@ func Debug(v ...any) {
 		return
 	}
 
-	debugLog.Print(v...)
+	_ = debugLog.Output(callerSkip, fmt.Sprint(v...))
 }
 
 func Printf(format string, v ...any) {
-	stdLog.Printf(format, v...)
+	_ = stdLog.Output(callerSkip, fmt.Sprintf(format, v...))
 }
 
 func Println(v ...any) {
-	stdLog.Println(v...)
+	_ = stdLog.Output(callerSkip, fmt.Sprintln(v...))
 }
 
 func Print(v ...any) {
-	stdLog.Print(v...)
+	_ = stdLog.Output(callerSkip, fmt.Sprint(v...))
 }
 
 func Fatal(v ...any) {
-	stdLog.Fatal(v...)
+	_ = stdLog.Output(callerSkip, fmt.Sprint(v...))
+	os.Exit(1)
 }
 
 func Fatalln(v ...any) {
-	stdLog.Fatalln(v...)
+	_ = stdLog.Output(callerSkip, fmt.Sprintln(v...))
+	os.Exit(1)
 }
 
 func Fatalf(format string, v ...any) {
-	stdLog.Fatalf(format, v...)
+	_ = stdLog.Output(callerSkip, fmt.Sprintf(format, v...))
+	os.Exit(1)
 }
 
 func Panic(v ...any) {
-	stdLog.Panic(v...)
+	msg := fmt.Sprint(v...)
+	_ = stdLog.Output(callerSkip, msg)
+	panic(msg)
 }
 
 func Panicln(v ...any) {
-	stdLog.Panicln(v...)
+	msg := fmt.Sprintln(v...)
+	_ = stdLog.Output(callerSkip, msg)
+	panic(msg)
 }
 
 func Panicf(format string, v ...any) {
-	stdLog.Panicf(format, v...)
+	msg := fmt.Sprintf(format, v...)
+	_ = stdLog.Output(callerSkip, msg)
+	panic(msg)
 }
 
 func checkDebugLogParam() bool {
