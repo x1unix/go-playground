@@ -30,7 +30,7 @@ async function run() {
   });
 
   go.setEnv('GOPATH', '/go');
-  go.setEnv('WASM_DEBUG', '1');
+  go.setEnv('WASM_DEBUG', '0');
 
   const helper = new SyscallHelper(go, false);
 
