@@ -67,21 +67,27 @@ func (j dependenciesJar) compareAndStore(m *module.Version) {
 
 // PackageManager checks and stores program dependencies.
 type PackageManager struct {
-	goModProxy  *goproxy.Client
-	cachedPaths syncx.Map[string, *module.Version]
-	pkgCache    PackageCache
+	goModProxy       *goproxy.Client
+	cachedPaths      syncx.Map[string, *module.Version]
+	pkgCache         PackageCache
+	progressReporter PMProgressObserver
 }
 
 func NewPackageManager(modProxy *goproxy.Client, pkgCache PackageCache) *PackageManager {
 	return &PackageManager{
-		pkgCache:    pkgCache,
-		goModProxy:  modProxy,
-		cachedPaths: syncx.NewMap[string, *module.Version](),
+		pkgCache:         pkgCache,
+		goModProxy:       modProxy,
+		cachedPaths:      syncx.NewMap[string, *module.Version](),
+		progressReporter: noopProgressObserver{},
 	}
 }
 
+func (mgr *PackageManager) SetProgressObserver(pm PMProgressObserver) {
+	mgr.progressReporter = pm
+}
+
 // CheckDependencies checks if import paths are solvable and downloads dependencies if necessary.
-func (mgr *PackageManager) CheckDependencies(ctx context.Context, importPaths []string) error {
+func (mgr *PackageManager) CheckDependencies(ctx context.Context, importPaths []string) (err error) {
 	newProjectPackages := lo.Filter(importPaths, func(item string, _ int) bool {
 		if mgr.cachedPaths.Has(item) {
 			return false
@@ -103,8 +109,12 @@ func (mgr *PackageManager) CheckDependencies(ctx context.Context, importPaths []
 		return nil
 	}
 
+	defer mgr.progressReporter.DependencyCheckFinish(err)
+	mgr.progressReporter.DependencyResolveStart(len(newProjectPackages))
+
 	modsJar := make(dependenciesJar, len(newProjectPackages)*2)
 	for _, pkg := range newProjectPackages {
+		mgr.progressReporter.PackageSearchStart(pkg)
 		if err := mgr.requestPackageByImportPath(ctx, pkg, modsJar); err != nil {
 			return err
 		}
@@ -177,13 +187,17 @@ func (mgr *PackageManager) downloadModule(ctx context.Context, pkgInfo *module.V
 
 	defer r.Close()
 
-	wlog.Printf("Downloading %s...", pkgInfo)
+	wlog.Debugf("Downloading %s...", pkgInfo)
 
 	buff := buffPool.Get()
 	buff.Grow(int(r.Size))
 	defer buff.Close()
 
-	if _, err := io.Copy(buff, r); err != nil {
+	callbackReader := newProgressReader(r.Size, func(p Progress) {
+		mgr.progressReporter.PackageDownload(pkgInfo, p)
+	})
+
+	if _, err := io.Copy(buff, io.TeeReader(r, callbackReader)); err != nil {
 		return fmt.Errorf("failed to download module %s: %w", pkgInfo, err)
 	}
 
@@ -192,14 +206,18 @@ func (mgr *PackageManager) downloadModule(ctx context.Context, pkgInfo *module.V
 		return fmt.Errorf("failed to open module archive %s: %w", pkgInfo, err)
 	}
 
-	for _, file := range zr.File {
+	for i, file := range zr.File {
 		// TODO: ignore non-go files
 		if shouldSkipFile(file.Name) {
 			wlog.Printf("File %s is ignored, skip", file.Name)
 			continue
 		}
 
-		wlog.Printf("Extracting %s...", file.Name)
+		wlog.Debugf("Extracting %s...", file.Name)
+		mgr.progressReporter.PackageExtract(pkgInfo, Progress{
+			Total:   len(zr.File),
+			Current: i + 1,
+		})
 
 		if err := mgr.pkgCache.WritePackageFile(pkgInfo, file.Name, newZipFSFile(file)); err != nil {
 			// clean corrupted installation

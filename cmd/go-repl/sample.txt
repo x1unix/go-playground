@@ -11,5 +11,5 @@ func main() {
 	}
 	defer logger.Sync() // flushes buffer, if any
 	sugar := logger.Sugar()
-	sugar.Infow("hello world!!!")
+	sugar.Infow("hello world from Go inside of Go inside of WebAssembly !!!")
 }

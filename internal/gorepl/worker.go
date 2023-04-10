@@ -3,6 +3,7 @@ package gorepl
 import (
 	"context"
 	"fmt"
+	"github.com/x1unix/go-playground/internal/gowasm/uihost"
 	"io/fs"
 	"os"
 	"path"
@@ -20,9 +21,10 @@ type ReadWriteFS interface {
 }
 
 type Worker struct {
-	vendorFs ReadWriteFS
-	goPath   string
-	pkgMgr   *pacman.PackageManager
+	vendorFs   ReadWriteFS
+	goPath     string
+	pkgMgr     *pacman.PackageManager
+	pmObserver *uihost.PackageDownloadObserver
 }
 
 func NewWorker(vendorFs ReadWriteFS, pkgIndex pacman.PackageIndex, client *goproxy.Client) *Worker {
@@ -33,10 +35,15 @@ func NewWorker(vendorFs ReadWriteFS, pkgIndex pacman.PackageIndex, client *gopro
 		pkgIndex,
 	)
 
+	pmObserver := uihost.NewPackageDownloadObserver()
+	pkgMgr := pacman.NewPackageManager(client, cache)
+	pkgMgr.SetProgressObserver(pmObserver)
+
 	return &Worker{
-		vendorFs: vendorFs,
-		goPath:   goPath,
-		pkgMgr:   pacman.NewPackageManager(client, cache),
+		vendorFs:   vendorFs,
+		goPath:     goPath,
+		pkgMgr:     pacman.NewPackageManager(client, cache),
+		pmObserver: pmObserver,
 	}
 }
 
@@ -78,6 +85,7 @@ func (w *Worker) checkNewImports(ctx context.Context, code []byte) error {
 		return err
 	}
 
+	w.pmObserver.Start(ctx)
 	return w.pkgMgr.CheckDependencies(ctx, rootImports)
 }
 
