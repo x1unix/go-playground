@@ -34,7 +34,7 @@ export class ConsoleBinding extends PackageBinding {
       return;
     }
 
-    const msg = stringDecoder.decode(mem.get(slice.data, slice.len));
+    const msg = stringDecoder.decode(mem.get(slice.data, slice.len, false));
     this.handler.write(fd, msg);
   }
 }

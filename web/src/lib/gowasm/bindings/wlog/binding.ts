@@ -25,7 +25,7 @@ export class LoggerBinding extends PackageBinding {
     const level = stack.next<LogLevel>(Uint8);
     const msgSlice = stack.next<SliceHeader>(SliceHeaderType);
     const msg = stringDecoder.decode(
-      mem.get(msgSlice.data, msgSlice.len)
+      mem.get(msgSlice.data, msgSlice.len, false)
     );
 
     if (level === LogLevel.Debug) {
