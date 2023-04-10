@@ -27,11 +27,6 @@ var buffPool = buffutil.NewBufferPool()
 var (
 	versionBranchRegEx = regexp.MustCompile(`^v\d(.\d+)?(.\d+)?$`)
 	goPkgInPackage     = regexp.MustCompile(`^[\w\d]+\.v\d(.\d+)?(.\d+)?$`)
-
-	ignoredFiles = []string{
-		"/testdata/",
-		"_test.go",
-	}
 )
 
 type PackageCache interface {
@@ -381,15 +376,4 @@ func guessPackageNameFromImport(importPath string) (string, bool) {
 func isPackageOutdated(newPkg, oldPkg *module.Version) bool {
 	result := semver.Compare(newPkg.Version, oldPkg.Version)
 	return result != -1
-}
-
-// isModuleFileIgnored checks if file should be ignored
-func shouldSkipFile(filename string) bool {
-	for _, rule := range ignoredFiles {
-		if strings.Contains(filename, rule) {
-			return true
-		}
-	}
-
-	return false
 }
