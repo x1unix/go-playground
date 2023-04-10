@@ -1,4 +1,10 @@
-import { UInt8ArrayTypeSpec, Int64, Struct, Uint64, Uint8 } from '~/lib/go';
+import {
+  UInt8ArrayTypeSpec,
+  Int64,
+  Struct,
+  Uint8,
+  UintPtr
+} from '~/lib/go';
 import { newPackageSymbolFunc } from '../../utils';
 
 export const MAX_FILE_NAME_LEN = 128;
@@ -33,8 +39,8 @@ export const TSizedFileName = Struct<SizedFileName>(sym('sizedFileName'), [
 ]);
 
 export const TInode = Struct<Inode>(sym('inode'), [
-  { key: 'id', type: Uint64},
-  { key: 'parentId', type: Uint64 },
+  { key: 'id', type: UintPtr },
+  { key: 'parentId', type: UintPtr },
   { key: 'fileType', type: Uint8 },
   { key: 'size', type: Int64 },
   { key: 'createdAt', type: Int64 },

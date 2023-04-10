@@ -58,8 +58,14 @@ export class BrowserFSBinding extends PackageBinding {
         throw new SyscallError(Errno.EFAULT);
       }
 
-      const result = await this.store.stat(fileName);
-      mem.write(outPtr, TInode, result);
+      const {name, ...result} = await this.store.stat(fileName);
+      mem.write<Inode>(outPtr, TInode, {
+        ...result,
+        name: {
+          len: name.length,
+          data: stringEncoder.encode(name)
+        }
+      });
     });
   }
 
