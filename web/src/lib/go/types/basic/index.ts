@@ -1,11 +1,12 @@
 import { BooleanTypeSpec } from "~/lib/go/types/basic/boolean";
-import { UInt64TypeSpec } from "~/lib/go/types/basic/uint64";
+import {Int64TypeSpec, UInt64TypeSpec} from "~/lib/go/types/basic/uint64";
 import { DataViewableTypeSpec } from "~/lib/go/types/basic/dataview";
 
 // Common type aliases
 export const Bool = new BooleanTypeSpec();
-// FIXME: fix Int and UInt spec definitions
+// FIXME: fix UInt spec definitions
 export const Int = new UInt64TypeSpec('int');
+export const Int64 = new Int64TypeSpec('int64');
 export const Uint = new UInt64TypeSpec('uint');
 export const UintPtr = new UInt64TypeSpec('uintptr');
 export const Byte = new DataViewableTypeSpec('byte', 1, 1, 0, {
@@ -38,11 +39,6 @@ export const Int32 = new DataViewableTypeSpec('int32', 4, 4, 0, {
 export const Uint64 = new DataViewableTypeSpec('uint64', 8, 8, 0, {
   read: DataView.prototype.getBigUint64,
   write: DataView.prototype.setBigUint64
-});
-
-export const Int64 = new DataViewableTypeSpec('int64', 8, 8, 0, {
-  read: DataView.prototype.getBigInt64,
-  write: DataView.prototype.setBigInt64
 });
 
 export const Float32 = new DataViewableTypeSpec('float32', 4, 4, 0, {
