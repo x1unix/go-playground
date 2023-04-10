@@ -68,9 +68,17 @@ export class StructTypeSpec<T=object> extends AbstractTypeSpec {
   write(view, addr, val, buff: ArrayBufferLike) {
     const address = this._firstAttr.alignAddress(addr);
     let offset = address;
+    if (typeof val !== 'object') {
+      throw new ReferenceError(
+        `${this.constructor.name}.write: invalid value passed (${typeof val} ${val}). ` +
+        `Value should be an object with attributes (${this._attributes.map(a => a.key).join(', ')}) ` +
+        `(struct ${this.name})`
+      );
+    }
+
     for (let attr of this._attributes) {
       const {key, type} = attr;
-      if (!val[key]) {
+      if (!(key in val)) {
         throw new ReferenceError(`${this.constructor.name}.write: missing object property "${key}" (struct ${this.name})`)
       }
 
