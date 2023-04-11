@@ -7,28 +7,23 @@
 package main
 
 import (
-	"context"
-	_ "embed"
-
 	"github.com/x1unix/go-playground/internal/gorepl"
+	"github.com/x1unix/go-playground/internal/gowasm"
 	"github.com/x1unix/go-playground/internal/gowasm/browserfs"
 	"github.com/x1unix/go-playground/internal/gowasm/packagedb"
-	"github.com/x1unix/go-playground/internal/gowasm/wlog"
 	"github.com/x1unix/go-playground/pkg/goproxy"
 )
-
-//go:embed sample.txt
-var sample []byte
 
 func main() {
 	vendorFS := browserfs.NewFS()
 	pkgIndex := packagedb.NewPackageIndex()
-	client := goproxy.NewClientWithDefaults()
+	client := goproxy.NewClientFromEnv()
+	runner := gorepl.NewRunner(vendorFS, pkgIndex, client)
 
-	ctx := context.Background()
-	worker := gorepl.NewWorker(vendorFS, pkgIndex, client)
-	if err := worker.Evaluate(ctx, sample); err != nil {
-		wlog.Println("Eval error:", err)
-	}
-	wlog.Println("Eval ok")
+	handler := gorepl.NewHandler(client, runner)
+	worker := gowasm.NewWorker()
+	worker.Export("RunProgram", handler.HandleRunProgram)
+	worker.Export("TerminateProgram", handler.HandleTerminateProgram)
+	worker.Export("UpdateGoProxyAddress", handler.HandleUpdateGoProxyAddress)
+	worker.Run()
 }
