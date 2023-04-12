@@ -74,7 +74,9 @@ const startWorker = () => new Promise<GoReplWorker>((res, rej) => {
 
   instantiateStreaming(fetch('/go.wasm'), go.importObject).then(({instance}) => (
     go.run(instance as GoWebAssemblyInstance)
-  )).catch(err => rej(err));
+  ))
+    .then(() => console.log('worker finished'))
+    .catch(err => rej(err));
 })
 
 async function run() {
