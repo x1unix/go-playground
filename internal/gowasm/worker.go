@@ -3,10 +3,9 @@ package gowasm
 import (
 	"context"
 	"fmt"
-	"syscall/js"
-
 	"github.com/samber/lo"
 	"github.com/x1unix/go-playground/internal/gowasm/wlog"
+	"syscall/js"
 )
 
 type Func func(ctx context.Context, args []js.Value) (any, error)
@@ -42,6 +41,12 @@ func (w *Worker) Export(methodName string, cb Func) {
 	w.exports[methodName] = cb
 }
 
+type jsFunc struct {
+	ref   uint64
+	grPtr uintptr
+	id    uint32
+}
+
 // Run registers worker and starts program execution.
 //
 // This method blocks the main goroutine until worker context is alive.
@@ -49,7 +54,7 @@ func (w *Worker) Run() {
 	methods := lo.Keys(w.exports)
 	handlerFunc := js.FuncOf(w.handleCall)
 	wlog.Debug("Registering worker entrypoint...")
-	go registerWorkerEntrypoint(handlerFunc, methods)
+	go registerWorkerEntrypoint(methods, handlerFunc)
 
 	wlog.Debug("Worker started")
 	<-w.ctx.Done()

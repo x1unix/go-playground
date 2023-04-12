@@ -4,7 +4,7 @@
 
 #include "textflag.h"
 
-// func registerWorkerEntrypoint(handler js.Func, methods []string)
+// func registerWorkerEntrypoint(methods []string, handler js.Func)
 TEXT ·registerWorkerEntrypoint(SB), NOSPLIT, $0
   CallImport
   RET
