@@ -21,6 +21,10 @@ class GoStringTypeSpec extends StructTypeSpec<StringHeader> {
 
   protected valueFromStruct(mem: ArrayBufferLike, structVal: StringHeader) {
     const { data, len } = structVal;
+    if (!len) {
+      return '';
+    }
+
     return stringDecoder.decode(new DataView(mem, data, len));
   }
 }

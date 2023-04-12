@@ -2,6 +2,7 @@ import {AbstractTypeSpec} from '~/lib/go/types/spec';
 import {DebugOptions, hex} from '~/lib/go/common';
 import {Ref, RefSlice, RefType} from "~/lib/go/pkg/syscall/js";
 import {JSValuesTable} from "~/lib/go/wrapper/interface";
+import {MemoryInspector} from "~/lib/go/debug";
 
 type TypedArray =
   Uint8Array | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array
@@ -11,12 +12,14 @@ type TypedArray =
  */
 export class MemoryView {
   private readonly debug;
+  private memInspector: MemoryInspector;
   constructor(
     private mem: DataView,
     private values: JSValuesTable,
     opts: DebugOptions = {}
   ) {
     this.debug = opts.debug ?? false;
+    this.memInspector = new MemoryInspector(this.mem);
   }
 
   get dataView() {
@@ -27,12 +30,17 @@ export class MemoryView {
     return this.mem.buffer;
   }
 
+  get inspector() {
+    return this.memInspector;
+  }
+
   /**
    * Resets memory view using passed data view.
    * @param mem
    */
   reset(mem: DataView) {
     this.mem = mem;
+    this.memInspector = new MemoryInspector(mem);
   }
 
   /**

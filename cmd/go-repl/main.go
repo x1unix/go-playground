@@ -22,8 +22,8 @@ func main() {
 
 	handler := gorepl.NewHandler(client, runner)
 	worker := gowasm.NewWorker()
-	worker.Export("RunProgram", handler.HandleRunProgram)
-	worker.Export("TerminateProgram", handler.HandleTerminateProgram)
-	worker.Export("UpdateGoProxyAddress", handler.HandleUpdateGoProxyAddress)
+	worker.Export("runProgram", handler.HandleRunProgram)
+	worker.Export("terminateProgram", handler.HandleTerminateProgram)
+	worker.Export("updateGoProxyAddress", handler.HandleUpdateGoProxyAddress)
 	worker.Run()
 }
