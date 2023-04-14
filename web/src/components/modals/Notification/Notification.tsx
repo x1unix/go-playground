@@ -17,12 +17,14 @@ interface ProgressState {
   current?: number
 }
 
-interface NotificationProps {
+export interface NotificationProps {
+  id: number|string
   type?: NotificationType
   title: string
   description?: string
   canDismiss?: boolean
   progress?: ProgressState
+  onClose?: () => void
 }
 
 const iconColorPaletteMap: {[k in NotificationType]: keyof ISemanticColors} = {
@@ -40,17 +42,19 @@ const statusIconMapping: {[k in NotificationType]: string} = {
 };
 
 const Notification: React.FunctionComponent<NotificationProps> = ({
+  id,
   title,
   progress,
   description,
   canDismiss = true,
-  type = NotificationType.Info
+  type = NotificationType.Info,
+  onClose,
 }) => {
   const {semanticColors, fonts, ...theme} = useTheme();
-  console.log(theme);
   return (
     <div
       className="Notification"
+      data-notification-id={id}
       style={{
         background: semanticColors.bodyStandoutBackground,
         boxShadow: theme.effects.elevation16,
@@ -74,6 +78,7 @@ const Notification: React.FunctionComponent<NotificationProps> = ({
             <IconButton
               title="Close"
               ariaLabel="Close notification"
+              onClick={onClose}
               style={{
                 color: 'inherit',
                 width: 'auto',

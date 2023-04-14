@@ -1,40 +1,65 @@
-import React from 'react';
-import Notification, {NotificationType} from "./Notification";
+import React, {useState} from 'react';
+import Notification, {NotificationType, NotificationProps } from "./Notification";
 import "./NotificationHost.css";
 
+const notifs: NotificationProps[] = [
+/*  {
+    id: 0,
+    title: 'Empty',
+  },
+  {
+    id: 1,
+    title: 'Success',
+    description: 'All packages installed successfully',
+  },
+  {
+    id: 2,
+    title: 'Initializing...',
+    progress: {
+      indeterminate: true
+    },
+  },*/
+  {
+    id: 4,
+    title: 'Warning',
+    type: NotificationType.Warning,
+    description: 'Some warning message'
+  },
+  {
+    id: 5,
+    title: 'Failed to install dependencies',
+    type: NotificationType.Error,
+    description: 'Failed to download package golang.org/x/tools/syscall: Get https://proxy.golang.org - 500 Internal Status Error'
+  },
+  {
+    id: 3,
+    title: 'Installing dependencies...',
+    description: 'Downloading golang.org/x/tools/syscall',
+    progress: {
+      indeterminate: true
+    },
+  }
+];
+
 const NotificationHost = () => {
+  const [notifications, setNotifications] = useState<NotificationProps[]>([
+    notifs.pop()!
+  ]);
   return (
     <div className="NotificationHost">
-      <Notification
-        title="Empty"
-      />
-      <Notification
-        title="Success"
-        description="All packages installed successfully"
-      />
-      <Notification
-        title="Initializing..."
-        progress={{
-          indeterminate: true
-        }}
-      />
-      <Notification
-        title="Installing dependencies..."
-        description="Downloading golang.org/x/tools/syscall"
-        progress={{
-          indeterminate: true
-        }}
-      />
-      <Notification
-        type={NotificationType.Warning}
-        title="Incomplete state"
-        description="Some stuff happened..."
-      />
-      <Notification
-        type={NotificationType.Error}
-        title="Failed to install dependencies"
-        description="Failed to download package golang.org/x/tools/syscall: Get https://proxy.golang.org - 500 Internal Status Error"
-      />
+      {notifications.map((e) => (
+        <Notification
+          key={e.id}
+          {...e}
+          onClose={() => {
+            const next = notifs.pop();
+            if (!next) {
+              return;
+            }
+            setNotifications((prev) => [...prev, next])
+          }}
+        />
+      ))}
     </div>
   )
 };
