@@ -26,19 +26,20 @@ const notifs: NotificationProps[] = [
     description: 'Some warning message'
   },
   {
+    id: 3,
+    title: 'Installing dependencies...',
+    description: 'Downloading golang.org/x/tools/syscall',
+    canDismiss: false,
+    progress: {
+      indeterminate: true
+    },
+  },
+  {
     id: 5,
     title: 'Failed to install dependencies',
     type: NotificationType.Error,
     description: 'Failed to download package golang.org/x/tools/syscall: Get https://proxy.golang.org - 500 Internal Status Error'
   },
-  {
-    id: 3,
-    title: 'Installing dependencies...',
-    description: 'Downloading golang.org/x/tools/syscall',
-    progress: {
-      indeterminate: true
-    },
-  }
 ];
 
 const NotificationHost = () => {

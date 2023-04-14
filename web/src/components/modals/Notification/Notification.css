@@ -32,19 +32,3 @@
   margin-bottom: .4rem;
 }
 
-.Notification__Content {
-  /*margin-bottom: .4rem;*/
-}
-
-@media (max-width: 479px) {
-  .Notification {
-    max-width: none;
-  }
-}
-
-@media (min-width: 480px) {
-  .Notification {
-    min-width: 320px;
-    max-width: 480px;
-  }
-}

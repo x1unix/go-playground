@@ -44,6 +44,7 @@
   .NotificationHost .Notification {
     align-items: stretch;
     animation: .3s ease-out 0s notification-appear-mobile;
+    max-width: none;
   }
 }
 
@@ -58,5 +59,7 @@
 
   .NotificationHost .Notification {
     animation: .3s ease-out 0s notification-appear-desktop;
+    min-width: 400px;
+    max-width: 480px;
   }
 }
