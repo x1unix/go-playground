@@ -1,0 +1,24 @@
+.NotificationHost {
+  position: absolute;
+  bottom: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 10px;
+}
+
+@media (max-width: 479px) {
+  .NotificationHost {
+    justify-content: stretch;
+    align-items: stretch;
+  }
+}
+
+@media (min-width: 480px) {
+  .NotificationHost {
+    right: 0;
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+}

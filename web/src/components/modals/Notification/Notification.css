@@ -1,0 +1,64 @@
+@keyframes notification-appear {
+  from {
+    top: 64px;
+    opacity: 0.2;
+  }
+
+  to {
+    top: 0;
+    opacity: 1;
+  }
+}
+
+.Notification {
+  background: red;
+  margin: 10px 10px 0;
+  box-sizing: border-box;
+  padding: 0.75rem;
+  position: relative;
+  animation: .3s ease-out 0s notification-appear;
+}
+
+.Notification__Header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.Notification__Icon {
+  margin-right: 5px;
+  margin-bottom: -2px;
+}
+
+.Notification__Controls {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.Notification__Content + .Notification__Progress {
+  margin-top: .3rem;
+}
+
+.Notification__Container {
+  padding-top: .8rem;
+  margin-bottom: .4rem;
+}
+
+.Notification__Content {
+  /*margin-bottom: .4rem;*/
+}
+
+@media (max-width: 479px) {
+  .Notification {
+    max-width: none;
+  }
+}
+
+@media (min-width: 480px) {
+  .Notification {
+    min-width: 320px;
+    max-width: 480px;
+  }
+}
