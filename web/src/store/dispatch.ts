@@ -35,6 +35,8 @@ export type StateProvider = () => State
 export type DispatchFn = (a: Action | any) => any
 export type Dispatcher = (dispatch: DispatchFn, getState: StateProvider) => void
 
+export type StateDispatch = <V=any,T=string>(v: Action<T, V> | Dispatcher) => void;
+
 /////////////////////////////
 //      Dispatchers        //
 /////////////////////////////

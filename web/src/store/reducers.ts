@@ -6,6 +6,7 @@ import { RunResponse, EvalEvent } from '~/services/api';
 import config, { MonacoSettings, RuntimeType } from '~/services/config'
 
 import vimReducers from './vim/reducers';
+import notificationReducers from './notifications/reducers';
 import { Action, ActionType, FileImportArgs, BuildParamsArgs, MonacoParamsChanges } from './actions';
 import { mapByAction } from './helpers';
 
@@ -132,7 +133,8 @@ const reducers = {
       return { ...s, ...payload };
     }
   }, {}),
-  vim: vimReducers
+  vim: vimReducers,
+  notifications: notificationReducers,
 };
 
 export const getInitialState = (): State => ({
@@ -152,6 +154,7 @@ export const getInitialState = (): State => ({
   },
   monaco: config.monacoSettings,
   panel: config.panelLayout,
+  notifications: {},
   vim: null
 });
 
