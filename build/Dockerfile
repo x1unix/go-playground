@@ -15,6 +15,7 @@ COPY go.sum .
 ARG APP_VERSION=1.0.0
 RUN echo "Building server with version $APP_VERSION" && \
     go build -o server -ldflags="-X 'main.Version=$APP_VERSION'" ./cmd/playground && \
+    GOOS=js GOARCH=wasm go build -o ./go-repl.wasm ./cmd/go-repl && \
     GOOS=js GOARCH=wasm go build -o ./worker.wasm ./cmd/webworker && \
     cp $(go env GOROOT)/misc/wasm/wasm_exec.js .
 
@@ -30,6 +31,7 @@ COPY data ./data
 COPY --from=ui-build /tmp/web/build ./public
 COPY --from=build /tmp/playground/server .
 COPY --from=build /tmp/playground/worker.wasm ./public
+COPY --from=build /tmp/playground/go-repl.wasm ./public
 COPY --from=build /tmp/playground/wasm_exec.js ./public
 EXPOSE 8000
 ENTRYPOINT /opt/playground/server \
