@@ -3,7 +3,7 @@ import { MemoryInspector} from "../debug";
 import { Bool, GoStringType } from "../types";
 import { GoInstance, ImportObject, PendingEvent } from "./interface";
 import {Func, Ref, RefType} from "../pkg/syscall/js";
-import { MemoryView } from '../memory/view';
+import { MemoryView } from "../memory/view";
 
 import {
   GoWebAssemblyInstance,
@@ -51,7 +51,7 @@ export type CallImportHandler = (sp: number, stack: StackReader, mem: MemoryView
 
 export interface Options {
   debug?: boolean
-  debugSkipCalls?: string[]
+  debugCalls?: string[]
   globalValue?: any
 }
 
@@ -59,7 +59,7 @@ export class GoWrapper {
   private _inspector: MemoryInspector|null = null;
   private _memView: MemoryView|null = null;
   private _debug = false;
-  private _debugSkipCalls: Set<string>;
+  private _debugCalls: Set<string>;
   private _globalValue: object;
   private go: GoInstance;
 
@@ -90,10 +90,10 @@ export class GoWrapper {
     return this.go._inst!.exports;
   }
 
-  constructor(parent: GoInstance, {debug = false, debugSkipCalls, globalValue}: Options = {}) {
+  constructor(parent: GoInstance, {debug = false, debugCalls, globalValue}: Options = {}) {
     this.go = parent;
     this._debug = debug;
-    this._debugSkipCalls = new Set(debugSkipCalls ?? []);
+    this._debugCalls = new Set(debugCalls ?? []);
     this._globalValue = globalValue?.Go === GoWrapper ? globalValue : (
       wrapGlobal()
     );
@@ -147,7 +147,7 @@ export class GoWrapper {
       const methodName = reader.next<string>(GoStringType);
       const args = reader.nextRefSlice();
 
-      if (this._debug) {
+      if (this.isCallDebuggable('syscall/js.valueCall')) {
         const funcName = `${obj.constructor.name}.${methodName}`;
         console.log(`js.ValueCall: ${funcName}`, {
           obj, methodName, args
@@ -276,7 +276,7 @@ export class GoWrapper {
   {
     return (sp: number) => {
       sp >>>= 0;
-      const isDebug = this._debug && !this._debugSkipCalls.has(name);
+      const isDebug = this.isCallDebuggable(name);
       if (isDebug) {
         console.log(`CallImport: ${name} (SP: ${sp.toString(16)})`);
       }
@@ -344,5 +344,17 @@ export class GoWrapper {
 
   _resume() {
     return this.go._resume();
+  }
+
+  private isCallDebuggable(name: string) {
+    if (!this._debug) {
+      return false;
+    }
+
+    if (!this._debugCalls?.size) {
+      return false;
+    }
+
+    return this._debugCalls.has(name);
   }
 }
