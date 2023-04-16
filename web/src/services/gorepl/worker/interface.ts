@@ -5,6 +5,7 @@ export enum GoWorkerBootEventType {
   Downloading,
   Starting,
   Complete,
+  Crash = 4,
 }
 
 /**
@@ -96,6 +97,7 @@ export interface GoWorkerExitEvent {
  */
 export interface GoWorkerBootEvent {
   eventType: GoWorkerBootEventType
+  code?: number,
   progress?: {
     totalBytes: number
     currentBytes: number

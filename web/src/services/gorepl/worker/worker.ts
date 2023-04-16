@@ -134,6 +134,19 @@ export const startGoWorker = (globalScope: any, rpcClient: Client, cfg: WorkerCo
       }
     }));
 
+    // Capture worker crash event
+    go.onExit = (code: number) => {
+      console.log('Crash: ', code);
+      if (!code) {
+        return;
+      }
+
+      rpcClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
+        eventType: GoWorkerBootEventType.Crash,
+        code: code,
+      });
+    };
+
     instantiateStreaming(fetchWithProgress(rpcClient, GO_WASM_URL), go.importObject)
       .then(({instance}) => {
         rpcClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {

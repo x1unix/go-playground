@@ -1,6 +1,6 @@
 import { StackReader } from "../stack";
 import { MemoryInspector} from "../debug";
-import { Bool, GoStringType } from "../types";
+import {Bool, GoStringType, Int32} from "../types";
 import { GoInstance, ImportObject, PendingEvent } from "./interface";
 import {Func, Ref, RefType} from "../pkg/syscall/js";
 import { MemoryView } from "../memory/view";
@@ -62,6 +62,11 @@ export class GoWrapper {
   private _debugCalls: Set<string>;
   private _globalValue: object;
   private go: GoInstance;
+
+  /**
+   * Go program exit listener
+   */
+  public onExit?: (code: number) => void;
 
   /**
    * Returns WebAssembly memory inspector
@@ -130,10 +135,18 @@ export class GoWrapper {
       this.go.mem = new DataView(this.exports.mem.buffer);
       this._memView?.reset(this.go.mem);
       this._inspector = new MemoryInspector(this.go.mem);
-    })
+    });
 
     this.exportFunction('syscall/js.valueCall', (sp, reader) => {
       this.valueCall(sp, reader);
+    });
+
+    const wasmExitFunc = this.go.importObject.go['runtime.wasmExit'];
+    this.exportFunction('runtime.wasmExit', (sp, reader) => {
+      reader.skipHeader();
+      const code = reader.next<number>(Int32);
+      wasmExitFunc.call(this.go, sp);
+      this.onExit?.(code);
     })
   }
 
@@ -335,7 +348,8 @@ export class GoWrapper {
       }
     );
 
-    return this.go.run(wrappedInstance);
+    const r = await this.go.run(wrappedInstance);
+    return r;
   }
 
   exit(code: number) {

@@ -131,8 +131,17 @@ const handleStdoutWrite = (dispatcher: DispatchFn, {msgType, message}: StdoutWri
   }));
 }
 
-const handleWorkerBootEvent = (dispatcher: DispatchFn, {eventType, progress}: GoWorkerBootEvent) => {
+const handleWorkerBootEvent = (dispatcher: DispatchFn, {eventType, progress, code}: GoWorkerBootEvent) => {
   switch (eventType) {
+    case GoWorkerBootEventType.Crash:
+      dispatcher(newAddNotificationAction({
+        id: WORKER_NOTIFICATION_ID,
+        type: NotificationType.Error,
+        title: 'Go worker crashed',
+        description: `WebAssembly worker crashed with exit code ${code}.`,
+        canDismiss: true
+      }));
+      return;
     case GoWorkerBootEventType.Downloading:
       dispatcher(newAddNotificationAction({
         id: WORKER_NOTIFICATION_ID,
