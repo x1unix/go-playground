@@ -38,7 +38,7 @@ const CONTENT_LENGTH_HEADER = 'content-length';
 /**
  * Go WASM executable URL
  */
-const GO_WASM_URL = process.env.REACT_APP_GO_WASM_URL ?? '/go.wasm';
+const GO_WASM_URL = process.env.REACT_APP_GO_WASM_URL ?? '/go-repl.wasm';
 
 export interface GoReplWorker extends Worker {
   runProgram(strSize: number, data: Uint8Array)
