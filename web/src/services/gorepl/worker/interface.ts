@@ -1,5 +1,12 @@
 import {ConsoleStreamType} from "~/lib/gowasm/bindings/stdio";
 
+export enum GoWorkerBootEventType {
+  None,
+  Downloading,
+  Starting,
+  Complete,
+}
+
 /**
  * Default Worker config
  */
@@ -64,7 +71,12 @@ export enum WorkerEvent {
   /**
    * Event fired when Go WebAssembly worker was shut down
    */
-  GoWorkerExit = 'goWorkerExit'
+  GoWorkerExit = 'goWorkerExit',
+
+  /**
+   * Event fired during Go worker load progress
+   */
+  GoWorkerBoot = 'goWorkerBoot'
 }
 
 /**
@@ -77,4 +89,15 @@ export interface StdoutWriteEvent {
 
 export interface GoWorkerExitEvent {
   error?: string
+}
+
+/**
+ * Go WebAssembly worker boot event
+ */
+export interface GoWorkerBootEvent {
+  eventType: GoWorkerBootEventType
+  progress?: {
+    totalBytes: number
+    currentBytes: number
+  }
 }

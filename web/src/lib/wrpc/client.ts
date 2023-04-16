@@ -259,7 +259,7 @@ export class Client<H=Handler> {
     // Discard all pending promises in case of worker init issue.
     // Any issues occur before worker script was fetched don't contain message.
     console.error('wrpc: worker returned an error: ', event);
-    const err = new Error(event.message ?? 'failed to initialize WebWorker');
+    const err = new Error(event.message ?? 'Failed to initialize Go WebWorker');
     this.responseQueue.forEach(listener => {
       listener.rejector(err);
       if (listener.timeoutId) {

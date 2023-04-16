@@ -6,7 +6,7 @@ import {
   newErrorAction,
   newProgramWriteAction,
 } from "~/store/actions";
-import { DispatchFn, StateProvider} from "~/store/helpers";
+import {DispatchFn, StateProvider} from "~/store/helpers";
 
 import {
   newAddNotificationAction,
@@ -20,9 +20,13 @@ import {
   ProgramStateChangeEvent,
 } from "./worker/types";
 import {
-  WorkerInterface,
+  defaultWorkerConfig,
+  GoWorkerBootEvent,
+  GoWorkerBootEventType,
+  StdoutWriteEvent,
+  WorkerConfig,
   WorkerEvent,
-  StdoutWriteEvent, defaultWorkerConfig, WorkerConfig,
+  WorkerInterface,
 } from "./worker/interface";
 
 const PKG_MGR_NOTIFICATION_ID = 'packageManager'
@@ -83,6 +87,12 @@ export const getWorkerInstance = async (dispatcher: DispatchFn, stateProvider: S
 
   try {
     await client.ping();
+
+    // Track WebAssembly worker download progress
+    client.subscribe<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, event => {
+      handleWorkerBootEvent(dispatcher, event);
+    });
+
     await client.call<WorkerConfig>('init', {
       ...defaultWorkerConfig,
       env: {
@@ -119,6 +129,41 @@ const handleStdoutWrite = (dispatcher: DispatchFn, {msgType, message}: StdoutWri
     Message: message,
     Delay: 0,
   }));
+}
+
+const handleWorkerBootEvent = (dispatcher: DispatchFn, {eventType, progress}: GoWorkerBootEvent) => {
+  switch (eventType) {
+    case GoWorkerBootEventType.Downloading:
+      dispatcher(newAddNotificationAction({
+        id: WORKER_NOTIFICATION_ID,
+        type: NotificationType.Info,
+        title: 'Starting Go worker',
+        description: 'Downloading WebAssembly worker...',
+        canDismiss: false,
+        progress: {
+          total: progress?.totalBytes,
+          current: progress?.currentBytes
+        }
+      }));
+      return;
+    case GoWorkerBootEventType.Starting:
+      dispatcher(newAddNotificationAction({
+        id: WORKER_NOTIFICATION_ID,
+        type: NotificationType.Info,
+        title: 'Starting Go worker',
+        description: 'Starting WebAssembly worker...',
+        canDismiss: false,
+        progress: {
+          indeterminate: true
+        }
+      }));
+      return;
+    case GoWorkerBootEventType.Complete:
+      dispatcher(newRemoveNotificationAction(WORKER_NOTIFICATION_ID));
+      return;
+    default:
+      return;
+  }
 }
 
 const handleProgramStateEvent = (dispatcher: DispatchFn, {state, message}: ProgramStateChangeEvent) => {

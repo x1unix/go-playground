@@ -13,19 +13,24 @@ import {BrowserFSBinding} from "~/lib/gowasm/bindings/browserfs";
 import {PackageDBBinding} from "~/lib/gowasm/bindings/packagedb";
 import {Worker, WorkerBinding} from "~/lib/gowasm/bindings/worker";
 import {PackageManagerEvent, ProgramStateChangeEvent} from "./types";
+import {PackageCacheDB, PackageFileStore, PackageIndex} from "../pkgcache";
 import {
-  PackageCacheDB,
-  PackageFileStore,
-  PackageIndex
-} from "../pkgcache";
-import {
-  StdoutWriteEvent,
-  WorkerEvent,
-  WorkerConfig,
+  defaultWorkerConfig,
+  GoWorkerBootEvent,
+  GoWorkerBootEventType,
   GoWorkerExitEvent,
-  defaultWorkerConfig
+  StdoutWriteEvent,
+  WorkerConfig,
+  WorkerEvent
 } from "./interface";
 import {UIHostBinding} from "./binding";
+
+/**
+ * Decompressed content length
+ */
+const PAYLOAD_CONTENT_LENGTH_HEADER = 'x-payload-content-length';
+
+const CONTENT_LENGTH_HEADER = 'content-length';
 
 /**
  * Go WASM executable URL
@@ -38,6 +43,30 @@ export interface GoReplWorker extends Worker {
   terminateProgram()
 }
 
+class BootTimeoutGuard {
+  private timeout?: NodeJS.Timeout;
+  private started = false;
+
+  startBootTimeout(rejector: Function, ms?: number) {
+    if (!ms) {
+      return;
+    }
+
+    this.timeout = setTimeout(() => {
+      if (this.started) {
+        return;
+      }
+
+      rejector(new Error('Go WebAssembly worker start timeout exceeded'));
+    });
+  }
+
+  cancel(isStarted=true) {
+    this.started = isStarted;
+    clearTimeout(this.timeout!);
+  }
+}
+
 /**
  * Starts a new Go WebAssembly interpreter worker and attaches RPC client.
  *
@@ -48,14 +77,7 @@ export interface GoReplWorker extends Worker {
  */
 export const startGoWorker = (globalScope: any, rpcClient: Client, cfg: WorkerConfig = defaultWorkerConfig) => new Promise<GoReplWorker>(
   (res, rej) => {
-    let started = false;
-
-    const timeoutId = setTimeout(() => {
-      if (started) {
-        return;
-      }
-      rej(new Error('Go WebAssembly worker start timeout exceeded'));
-    }, cfg.startTimeout);
+    const timeout = new BootTimeoutGuard();
 
     // Wrap Go from wasm_exec.js with overlay.
     const go = new GoWrapper(new globalScope.Go(), {
@@ -94,8 +116,10 @@ export const startGoWorker = (globalScope: any, rpcClient: Client, cfg: WorkerCo
     // Intercept Go runtime start
     registerExportObject(go, new WorkerBinding<GoReplWorker>(go, {
       onWorkerRegister: (worker) => {
-        started = true;
-        clearTimeout(timeoutId);
+        timeout.cancel(true);
+        rpcClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
+          eventType: GoWorkerBootEventType.Complete,
+        });
         res(worker);
       }
     }));
@@ -110,14 +134,68 @@ export const startGoWorker = (globalScope: any, rpcClient: Client, cfg: WorkerCo
       }
     }));
 
-    instantiateStreaming(fetch(GO_WASM_URL), go.importObject)
-      .then(({instance}) => (
-        go.run(instance as GoWebAssemblyInstance)
-      ))
+    instantiateStreaming(fetchWithProgress(rpcClient, GO_WASM_URL), go.importObject)
+      .then(({instance}) => {
+        rpcClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
+          eventType: GoWorkerBootEventType.Starting,
+        });
+        timeout.startBootTimeout(rej, cfg.startTimeout);
+        return go.run(instance as GoWebAssemblyInstance);
+      })
       .then(() => {
         rpcClient.publish<GoWorkerExitEvent>(WorkerEvent.GoWorkerExit, {});
       })
-      .catch(err => rej(err))
-      .finally(() => clearTimeout(timeoutId));
+      .catch(err => {
+        timeout.cancel();
+        rej(err);
+      });
   }
 );
+
+/**
+ * Fetches WebAssembly binary with progress reported to the event queue.
+ *
+ * @param rspClient Worker RPC client
+ * @param req Fetch request args
+ */
+const fetchWithProgress = async (rspClient: Client, req: RequestInfo): Promise<Response> => {
+  const rsp = await fetch(req);
+  if (rsp.status !== 200) {
+    throw new Error(`Cannot fetch WebAssembly worker: GET ${rsp.url} - ${rsp.status} ${rsp.statusText}`);
+  }
+
+  const contentLength = rsp.headers.get(PAYLOAD_CONTENT_LENGTH_HEADER) ??
+    rsp.headers.get(CONTENT_LENGTH_HEADER);
+
+  if (!contentLength) {
+    console.warn('worker: WASM content length is not available');
+    return rsp;
+  }
+
+  const totalBytes = parseInt(contentLength, 10);
+  let readBytes = 0;
+
+  return new Response(new ReadableStream({
+    async start(controller) {
+      const reader = rsp.body!.getReader();
+      for (;;) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        readBytes += value?.byteLength ?? 1;
+        rspClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
+          eventType: GoWorkerBootEventType.Downloading,
+          progress: {
+            totalBytes,
+            currentBytes: readBytes,
+          }
+        });
+        controller.enqueue(value);
+      }
+      controller.close();
+    },
+  }), {
+    headers: rsp.headers,
+    status: rsp.status,
+    statusText: rsp.statusText,
+  });
+}
