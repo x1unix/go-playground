@@ -3,7 +3,6 @@ package goplay
 import (
 	"context"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 )
@@ -27,7 +26,7 @@ func (c *Client) GetSnippet(ctx context.Context, snippetID string) (*Snippet, er
 	defer resp.Body.Close()
 	switch resp.StatusCode {
 	case http.StatusOK:
-		snippet, err := ioutil.ReadAll(resp.Body)
+		snippet, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
 		}

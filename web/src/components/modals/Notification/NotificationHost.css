@@ -1,0 +1,65 @@
+@keyframes notification-appear-desktop {
+  from {
+    transform: translate3d(0, 33%, 0);
+    opacity: 0.2;
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes notification-appear-mobile {
+  from {
+    transform: translate3d(33%, 0, 0);
+    opacity: 0.2;
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+
+.NotificationHost {
+  position: absolute;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+
+  padding-bottom: 10px;
+}
+
+@media (max-width: 479px) {
+  .NotificationHost {
+    top: 0;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    justify-content: stretch;
+  }
+
+  .NotificationHost .Notification {
+    align-items: stretch;
+    animation: .3s ease-out 0s notification-appear-mobile;
+    max-width: none;
+  }
+}
+
+@media (min-width: 480px) {
+  .NotificationHost {
+    right: 0;
+    bottom: 0;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+
+  .NotificationHost .Notification {
+    animation: .3s ease-out 0s notification-appear-desktop;
+    min-width: 400px;
+    max-width: 480px;
+  }
+}

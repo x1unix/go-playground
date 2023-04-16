@@ -30,9 +30,14 @@ const COMPILER_OPTIONS: IDropdownOption[] = [
     key: RuntimeType.GoTipPlayground, text: 'Go Playground (Go Tip)' },
   {
     key: RuntimeType.WebAssembly,
-    text: `WebAssembly (${WASM_SUPPORTED ? 'Experimental' : 'Unsupported'})`,
+    text: `WebAssembly - Compiler ${WASM_SUPPORTED ? '' : '(Unsupported)'}`,
     disabled: !WASM_SUPPORTED
   },
+  {
+    key: RuntimeType.Interpreter,
+    text: `WebAssembly - Interpreter (${WASM_SUPPORTED ? 'Experimental' : 'Unsupported'})`,
+    disabled: !WASM_SUPPORTED
+  }
 ];
 
 const CURSOR_BLINK_STYLE_OPTS: IDropdownOption[] = [
@@ -60,6 +65,47 @@ const FONT_OPTS: IDropdownOption[] = [
   }))
 ];
 
+const runtimeTypeWarnings: {[k in RuntimeType]: (React.ReactElement | null)} = ({
+  [RuntimeType.GoTipPlayground]: (
+    <MessageBar isMultiline={true} messageBarType={MessageBarType.info}>
+      <b>Gotip Playground</b> option uses the official Go Playground server with latest unstable Go version.
+      <p>
+        See<Link href='https://pkg.go.dev/golang.org/dl/gotip' target='_blank'>gotip help</Link> for more details.
+      </p>
+    </MessageBar>
+  ),
+  [RuntimeType.GoPlayground]: (
+    <MessageBar isMultiline={true} messageBarType={MessageBarType.info}>
+      <b>Go Playground</b> option uses the official Go Playground server to run a program.
+    </MessageBar>
+  ),
+  [RuntimeType.WebAssembly]: (
+    <MessageBar isMultiline={true} messageBarType={MessageBarType.info}>
+      <b>WebAssembly Compiler</b>
+      <span> option uses API server to build Go program as WebAssembly executable.</span>
+      <p>
+        Program is still compiled on the server but execution is performed inside a browser.
+      </p>
+      <p>
+        Unlike Go playground server, this option provides a real concurrency and access to system date time.
+      </p>
+      <p>
+        See<Link href='https://github.com/golang/go/wiki/WebAssembly' target='_blank'>documentation</Link> for more details.
+      </p>
+    </MessageBar>
+  ),
+  [RuntimeType.Interpreter]: (
+    <MessageBar isMultiline={true} messageBarType={MessageBarType.warning}>
+      <b>WebAssembly Interpreter</b>
+      <span> compiles and runs Go code inside the browser using </span>
+      <Link href='https://github.com/traefik/yaegi' target='_blank'>Yaegi</Link> Go interpreter.
+      <p>
+        This mode allows to run code in without <u>internet</u>, but is very unstable. Use at your own risk.
+      </p>
+    </MessageBar>
+  )
+})
+
 export interface SettingsChanges {
   monaco?: MonacoParamsChanges
   args?: BuildParamsArgs,
@@ -76,8 +122,7 @@ export interface SettingsProps {
 
 interface SettingsModalState {
   isOpen?: boolean,
-  showWarning?: boolean
-  showGoTipMessage?: boolean
+  selectedRuntime: RuntimeType
 }
 
 @Connect(state => ({
@@ -93,8 +138,7 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
     super(props);
     this.state = {
       isOpen: props.isOpen,
-      showWarning: props.settings.runtime === RuntimeType.WebAssembly,
-      showGoTipMessage: props.settings.runtime === RuntimeType.GoTipPlayground,
+      selectedRuntime: props.settings.runtime,
     }
   }
 
@@ -126,7 +170,7 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
   render() {
     const contentStyles = getContentStyles(this.theme);
     const iconButtonStyles = getIconButtonStyles(this.theme);
-    const { showGoTipMessage, showWarning } = this.state;
+    const { selectedRuntime } = this.state;
     return (
       <Modal
         titleAriaId={this.titleID}
@@ -221,31 +265,13 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                     };
 
                     this.setState({
-                      showWarning: val?.key === RuntimeType.WebAssembly,
-                      showGoTipMessage: val?.key === RuntimeType.GoTipPlayground
+                      selectedRuntime: val?.key as RuntimeType,
                     });
                   }}
                 />}
               />
               <div style={{ marginTop: '10px' }}>
-                { showWarning && (
-                  <MessageBar isMultiline={true} messageBarType={MessageBarType.warning}>
-                    <b>WebAssembly</b> is a modern runtime that gives you additional features
-                    like possibility to interact with web browser but is unstable.
-                    Use it at your own risk.
-                    <p>
-                      See<Link href='https://github.com/golang/go/wiki/WebAssembly' target='_blank'>documentation</Link> for more details.
-                    </p>
-                  </MessageBar>
-                )}
-                { showGoTipMessage && (
-                  <MessageBar isMultiline={true} messageBarType={MessageBarType.warning}>
-                    <b>Gotip Playground</b> uses the current unstable development build of Go.
-                    <p>
-                      See<Link href='https://pkg.go.dev/golang.org/dl/gotip' target='_blank'>gotip help</Link> for more details.
-                    </p>
-                  </MessageBar>
-                )}
+                { runtimeTypeWarnings[selectedRuntime] }
               </div>
               <SettingsProperty
                 key='autoFormat'

@@ -70,15 +70,13 @@ registerRoute(
 );
 
 // Cache WebAssembly and Go assets
-const goWasmAssetsRegExp = new RegExp('^/(wasm_exec.js|worker.wasm)$');
+const goWasmAssetsRegExp = new RegExp('^/(wasm_exec.js|go-repl.wasm|worker.wasm)$');
 const DAY_IN_SECONDS = 24 * 60 * 60;
 registerRoute(
   ({ url }) => url.origin === self.location.origin && goWasmAssetsRegExp.test(url.pathname),
   new StaleWhileRevalidate({
     cacheName: 'wasm',
     plugins: [
-      // Ensure that once this runtime cache reaches a maximum size the
-      // least-recently used images are removed.
       new ExpirationPlugin({ maxAgeSeconds: 5 * DAY_IN_SECONDS }),
     ],
   })

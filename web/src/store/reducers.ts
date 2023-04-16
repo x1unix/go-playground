@@ -6,6 +6,7 @@ import { RunResponse, EvalEvent } from '~/services/api';
 import config, { MonacoSettings, RuntimeType } from '~/services/config'
 
 import vimReducers from './vim/reducers';
+import notificationReducers from './notifications/reducers';
 import { Action, ActionType, FileImportArgs, BuildParamsArgs, MonacoParamsChanges } from './actions';
 import { mapByAction } from './helpers';
 
@@ -54,14 +55,15 @@ const reducers = {
     [ActionType.ERROR]: (s: StatusState, a: Action<string>) => {
       return { ...s, loading: false, lastError: a.payload }
     },
-    [ActionType.LOADING]: (s: StatusState, _: Action<string>) => {
-      return { ...s, loading: true }
+    [ActionType.LOADING]: (s: StatusState, _: Action) => {
+      return { ...s, loading: true, events: [] }
     },
     [ActionType.EVAL_START]: (s: StatusState, _: Action) => {
       return { lastError: null, loading: false, events: [] }
     },
     [ActionType.EVAL_EVENT]: (s: StatusState, a: Action<EvalEvent>) => {
-      return { lastError: null, loading: false, events: s.events?.concat(a.payload) }
+      return { lastError: null, loading: false, events: s.events ?
+          s.events.concat(a.payload) : [a.payload] }
     },
     [ActionType.EVAL_FINISH]: (s: StatusState, _: Action) => {
       return { ...s, loading: false }
@@ -101,7 +103,8 @@ const reducers = {
     autoFormat: true,
     runtime: RuntimeType.GoPlayground,
     useSystemTheme: config.useSystemTheme,
-    enableVimMode: config.enableVimMode
+    enableVimMode: config.enableVimMode,
+    goProxyUrl: config.goProxyUrl,
   }),
   monaco: mapByAction<MonacoSettings>({
     [ActionType.MONACO_SETTINGS_CHANGE]: (s: MonacoSettings, a: Action<MonacoParamsChanges>) => {
@@ -132,7 +135,8 @@ const reducers = {
       return { ...s, ...payload };
     }
   }, {}),
-  vim: vimReducers
+  vim: vimReducers,
+  notifications: notificationReducers,
 };
 
 export const getInitialState = (): State => ({
@@ -148,10 +152,12 @@ export const getInitialState = (): State => ({
     autoFormat: config.autoFormat,
     runtime: config.runtimeType,
     useSystemTheme: config.useSystemTheme,
-    enableVimMode: config.enableVimMode
+    enableVimMode: config.enableVimMode,
+    goProxyUrl: config.goProxyUrl,
   },
   monaco: config.monacoSettings,
   panel: config.panelLayout,
+  notifications: {},
   vim: null
 });
 

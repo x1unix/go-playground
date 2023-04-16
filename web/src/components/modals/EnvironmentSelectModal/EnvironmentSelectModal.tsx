@@ -24,9 +24,15 @@ const options = [
     icon: <VscBeaker />
   },
   {
-    label: 'WebAssembly',
-    description: 'Run Go code in your web browser with access to JS API.',
+    label: 'WebAssembly (Compiler)',
+    description: 'Build program on server and run in browser.',
     type: RuntimeType.WebAssembly,
+    icon: <SiWebassembly />
+  },
+  {
+    label: 'WebAssembly (Interpreter)',
+    description: 'Build and run Go program in web browser. Works offline.',
+    type: RuntimeType.Interpreter,
     icon: <SiWebassembly />
   }
 ]

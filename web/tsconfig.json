@@ -23,6 +23,7 @@
     "experimentalDecorators": true,
     "noFallthroughCasesInSwitch": true,
     "typeRoots": [
+      "src/lib/go/@types",
       "src/types/monaco-vim",
       "node_modules/@types"
     ]

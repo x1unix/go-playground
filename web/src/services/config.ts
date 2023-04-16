@@ -12,12 +12,14 @@ const ENABLE_VIM_MODE_KEY = 'ms.monaco.vimModeEnabled';
 const AUTOFORMAT_KEY = 'go.build.autoFormat';
 const MONACO_SETTINGS = 'ms.monaco.settings';
 const PANEL_SETTINGS = 'ui.layout.panel';
+const GOPROXY_URL = 'go.env.GOPROXY';
 
 
 export enum RuntimeType {
   GoPlayground    = 'GO_PLAYGROUND',
   GoTipPlayground = 'GO_TIP_PLAYGROUND',
-  WebAssembly     = 'WASM'
+  WebAssembly     = 'WASM',
+  Interpreter     = 'INTERPRETER',
 }
 
 export namespace RuntimeType {
@@ -32,7 +34,9 @@ export namespace RuntimeType {
       case RuntimeType.GoPlayground:
         return "Go Playground";
       case RuntimeType.WebAssembly:
-        return "WebAssembly";
+        return "WebAssembly (Compiler)";
+      case RuntimeType.Interpreter:
+        return "WebAssembly (Interpreter)";
       default:
         return RuntimeType[t];
     }
@@ -126,6 +130,15 @@ const Config = {
   set enableVimMode(val: boolean) {
     this._cache[ENABLE_VIM_MODE_KEY] = val;
     localStorage.setItem(ENABLE_VIM_MODE_KEY, val.toString());
+  },
+
+  get goProxyUrl() {
+    return this.getValue<string>(GOPROXY_URL, "https://proxy.golang.org");
+  },
+
+  set goProxyUrl(newVal: string) {
+    this._cache[GOPROXY_URL] = newVal;
+    localStorage.setItem(GOPROXY_URL, newVal);
   },
 
   get runtimeType(): RuntimeType {

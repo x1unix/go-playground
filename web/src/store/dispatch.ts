@@ -3,15 +3,17 @@ import {push} from 'connected-react-router';
 
 import client, {
   EvalEventKind,
+  PlaygroundBackend,
   instantiateStreaming,
-  PlaygroundBackend
 } from '~/services/api';
 
+import {getImportObject, goRun} from '~/services/go';
+import {getWorkerInstance} from "~/services/gorepl";
 import config, {RuntimeType} from '~/services/config';
 import {DEMO_CODE} from '~/components/editor/props';
-import {getImportObject, goRun} from '~/services/go';
-import {PanelState, SettingsState, State} from './state';
+import {PanelState, SettingsState} from './state';
 import {isDarkModeEnabled} from "~/utils/theme";
+import {DispatchFn, StateProvider} from "./helpers";
 
 import {
   Action,
@@ -19,21 +21,21 @@ import {
   MonacoParamsChanges,
   newBuildParamsChangeAction,
   newBuildResultAction,
+  newEnvironmentChangeAction,
   newErrorAction,
   newImportFileAction,
   newLoadingAction,
   newMonacoParamsChangeAction,
   newPanelStateChangeAction,
-  newSettingsChangeAction,
   newProgramWriteAction,
+  newSettingsChangeAction,
   newToggleThemeAction,
-  newUIStateChangeAction,
-  newEnvironmentChangeAction
+  newUIStateChangeAction
 } from './actions';
 
-export type StateProvider = () => State
-export type DispatchFn = (a: Action | any) => any
 export type Dispatcher = (dispatch: DispatchFn, getState: StateProvider) => void
+
+export type StateDispatch = <V=any,T=string>(v: Action<T, V> | Dispatcher) => void;
 
 /////////////////////////////
 //      Dispatchers        //
@@ -172,6 +174,15 @@ export const runFileDispatcher: Dispatcher =
             .then(result => console.log('exit code: %d', result))
             .catch(err => console.log('err', err))
             .finally(() => dispatch({ type: ActionType.EVAL_FINISH }));
+          break;
+        case RuntimeType.Interpreter:
+          try {
+            const worker = await getWorkerInstance(dispatch, getState);
+            await worker.runProgram(editor.code);
+          } catch (err: any) {
+            dispatch(newErrorAction(err.message ?? err.toString()));
+          }
+
           break;
         default:
           dispatch(newErrorAction(`AppError: Unknown Go runtime type "${settings.runtime}"`));
