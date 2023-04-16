@@ -1,8 +1,13 @@
 /**
- * Aligns memory address using provided alighment
+ * Aligns memory address using provided alignment
+ *
  * @param addr Address
- * @param align Alignment
+ * @param alignment Alignment
  */
-export const alignAddr = (addr: number, align: number) => (
-  ((addr + align - 1) / align) * align
-);
+export const alignAddr = (addr: number, alignment: number) => {
+  // Calculate the offset required to align the address
+  const offset = alignment - (addr % alignment);
+
+  // Add the offset to the address to align it
+  return addr + offset;
+};
