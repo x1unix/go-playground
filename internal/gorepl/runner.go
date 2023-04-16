@@ -2,6 +2,7 @@ package gorepl
 
 import (
 	"context"
+	"fmt"
 	"io/fs"
 	"os"
 	"path"
@@ -64,7 +65,7 @@ func (w *Runner) Evaluate(ctx context.Context, code []byte) error {
 		return newBuildError(err, "")
 	}
 
-	_, err = vm.ExecuteWithContext(ctx, prog)
+	err = executeSafely(ctx, vm, prog)
 	if err != nil {
 		return err
 	}
@@ -87,4 +88,19 @@ func getGoPath() string {
 		return "/go"
 	}
 	return goPath
+}
+
+func executeSafely(ctx context.Context, vm *interp.Interpreter, prog *interp.Program) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("panic during execution: %s", err)
+		}
+	}()
+
+	_, err = vm.ExecuteWithContext(ctx, prog)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
