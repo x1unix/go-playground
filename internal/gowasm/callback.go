@@ -9,8 +9,6 @@ import (
 	"github.com/x1unix/go-playground/internal/util/syncx"
 )
 
-const initSeats = 1024
-
 var (
 	callbacks = syncx.NewMap[CallbackID, chan Result]()
 

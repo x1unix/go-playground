@@ -16,7 +16,7 @@ const (
 // inode contains IndexedDB fs entry attributes
 type inode struct {
 	id        uint64
-	parentId  uint64
+	parentId  uint64 //nolint:unused
 	fileType  fileType
 	size      int64
 	createdAt int64
@@ -26,17 +26,6 @@ type inode struct {
 type sizedFileName struct {
 	len  uint8
 	data [maxFileNameLen]byte
-}
-
-func newSizedFileName(str string) sizedFileName {
-	var data [maxFileNameLen]byte
-	count := copy(data[:], str[:mathx.Min(
-		maxFileNameLen, len(str),
-	)])
-	return sizedFileName{
-		len:  uint8(count),
-		data: data,
-	}
 }
 
 func (n sizedFileName) string() string {
