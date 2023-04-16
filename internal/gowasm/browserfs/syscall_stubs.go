@@ -12,7 +12,7 @@ func readDir(name string, out *[]inode, cb int) {
 	panic("not implemented")
 }
 
-func readFile(f inode, out *[]byte, cb int) {
+func readFile(fd uint64, out *[]byte, cb int) {
 	panic("not implemented")
 }
 
