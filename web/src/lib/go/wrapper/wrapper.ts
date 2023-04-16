@@ -28,6 +28,10 @@ export const wrapGlobal = (overlay: object = {}, globalValue: object = window ||
       continue;
     }
 
+    if (key in overlay) {
+      continue;
+    }
+
     const prop = globalValue[key];
     if (typeof prop !== 'function') {
       mockObject[key] = prop;
