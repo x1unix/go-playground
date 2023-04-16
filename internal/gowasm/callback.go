@@ -5,13 +5,14 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/dolthub/swiss"
+	"github.com/x1unix/go-playground/internal/gowasm/wlog"
+	"github.com/x1unix/go-playground/internal/util/syncx"
 )
 
 const initSeats = 1024
 
 var (
-	callbacks = swiss.NewMap[CallbackID, chan Result](initSeats)
+	callbacks = syncx.NewMap[CallbackID, chan Result]()
 
 	lastSeatID = 0
 	lock       sync.Mutex
@@ -86,5 +87,6 @@ func NotifyResult(cb CallbackID, result Result) {
 		panic(fmt.Sprint("gowasm: invalid callback ID: ", cb))
 	}
 
+	wlog.Debugf("NotifyWrite: ID=%d Result=%d", cb, result)
 	ch <- result
 }

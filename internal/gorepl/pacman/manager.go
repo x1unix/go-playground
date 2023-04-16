@@ -133,7 +133,7 @@ func (mgr *PackageManager) CheckDependencies(ctx context.Context, importPaths []
 			return err
 		}
 
-		mgr.cachedPaths.Add(pkgName, ver)
+		mgr.cachedPaths.Put(pkgName, ver)
 	}
 
 	return nil

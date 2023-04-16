@@ -37,7 +37,7 @@ func NewMap[K comparable, V any]() Map[K, V] {
 	}
 }
 
-func (m Map[K, V]) Add(key K, val V) {
+func (m Map[K, V]) Put(key K, val V) {
 	m.m.Store(key, val)
 }
 
