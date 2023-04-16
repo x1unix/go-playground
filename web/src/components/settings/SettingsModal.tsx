@@ -33,6 +33,11 @@ const COMPILER_OPTIONS: IDropdownOption[] = [
     text: `WebAssembly (${WASM_SUPPORTED ? 'Experimental' : 'Unsupported'})`,
     disabled: !WASM_SUPPORTED
   },
+  {
+    key: RuntimeType.Browser,
+    text: `Browser (${WASM_SUPPORTED ? 'Experimental' : 'Unsupported'})`,
+    disabled: !WASM_SUPPORTED
+  }
 ];
 
 const CURSOR_BLINK_STYLE_OPTS: IDropdownOption[] = [
