@@ -133,8 +133,8 @@ export class GoWrapper {
   private patchImportObject() {
     this.exportFunction('runtime.resetMemoryDataView', () => {
       this.go.mem = new DataView(this.exports.mem.buffer);
-      this._memView?.reset(this.exports.mem.buffer);
-      this._inspector = new MemoryInspector(this.exports.mem.buffer);
+      this._memView?.reset(this.exports.mem);
+      this._inspector = new MemoryInspector(this.exports.mem);
     });
 
     this.exportFunction('syscall/js.valueCall', (sp, reader) => {
@@ -340,6 +340,7 @@ export class GoWrapper {
       }
     });
 
+    // Pass raw memory reference to avoid race condition on mutation and update.
     this._inspector = MemoryInspector.fromInstance(wrappedInstance);
     this._memView = MemoryView.fromInstance(
       wrappedInstance,

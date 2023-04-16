@@ -11,7 +11,7 @@ export class MemoryView {
   private readonly debug;
   private memInspector: MemoryInspector;
   constructor(
-    private mem: ArrayBufferLike,
+    private mem: WebAssembly.Memory,
     private values: JSValuesTable,
     opts: DebugOptions = {}
   ) {
@@ -20,7 +20,7 @@ export class MemoryView {
   }
 
   get dataView() {
-    return new DataView(this.mem);
+    return new DataView(this.mem.buffer);
   }
 
   get memory() {
@@ -35,7 +35,7 @@ export class MemoryView {
    * Resets memory view using passed data view.
    * @param mem
    */
-  reset(mem: ArrayBufferLike) {
+  reset(mem: WebAssembly.Memory) {
     this.mem = mem;
     this.memInspector = new MemoryInspector(mem);
   }
@@ -55,9 +55,9 @@ export class MemoryView {
       throw new ReferenceError('MemoryView.write: missing type reader');
     }
 
-    const view = new DataView(this.mem);
+    const view = new DataView(this.mem.buffer);
     const { address, endOffset } = typeSpec.write(
-      view, addr, data, this.mem
+      view, addr, data, this.mem.buffer
     );
 
     if (this.debug) {
@@ -74,7 +74,7 @@ export class MemoryView {
    * @param src Data source.
    */
   set(address: number, src: Uint8Array) {
-    new Uint8Array(this.mem).set(src, address);
+    new Uint8Array(this.mem.buffer).set(src, address);
   }
 
   /**
@@ -87,10 +87,10 @@ export class MemoryView {
    */
   get(address: number, length: number, copy=true) {
     if (!copy) {
-      return new Uint8Array(this.mem, address, length);
+      return new Uint8Array(this.mem.buffer, address, length);
     }
 
-    return new Uint8Array(this.mem.slice(address, address + length));
+    return new Uint8Array(this.mem.buffer.slice(address, address + length));
   }
 
   /**
@@ -106,9 +106,9 @@ export class MemoryView {
       throw new ReferenceError('MemoryView.read: missing type reader');
     }
 
-    const view = new DataView(this.mem);
+    const view = new DataView(this.mem.buffer);
     const { value, address } = typeSpec.read(
-      view, addr, this.mem
+      view, addr, this.mem.buffer
     );
 
     if (this.debug) {
@@ -145,12 +145,11 @@ export class MemoryView {
    */
   static fromInstance(instance: WebAssembly.Instance, jsVals: JSValuesTable, opts?: DebugOptions) {
     const { mem } = instance.exports;
-    const buffer = mem['buffer'] as ArrayBufferLike;
-    if (!buffer) {
-      throw new ReferenceError('Missing exported symbol "buffer" in instance');
+    if (!mem) {
+      throw new ReferenceError('Missing exported symbol "mem" in instance');
     }
 
-    return new MemoryView(buffer, jsVals, opts);
+    return new MemoryView(mem as WebAssembly.Memory, jsVals, opts);
   }
 
 }

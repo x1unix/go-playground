@@ -5,7 +5,7 @@ const ZERO_CHAR_PLACEHOLDER = '・'.charCodeAt(0);
 const ROW_SEPARATOR = '｜';
 
 export class MemoryInspector {
-  constructor(private mem: ArrayBufferLike) {}
+  constructor(private mem: WebAssembly.Memory) {}
 
   /**
    * Returns memory inspector from WebAssembly module instance.
@@ -14,16 +14,15 @@ export class MemoryInspector {
    */
   static fromInstance(instance: WebAssembly.Instance) {
     const { mem } = instance.exports;
-    const buffer = mem['buffer'] as ArrayBufferLike;
-    if (!buffer) {
+    if (!mem) {
       throw new ReferenceError('Missing exported symbol "buffer" in instance');
     }
 
-    return new MemoryInspector(buffer);
+    return new MemoryInspector(mem as WebAssembly.Memory);
   }
 
   dump(offset: number, count: number, colCount=8) {
-    const view = new DataView(this.mem);
+    const view = new DataView(this.mem.buffer);
 
     count = count < colCount ? colCount : count;
     let rowCount = Math.floor(count / colCount);
