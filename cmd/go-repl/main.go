@@ -16,6 +16,9 @@ import (
 )
 
 func main() {
+	// Go memory ballast, 10MiB
+	_ = make([]byte, 10<<20)
+
 	worker := gowasm.NewWorker()
 
 	vendorFS := browserfs.NewFS()
