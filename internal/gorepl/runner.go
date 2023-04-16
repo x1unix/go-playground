@@ -41,7 +41,7 @@ func NewRunner(vendorFs ReadWriteFS, pkgIndex pacman.PackageIndex, client *gopro
 	return &Runner{
 		vendorFs:   vendorFs,
 		goPath:     goPath,
-		pkgMgr:     pacman.NewPackageManager(client, cache),
+		pkgMgr:     pkgMgr,
 		pmObserver: pmObserver,
 	}
 }
@@ -80,7 +80,6 @@ func (w *Runner) checkNewImports(ctx context.Context, code []byte) error {
 		return err
 	}
 
-	w.pmObserver.Start(ctx)
 	return w.pkgMgr.CheckDependencies(ctx, rootImports)
 }
 

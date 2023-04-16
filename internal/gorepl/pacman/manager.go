@@ -82,6 +82,7 @@ func NewPackageManager(modProxy *goproxy.Client, pkgCache PackageCache) *Package
 	}
 }
 
+// SetProgressObserver sets package manager event listener
 func (mgr *PackageManager) SetProgressObserver(pm PMProgressObserver) {
 	mgr.progressReporter = pm
 }
@@ -209,7 +210,7 @@ func (mgr *PackageManager) downloadModule(ctx context.Context, pkgInfo *module.V
 	for i, file := range zr.File {
 		// TODO: ignore non-go files
 		if shouldSkipFile(file.Name) {
-			wlog.Printf("File %s is ignored, skip", file.Name)
+			wlog.Debugf("File %s is ignored, skip", file.Name)
 			continue
 		}
 
