@@ -2,7 +2,7 @@ package langserver
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -135,7 +135,7 @@ func shouldFormatCode(r *http.Request) (bool, error) {
 }
 
 func getPayloadFromRequest(r *http.Request) ([]byte, error) {
-	src, err := ioutil.ReadAll(r.Body)
+	src, err := io.ReadAll(r.Body)
 	if err != nil {
 		return nil, Errorf(http.StatusBadGateway, "failed to read request: %s", err)
 	}

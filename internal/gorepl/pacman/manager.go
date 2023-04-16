@@ -304,16 +304,6 @@ func (mgr *PackageManager) findPackageByImport(ctx context.Context, pkgUrl strin
 	return nil, err
 }
 
-func (mgr *PackageManager) isPackageCached(pkg *module.Version) bool {
-	cachedPkg, ok := mgr.cachedPaths.Get(pkg.Path)
-	if !ok {
-		return false
-	}
-
-	// Always prefer most recent version
-	return !isPackageOutdated(pkg, cachedPkg)
-}
-
 func isSelfModulePackage(goModulePath, importUrl string) bool {
 	if goModulePath == "" {
 		return false

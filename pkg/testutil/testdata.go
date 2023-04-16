@@ -2,7 +2,6 @@ package testutil
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -22,7 +21,7 @@ func OpenTestdata(t *testing.T, fPath string) io.ReadWriteCloser {
 // ReadTestdata reads testdata file
 func ReadTestdata(t *testing.T, fPath string) []byte {
 	t.Helper()
-	data, err := ioutil.ReadAll(OpenTestdata(t, fPath))
+	data, err := io.ReadAll(OpenTestdata(t, fPath))
 	if err != nil {
 		t.Fatalf("testdata: cannot read %q - %s", fPath, err)
 	}

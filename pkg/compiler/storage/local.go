@@ -3,7 +3,6 @@ package storage
 import (
 	"context"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
@@ -77,7 +76,7 @@ func NewLocalStorage(log *zap.SugaredLogger, baseDir string) (ls *LocalStorage, 
 }
 
 func isDirDirty(dir string) (bool, error) {
-	items, err := ioutil.ReadDir(dir)
+	items, err := os.ReadDir(dir)
 	if os.IsNotExist(err) {
 		return false, nil
 	}
@@ -148,7 +147,7 @@ func (s LocalStorage) CreateLocationAndDo(id ArtifactID, data []byte, cb Callbac
 	wasmLocation := s.getOutputLocation(id)
 	goFileName := id.Ext(ExtGo)
 	srcFile := filepath.Join(tmpSrcDir, goFileName)
-	if err := ioutil.WriteFile(srcFile, data, perm); err != nil {
+	if err := os.WriteFile(srcFile, data, perm); err != nil {
 		s.log.Errorw(
 			"failed to save source file",
 			"artifact", id.String(),

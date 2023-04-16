@@ -61,11 +61,6 @@ func main() {
 	}
 }
 
-func help() {
-	fmt.Printf("%s - Generate assembly file for external WASM functions.\n\n", programName)
-	fmt.Printf("Usage: %s filename.go\n", programName)
-}
-
 func run(fileName string, dryRun bool) error {
 	tpl, err := template.New("gowasm-import-template.s").Parse(string(tplData))
 	if err != nil {

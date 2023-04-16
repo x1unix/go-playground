@@ -26,5 +26,6 @@ func (p *SlicePool[T]) Get() []T {
 
 func (p *SlicePool[T]) Put(v []T) {
 	v = v[:0]
+	//nolint:staticcheck
 	p.pool.Put(v)
 }

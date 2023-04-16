@@ -3,3 +3,8 @@ run:
   skip-dirs:
     - pkg/worker
     - cmd/webworker
+issues:
+  exclude-rules:
+    - path: 'internal/gowasm/(.+)\.go'
+      linters:
+        - typecheck

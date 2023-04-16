@@ -64,7 +64,7 @@ func main() {
 
 	goVer, err := os.ReadFile(filepath.Join(goroot, "VERSION"))
 	if err != nil {
-		log.Printf("Warning: failed to find VERSION file: ", err)
+		log.Printf("Warning: failed to find VERSION file: %s", err)
 	}
 
 	tplCtx := tplContext{
