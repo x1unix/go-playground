@@ -12,6 +12,7 @@ const ENABLE_VIM_MODE_KEY = 'ms.monaco.vimModeEnabled';
 const AUTOFORMAT_KEY = 'go.build.autoFormat';
 const MONACO_SETTINGS = 'ms.monaco.settings';
 const PANEL_SETTINGS = 'ui.layout.panel';
+const GOPROXY_URL = 'go.env.GOPROXY';
 
 
 export enum RuntimeType {
@@ -126,6 +127,15 @@ const Config = {
   set enableVimMode(val: boolean) {
     this._cache[ENABLE_VIM_MODE_KEY] = val;
     localStorage.setItem(ENABLE_VIM_MODE_KEY, val.toString());
+  },
+
+  get goProxyUrl() {
+    return this.getValue<string>(GOPROXY_URL, "https://proxy.golang.org");
+  },
+
+  set goProxyUrl(newVal: string) {
+    this._cache[GOPROXY_URL] = newVal;
+    localStorage.setItem(GOPROXY_URL, newVal);
   },
 
   get runtimeType(): RuntimeType {

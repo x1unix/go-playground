@@ -5,17 +5,16 @@ import client, {
   EvalEventKind,
   PlaygroundBackend
 } from '~/services/api';
-import { instantiateStreaming } from '~/lib/go';
 
+import {getWorkerInstance} from "~/services/gorepl";
 import config, {RuntimeType} from '~/services/config';
 import {DEMO_CODE} from '~/components/editor/props';
-import {getImportObject, goRun} from '~/services/go';
-import {PanelState, SettingsState, State} from './state';
+import {PanelState, SettingsState} from './state';
 import {isDarkModeEnabled} from "~/utils/theme";
+import { DispatchFn, StateProvider } from "./helpers";
 
 import {
   Action,
-  ActionType,
   MonacoParamsChanges,
   newBuildParamsChangeAction,
   newBuildResultAction,
@@ -31,8 +30,6 @@ import {
   newEnvironmentChangeAction
 } from './actions';
 
-export type StateProvider = () => State
-export type DispatchFn = (a: Action | any) => any
 export type Dispatcher = (dispatch: DispatchFn, getState: StateProvider) => void
 
 export type StateDispatch = <V=any,T=string>(v: Action<T, V> | Dispatcher) => void;
@@ -165,15 +162,13 @@ export const runFileDispatcher: Dispatcher =
           dispatch(newBuildResultAction(rsp));
           break;
         case RuntimeType.WebAssembly:
-          let resp = await client.build(editor.code, settings.autoFormat);
-          let wasmFile = await client.getArtifact(resp.fileName);
-          let instance = await instantiateStreaming(wasmFile, getImportObject());
-          dispatch({ type: ActionType.EVAL_START });
-          dispatch(newBuildResultAction({ formatted: resp.formatted, events: [] }));
-          goRun(instance)
-            .then(result => console.log('exit code: %d', result))
-            .catch(err => console.log('err', err))
-            .finally(() => dispatch({ type: ActionType.EVAL_FINISH }));
+          try {
+            const worker = await getWorkerInstance(dispatch, getState);
+            await worker.runProgram(editor.code);
+          } catch (err: any) {
+            dispatch(newErrorAction(err.message ?? err.toString()));
+          }
+
           break;
         default:
           dispatch(newErrorAction(`AppError: Unknown Go runtime type "${settings.runtime}"`));

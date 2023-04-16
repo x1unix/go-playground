@@ -49,8 +49,8 @@ export class UIHostBinding extends PackageBinding {
   onProgramEvalStateChange(sp: number, stack: StackReader, _: MemoryView) {
     stack.skipHeader();
     const state = stack.next<EvalState>(Uint8);
-    const msg = stack.next<string>(GoStringType);
+    const message = stack.next<string>(GoStringType);
 
-    this.handler.onProgramEvalStateChange(state, msg);
+    this.handler.onProgramEvalStateChange({state, message});
   }
 }

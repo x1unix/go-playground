@@ -35,9 +35,17 @@ export interface PackageManagerEvent {
 }
 
 /**
+ * Go program execution event
+ */
+export interface ProgramStateChangeEvent {
+  state: EvalState
+  message?: string
+}
+
+/**
  * EvalEventHandler handles Go program compilation and package manager events.
  */
 export interface EvalEventHandler {
   onPackageManagerEvent(e: PackageManagerEvent)
-  onProgramEvalStateChange(state: EvalState, msg: string)
+  onProgramEvalStateChange(e: ProgramStateChangeEvent)
 }

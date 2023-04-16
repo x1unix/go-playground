@@ -1,93 +1,47 @@
+import {Client} from "~/lib/wrpc";
+import {stringEncoder} from "~/lib/go";
 import {
-  GoWebAssemblyInstance,
-  GoWrapper,
-  instantiateStreaming,
-  wrapGlobal,
-} from "~/lib/go";
-import {
-  PackageCacheDB,
-  PackageFileStore,
-  PackageIndex
-} from "~/services/gorepl/pkgcache";
-import {registerExportObject} from "~/lib/gowasm";
-import SyscallHelper from "~/lib/gowasm/syscall";
-import {LoggerBinding} from "~/lib/gowasm/bindings/wlog";
-import {ConsoleBinding, ConsoleStreamType} from "~/lib/gowasm/bindings/stdio";
-import {BrowserFSBinding} from "~/lib/gowasm/bindings/browserfs";
-import {PackageDBBinding} from "~/lib/gowasm/bindings/packagedb";
-import {WorkerBinding} from "~/lib/gowasm/bindings/worker";
-import {
+  defaultWorkerConfig,
   GoReplWorker,
-} from "~/services/gorepl/handler";
-import {UIHostBinding} from "~/services/gorepl/binding";
+  startGoWorker, WorkerConfig,
+} from "~/services/gorepl/worker";
 
 declare const self: DedicatedWorkerGlobalScope;
 export default {} as typeof Worker & { new (): Worker };
 
-const DEBUG = false;
-// const DEBUG = true;
+self.importScripts('/wasm_exec.js');
 
-const startWorker = () => new Promise<GoReplWorker>((res, rej) => {
-  const go = new GoWrapper(new self.Go(), {
-    debug: DEBUG,
-    globalValue: wrapGlobal({}, self)
-  });
-
-  const helper = new SyscallHelper(go, false);
-  const pkgDb = new PackageCacheDB();
-  const pkgIndex = new PackageIndex(pkgDb)
-  const fs = new PackageFileStore(pkgDb);
-
-  go.setEnv('GOPATH', '/go');
-  go.setEnv('WASM_DEBUG', '0');
-
-  // Core imports
-  registerExportObject(go, helper);
-  registerExportObject(go, new LoggerBinding());
-  registerExportObject(go, new BrowserFSBinding(helper, fs));
-  registerExportObject(go, new PackageDBBinding(helper, pkgIndex));
-  registerExportObject(go, new ConsoleBinding({
-    write(fd: ConsoleStreamType, msg: string) {
-      if (fd === ConsoleStreamType.Stderr) {
-        console.error(msg);
-        return
-      }
-
-      console.log(msg);
+let worker: GoReplWorker|null = null;
+const rpcClient = new Client(globalThis, {
+  init: async (cfg: WorkerConfig = defaultWorkerConfig) => {
+    worker = await startGoWorker(self, rpcClient, cfg);
+  },
+  runProgram: (code: string) => {
+    if (!worker) {
+      throw new Error('Go WebAssembly worker is not ready yet');
     }
-  }));
 
-  // Worker-specific imports
-  registerExportObject(go, new WorkerBinding<GoReplWorker>(go, {
-    onWorkerRegister: (worker) => {
-      res(worker);
+    const data = stringEncoder.encode(code);
+    worker.runProgram(data.length, data);
+  },
+  terminateProgram: async () => {
+    if (!worker) {
+      return;
     }
-  }));
-  registerExportObject(go, new UIHostBinding({
-    onPackageManagerEvent: e => {
-      console.log('onPackageManagerEvent', e)
-    },
-    onProgramEvalStateChange: (state, msg) => {
-      console.log('onProgramEvalStateChange', { state, msg});
-    }
-  }));
 
-  instantiateStreaming(fetch('/go.wasm'), go.importObject).then(({instance}) => (
-    go.run(instance as GoWebAssemblyInstance)
-  ))
-    .then(() => console.log('worker finished'))
-    .catch(err => rej(err));
-})
-
-async function run() {
-  self.importScripts('/wasm_exec.js');
-  const worker = await startWorker();
-
-  console.log('Worker loaded:', worker);
-  setTimeout(() => {
-    console.log('Stopping worker');
     worker.exit();
-  }, 2000);
-}
+  },
+  updateGoProxyAddress: (newAddress: string) => {
+    if (!worker) {
+      return;
+    }
 
-run().then(() => console.log('Worker started...')).catch(err => console.error('RUN ERR-', err))
+    try {
+      new URL(newAddress);
+    } catch (ex) {
+      throw new Error(`invalid Go module proxy URL "${newAddress}": ${ex}`);
+    }
+
+    worker.updateGoProxyAddress(newAddress);
+  }
+});

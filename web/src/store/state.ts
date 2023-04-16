@@ -29,6 +29,7 @@ export interface SettingsState {
   autoFormat: boolean,
   runtime: RuntimeType,
   enableVimMode: boolean
+  goProxyUrl: string
 }
 
 export interface PanelState {

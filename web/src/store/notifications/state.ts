@@ -1,5 +1,3 @@
-import {Dispatcher} from "~/store/dispatch";
-
 export enum NotificationType {
   None = '',
   Info = 'info',
@@ -14,7 +12,7 @@ export interface Notification {
   description?: string
   canDismiss?: boolean
   progress?: {
-    indeterminate: boolean
+    indeterminate?: boolean
     total?: number
     current?: number
   }
