@@ -30,6 +30,8 @@ const appendWasmContentLength = async (req, res, next) => {
     const filePath = path.join(process.cwd(), 'public', req.path);
     const {size} = await fs.stat(filePath);
     res.setHeader('x-payload-content-length', size);
+  } catch (_) {
+    // Suppress errors
   } finally {
     next();
   }
@@ -41,11 +43,11 @@ module.exports = function(app) {
     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
 
     if (!req.url.endsWith('.wasm')) {
-      next(req, res);
+      next();
       return;
     }
 
-    appendWasmContentLength(req, res, next);
+    appendWasmContentLength(req, res, next).catch(err => {});
   });
 
   app.use(
