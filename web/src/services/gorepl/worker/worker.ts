@@ -136,11 +136,6 @@ export const startGoWorker = (globalScope: any, rpcClient: Client, cfg: WorkerCo
 
     // Capture worker crash event
     go.onExit = (code: number) => {
-      console.log('Crash: ', code);
-      if (!code) {
-        return;
-      }
-
       rpcClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
         eventType: GoWorkerBootEventType.Crash,
         code: code,

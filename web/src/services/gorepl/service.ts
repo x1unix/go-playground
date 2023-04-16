@@ -35,13 +35,13 @@ const WORKER_NOTIFICATION_ID = 'goWorker';
 /**
  * Worker client singleton
  */
-let clientInstance: WorkerClient;
+let clientInstance: WorkerClient|null = null;
 
 /**
  * RPC client for a Go web worker
  */
 class WorkerClient implements WorkerInterface {
-  constructor(private client: Client) {}
+  constructor(private client: Client, private worker: Worker) {}
 
   runProgram(code: string) {
     return this.client.call('runProgram', code);
@@ -53,6 +53,11 @@ class WorkerClient implements WorkerInterface {
 
   updateGoProxyAddress(newAddress: string) {
     return this.client.call('updateGoProxyAddress', newAddress);
+  }
+
+  terminate() {
+    this.client.dispose();
+    this.worker.terminate();
   }
 }
 
@@ -107,7 +112,7 @@ export const getWorkerInstance = async (dispatcher: DispatchFn, stateProvider: S
   }
 
   dispatcher(newRemoveNotificationAction(WORKER_NOTIFICATION_ID));
-  clientInstance = new WorkerClient(client);
+  clientInstance = new WorkerClient(client, worker);
 
   // Populate program execution events to Redux
   client.subscribe<PackageManagerEvent>(WorkerEvent.PackageManagerEvent, event => {
@@ -141,6 +146,8 @@ const handleWorkerBootEvent = (dispatcher: DispatchFn, {eventType, progress, cod
         description: `WebAssembly worker crashed with exit code ${code}.`,
         canDismiss: true
       }));
+      clientInstance?.terminate();
+      clientInstance = null;
       return;
     case GoWorkerBootEventType.Downloading:
       dispatcher(newAddNotificationAction({
