@@ -8,6 +8,7 @@ package main
 
 import (
 	"github.com/x1unix/go-playground/internal/gorepl"
+	"github.com/x1unix/go-playground/internal/gorepl/uihost"
 	"github.com/x1unix/go-playground/internal/gowasm"
 	"github.com/x1unix/go-playground/internal/gowasm/browserfs"
 	"github.com/x1unix/go-playground/internal/gowasm/packagedb"
@@ -15,13 +16,16 @@ import (
 )
 
 func main() {
+	worker := gowasm.NewWorker()
+
 	vendorFS := browserfs.NewFS()
 	pkgIndex := packagedb.NewPackageIndex()
 	client := goproxy.NewClientFromEnv()
-	runner := gorepl.NewRunner(vendorFS, pkgIndex, client)
+	pmObserver := uihost.NewPackageDownloadObserver()
+	pmObserver.Start(worker.Context())
 
+	runner := gorepl.NewRunner(vendorFS, pkgIndex, client, pmObserver)
 	handler := gorepl.NewHandler(client, runner)
-	worker := gowasm.NewWorker()
 	worker.Export("runProgram", handler.HandleRunProgram)
 	worker.Export("terminateProgram", handler.HandleTerminateProgram)
 	worker.Export("updateGoProxyAddress", handler.HandleUpdateGoProxyAddress)

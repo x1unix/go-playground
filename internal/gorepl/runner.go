@@ -9,7 +9,6 @@ import (
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
 	"github.com/x1unix/go-playground/internal/gorepl/pacman"
-	"github.com/x1unix/go-playground/internal/gorepl/uihost"
 	"github.com/x1unix/go-playground/internal/gowasm"
 	"github.com/x1unix/go-playground/pkg/goproxy"
 )
@@ -23,10 +22,10 @@ type Runner struct {
 	vendorFs   ReadWriteFS
 	goPath     string
 	pkgMgr     *pacman.PackageManager
-	pmObserver *uihost.PackageDownloadObserver
+	pmObserver pacman.PMProgressObserver
 }
 
-func NewRunner(vendorFs ReadWriteFS, pkgIndex pacman.PackageIndex, client *goproxy.Client) *Runner {
+func NewRunner(vendorFs ReadWriteFS, pkgIndex pacman.PackageIndex, client *goproxy.Client, pmObserver pacman.PMProgressObserver) *Runner {
 	goPath := getGoPath()
 	cache := pacman.NewSimpleFSCache(
 		path.Join(goPath, "src/vendor"),
@@ -34,7 +33,6 @@ func NewRunner(vendorFs ReadWriteFS, pkgIndex pacman.PackageIndex, client *gopro
 		pkgIndex,
 	)
 
-	pmObserver := uihost.NewPackageDownloadObserver()
 	pkgMgr := pacman.NewPackageManager(client, cache)
 	pkgMgr.SetProgressObserver(pmObserver)
 
