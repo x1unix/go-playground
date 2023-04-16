@@ -12,7 +12,7 @@ export enum NotificationType {
 }
 
 interface ProgressState {
-  indeterminate: boolean
+  indeterminate?: boolean
   total?: number
   current?: number
 }
@@ -40,6 +40,15 @@ const statusIconMapping: {[k in NotificationType]: string} = {
   [NotificationType.Info]: 'info',
   [NotificationType.None]: 'info',
 };
+
+const getPercentComplete = (progress: NotificationProps['progress']): (number|undefined) => {
+  if (!progress || progress?.indeterminate) {
+    return;
+  }
+
+  const { current, total } = progress;
+  return (current! * 100) / total!;
+}
 
 const Notification: React.FunctionComponent<NotificationProps> = ({
   id,
@@ -104,7 +113,9 @@ const Notification: React.FunctionComponent<NotificationProps> = ({
           )}
           { progress && (
             <div className="Notification__Progress">
-              <ProgressIndicator />
+              <ProgressIndicator
+                percentComplete={getPercentComplete(progress)}
+              />
             </div>
           )}
         </div>

@@ -15,7 +15,7 @@ const NotificationHost: React.FunctionComponent<Props> = ({notifications, dispat
   return (
     <div className="NotificationHost">
       { notifications ? (
-        Object.entries(([key, notification]) => (
+        Object.entries(notifications).map(([key, notification]) => (
           <Notification
             key={key}
             {...notification}
