@@ -12,6 +12,8 @@ import {ConsoleBinding, ConsoleStreamType} from "~/lib/gowasm/bindings/stdio";
 import {BrowserFSBinding} from "~/lib/gowasm/bindings/browserfs";
 import {PackageDBBinding} from "~/lib/gowasm/bindings/packagedb";
 import {Worker, WorkerBinding} from "~/lib/gowasm/bindings/worker";
+import {FileSystemWrapper} from "~/services/go/fs";
+import ProcessStub from "~/services/go/process";
 import {PackageManagerEvent, ProgramStateChangeEvent} from "./types";
 import {PackageCacheDB, PackageFileStore, PackageIndex} from "../pkgcache";
 import {
@@ -24,6 +26,7 @@ import {
   WorkerEvent
 } from "./interface";
 import {UIHostBinding} from "./binding";
+import {StdioWrapper} from "./console";
 
 /**
  * Decompressed content length
@@ -79,10 +82,16 @@ export const startGoWorker = (globalScope: any, rpcClient: Client, cfg: WorkerCo
   (res, rej) => {
     const timeout = new BootTimeoutGuard();
 
+    const ioWrapper = new StdioWrapper(rpcClient);
+    const globalMocks = {
+      fs: new FileSystemWrapper(ioWrapper.stdoutPipe, ioWrapper.stderrPipe),
+      process: ProcessStub,
+    }
+
     // Wrap Go from wasm_exec.js with overlay.
     const go = new GoWrapper(new globalScope.Go(), {
       debug: cfg.debugRuntime,
-      globalValue: wrapGlobal({}, globalScope)
+      globalValue: wrapGlobal(globalMocks, globalScope)
     });
 
     const helper = new SyscallHelper(go, false);

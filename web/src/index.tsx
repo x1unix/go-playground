@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import { initializeIcons } from '@fluentui/react/lib/Icons';
 import { registerGoLanguageProvider } from '~/components/editor/provider';
 import apiClient from '~/services/api';
-import { foo } from '~/services/go/interpreter';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import App from './App';
 import './index.css';
@@ -12,7 +11,6 @@ import './index.css';
 import 'core-js/actual/promise/all-settled';
 import 'core-js/actual/array/flat-map';
 
-window['foo'] = foo;
 initializeIcons();
 registerGoLanguageProvider(apiClient);
 
