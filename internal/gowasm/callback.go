@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"sync"
 	"syscall"
+
+	"github.com/dolthub/swiss"
 )
 
 const initSeats = 1024
 
 var (
-	callbacks  = make(map[CallbackID]chan Result, initSeats)
+	callbacks = swiss.NewMap[CallbackID, chan Result](initSeats)
+
 	lastSeatID = 0
 	lock       sync.Mutex
 )
@@ -27,7 +30,7 @@ func RequestCallback() CallbackID {
 	lastSeatID++
 	seatID := lastSeatID
 	ch := make(chan Result, 1)
-	callbacks[seatID] = ch
+	callbacks.Put(seatID, ch)
 	return seatID
 }
 
@@ -47,7 +50,7 @@ func AwaitCallback(cbID CallbackID) error {
 
 // AwaitResult awaits for callback completion and returns raw result.
 func AwaitResult(cbID CallbackID) (Result, error) {
-	ch, ok := callbacks[cbID]
+	ch, ok := callbacks.Get(cbID)
 	if !ok {
 		return 0, ErrCallbackInvalid
 	}
@@ -61,24 +64,24 @@ func AwaitResult(cbID CallbackID) (Result, error) {
 }
 
 // ReleaseCallback releases acquired callback.
-func ReleaseCallback(cbId int) {
+func ReleaseCallback(cbId CallbackID) {
 	lock.Lock()
 	defer lock.Unlock()
 
-	ch, ok := callbacks[cbId]
+	ch, ok := callbacks.Get(cbId)
 	if !ok {
 		panic("invalid callback ID")
 	}
 
 	close(ch)
-	delete(callbacks, cbId)
+	callbacks.Delete(cbId)
 }
 
 // NotifyResult publishes callback result and notifies listener.
 //
 // This method is intended to be called only from JS side and kept public only for testing purposes.
 func NotifyResult(cb CallbackID, result Result) {
-	ch, ok := callbacks[cb]
+	ch, ok := callbacks.Get(cb)
 	if !ok {
 		panic(fmt.Sprint("gowasm: invalid callback ID: ", cb))
 	}
