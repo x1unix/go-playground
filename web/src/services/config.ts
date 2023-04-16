@@ -34,9 +34,9 @@ export namespace RuntimeType {
       case RuntimeType.GoPlayground:
         return "Go Playground";
       case RuntimeType.WebAssembly:
-        return "WebAssembly";
+        return "WebAssembly (Compiler)";
       case RuntimeType.Browser:
-        return "WebAssembly (Local)";
+        return "WebAssembly (Interpreter)";
       default:
         return RuntimeType[t];
     }
