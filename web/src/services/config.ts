@@ -18,7 +18,8 @@ const GOPROXY_URL = 'go.env.GOPROXY';
 export enum RuntimeType {
   GoPlayground    = 'GO_PLAYGROUND',
   GoTipPlayground = 'GO_TIP_PLAYGROUND',
-  WebAssembly     = 'WASM'
+  WebAssembly     = 'WASM',
+  Browser         = 'BROWSER',
 }
 
 export namespace RuntimeType {

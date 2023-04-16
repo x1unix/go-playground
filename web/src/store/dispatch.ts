@@ -3,31 +3,34 @@ import {push} from 'connected-react-router';
 
 import client, {
   EvalEventKind,
-  PlaygroundBackend
+  PlaygroundBackend,
+  instantiateStreaming,
 } from '~/services/api';
 
+import {getImportObject, goRun} from '~/services/go';
 import {getWorkerInstance} from "~/services/gorepl";
 import config, {RuntimeType} from '~/services/config';
 import {DEMO_CODE} from '~/components/editor/props';
 import {PanelState, SettingsState} from './state';
 import {isDarkModeEnabled} from "~/utils/theme";
-import { DispatchFn, StateProvider } from "./helpers";
+import {DispatchFn, StateProvider} from "./helpers";
 
 import {
   Action,
+  ActionType,
   MonacoParamsChanges,
   newBuildParamsChangeAction,
   newBuildResultAction,
+  newEnvironmentChangeAction,
   newErrorAction,
   newImportFileAction,
   newLoadingAction,
   newMonacoParamsChangeAction,
   newPanelStateChangeAction,
-  newSettingsChangeAction,
   newProgramWriteAction,
+  newSettingsChangeAction,
   newToggleThemeAction,
-  newUIStateChangeAction,
-  newEnvironmentChangeAction
+  newUIStateChangeAction
 } from './actions';
 
 export type Dispatcher = (dispatch: DispatchFn, getState: StateProvider) => void
@@ -162,6 +165,17 @@ export const runFileDispatcher: Dispatcher =
           dispatch(newBuildResultAction(rsp));
           break;
         case RuntimeType.WebAssembly:
+          let resp = await client.build(editor.code, settings.autoFormat);
+          let wasmFile = await client.getArtifact(resp.fileName);
+          let instance = await instantiateStreaming(wasmFile, getImportObject());
+          dispatch({ type: ActionType.EVAL_START });
+          dispatch(newBuildResultAction({ formatted: resp.formatted, events: [] }));
+          goRun(instance)
+            .then(result => console.log('exit code: %d', result))
+            .catch(err => console.log('err', err))
+            .finally(() => dispatch({ type: ActionType.EVAL_FINISH }));
+          break;
+        case RuntimeType.Browser:
           try {
             const worker = await getWorkerInstance(dispatch, getState);
             await worker.runProgram(editor.code);
