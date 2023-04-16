@@ -57,7 +57,7 @@ build-webworker:
 .PHONY:go-repl
 go-repl:
 	@echo ":: Building Go interpreter module..." && \
-	GOOS=js GOARCH=wasm $(GO) build -o $(PUBLIC_DIR)/$(INTERPRETER_WORKER_NAME) $(INTERPRETER_PKG)
+	GOOS=js GOARCH=wasm $(GO) build -o $(PUBLIC_DIR)/go-repl.wasm $(INTERPRETER_PKG)
 
 .PHONY:build-wasm
 build-wasm: copy-wasm-exec build-webworker go-repl
