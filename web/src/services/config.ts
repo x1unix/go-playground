@@ -19,7 +19,7 @@ export enum RuntimeType {
   GoPlayground    = 'GO_PLAYGROUND',
   GoTipPlayground = 'GO_TIP_PLAYGROUND',
   WebAssembly     = 'WASM',
-  Browser         = 'BROWSER',
+  Interpreter     = 'INTERPRETER',
 }
 
 export namespace RuntimeType {
@@ -35,7 +35,7 @@ export namespace RuntimeType {
         return "Go Playground";
       case RuntimeType.WebAssembly:
         return "WebAssembly (Compiler)";
-      case RuntimeType.Browser:
+      case RuntimeType.Interpreter:
         return "WebAssembly (Interpreter)";
       default:
         return RuntimeType[t];

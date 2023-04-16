@@ -32,7 +32,7 @@ const options = [
   {
     label: 'WebAssembly (Interpreter)',
     description: 'Build and run Go program in web browser. Works offline.',
-    type: RuntimeType.Browser,
+    type: RuntimeType.Interpreter,
     icon: <SiWebassembly />
   }
 ]

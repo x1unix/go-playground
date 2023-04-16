@@ -175,7 +175,7 @@ export const runFileDispatcher: Dispatcher =
             .catch(err => console.log('err', err))
             .finally(() => dispatch({ type: ActionType.EVAL_FINISH }));
           break;
-        case RuntimeType.Browser:
+        case RuntimeType.Interpreter:
           try {
             const worker = await getWorkerInstance(dispatch, getState);
             await worker.runProgram(editor.code);

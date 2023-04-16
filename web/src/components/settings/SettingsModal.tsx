@@ -34,7 +34,7 @@ const COMPILER_OPTIONS: IDropdownOption[] = [
     disabled: !WASM_SUPPORTED
   },
   {
-    key: RuntimeType.Browser,
+    key: RuntimeType.Interpreter,
     text: `WebAssembly - Interpreter (${WASM_SUPPORTED ? 'Experimental' : 'Unsupported'})`,
     disabled: !WASM_SUPPORTED
   }
@@ -94,7 +94,7 @@ const runtimeTypeWarnings: {[k in RuntimeType]: (React.ReactElement | null)} = (
       </p>
     </MessageBar>
   ),
-  [RuntimeType.Browser]: (
+  [RuntimeType.Interpreter]: (
     <MessageBar isMultiline={true} messageBarType={MessageBarType.warning}>
       <b>WebAssembly Interpreter</b>
       <span> compiles and runs Go code inside the browser using </span>
