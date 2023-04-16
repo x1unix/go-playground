@@ -8,7 +8,3 @@ issues:
     - path: 'internal/gowasm/(.+)\.go'
       linters:
         - typecheck
-linters:
-  disable:
-    # workaround for: 'panic: load embedded ruleguard rules: rules/rules.go:13: can't load fmt'
-    - fmt
