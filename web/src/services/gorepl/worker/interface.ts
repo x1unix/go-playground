@@ -4,7 +4,7 @@ import {ConsoleStreamType} from "~/lib/gowasm/bindings/stdio";
  * Default Worker config
  */
 export const defaultWorkerConfig: WorkerConfig = {
-  startTimeout: 5000
+  startTimeout: 30 * 1000 // 30s
 };
 
 /**
