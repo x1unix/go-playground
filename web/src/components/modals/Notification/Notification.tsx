@@ -47,7 +47,8 @@ const getPercentComplete = (progress: NotificationProps['progress']): (number|un
   }
 
   const { current, total } = progress;
-  return (current! * 100) / total!;
+  const percentage = (current! * 100) / total!;
+  return percentage / 100;
 }
 
 const Notification: React.FunctionComponent<NotificationProps> = ({
