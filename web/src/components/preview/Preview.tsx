@@ -1,11 +1,11 @@
 import React from 'react';
-import { MessageBar, MessageBarType } from '@fluentui/react';
+import {MessageBar, MessageBarType} from '@fluentui/react';
 
 import ThemeableComponent from '@components/utils/ThemeableComponent';
-import { getDefaultFontFamily } from '~/services/fonts';
-import { Connect } from '~/store';
-import { RuntimeType } from '~/services/config';
-import { EvalEvent } from '~/services/api';
+import {getDefaultFontFamily} from '~/services/fonts';
+import {Connect} from '~/store';
+import {RuntimeType} from '~/services/config';
+import {EvalEvent} from '~/services/api';
 import EvalEventView from './EvalEventView';
 import './Preview.css';
 
@@ -29,7 +29,9 @@ export default class Preview extends ThemeableComponent<PreviewProps> {
 
   render() {
     // Some content should not be displayed in WASM mode (like delay, etc)
-    const isWasm = this.props.runtime === RuntimeType.WebAssembly;
+    const isWasm = this.props.runtime === RuntimeType.WebAssembly ||
+      this.props.runtime === RuntimeType.Interpreter;
+
     let content;
     if (this.props.lastError) {
       content = (
@@ -51,8 +53,10 @@ export default class Preview extends ThemeableComponent<PreviewProps> {
         />
       ));
 
-      if (!isWasm) {
-        content.push(<div className="app-preview__epilogue" key="exit">Program exited.</div>)
+      if (!isWasm && !this.props.loading) {
+        content.push(
+          <div className="app-preview__epilogue" key="exit">Program exited.</div>
+        );
       }
     } else {
       content = <span>Press "Run" to compile program.</span>;
