@@ -60,7 +60,7 @@ func (h *Handler) HandleRunProgram(ctx context.Context, args []js.Value) (any, e
 		return nil, errors.New("another program is already running")
 	}
 
-	code := make([]byte, 0, strSize)
+	code := make([]byte, strSize)
 	n, err := gowasm.CopyBytesToGo(code, uint8ArrRef)
 	if err != nil {
 		return nil, err
