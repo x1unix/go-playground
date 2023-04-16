@@ -169,6 +169,8 @@ func mapSyscallError(errno syscall.Errno) error {
 }
 
 func awaitCallback(cb gowasm.CallbackID) error {
+	defer gowasm.ReleaseCallback(cb)
+
 	err := gowasm.AwaitCallback(cb)
 	if err == nil {
 		return nil

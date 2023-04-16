@@ -62,6 +62,9 @@ func AwaitResult(cbID CallbackID) (Result, error) {
 
 // ReleaseCallback releases acquired callback.
 func ReleaseCallback(cbId int) {
+	lock.Lock()
+	defer lock.Unlock()
+
 	ch, ok := callbacks[cbId]
 	if !ok {
 		panic("invalid callback ID")

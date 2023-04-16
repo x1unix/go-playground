@@ -23,8 +23,6 @@ func isFunc(v js.Value) bool {
 	return v.Type() == js.TypeFunction
 }
 
-//func AwaitCallback[T any]()
-
 func Await[T any](promiseValue js.Value) (*T, error) {
 	if promiseValue.Type() != js.TypeObject {
 		return nil, fmt.Errorf("passed value should be object, got %s", promiseValue)

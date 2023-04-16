@@ -147,7 +147,7 @@ export class GoWrapper {
       const code = reader.next<number>(Int32);
       wasmExitFunc.call(this.go, sp);
       this.onExit?.(code);
-    })
+    });
   }
 
   private valueCall(sp: number, reader: StackReader) {

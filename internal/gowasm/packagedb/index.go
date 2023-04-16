@@ -31,11 +31,13 @@ func NewPackageIndex() PackageIndex {
 func (p PackageIndex) LookupPackage(pkgName string) (*module.Version, error) {
 	wlog.Debugln("LookupPackage: ", pkgName)
 	cb := gowasm.RequestCallback()
+	defer gowasm.ReleaseCallback(cb)
 
 	// Since JS host can't access Go memory allocator,
 	// preallocate enough memory for result.
 	buff := make([]byte, 0, maxPackageVersionLength)
 	go lookupPackage(pkgName, &buff, cb)
+
 	err := gowasm.AwaitCallback(cb)
 	if err == syscall.ENOENT {
 		return nil, fs.ErrNotExist
@@ -54,6 +56,8 @@ func (p PackageIndex) LookupPackage(pkgName string) (*module.Version, error) {
 func (p PackageIndex) RegisterPackage(pkg *module.Version) error {
 	wlog.Debugln("RegisterPackage: ", pkg)
 	cb := gowasm.RequestCallback()
+	defer gowasm.ReleaseCallback(cb)
+
 	go registerPackage(pkg.Path, pkg.Version, cb)
 	if err := gowasm.AwaitCallback(cb); err != nil {
 		return err
@@ -65,6 +69,8 @@ func (p PackageIndex) RegisterPackage(pkg *module.Version) error {
 func (p PackageIndex) RemovePackage(pkg *module.Version) error {
 	wlog.Debugln("RemovePackage: ", pkg)
 	cb := gowasm.RequestCallback()
+	defer gowasm.ReleaseCallback(cb)
+
 	go removePackage(pkg.Path, cb)
 	if err := gowasm.AwaitCallback(cb); err != nil {
 		return err
