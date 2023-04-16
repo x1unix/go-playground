@@ -5,11 +5,7 @@ const ZERO_CHAR_PLACEHOLDER = '・'.charCodeAt(0);
 const ROW_SEPARATOR = '｜';
 
 export class MemoryInspector {
-  private _mem: DataView;
-
-  constructor(mem: DataView) {
-    this._mem = mem;
-  }
+  constructor(private mem: ArrayBufferLike) {}
 
   /**
    * Returns memory inspector from WebAssembly module instance.
@@ -23,11 +19,12 @@ export class MemoryInspector {
       throw new ReferenceError('Missing exported symbol "buffer" in instance');
     }
 
-    const view = new DataView(buffer);
-    return new MemoryInspector(view);
+    return new MemoryInspector(buffer);
   }
 
   dump(offset: number, count: number, colCount=8) {
+    const view = new DataView(this.mem);
+
     count = count < colCount ? colCount : count;
     let rowCount = Math.floor(count / colCount);
     if (count % colCount > 0) {
@@ -40,7 +37,7 @@ export class MemoryInspector {
       let rowOffset = offset + (row * colCount);
       let bytes: number[] = [];
       for (let i = 0; i < colCount; i++) {
-        const byte = this._mem.getUint8(rowOffset + i);
+        const byte = view.getUint8(rowOffset + i);
         bytes.push(byte)
       }
 

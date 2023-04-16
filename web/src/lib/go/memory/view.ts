@@ -4,9 +4,6 @@ import {Ref, RefSlice, RefType} from "~/lib/go/pkg/syscall/js";
 import {JSValuesTable} from "~/lib/go/wrapper/interface";
 import {MemoryInspector} from "~/lib/go/debug";
 
-type TypedArray =
-  Uint8Array | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array
-
 /**
  * MemoryView provides functionality to read or write into Go program memory.
  */
@@ -14,7 +11,7 @@ export class MemoryView {
   private readonly debug;
   private memInspector: MemoryInspector;
   constructor(
-    private mem: DataView,
+    private mem: ArrayBufferLike,
     private values: JSValuesTable,
     opts: DebugOptions = {}
   ) {
@@ -23,11 +20,11 @@ export class MemoryView {
   }
 
   get dataView() {
-    return this.mem;
+    return new DataView(this.mem);
   }
 
   get memory() {
-    return this.mem.buffer;
+    return this.mem;
   }
 
   get inspector() {
@@ -38,7 +35,7 @@ export class MemoryView {
    * Resets memory view using passed data view.
    * @param mem
    */
-  reset(mem: DataView) {
+  reset(mem: ArrayBufferLike) {
     this.mem = mem;
     this.memInspector = new MemoryInspector(mem);
   }
@@ -58,8 +55,9 @@ export class MemoryView {
       throw new ReferenceError('MemoryView.write: missing type reader');
     }
 
+    const view = new DataView(this.mem);
     const { address, endOffset } = typeSpec.write(
-      this.mem, addr, data, this.mem.buffer
+      view, addr, data, this.mem
     );
 
     if (this.debug) {
@@ -76,7 +74,7 @@ export class MemoryView {
    * @param src Data source.
    */
   set(address: number, src: Uint8Array) {
-    new Uint8Array(this.mem.buffer).set(src, address);
+    new Uint8Array(this.mem).set(src, address);
   }
 
   /**
@@ -89,10 +87,10 @@ export class MemoryView {
    */
   get(address: number, length: number, copy=true) {
     if (!copy) {
-      return new Uint8Array(this.mem.buffer, address, length);
+      return new Uint8Array(this.mem, address, length);
     }
 
-    return new Uint8Array(this.mem.buffer.slice(address, address + length));
+    return new Uint8Array(this.mem.slice(address, address + length));
   }
 
   /**
@@ -108,8 +106,9 @@ export class MemoryView {
       throw new ReferenceError('MemoryView.read: missing type reader');
     }
 
+    const view = new DataView(this.mem);
     const { value, address } = typeSpec.read(
-      this.mem, addr, this.mem.buffer
+      view, addr, this.mem
     );
 
     if (this.debug) {
@@ -151,8 +150,7 @@ export class MemoryView {
       throw new ReferenceError('Missing exported symbol "buffer" in instance');
     }
 
-    const view = new DataView(buffer);
-    return new MemoryView(view, jsVals, opts);
+    return new MemoryView(buffer, jsVals, opts);
   }
 
 }

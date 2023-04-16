@@ -133,8 +133,8 @@ export class GoWrapper {
   private patchImportObject() {
     this.exportFunction('runtime.resetMemoryDataView', () => {
       this.go.mem = new DataView(this.exports.mem.buffer);
-      this._memView?.reset(this.go.mem);
-      this._inspector = new MemoryInspector(this.go.mem);
+      this._memView?.reset(this.exports.mem.buffer);
+      this._inspector = new MemoryInspector(this.exports.mem.buffer);
     });
 
     this.exportFunction('syscall/js.valueCall', (sp, reader) => {
