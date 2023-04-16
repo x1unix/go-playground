@@ -69,7 +69,7 @@ export const startGoWorker = (globalScope: any, rpcClient: Client, cfg: WorkerCo
     const fs = new PackageFileStore(pkgDb);
 
     go.setEnv('GOPATH', '/go');
-    go.setEnv('WASM_DEBUG', cfg.debugWasm ? '0' : '1');
+    go.setEnv('WASM_DEBUG', cfg.debugWasm ? '1' : '0');
     if (cfg.env) {
       Object.entries(cfg.env)
         .forEach(([k, v]) => go.setEnv(k, v));
