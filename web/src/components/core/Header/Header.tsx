@@ -17,7 +17,6 @@ import {
   Dispatcher,
   dispatchToggleTheme,
   formatFileDispatcher,
-  newBuildParamsChangeDispatcher,
   newCodeImportDispatcher,
   newImportFileDispatcher,
   newMonacoParamsChangeDispatcher,
@@ -236,12 +235,6 @@ export class Header extends ThemeableComponent<any, HeaderState> {
     if (changes.monaco) {
       // Update monaco state if some of it's settings were changed
       this.props.dispatch(newMonacoParamsChangeDispatcher(changes.monaco));
-    }
-
-    if (changes.args) {
-      // Save runtime settings
-      const { runtime, autoFormat } = changes.args;
-      this.props.dispatch(newBuildParamsChangeDispatcher(runtime, autoFormat));
     }
 
     if (changes.settings) {

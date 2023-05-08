@@ -91,14 +91,6 @@ export const newSettingsChangeDispatcher = (changes: Partial<SettingsState>): Di
   }
 );
 
-export function newBuildParamsChangeDispatcher(runtime: RuntimeType, autoFormat: boolean): Dispatcher {
-  return (dispatch: DispatchFn, _: StateProvider) => {
-    config.runtimeType = runtime;
-    config.autoFormat = autoFormat;
-    dispatch(newBuildParamsChangeAction(runtime, autoFormat));
-  };
-}
-
 export function newEnvironmentChangeDispatcher(runtime: RuntimeType): Dispatcher {
   return (dispatch: DispatchFn, _: StateProvider) => {
     config.runtimeType = runtime;
