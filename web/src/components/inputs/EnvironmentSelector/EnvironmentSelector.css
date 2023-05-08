@@ -1,0 +1,13 @@
+.EnvironmentSelector__Icon {
+  display: flex;
+}
+
+@media (max-width: 479px) {
+  .EnvironmentSelector--responsive .EnvironmentSelector__Title {
+    display: none;
+  }
+
+  .EnvironmentSelector--responsive .EnvironmentSelector__Icon {
+    display: block;
+  }
+}
