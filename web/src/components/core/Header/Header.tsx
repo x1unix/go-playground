@@ -1,12 +1,16 @@
 import React from 'react';
-import { CommandBar, ICommandBarItemProps } from '@fluentui/react/lib/CommandBar';
+import {
+  CommandBar,
+  ICommandBarItemProps, Stack,
+} from '@fluentui/react';
 
-import SettingsModal, { SettingsChanges } from '~/components/settings/SettingsModal';
-import ThemeableComponent from '@components/utils/ThemeableComponent';
-import AboutModal from '~/components/modals/AboutModal';
 import config from '~/services/config';
-import { getSnippetsMenuItems, SnippetMenuItem } from '~/utils/headerutils';
+import SettingsModal, { SettingsChanges } from '~/components/settings/SettingsModal';
+import ThemeableComponent from '~/components/utils/ThemeableComponent';
+import AboutModal from '~/components/modals/AboutModal';
 import ChangeLogModal from '~/components/modals/ChangeLogModal';
+import { getSnippetsMenuItems, SnippetMenuItem } from '~/utils/headerutils';
+import EnvironmentSelector from '~/components/inputs/EnvironmentSelector';
 import SharePopup from '~/components/utils/SharePopup';
 import {
   Connect,
@@ -151,15 +155,18 @@ export class Header extends ThemeableComponent<any, HeaderState> {
   get asideItems(): ICommandBarItemProps[] {
     return [
       {
-        key: 'changelog',
-        text: 'What\'s new',
-        ariaLabel: 'Changelog',
-        iconOnly: true,
-        disabled: this.props.loading,
-        iconProps: { iconName: 'Giftbox' },
-        onClick: () => {
-          this.setState({ showChangelog: true });
-        }
+        key: 'selectEnvironment',
+        commandBarButtonAs: (_) => (
+          <Stack
+            horizontal
+            verticalAlign="center"
+            style={{
+              marginRight: ".5rem"
+            }}
+          >
+            <EnvironmentSelector responsive />
+          </Stack>
+        )
       },
       {
         key: 'format',
@@ -201,6 +208,17 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         ariaLabel: 'Donate',
         iconProps: { iconName: 'Heart' },
         onClick: () => window.open(config.donateUrl, '_blank')
+      },
+      {
+        key: 'changelog',
+        text: 'What\'s new',
+        ariaLabel: 'Changelog',
+        iconOnly: true,
+        disabled: this.props.loading,
+        iconProps: { iconName: 'Giftbox' },
+        onClick: () => {
+          this.setState({ showChangelog: true });
+        }
       },
       {
         key: 'about',
@@ -276,3 +294,4 @@ export class Header extends ThemeableComponent<any, HeaderState> {
   }
 }
 
+let ok = false;
