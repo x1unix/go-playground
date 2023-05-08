@@ -68,14 +68,8 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 	go store.StartCleaner(ctx, cfg.Build.CleanupInterval, nil)
 
 	// Initialize services
-	pgClient := goplay.NewClient(cfg.Playground.PlaygroundURL, goplay.DefaultUserAgent,
+	playgroundClient := goplay.NewClient(cfg.Playground.PlaygroundURL, goplay.DefaultUserAgent,
 		cfg.Playground.ConnectTimeout)
-	goTipClient := goplay.NewClient(cfg.Playground.GoTipPlaygroundURL, goplay.DefaultUserAgent,
-		cfg.Playground.ConnectTimeout)
-	clients := &langserver.PlaygroundServices{
-		Default: pgClient,
-		GoTip:   goTipClient,
-	}
 	buildCfg := compiler.BuildEnvironmentConfig{
 		IncludedEnvironmentVariables: osutil.SelectEnvironmentVariables(cfg.Build.BypassEnvVarsList...),
 	}
@@ -86,7 +80,7 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 	// Initialize API endpoints
 	r := mux.NewRouter()
 	svcCfg := langserver.ServiceConfig{Version: Version}
-	langserver.New(svcCfg, clients, packages, buildSvc).
+	langserver.New(svcCfg, playgroundClient, packages, buildSvc).
 		Mount(r.PathPrefix("/api").Subrouter())
 
 	// Web UI routes

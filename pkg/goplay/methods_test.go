@@ -3,7 +3,7 @@ package goplay
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -81,7 +81,7 @@ func TestClient_Compile(t *testing.T) {
 					assert.Equal(t, http.MethodPost, r.Method)
 					assert.Equal(t, "/compile", r.URL.Path, "expected path mismatch")
 
-					body, err := ioutil.ReadAll(r.Body)
+					body, err := io.ReadAll(r.Body)
 					defer r.Body.Close()
 					assert.NoError(t, err)
 					q, err := url.ParseQuery(string(body))
@@ -94,7 +94,13 @@ func TestClient_Compile(t *testing.T) {
 				defer srv.Close()
 			}
 
-			got, err := client.Compile(context.TODO(), c.payload)
+			req := CompileRequest{
+				Version: DefaultVersion,
+				WithVet: true,
+				Body:    c.payload,
+			}
+
+			got, err := client.Compile(context.TODO(), req, "")
 			if c.err != "" {
 				testutil.ContainsError(t, err, c.err)
 				return
@@ -156,7 +162,7 @@ func TestClient_GoImports(t *testing.T) {
 				defer srv.Close()
 			}
 
-			got, err := client.GoImports(context.TODO(), c.payload)
+			got, err := client.GoImports(context.TODO(), c.payload, BackendGoCurrent)
 			if c.err != "" {
 				testutil.ContainsError(t, err, c.err)
 				return
