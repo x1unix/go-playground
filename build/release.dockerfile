@@ -20,7 +20,7 @@ RUN echo "Building server with version $APP_VERSION" && \
     GOOS=js GOARCH=wasm go build -o ./go-repl.wasm ./cmd/go-repl && \
     cp $(go env GOROOT)/misc/wasm/wasm_exec.js .
 
-FROM golang:1.18-alpine as production
+FROM golang:1.19-alpine as production
 WORKDIR /opt/playground
 ENV GOROOT /usr/local/go
 ENV APP_CLEAN_INTERVAL=10m
