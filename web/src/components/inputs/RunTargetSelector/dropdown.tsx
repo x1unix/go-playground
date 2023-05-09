@@ -24,7 +24,7 @@ const renderTitle = ({data, text, hidden}: DropdownOption): JSX.Element|null => 
       {
         data?.icon && (
           <span
-            className="EnvironmentSelector__Icon"
+            className="RunTargetSelector__Icon"
             style={{
               color: data.iconColor ?? OptionColors.Default
             }}
@@ -34,7 +34,7 @@ const renderTitle = ({data, text, hidden}: DropdownOption): JSX.Element|null => 
         )
       }
       <Label
-        className="EnvironmentSelector__Title"
+        className="RunTargetSelector__Title"
         style={{padding: 0}}
       >
         {text}

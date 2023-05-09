@@ -9,7 +9,7 @@ import ThemeableComponent from '~/components/utils/ThemeableComponent';
 import AboutModal from '~/components/modals/AboutModal';
 import ChangeLogModal from '~/components/modals/ChangeLogModal';
 import { getSnippetsMenuItems, SnippetMenuItem } from '~/utils/headerutils';
-import EnvironmentSelector from '~/components/inputs/EnvironmentSelector';
+import RunTargetSelector from '~/components/inputs/RunTargetSelector';
 import SharePopup from '~/components/utils/SharePopup';
 import {
   Connect,
@@ -163,7 +163,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
               marginRight: ".5rem"
             }}
           >
-            <EnvironmentSelector
+            <RunTargetSelector
               responsive
               disabled={this.props.loading}
             />

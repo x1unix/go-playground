@@ -12,7 +12,7 @@ import {RunTargetConfig} from "~/services/config";
 import {DropdownOption, dropdownOptions, keyFromOption} from "./options";
 import {onRenderOption, onRenderTitle} from "./dropdown";
 
-import "./EnvironmentSelector.css";
+import "./RunTargetSelector.css";
 
 const dropdownStyles: Partial<IDropdownStyles> = {
   callout: {
@@ -44,7 +44,7 @@ interface Props extends OwnProps, StateProps {
   dispatch: StateDispatch
 }
 
-const EnvironmentSelector: React.FC<Props> = ({
+const RunTargetSelector: React.FC<Props> = ({
   responsive,
   disabled,
   runTarget,
@@ -57,7 +57,7 @@ const EnvironmentSelector: React.FC<Props> = ({
   return (
     <Dropdown
       className={clsx({
-        'EnvironmentSelector--responsive': responsive
+        'RunTargetSelector--responsive': responsive
       })}
       options={dropdownOptions}
       selectedKey={selectedKey}
@@ -80,9 +80,9 @@ const EnvironmentSelector: React.FC<Props> = ({
   )
 }
 
-const ConnectedEnvironmentSelector = connect<StateProps, any, OwnProps, State>
+const ConnectedRunTargetSelector = connect<StateProps, any, OwnProps, State>
 (({runTarget}) => ({runTarget}))(
-  EnvironmentSelector as any // Temporary hack to avoid TS complains on StateDispatch.
+  RunTargetSelector as any // Temporary hack to avoid TS complains on StateDispatch.
 );
 
-export default ConnectedEnvironmentSelector;
+export default ConnectedRunTargetSelector;
