@@ -60,7 +60,7 @@ const Config = {
   },
 
   set runTargetConfig(newVal: RunTargetConfig) {
-    this.getObject(RUN_TARGET_KEY, newVal);
+    this.setObject(RUN_TARGET_KEY, newVal);
   },
 
   get autoFormat(): boolean {

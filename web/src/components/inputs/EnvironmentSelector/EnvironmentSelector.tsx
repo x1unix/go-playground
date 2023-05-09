@@ -1,15 +1,21 @@
 import clsx from "clsx";
-import React, {useState} from 'react';
+import React, {useMemo} from 'react';
+import {connect} from "react-redux";
 import {Dropdown, IDropdownStyles} from '@fluentui/react';
+import {
+  newRunTargetChangeDispatcher,
+  State,
+  StateDispatch
+} from "~/store";
+import {RunTargetConfig} from "~/services/config";
 
-import {dropdownOptions, EvalType, keyFromOption} from "./options";
+import {DropdownOption, dropdownOptions, keyFromOption} from "./options";
 import {onRenderOption, onRenderTitle} from "./dropdown";
 
-import './EnvironmentSelector.css'
+import "./EnvironmentSelector.css";
 
 const dropdownStyles: Partial<IDropdownStyles> = {
   callout: {
-    // backgroundColor: "red",
     minWidth: "256px"
   },
   dropdownOptionText: { overflow: 'visible', whiteSpace: 'normal' },
@@ -25,13 +31,28 @@ const dropdownStyles: Partial<IDropdownStyles> = {
   },
 };
 
-interface Props {
+interface OwnProps {
   disabled?: boolean
   responsive?: boolean
 }
 
-const EnvironmentSelector: React.FC<Props> = ({responsive, disabled}) => {
-  const [currentValue, setValue] = useState(keyFromOption(EvalType.Remote));
+interface StateProps {
+  runTarget: RunTargetConfig
+}
+
+interface Props extends OwnProps, StateProps {
+  dispatch: StateDispatch
+}
+
+const EnvironmentSelector: React.FC<Props> = ({
+  responsive,
+  disabled,
+  runTarget,
+  dispatch
+}) => {
+  const selectedKey = useMemo(() => (
+    keyFromOption(runTarget.target, runTarget.backend)
+  ), [runTarget]);
 
   return (
     <Dropdown
@@ -39,21 +60,29 @@ const EnvironmentSelector: React.FC<Props> = ({responsive, disabled}) => {
         'EnvironmentSelector--responsive': responsive
       })}
       options={dropdownOptions}
-      selectedKey={currentValue}
+      selectedKey={selectedKey}
       onRenderTitle={onRenderTitle}
       onRenderOption={onRenderOption}
       disabled={disabled}
       styles={dropdownStyles}
       onChange={(_, opt) => {
-        if (!opt) {
+        if (!opt?.data) {
           return;
         }
 
-        setValue(keyFromOption(opt.data.type, opt.data.version));
-        console.log(opt);
+        const {data} = opt as DropdownOption;
+        dispatch(newRunTargetChangeDispatcher({
+          target: data!.type,
+          backend: data!.backend,
+        }));
       }}
     />
   )
 }
 
-export default EnvironmentSelector;
+const ConnectedEnvironmentSelector = connect<StateProps, any, OwnProps, State>
+(({runTarget}) => ({runTarget}))(
+  EnvironmentSelector as any // Temporary hack to avoid TS complains on StateDispatch.
+);
+
+export default ConnectedEnvironmentSelector;

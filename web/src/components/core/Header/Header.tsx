@@ -163,7 +163,10 @@ export class Header extends ThemeableComponent<any, HeaderState> {
               marginRight: ".5rem"
             }}
           >
-            <EnvironmentSelector responsive />
+            <EnvironmentSelector
+              responsive
+              disabled={this.props.loading}
+            />
           </Stack>
         )
       },

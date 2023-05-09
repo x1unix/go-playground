@@ -4,7 +4,6 @@ import {editor} from 'monaco-editor';
 
 import { RunResponse, EvalEvent } from '~/services/api';
 import config, {
-  defaultRunTarget,
   MonacoSettings,
   RunTargetConfig
 } from '~/services/config';
@@ -28,7 +27,7 @@ const reducers = {
     [ActionType.RUN_TARGET_CHANGE]: (_, {payload}: Action<RunTargetConfig>) => (
       payload
     ),
-  }, defaultRunTarget),
+  }, config.runTargetConfig),
   editor: mapByAction<EditorState>({
     [ActionType.FILE_CHANGE]: (s: EditorState, a: Action<string>) => {
       s.code = a.payload;
@@ -77,10 +76,10 @@ const reducers = {
     [ActionType.EVAL_FINISH]: (s: StatusState, _: Action) => {
       return { ...s, loading: false }
     },
-    [ActionType.RUN_TARGET_CHANGE]: (s: StatusState, a: Action<RunTargetConfig>) => {
-      if (a.payload.target) {
+    [ActionType.RUN_TARGET_CHANGE]: (s: StatusState, {payload}: Action<RunTargetConfig>) => {
+      if (payload.target) {
         // Reset build output if build runtime was changed
-        return { loading: false, lastError: null }
+        return { ...s, loading: false, lastError: null }
       }
 
       return s;
@@ -156,7 +155,7 @@ export const getInitialState = (): State => ({
     enableVimMode: config.enableVimMode,
     goProxyUrl: config.goProxyUrl,
   },
-  runTarget: defaultRunTarget,
+  runTarget: config.runTargetConfig,
   monaco: config.monacoSettings,
   panel: config.panelLayout,
   notifications: {},
