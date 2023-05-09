@@ -61,7 +61,7 @@ const RunTargetSelector: React.FC<Props> = ({
       })}
       options={dropdownOptions}
       selectedKey={selectedKey}
-      onRenderTitle={onRenderTitle}
+      onRenderTitle={(opt) => onRenderTitle(opt, disabled)}
       onRenderOption={onRenderOption}
       disabled={disabled}
       styles={dropdownStyles}

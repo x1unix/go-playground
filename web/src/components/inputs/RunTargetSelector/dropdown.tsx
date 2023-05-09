@@ -8,7 +8,7 @@ import {
 } from "@fluentui/react";
 import {OptionColors, DropdownOption} from "./options";
 
-const renderTitle = ({data, text, hidden}: DropdownOption): JSX.Element|null => {
+const renderTitle = ({data, text, hidden}: DropdownOption, isDisabled?: boolean): JSX.Element|null => {
   if (hidden) {
     return null;
   }
@@ -35,6 +35,7 @@ const renderTitle = ({data, text, hidden}: DropdownOption): JSX.Element|null => 
       }
       <Label
         className="RunTargetSelector__Title"
+        disabled={isDisabled}
         style={{
           padding: 0,
           display: 'inline-block',
@@ -78,8 +79,8 @@ const renderOption = ({data, text}: DropdownOption): JSX.Element => {
   );
 }
 
-export const onRenderTitle = (options?: IDropdownOption[]): JSX.Element|null => (
-  !options ? null : renderTitle(options[0] as DropdownOption)
+export const onRenderTitle = (options?: IDropdownOption[], isDisabled?: boolean): JSX.Element|null => (
+  !options ? null : renderTitle(options?.[0] as DropdownOption, isDisabled)
 )
 
 export const onRenderOption = (opt?: ISelectableOption): JSX.Element => (
