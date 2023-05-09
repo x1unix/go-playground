@@ -3,11 +3,15 @@ import { combineReducers } from 'redux';
 import {editor} from 'monaco-editor';
 
 import { RunResponse, EvalEvent } from '~/services/api';
-import config, { MonacoSettings, RuntimeType } from '~/services/config'
+import config, {
+  defaultRunTarget,
+  MonacoSettings,
+  RunTargetConfig
+} from '~/services/config';
 
 import vimReducers from './vim/reducers';
 import notificationReducers from './notifications/reducers';
-import { Action, ActionType, FileImportArgs, BuildParamsArgs, MonacoParamsChanges } from './actions';
+import { Action, ActionType, FileImportArgs, MonacoParamsChanges } from './actions';
 import { mapByAction } from './helpers';
 
 import {
@@ -20,6 +24,11 @@ import {
 } from './state';
 
 const reducers = {
+  runTarget: mapByAction<RunTargetConfig>({
+    [ActionType.RUN_TARGET_CHANGE]: (_, {payload}: Action<RunTargetConfig>) => (
+      payload
+    ),
+  }, defaultRunTarget),
   editor: mapByAction<EditorState>({
     [ActionType.FILE_CHANGE]: (s: EditorState, a: Action<string>) => {
       s.code = a.payload;
@@ -68,8 +77,8 @@ const reducers = {
     [ActionType.EVAL_FINISH]: (s: StatusState, _: Action) => {
       return { ...s, loading: false }
     },
-    [ActionType.BUILD_PARAMS_CHANGE]: (s: StatusState, a: Action<BuildParamsArgs>) => {
-      if (a.payload.runtime) {
+    [ActionType.RUN_TARGET_CHANGE]: (s: StatusState, a: Action<RunTargetConfig>) => {
+      if (a.payload.target) {
         // Reset build output if build runtime was changed
         return { loading: false, lastError: null }
       }
@@ -89,19 +98,12 @@ const reducers = {
       config.darkThemeEnabled = s.darkMode;
       return s;
     },
-    [ActionType.BUILD_PARAMS_CHANGE]: (s: SettingsState, a: Action<BuildParamsArgs>) => {
-      return Object.assign({}, s, a.payload);
-    },
-    [ActionType.ENVIRONMENT_CHANGE]: (s: SettingsState, { payload }: Action<RuntimeType>) => ({
-      ...s, runtime: payload,
-    }),
     [ActionType.SETTINGS_CHANGE]: (s: SettingsState, {payload}: Action<Partial<SettingsState>>) => ({
       ...s, ...payload
     })
   }, {
     darkMode: config.darkThemeEnabled,
     autoFormat: true,
-    runtime: RuntimeType.GoPlayground,
     useSystemTheme: config.useSystemTheme,
     enableVimMode: config.enableVimMode,
     goProxyUrl: config.goProxyUrl,
@@ -150,11 +152,11 @@ export const getInitialState = (): State => ({
   settings: {
     darkMode: config.darkThemeEnabled,
     autoFormat: config.autoFormat,
-    runtime: config.runtimeType,
     useSystemTheme: config.useSystemTheme,
     enableVimMode: config.enableVimMode,
     goProxyUrl: config.goProxyUrl,
   },
+  runTarget: defaultRunTarget,
   monaco: config.monacoSettings,
   panel: config.panelLayout,
   notifications: {},

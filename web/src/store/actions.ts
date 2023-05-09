@@ -1,7 +1,7 @@
 import {editor} from "monaco-editor";
 import {PanelState, SettingsState, UIState} from './state';
 import { RunResponse, EvalEvent } from '~/services/api';
-import { MonacoSettings, RuntimeType } from '~/services/config';
+import {MonacoSettings, RunTargetConfig} from '~/services/config';
 
 export enum ActionType {
   IMPORT_FILE = 'IMPORT_FILE',
@@ -10,11 +10,10 @@ export enum ActionType {
   ERROR = 'ERROR',
   COMPILE_RESULT = 'COMPILE_RESULT',
   TOGGLE_THEME = 'TOGGLE_THEME',
-  BUILD_PARAMS_CHANGE = 'BUILD_PARAMS_CHANGE',
+  RUN_TARGET_CHANGE = 'RUN_TARGET_CHANGE',
   MONACO_SETTINGS_CHANGE = 'MONACO_SETTINGS_CHANGE',
   UI_STATE_CHANGE = 'UI_STATE_CHANGE',
   MARKER_CHANGE = 'MARKER_CHANGE',
-  ENVIRONMENT_CHANGE = 'ENVIRONMENT_CHANGE',
   PANEL_STATE_CHANGE = 'PANEL_STATE_CHANGE',
   SETTINGS_CHANGE = 'SETTINGS_CHANGE',
 
@@ -34,16 +33,9 @@ export interface FileImportArgs {
   contents: string
 }
 
-export interface BuildParamsArgs {
-  runtime: RuntimeType
-  autoFormat: boolean
-}
-
 export type MonacoParamsChanges<T = any> = {
   [k in keyof MonacoSettings | string]: T;
 };
-
-export const actionOf = (type: ActionType) => ({ type });
 
 export const newImportFileAction = (fileName: string, contents: string) =>
 ({
@@ -87,16 +79,9 @@ export const newLoadingAction = () =>
   payload: null,
 });
 
-export const newBuildParamsChangeAction = (runtime: RuntimeType, autoFormat: boolean) =>
-({
-  type: ActionType.BUILD_PARAMS_CHANGE,
-  payload: { runtime, autoFormat } as BuildParamsArgs
-});
-
-export const newEnvironmentChangeAction = (runtime: RuntimeType) =>
-({
-  type: ActionType.ENVIRONMENT_CHANGE,
-  payload: runtime
+export const newRunTargetChangeAction = (cfg: RunTargetConfig) => ({
+  type: ActionType.RUN_TARGET_CHANGE,
+  payload: cfg
 });
 
 export const newMonacoParamsChangeAction = <T>(changes: MonacoParamsChanges<T>) =>

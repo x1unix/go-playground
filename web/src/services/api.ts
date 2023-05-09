@@ -1,14 +1,29 @@
 import * as axios from 'axios';
 import { AxiosInstance } from 'axios';
 import * as monaco from "monaco-editor";
-import config from './config';
+import environment from "~/environment";
 
-const apiAddress = `${config.serverUrl}/api`;
+const apiAddress = `${environment.apiUrl}/api`;
 const axiosClient = axios.default.create({ baseURL: apiAddress });
 
-export enum PlaygroundBackend {
+/**
+ * Backend is Go version type
+ */
+export enum Backend {
+  /**
+   * Current Go version
+   */
   Default = '',
-  GoTip = 'gotip'
+
+  /**
+   * Development branch (tip)
+   */
+  GoTip = 'gotip',
+
+  /**
+   * Previous Go version
+   */
+  GoPrev = 'goprev',
 }
 
 export enum EvalEventKind {
@@ -105,11 +120,11 @@ class Client implements IAPIClient {
     return resp;
   }
 
-  async evaluateCode(code: string, format: boolean, backend = PlaygroundBackend.Default): Promise<RunResponse> {
+  async evaluateCode(code: string, format: boolean, backend = Backend.Default): Promise<RunResponse> {
     return this.post<RunResponse>(`/run?format=${Boolean(format)}&backend=${backend}`, code);
   }
 
-  async formatCode(code: string, backend = PlaygroundBackend.Default): Promise<RunResponse> {
+  async formatCode(code: string, backend = Backend.Default): Promise<RunResponse> {
     return this.post<RunResponse>(`/format?backend=${backend}`, code);
   }
 

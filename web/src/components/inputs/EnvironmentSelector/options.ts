@@ -54,7 +54,7 @@ export const dropdownOptions: DropdownOption[] = [
   },
   {
     key: keyFromOption(EvalType.Remote),
-    text: `Go ${environment.currentGoVersion}`,
+    text: `Go ${environment.go.currentVersion}`,
     data: {
       icon: VscCloud,
       type: EvalType.Remote,
@@ -63,7 +63,7 @@ export const dropdownOptions: DropdownOption[] = [
   },
   {
     key: keyFromOption(EvalType.Remote, 'goprev'),
-    text: `Go ${environment.previousGoVersion}`,
+    text: `Go ${environment.go.previousVersion}`,
     data: {
       icon: VscCloud,
       type: EvalType.Remote,

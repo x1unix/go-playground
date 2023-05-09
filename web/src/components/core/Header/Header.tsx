@@ -4,7 +4,6 @@ import {
   ICommandBarItemProps, Stack,
 } from '@fluentui/react';
 
-import config from '~/services/config';
 import SettingsModal, { SettingsChanges } from '~/components/settings/SettingsModal';
 import ThemeableComponent from '~/components/utils/ThemeableComponent';
 import AboutModal from '~/components/modals/AboutModal';
@@ -27,6 +26,7 @@ import {
   shareSnippetDispatcher
 } from '~/store';
 import './Header.css';
+import environment from "~/environment";
 
 /**
  * Uniquie class name for share button to use as popover target.
@@ -199,14 +199,14 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         text: 'Submit Issue',
         ariaLabel: 'Submit Issue',
         iconProps: { iconName: 'Bug' },
-        onClick: () => window.open(config.issueUrl, '_blank')
+        onClick: () => window.open(environment.urls.issue, '_blank')
       },
       {
         key: 'donate',
         text: 'Donate',
         ariaLabel: 'Donate',
         iconProps: { iconName: 'Heart' },
-        onClick: () => window.open(config.donateUrl, '_blank')
+        onClick: () => window.open(environment.urls.donate, '_blank')
       },
       {
         key: 'changelog',
@@ -233,7 +233,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
 
   private onSettingsClose(changes: SettingsChanges) {
     if (changes.monaco) {
-      // Update monaco state if some of it's settings were changed
+      // Update monaco state if some of its settings were changed
       this.props.dispatch(newMonacoParamsChangeDispatcher(changes.monaco));
     }
 
@@ -286,5 +286,3 @@ export class Header extends ThemeableComponent<any, HeaderState> {
     );
   }
 }
-
-let ok = false;

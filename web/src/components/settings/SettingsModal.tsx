@@ -11,10 +11,9 @@ import {Pivot, PivotItem} from '@fluentui/react/lib/Pivot';
 import ThemeableComponent from '@components/utils/ThemeableComponent';
 import {getContentStyles, getIconButtonStyles} from '~/styles/modal';
 import SettingsProperty from './SettingsProperty';
-import {MonacoSettings, RuntimeType} from '~/services/config';
+import {MonacoSettings} from '~/services/config';
 import {DEFAULT_FONT, getAvailableFonts} from '~/services/fonts';
 import {
-  BuildParamsArgs,
   Connect,
   MonacoParamsChanges,
   SettingsState
@@ -59,8 +58,7 @@ export interface SettingsProps {
 }
 
 interface SettingsModalState {
-  isOpen?: boolean,
-  selectedRuntime: RuntimeType
+  isOpen?: boolean
 }
 
 @Connect(state => ({
@@ -76,7 +74,6 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
     super(props);
     this.state = {
       isOpen: props.isOpen,
-      selectedRuntime: props.settings.runtime,
     }
   }
 
@@ -108,7 +105,6 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
   render() {
     const contentStyles = getContentStyles(this.theme);
     const iconButtonStyles = getIconButtonStyles(this.theme);
-    const { selectedRuntime } = this.state;
     return (
       <Modal
         titleAriaId={this.titleID}

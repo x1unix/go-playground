@@ -1,8 +1,9 @@
 import { connect } from "react-redux";
 import {editor} from "monaco-editor";
 import { EvalEvent } from "~/services/api";
-import { MonacoSettings, RuntimeType } from "~/services/config";
+import {MonacoSettings, RunTargetConfig} from "~/services/config";
 import {LayoutType} from "~/styles/layout";
+
 import { VimState } from "./vim/state";
 import { NotificationsState } from "./notifications/state";
 
@@ -27,7 +28,6 @@ export interface SettingsState {
   darkMode: boolean
   useSystemTheme: boolean
   autoFormat: boolean,
-  runtime: RuntimeType,
   enableVimMode: boolean
   goProxyUrl: string
 }
@@ -43,6 +43,7 @@ export interface State {
   editor: EditorState
   status?: StatusState,
   settings: SettingsState
+  runTarget: RunTargetConfig
   monaco: MonacoSettings
   panel: PanelState
   ui?: UIState

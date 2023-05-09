@@ -4,7 +4,7 @@ import {MessageBar, MessageBarType} from '@fluentui/react';
 import ThemeableComponent from '@components/utils/ThemeableComponent';
 import {getDefaultFontFamily} from '~/services/fonts';
 import {Connect} from '~/store';
-import {RuntimeType} from '~/services/config';
+import {TargetType} from '~/services/config';
 import {EvalEvent} from '~/services/api';
 import EvalEventView from './EvalEventView';
 import './Preview.css';
@@ -13,10 +13,10 @@ export interface PreviewProps {
   lastError?: string | null;
   events?: EvalEvent[]
   loading?: boolean
-  runtime?: RuntimeType
+  targetType?: TargetType
 }
 
-@Connect(s => ({ darkMode: s.settings.darkMode, runtime: s.settings.runtime, ...s.status }))
+@Connect(s => ({ darkMode: s.settings.darkMode, targetType: s.runTarget.target, ...s.status }))
 export default class Preview extends ThemeableComponent<PreviewProps> {
   get styles() {
     const { palette } = this.theme;
@@ -29,8 +29,7 @@ export default class Preview extends ThemeableComponent<PreviewProps> {
 
   render() {
     // Some content should not be displayed in WASM mode (like delay, etc)
-    const isWasm = this.props.runtime === RuntimeType.WebAssembly ||
-      this.props.runtime === RuntimeType.Interpreter;
+    const isServer = this.props.targetType === TargetType.Server;
 
     let content;
     if (this.props.lastError) {
@@ -49,11 +48,11 @@ export default class Preview extends ThemeableComponent<PreviewProps> {
           message={Message}
           delay={Delay}
           kind={Kind}
-          showDelay={!isWasm}
+          showDelay={isServer}
         />
       ));
 
-      if (!isWasm && !this.props.loading) {
+      if (isServer && !this.props.loading) {
         content.push(
           <div className="app-preview__epilogue" key="exit">Program exited.</div>
         );

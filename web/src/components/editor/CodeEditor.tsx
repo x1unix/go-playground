@@ -20,7 +20,7 @@ import {
 import {Analyzer} from '~/services/analyzer';
 import {LANGUAGE_GOLANG, stateToOptions} from './props';
 import {getTimeNowUsageMarkers} from './utils';
-import {RuntimeType} from "@services/config";
+import {TargetType} from "~/services/config";
 
 const ANALYZE_DEBOUNCE_TIME = 500;
 
@@ -34,7 +34,7 @@ interface CodeEditorState {
   fileName: s.editor.fileName,
   darkMode: s.settings.darkMode,
   vimModeEnabled: s.settings.enableVimMode,
-  isServerEnvironment: RuntimeType.isServerRuntime(s.settings.runtime),
+  isServerEnvironment: s.runTarget.target === TargetType.Server,
   loading: s.status?.loading,
   options: s.monaco,
   vim: s.vim,
