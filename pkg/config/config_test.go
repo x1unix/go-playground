@@ -41,7 +41,6 @@ func TestFromFlags(t *testing.T) {
 		"-addr=testaddr",
 		"-static-dir=testdir",
 		"-playground-url=pgurl",
-		"-gotip-url=gotipurl",
 		"-timeout=2h",
 		"-wasm-build-dir=builddir",
 		"-f=pkgfile",
