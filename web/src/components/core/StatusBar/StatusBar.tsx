@@ -1,18 +1,15 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {connect} from 'react-redux';
 import {editor, MarkerSeverity} from 'monaco-editor';
-import { newEnvironmentChangeDispatcher } from '~/store';
-import config, {RuntimeType} from '~/services/config';
 import EllipsisText from '~/components/utils/EllipsisText';
 import StatusBarItem from '~/components/core/StatusBar/StatusBarItem';
-import EnvironmentSelectModal from '~/components/modals/EnvironmentSelectModal';
 import VimStatusBarItem from '~/plugins/vim/VimStatusBarItem';
 import './StatusBar.css';
+import environment from "~/environment";
 
 interface Props {
   loading?: true
   lastError?: string
-  runtime?: RuntimeType
   markers?: editor.IMarkerData[]
   dispatch?: Function
 }
@@ -74,9 +71,8 @@ const getStatusItem = ({loading, lastError}) => {
 }
 
 const StatusBar: React.FC<Props> = ({
-  loading, lastError, runtime, markers, dispatch
+  loading, lastError, markers
 }) => {
-  const [ runSelectorModalVisible, setRunSelectorModalVisible ] = useState(false);
   const className = loading ? 'StatusBar StatusBar--busy' : 'StatusBar';
   const {warnings, errors} = getMarkerCounters(markers);
   return (
@@ -102,43 +98,23 @@ const StatusBar: React.FC<Props> = ({
         </div>
         <div className="StatusBar__side-right">
           <StatusBarItem
-            icon="Code"
-            title="Select environment"
-            disabled={loading}
-            onClick={() => setRunSelectorModalVisible(true)}
-            hideTextOnMobile
-            button
-          >
-            Environment: {RuntimeType.toString(runtime)}
-          </StatusBarItem>
-          <StatusBarItem
             icon="Feedback"
             title="Send feedback"
-            href={config.issueUrl}
+            href={environment.urls.issue}
             iconOnly
           />
           <StatusBarItem
             imageSrc="/github-mark-light-32px.png"
             title="GitHub"
-            href={config.githubUrl}
+            href={environment.urls.github}
             iconOnly
           />
         </div>
       </div>
-      <EnvironmentSelectModal
-        value={runtime as RuntimeType}
-        isOpen={runSelectorModalVisible}
-        onClose={val => {
-          setRunSelectorModalVisible(false);
-          if (val) {
-            dispatch?.(newEnvironmentChangeDispatcher(val));
-          }
-        }}
-      />
     </>
   );
 };
 
-export default connect(({status: {loading, lastError, markers}, settings: {runtime}}: any) => (
-  {loading, lastError, markers, runtime}
+export default connect(({status: {loading, lastError, markers}}: any) => (
+  {loading, lastError, markers}
 ))(StatusBar);

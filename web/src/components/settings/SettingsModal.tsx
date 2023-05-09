@@ -7,38 +7,17 @@ import {
   Modal
 } from '@fluentui/react';
 import {Pivot, PivotItem} from '@fluentui/react/lib/Pivot';
-import {MessageBar, MessageBarType} from '@fluentui/react/lib/MessageBar';
-import {Link} from '@fluentui/react/lib/Link';
 
 import ThemeableComponent from '@components/utils/ThemeableComponent';
 import {getContentStyles, getIconButtonStyles} from '~/styles/modal';
 import SettingsProperty from './SettingsProperty';
-import {MonacoSettings, RuntimeType} from '~/services/config';
+import {MonacoSettings} from '~/services/config';
 import {DEFAULT_FONT, getAvailableFonts} from '~/services/fonts';
 import {
-  BuildParamsArgs,
   Connect,
   MonacoParamsChanges,
   SettingsState
 } from '~/store';
-
-const WASM_SUPPORTED = 'WebAssembly' in window;
-
-const COMPILER_OPTIONS: IDropdownOption[] = [
-  { key: RuntimeType.GoPlayground, text: 'Go Playground' },
-  {
-    key: RuntimeType.GoTipPlayground, text: 'Go Playground (Go Tip)' },
-  {
-    key: RuntimeType.WebAssembly,
-    text: `WebAssembly - Compiler ${WASM_SUPPORTED ? '' : '(Unsupported)'}`,
-    disabled: !WASM_SUPPORTED
-  },
-  {
-    key: RuntimeType.Interpreter,
-    text: `WebAssembly - Interpreter (${WASM_SUPPORTED ? 'Experimental' : 'Unsupported'})`,
-    disabled: !WASM_SUPPORTED
-  }
-];
 
 const CURSOR_BLINK_STYLE_OPTS: IDropdownOption[] = [
   { key: 'blink', text: 'Blink (default)' },
@@ -65,50 +44,8 @@ const FONT_OPTS: IDropdownOption[] = [
   }))
 ];
 
-const runtimeTypeWarnings: {[k in RuntimeType]: (React.ReactElement | null)} = ({
-  [RuntimeType.GoTipPlayground]: (
-    <MessageBar isMultiline={true} messageBarType={MessageBarType.info}>
-      <b>Gotip Playground</b> option uses the official Go Playground server with latest unstable Go version.
-      <p>
-        See<Link href='https://pkg.go.dev/golang.org/dl/gotip' target='_blank'>gotip help</Link> for more details.
-      </p>
-    </MessageBar>
-  ),
-  [RuntimeType.GoPlayground]: (
-    <MessageBar isMultiline={true} messageBarType={MessageBarType.info}>
-      <b>Go Playground</b> option uses the official Go Playground server to run a program.
-    </MessageBar>
-  ),
-  [RuntimeType.WebAssembly]: (
-    <MessageBar isMultiline={true} messageBarType={MessageBarType.info}>
-      <b>WebAssembly Compiler</b>
-      <span> option uses API server to build Go program as WebAssembly executable.</span>
-      <p>
-        Program is still compiled on the server but execution is performed inside a browser.
-      </p>
-      <p>
-        Unlike Go playground server, this option provides a real concurrency and access to system date time.
-      </p>
-      <p>
-        See<Link href='https://github.com/golang/go/wiki/WebAssembly' target='_blank'>documentation</Link> for more details.
-      </p>
-    </MessageBar>
-  ),
-  [RuntimeType.Interpreter]: (
-    <MessageBar isMultiline={true} messageBarType={MessageBarType.warning}>
-      <b>WebAssembly Interpreter</b>
-      <span> compiles and runs Go code inside the browser using </span>
-      <Link href='https://github.com/traefik/yaegi' target='_blank'>Yaegi</Link> Go interpreter.
-      <p>
-        This mode allows to run code in without <u>internet</u>, but is very unstable. Use at your own risk.
-      </p>
-    </MessageBar>
-  )
-})
-
 export interface SettingsChanges {
   monaco?: MonacoParamsChanges
-  args?: BuildParamsArgs,
   settings?: Partial<SettingsState>
 }
 
@@ -121,8 +58,7 @@ export interface SettingsProps {
 }
 
 interface SettingsModalState {
-  isOpen?: boolean,
-  selectedRuntime: RuntimeType
+  isOpen?: boolean
 }
 
 @Connect(state => ({
@@ -138,7 +74,6 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
     super(props);
     this.state = {
       isOpen: props.isOpen,
-      selectedRuntime: props.settings.runtime,
     }
   }
 
@@ -170,7 +105,6 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
   render() {
     const contentStyles = getContentStyles(this.theme);
     const iconButtonStyles = getIconButtonStyles(this.theme);
-    const { selectedRuntime } = this.state;
     return (
       <Modal
         titleAriaId={this.titleID}
@@ -201,6 +135,19 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                     defaultSelectedKey={this.props.monaco?.fontFamily ?? DEFAULT_FONT}
                     onChange={(_, num) => {
                       this.touchMonacoProperty('fontFamily', num?.key);
+                    }}
+                  />
+                )}
+              />
+              <SettingsProperty
+                key='minimap'
+                title='Mini Map'
+                control={(
+                  <Checkbox
+                    label="Enable mini map on side"
+                    defaultChecked={this.props.monaco?.minimap}
+                    onChange={(_, val) => {
+                      this.touchMonacoProperty('minimap', val);
                     }}
                   />
                 )}
@@ -247,47 +194,6 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                 )}
               />
             </PivotItem>
-            <PivotItem headerText='Go Environment' style={{ paddingBottom: '64px' }}>
-              <SettingsProperty
-                key='runtime'
-                title='Environment'
-                description='This option lets you choose where your Go code should be executed.'
-                control={<Dropdown
-                  options={COMPILER_OPTIONS}
-                  defaultSelectedKey={this.props.settings?.runtime}
-                  onChange={(_, val) => {
-                    if (!val) {
-                      return;
-                    }
-                    this.changes.args = {
-                      runtime: val?.key as RuntimeType,
-                      autoFormat: this.props.settings?.autoFormat ?? true,
-                    };
-
-                    this.setState({
-                      selectedRuntime: val?.key as RuntimeType,
-                    });
-                  }}
-                />}
-              />
-              <div style={{ marginTop: '10px' }}>
-                { runtimeTypeWarnings[selectedRuntime] }
-              </div>
-              <SettingsProperty
-                key='autoFormat'
-                title='Auto Format'
-                control={<Checkbox
-                  label="Auto format code before build"
-                  defaultChecked={this.props.settings?.autoFormat}
-                  onChange={(_, val) => {
-                    this.changes.args = {
-                      autoFormat: val ?? false,
-                      runtime: this.props.settings?.runtime ?? RuntimeType.GoPlayground,
-                    };
-                  }}
-                />}
-              />
-            </PivotItem>
             <PivotItem headerText='Advanced'>
               <SettingsProperty
                 key='cursorBlinking'
@@ -326,19 +232,6 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                     defaultChecked={this.props.monaco?.selectOnLineNumbers}
                     onChange={(_, val) => {
                       this.touchMonacoProperty('cursorStyle', val);
-                    }}
-                  />
-                )}
-              />
-              <SettingsProperty
-                key='minimap'
-                title='Mini Map'
-                control={(
-                  <Checkbox
-                    label="Enable mini map on side"
-                    defaultChecked={this.props.monaco?.minimap}
-                    onChange={(_, val) => {
-                      this.touchMonacoProperty('minimap', val);
                     }}
                   />
                 )}

@@ -1,19 +1,21 @@
 import React from 'react';
-import { CommandBar, ICommandBarItemProps } from '@fluentui/react/lib/CommandBar';
+import {
+  CommandBar,
+  ICommandBarItemProps, Stack,
+} from '@fluentui/react';
 
 import SettingsModal, { SettingsChanges } from '~/components/settings/SettingsModal';
-import ThemeableComponent from '@components/utils/ThemeableComponent';
+import ThemeableComponent from '~/components/utils/ThemeableComponent';
 import AboutModal from '~/components/modals/AboutModal';
-import config from '~/services/config';
-import { getSnippetsMenuItems, SnippetMenuItem } from '~/utils/headerutils';
 import ChangeLogModal from '~/components/modals/ChangeLogModal';
+import { getSnippetsMenuItems, SnippetMenuItem } from '~/utils/headerutils';
+import RunTargetSelector from '~/components/inputs/RunTargetSelector';
 import SharePopup from '~/components/utils/SharePopup';
 import {
   Connect,
   Dispatcher,
   dispatchToggleTheme,
   formatFileDispatcher,
-  newBuildParamsChangeDispatcher,
   newCodeImportDispatcher,
   newImportFileDispatcher,
   newMonacoParamsChangeDispatcher,
@@ -24,6 +26,7 @@ import {
   shareSnippetDispatcher
 } from '~/store';
 import './Header.css';
+import environment from "~/environment";
 
 /**
  * Uniquie class name for share button to use as popover target.
@@ -151,15 +154,21 @@ export class Header extends ThemeableComponent<any, HeaderState> {
   get asideItems(): ICommandBarItemProps[] {
     return [
       {
-        key: 'changelog',
-        text: 'What\'s new',
-        ariaLabel: 'Changelog',
-        iconOnly: true,
-        disabled: this.props.loading,
-        iconProps: { iconName: 'Giftbox' },
-        onClick: () => {
-          this.setState({ showChangelog: true });
-        }
+        key: 'selectEnvironment',
+        commandBarButtonAs: (_) => (
+          <Stack
+            horizontal
+            verticalAlign="center"
+            style={{
+              marginRight: ".5rem"
+            }}
+          >
+            <RunTargetSelector
+              responsive
+              disabled={this.props.loading}
+            />
+          </Stack>
+        )
       },
       {
         key: 'format',
@@ -193,14 +202,25 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         text: 'Submit Issue',
         ariaLabel: 'Submit Issue',
         iconProps: { iconName: 'Bug' },
-        onClick: () => window.open(config.issueUrl, '_blank')
+        onClick: () => window.open(environment.urls.issue, '_blank')
       },
       {
         key: 'donate',
         text: 'Donate',
         ariaLabel: 'Donate',
         iconProps: { iconName: 'Heart' },
-        onClick: () => window.open(config.donateUrl, '_blank')
+        onClick: () => window.open(environment.urls.donate, '_blank')
+      },
+      {
+        key: 'changelog',
+        text: 'What\'s new',
+        ariaLabel: 'Changelog',
+        iconOnly: true,
+        disabled: this.props.loading,
+        iconProps: { iconName: 'Giftbox' },
+        onClick: () => {
+          this.setState({ showChangelog: true });
+        }
       },
       {
         key: 'about',
@@ -216,14 +236,8 @@ export class Header extends ThemeableComponent<any, HeaderState> {
 
   private onSettingsClose(changes: SettingsChanges) {
     if (changes.monaco) {
-      // Update monaco state if some of it's settings were changed
+      // Update monaco state if some of its settings were changed
       this.props.dispatch(newMonacoParamsChangeDispatcher(changes.monaco));
-    }
-
-    if (changes.args) {
-      // Save runtime settings
-      const { runtime, autoFormat } = changes.args;
-      this.props.dispatch(newBuildParamsChangeDispatcher(runtime, autoFormat));
     }
 
     if (changes.settings) {
@@ -275,4 +289,3 @@ export class Header extends ThemeableComponent<any, HeaderState> {
     );
   }
 }
-

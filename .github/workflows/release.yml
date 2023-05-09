@@ -15,6 +15,10 @@ on:
   repository_dispatch:
     types: manual-deploy
 
+env:
+  GO_VERSION: 1.19
+  PREV_GO_VERSION: 1.18
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -58,7 +62,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: node:lts-gallium
-          options: -v ${{ github.workspace }}/web:/work -e REACT_APP_VERSION=${{ env.RELEASE_VERSION }} -e REACT_APP_GITHUB_URL=https://github.com/x1unix/go-playground -e NODE_ENV=production
+          options: -v ${{ github.workspace }}/web:/work -e REACT_APP_VERSION=${{ env.RELEASE_VERSION }} -e REACT_APP_GITHUB_URL=https://github.com/x1unix/go-playground -e NODE_ENV=production -e REACT_APP_GO_VERSION=${{ env.GO_VERSION }} REACT_APP_PREV_GO_VERSION=${{ env.PREV_GO_VERSION }}
           run: |
             yarn --cwd='/work' install --silent && yarn --cwd='/work' build
       - name: Build and push image

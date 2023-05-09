@@ -39,9 +39,6 @@ const appendWasmContentLength = async (req, res, next) => {
 
 module.exports = function(app) {
   app.use((req, res, next) => {
-    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-    res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-
     if (!req.url.endsWith('.wasm')) {
       next();
       return;

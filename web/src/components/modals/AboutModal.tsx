@@ -10,7 +10,7 @@ import { Modal } from '@fluentui/react/lib/Modal';
 import { Link } from '@fluentui/react/lib/Link';
 
 import { getContentStyles, getIconButtonStyles } from '~/styles/modal';
-import config from '~/services/config';
+import environment from "~/environment";
 
 const TITLE_ID = 'AboutTitle';
 const SUB_TITLE_ID = 'AboutSubtitle';
@@ -60,8 +60,8 @@ export default function AboutModal(props: AboutModalProps) {
           Better Go Playground
         </div>
         <div className={modalStyles.footer}>
-          <Link href={config.githubUrl} target='_blank'>GitHub</Link>
-          <span>Version: {config.appVersion}</span>
+          <Link href={environment.urls.github} target='_blank'>GitHub</Link>
+          <span>Version: {environment.appVersion}</span>
         </div>
       </div>
     </Modal>

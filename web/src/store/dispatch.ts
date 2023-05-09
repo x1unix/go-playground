@@ -3,13 +3,12 @@ import {push} from 'connected-react-router';
 
 import client, {
   EvalEventKind,
-  PlaygroundBackend,
   instantiateStreaming,
 } from '~/services/api';
 
 import {getImportObject, goRun} from '~/services/go';
 import {getWorkerInstance} from "~/services/gorepl";
-import config, {RuntimeType} from '~/services/config';
+import config, {RunTargetConfig, TargetType} from '~/services/config';
 import {DEMO_CODE} from '~/components/editor/props';
 import {PanelState, SettingsState} from './state';
 import {isDarkModeEnabled} from "~/utils/theme";
@@ -19,9 +18,8 @@ import {
   Action,
   ActionType,
   MonacoParamsChanges,
-  newBuildParamsChangeAction,
   newBuildResultAction,
-  newEnvironmentChangeAction,
+  newRunTargetChangeAction,
   newErrorAction,
   newImportFileAction,
   newLoadingAction,
@@ -91,20 +89,12 @@ export const newSettingsChangeDispatcher = (changes: Partial<SettingsState>): Di
   }
 );
 
-export function newBuildParamsChangeDispatcher(runtime: RuntimeType, autoFormat: boolean): Dispatcher {
-  return (dispatch: DispatchFn, _: StateProvider) => {
-    config.runtimeType = runtime;
-    config.autoFormat = autoFormat;
-    dispatch(newBuildParamsChangeAction(runtime, autoFormat));
-  };
-}
-
-export function newEnvironmentChangeDispatcher(runtime: RuntimeType): Dispatcher {
-  return (dispatch: DispatchFn, _: StateProvider) => {
-    config.runtimeType = runtime;
-    dispatch(newEnvironmentChangeAction(runtime));
+export const newRunTargetChangeDispatcher = (cfg: RunTargetConfig): Dispatcher => (
+  (dispatch: DispatchFn) => {
+    config.runTargetConfig = cfg;
+    dispatch(newRunTargetChangeAction(cfg));
   }
-}
+);
 
 export function newSnippetLoadDispatcher(snippetID?: string): Dispatcher {
   return async (dispatch: DispatchFn, _: StateProvider) => {
@@ -154,17 +144,13 @@ export const runFileDispatcher: Dispatcher =
   async (dispatch: DispatchFn, getState: StateProvider) => {
     dispatch(newLoadingAction());
     try {
-      const { settings, editor } = getState();
-      switch (settings.runtime) {
-        case RuntimeType.GoPlayground:
-          const res = await client.evaluateCode(editor.code, settings.autoFormat);
+      const { settings, editor, runTarget: {target, backend} } = getState();
+      switch (target) {
+        case TargetType.Server:
+          const res = await client.evaluateCode(editor.code, settings.autoFormat, backend);
           dispatch(newBuildResultAction(res));
           break;
-        case RuntimeType.GoTipPlayground:
-          const rsp = await client.evaluateCode(editor.code, settings.autoFormat, PlaygroundBackend.GoTip);
-          dispatch(newBuildResultAction(rsp));
-          break;
-        case RuntimeType.WebAssembly:
+        case TargetType.WebAssembly:
           let resp = await client.build(editor.code, settings.autoFormat);
           let wasmFile = await client.getArtifact(resp.fileName);
           let instance = await instantiateStreaming(wasmFile, getImportObject());
@@ -175,7 +161,7 @@ export const runFileDispatcher: Dispatcher =
             .catch(err => console.log('err', err))
             .finally(() => dispatch({ type: ActionType.EVAL_FINISH }));
           break;
-        case RuntimeType.Interpreter:
+        case TargetType.Interpreter:
           try {
             const worker = await getWorkerInstance(dispatch, getState);
             await worker.runProgram(editor.code);
@@ -185,7 +171,7 @@ export const runFileDispatcher: Dispatcher =
 
           break;
         default:
-          dispatch(newErrorAction(`AppError: Unknown Go runtime type "${settings.runtime}"`));
+          dispatch(newErrorAction(`AppError: Unknown Go runtime type "${target}"`));
       }
     } catch (err: any) {
       dispatch(newErrorAction(err.message));
@@ -198,8 +184,7 @@ export const formatFileDispatcher: Dispatcher =
     try {
       // Format code using GoTip is enabled to support
       // any syntax changes from unstable Go specs.
-      const { editor: {code}, settings: { runtime } } = getState();
-      const backend = runtime === RuntimeType.GoTipPlayground ? PlaygroundBackend.GoTip : PlaygroundBackend.Default;
+      const { editor: {code}, runTarget: { backend } } = getState();
       const res = await client.formatCode(code, backend);
 
       if (res.formatted) {

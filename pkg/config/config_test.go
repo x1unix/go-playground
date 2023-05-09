@@ -16,9 +16,8 @@ func TestFromFlags(t *testing.T) {
 			AssetsDir: "testdir",
 		},
 		Playground: PlaygroundConfig{
-			PlaygroundURL:      "pgurl",
-			GoTipPlaygroundURL: "gotipurl",
-			ConnectTimeout:     2 * time.Hour,
+			PlaygroundURL:  "pgurl",
+			ConnectTimeout: 2 * time.Hour,
 		},
 		Build: BuildConfig{
 			BuildDir:          "builddir",
@@ -42,7 +41,6 @@ func TestFromFlags(t *testing.T) {
 		"-addr=testaddr",
 		"-static-dir=testdir",
 		"-playground-url=pgurl",
-		"-gotip-url=gotipurl",
 		"-timeout=2h",
 		"-wasm-build-dir=builddir",
 		"-f=pkgfile",
@@ -100,9 +98,8 @@ func TestFromEnv(t *testing.T) {
 					AssetsDir: "testdir",
 				},
 				Playground: PlaygroundConfig{
-					PlaygroundURL:      "pgurl",
-					GoTipPlaygroundURL: "gotipurl",
-					ConnectTimeout:     2 * time.Hour,
+					PlaygroundURL:  "pgurl",
+					ConnectTimeout: 2 * time.Hour,
 				},
 				Build: BuildConfig{
 					BuildDir:          "builddir",
@@ -126,7 +123,6 @@ func TestFromEnv(t *testing.T) {
 				"APP_HTTP_ADDR":           "testaddr",
 				"APP_ASSETS_DIR":          "testdir",
 				"APP_PLAYGROUND_URL":      "pgurl",
-				"APP_GOTIP_URL":           "gotipurl",
 				"APP_PLAYGROUND_TIMEOUT":  "2h",
 				"APP_BUILD_DIR":           "builddir",
 				"APP_PKG_FILE":            "pkgfile",
