@@ -16,9 +16,8 @@ func TestFromFlags(t *testing.T) {
 			AssetsDir: "testdir",
 		},
 		Playground: PlaygroundConfig{
-			PlaygroundURL:      "pgurl",
-			GoTipPlaygroundURL: "gotipurl",
-			ConnectTimeout:     2 * time.Hour,
+			PlaygroundURL:  "pgurl",
+			ConnectTimeout: 2 * time.Hour,
 		},
 		Build: BuildConfig{
 			BuildDir:          "builddir",
@@ -100,9 +99,8 @@ func TestFromEnv(t *testing.T) {
 					AssetsDir: "testdir",
 				},
 				Playground: PlaygroundConfig{
-					PlaygroundURL:      "pgurl",
-					GoTipPlaygroundURL: "gotipurl",
-					ConnectTimeout:     2 * time.Hour,
+					PlaygroundURL:  "pgurl",
+					ConnectTimeout: 2 * time.Hour,
 				},
 				Build: BuildConfig{
 					BuildDir:          "builddir",
