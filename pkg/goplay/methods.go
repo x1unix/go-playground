@@ -79,7 +79,7 @@ func (c *Client) Compile(ctx context.Context, req CompileRequest, backend string
 // ValidateBackend validates Go Playground backend name.
 func ValidateBackend(backend Backend) bool {
 	switch backend {
-	case "", "gotip", "goprev":
+	case BackendGoCurrent, BackendGoTip, BackendGoPrev:
 		return true
 	}
 
