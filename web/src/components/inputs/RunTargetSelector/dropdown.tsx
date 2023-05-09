@@ -35,7 +35,13 @@ const renderTitle = ({data, text, hidden}: DropdownOption): JSX.Element|null => 
       }
       <Label
         className="RunTargetSelector__Title"
-        style={{padding: 0}}
+        style={{
+          padding: 0,
+          display: 'inline-block',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
+        }}
       >
         {text}
       </Label>
