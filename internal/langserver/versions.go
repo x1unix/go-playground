@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"golang.org/x/sync/errgroup"
 	"runtime"
 	"strings"
 	"time"
@@ -80,40 +81,60 @@ func (svc *BackendVersionService) probeGoVersions(ctx context.Context) (*Version
 
 func (svc *BackendVersionService) getPlaygroundVersions(ctx context.Context) (*PlaygroundVersions, error) {
 	versionInfo := &PlaygroundVersions{}
+	g, gCtx := errgroup.WithContext(ctx)
 	for _, backend := range backends {
-		err := retry.Do(
-			func() error {
-				version, err := svc.getGoBackendVersion(ctx, backend)
-				if err != nil {
-					return err
-				}
+		b := backend
+		g.Go(func() error {
+			svc.logger.Debug("Fetching go version for backend", zap.String("backend", b))
+			result, err := svc.fetchGoBackendVersionWithRetry(gCtx, backend)
+			if err != nil {
+				return fmt.Errorf("failed to get Go version from Go playground server for backend %q: %w",
+					backend, err)
+			}
 
-				versionInfo.SetBackendVersion(backend, version)
-				return nil
-			},
-			retry.Attempts(goVersionRetryAttempts),
-			retry.Delay(goVersionRetryDelay),
-			retry.RetryIf(func(err error) bool {
-				httpErr, ok := goplay.IsHTTPError(err)
-				if !ok {
-					return false
-				}
+			// We don't afraid race condition because each backend is written to a separate address
+			versionInfo.SetBackendVersion(b, result)
+			return nil
+		})
+	}
 
-				// Retry only on server issues
-				return httpErr.StatusCode >= 500
-			}),
-			retry.OnRetry(func(n uint, err error) {
-				svc.logger.Error("failed to get Go version from Go playground, retrying...",
-					zap.Error(err), zap.String("backend", backend), zap.Uint("attempt", n))
-			}),
-		)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get Go version from Go playground server for backend %q: %w",
-				backend, err)
-		}
+	if err := g.Wait(); err != nil {
+		return nil, err
 	}
 
 	return versionInfo, nil
+}
+
+func (svc *BackendVersionService) fetchGoBackendVersionWithRetry(ctx context.Context, backend goplay.Backend) (string, error) {
+	var result string
+	err := retry.Do(
+		func() error {
+			version, err := svc.getGoBackendVersion(ctx, backend)
+			if err != nil {
+				return err
+			}
+
+			result = version
+			return nil
+		},
+		retry.Attempts(goVersionRetryAttempts),
+		retry.Delay(goVersionRetryDelay),
+		retry.RetryIf(func(err error) bool {
+			httpErr, ok := goplay.IsHTTPError(err)
+			if !ok {
+				return false
+			}
+
+			// Retry only on server issues
+			return httpErr.StatusCode >= 500
+		}),
+		retry.OnRetry(func(n uint, err error) {
+			svc.logger.Error("failed to get Go version from Go playground, retrying...",
+				zap.Error(err), zap.String("backend", backend), zap.Uint("attempt", n))
+		}),
+	)
+
+	return result, err
 }
 
 func (svc *BackendVersionService) getGoBackendVersion(ctx context.Context, backend goplay.Backend) (string, error) {
