@@ -30,14 +30,20 @@ const (
 	playgroundBackendParam = "backend"
 )
 
+type BackendVersionProvider interface {
+	GetVersions(ctx context.Context) (*VersionsInformation, error)
+}
+
 // Service is language server service
 type Service struct {
-	config   ServiceConfig
-	log      *zap.SugaredLogger
-	index    analyzer.PackageIndex
-	compiler compiler.BuildService
-	client   *goplay.Client
-	limiter  *rate.Limiter
+	config          ServiceConfig
+	log             *zap.SugaredLogger
+	index           analyzer.PackageIndex
+	compiler        compiler.BuildService
+	versionProvider BackendVersionProvider
+
+	client  *goplay.Client
+	limiter *rate.Limiter
 }
 
 type ServiceConfig struct {
@@ -47,12 +53,13 @@ type ServiceConfig struct {
 // New is Service constructor
 func New(cfg ServiceConfig, client *goplay.Client, packages []*analyzer.Package, builder compiler.BuildService) *Service {
 	return &Service{
-		config:   cfg,
-		compiler: builder,
-		client:   client,
-		log:      zap.S().Named("langserver"),
-		index:    analyzer.BuildPackageIndex(packages),
-		limiter:  rate.NewLimiter(rate.Every(frameTime), compileRequestsPerFrame),
+		config:          cfg,
+		compiler:        builder,
+		client:          client,
+		log:             zap.S().Named("langserver"),
+		index:           analyzer.BuildPackageIndex(packages),
+		versionProvider: NewBackendVersionService(zap.L(), client, VersionCacheTTL),
+		limiter:         rate.NewLimiter(rate.Every(frameTime), compileRequestsPerFrame),
 	}
 }
 
@@ -72,6 +79,8 @@ func (s *Service) Mount(r *mux.Router) {
 		HandlerFunc(WrapHandler(s.HandleShare, ValidateContentLength))
 	r.Path("/snippet/{id}").Methods(http.MethodGet).
 		HandlerFunc(WrapHandler(s.HandleGetSnippet))
+	r.Path("/backends/info").Methods(http.MethodGet).
+		HandlerFunc(WrapHandler(s.HandleGetVersions))
 	r.Path("/artifacts/{artifactId:[a-fA-F0-9]+}.wasm").Methods(http.MethodGet).
 		HandlerFunc(WrapHandler(s.HandleArtifactRequest))
 }
@@ -264,6 +273,16 @@ func (s *Service) HandleRunCode(w http.ResponseWriter, r *http.Request) error {
 
 	s.log.Debugw("response from compiler", "res", res)
 	WriteJSON(w, result)
+	return nil
+}
+
+func (s *Service) HandleGetVersions(w http.ResponseWriter, r *http.Request) error {
+	versions, err := s.versionProvider.GetVersions(r.Context())
+	if err != nil {
+		return err
+	}
+
+	WriteJSON(w, versions)
 	return nil
 }
 
