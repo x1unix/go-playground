@@ -1,31 +1,30 @@
 import {saveAs} from 'file-saver';
 import {push} from 'connected-react-router';
 
-import client, {
-  EvalEventKind,
-  instantiateStreaming,
-} from '~/services/api';
+import client, {EvalEventKind, instantiateStreaming,} from '~/services/api';
 
 import {getImportObject, goRun} from '~/services/go';
 import {getWorkerInstance} from "~/services/gorepl";
 import config, {RunTargetConfig, TargetType} from '~/services/config';
 import {DEMO_CODE} from '~/components/editor/props';
-import {PanelState, SettingsState} from './state';
 import {isDarkModeEnabled} from "~/utils/theme";
+
+import {PanelState, SettingsState} from './state';
 import {DispatchFn, StateProvider} from "./helpers";
+import {newAddNotificationAction, NotificationType} from "./notifications";
 
 import {
   Action,
   ActionType,
   MonacoParamsChanges,
   newBuildResultAction,
-  newRunTargetChangeAction,
   newErrorAction,
   newImportFileAction,
   newLoadingAction,
   newMonacoParamsChangeAction,
   newPanelStateChangeAction,
   newProgramWriteAction,
+  newRunTargetChangeAction,
   newSettingsChangeAction,
   newToggleThemeAction,
   newUIStateChangeAction
@@ -129,14 +128,21 @@ export const shareSnippetDispatcher: Dispatcher =
   };
 
 export const saveFileDispatcher: Dispatcher =
-  (_: DispatchFn, getState: StateProvider) => {
+  (dispatch: DispatchFn, getState: StateProvider) => {
     try {
       const { fileName, code } = getState().editor;
-      const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
+      const blob = new Blob([code], {
+        type: 'text/plain;charset=utf-8'
+      });
       saveAs(blob, fileName);
-    } catch (err) {
-      // TODO: replace with a nice modal
-      alert(`Failed to save a file: ${err}`)
+    } catch (err: any) {
+      dispatch(newAddNotificationAction({
+        id: 'SAVE_FILE_ERROR',
+        type: NotificationType.Error,
+        title: 'Failed to save file',
+        description: err.toString(),
+        canDismiss: true
+      }));
     }
   };
 
@@ -158,7 +164,15 @@ export const runFileDispatcher: Dispatcher =
           dispatch(newBuildResultAction({ formatted: resp.formatted, events: [] }));
           goRun(instance)
             .then(result => console.log('exit code: %d', result))
-            .catch(err => console.log('err', err))
+            .catch(err => {
+              dispatch(newAddNotificationAction({
+                id: 'WASM_APP_ERROR',
+                type: NotificationType.Error,
+                title: 'Failed to run WebAssembly program',
+                description: err.toString(),
+                canDismiss: true,
+              }));
+            })
             .finally(() => dispatch({ type: ActionType.EVAL_FINISH }));
           break;
         case TargetType.Interpreter:
