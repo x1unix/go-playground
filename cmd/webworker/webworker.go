@@ -6,7 +6,7 @@ package main
 import (
 	"syscall/js"
 
-	"github.com/x1unix/go-playground/pkg/analyzer/check"
+	"github.com/x1unix/go-playground/internal/analyzer/check"
 	"github.com/x1unix/go-playground/pkg/worker"
 )
 

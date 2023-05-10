@@ -82,8 +82,11 @@ func funcToString(fn *ast.FuncType) string {
 // from function signature.
 //
 // Example:
-//		func sum(a, b int) int
+//
+//	func sum(a, b int) int
+//
 // Will output:
+//
 //	"sum(${1:a}, ${2:b})"
 func formatFuncInsertText(fn *ast.FuncDecl) string {
 	sb := strings.Builder{}

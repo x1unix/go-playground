@@ -3,9 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/x1unix/go-playground/internal/config"
-	langserver2 "github.com/x1unix/go-playground/internal/langserver"
-	"github.com/x1unix/go-playground/internal/langserver/webutil"
 	"net/http"
 	"path/filepath"
 	"sync"
@@ -13,9 +10,12 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/x1unix/foundation/app"
-	"github.com/x1unix/go-playground/pkg/analyzer"
-	"github.com/x1unix/go-playground/pkg/compiler"
-	"github.com/x1unix/go-playground/pkg/compiler/storage"
+	"github.com/x1unix/go-playground/internal/analyzer"
+	"github.com/x1unix/go-playground/internal/compiler"
+	"github.com/x1unix/go-playground/internal/compiler/storage"
+	"github.com/x1unix/go-playground/internal/config"
+	"github.com/x1unix/go-playground/internal/langserver"
+	"github.com/x1unix/go-playground/internal/langserver/webutil"
 	"github.com/x1unix/go-playground/pkg/goplay"
 	"github.com/x1unix/go-playground/pkg/util/cmdutil"
 	"github.com/x1unix/go-playground/pkg/util/osutil"
@@ -79,12 +79,12 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 
 	// Initialize API endpoints
 	r := mux.NewRouter()
-	svcCfg := langserver2.ServiceConfig{Version: Version}
-	langserver2.New(svcCfg, playgroundClient, packages, buildSvc).
+	svcCfg := langserver.ServiceConfig{Version: Version}
+	langserver.New(svcCfg, playgroundClient, packages, buildSvc).
 		Mount(r.PathPrefix("/api").Subrouter())
 
 	// Web UI routes
-	tplVars := langserver2.TemplateArguments{
+	tplVars := langserver.TemplateArguments{
 		GoogleTagID: cfg.Services.GoogleAnalyticsID,
 	}
 	if tplVars.GoogleTagID != "" {
@@ -96,8 +96,8 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 	}
 
 	assetsDir := cfg.HTTP.AssetsDir
-	indexHandler := langserver2.NewTemplateFileServer(zap.L(), filepath.Join(assetsDir, langserver2.IndexFileName), tplVars)
-	spaHandler := langserver2.NewSpaFileServer(assetsDir, tplVars)
+	indexHandler := langserver.NewTemplateFileServer(zap.L(), filepath.Join(assetsDir, langserver.IndexFileName), tplVars)
+	spaHandler := langserver.NewSpaFileServer(assetsDir, tplVars)
 	r.Path("/").
 		Handler(indexHandler)
 	r.Path("/snippet/{snippetID:[A-Za-z0-9_-]+}").

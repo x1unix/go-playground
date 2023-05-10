@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/x1unix/go-playground/pkg/compiler/storage"
+	"github.com/x1unix/go-playground/internal/compiler/storage"
 	"github.com/x1unix/go-playground/pkg/testutil"
 	"github.com/x1unix/go-playground/pkg/util/osutil"
 	"go.uber.org/zap/zaptest"

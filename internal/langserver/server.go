@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/x1unix/go-playground/pkg/analyzer"
-	"github.com/x1unix/go-playground/pkg/compiler"
-	"github.com/x1unix/go-playground/pkg/compiler/storage"
+	"github.com/x1unix/go-playground/internal/analyzer"
+	"github.com/x1unix/go-playground/internal/compiler"
+	"github.com/x1unix/go-playground/internal/compiler/storage"
 	"github.com/x1unix/go-playground/pkg/goplay"
 	"go.uber.org/zap"
 	"golang.org/x/time/rate"

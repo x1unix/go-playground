@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/x1unix/go-playground/pkg/compiler/storage"
+	"github.com/x1unix/go-playground/internal/compiler/storage"
 	"github.com/x1unix/go-playground/pkg/util/osutil"
 	"go.uber.org/zap"
 )

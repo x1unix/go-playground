@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/x1unix/go-playground/pkg/analyzer"
+	"github.com/x1unix/go-playground/internal/analyzer"
 	"github.com/x1unix/go-playground/pkg/goplay"
 	"go.uber.org/zap"
 )

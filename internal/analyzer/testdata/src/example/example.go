@@ -68,6 +68,7 @@ func SomeFunc2(m map[string]interface{}, v *int) []interface{} {
 }
 
 // IfaceFunc is stub with unterminated code block
+//
 //	2 + 2
 func IfaceFunc() Action {
 	return nil

@@ -1,9 +1,10 @@
 package analyzer
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/require"
 	"github.com/x1unix/go-playground/pkg/testutil"
-	"testing"
 )
 
 func TestPackage_IsBuiltin(t *testing.T) {
