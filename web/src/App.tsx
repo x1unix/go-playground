@@ -11,6 +11,7 @@ import Playground from '~/components/pages/Playground';
 import NotFoundPage from "~/components/pages/NotFoundPage";
 import ConnectedThemeProvider from '~/components/utils/ConnectedThemeProvider';
 import './App.css';
+import {ApiClientProvider} from "@services/api";
 
 // Configure store and import config from localStorage
 const store = configureStore();
@@ -22,21 +23,23 @@ bootstrapGo(createGoConsoleAdapter(a => store.dispatch(a)));
 const App = () => {
   return (
     <Provider store={store}>
-      <ConnectedRouter history={history}>
-        <ConnectedThemeProvider className="App">
-          <Switch>
-            <Route
-              path={[
-                "/",
-                "/snippet/:snippetID"
-              ]}
-              exact
-              component={Playground}
-            />
-            <Route path="*" component={NotFoundPage}/>
-          </Switch>
-        </ConnectedThemeProvider>
-      </ConnectedRouter>
+      <ApiClientProvider>
+        <ConnectedRouter history={history}>
+          <ConnectedThemeProvider className="App">
+            <Switch>
+              <Route
+                path={[
+                  "/",
+                  "/snippet/:snippetID"
+                ]}
+                exact
+                component={Playground}
+              />
+              <Route path="*" component={NotFoundPage}/>
+            </Switch>
+          </ConnectedThemeProvider>
+        </ConnectedRouter>
+      </ApiClientProvider>
     </Provider>
   );
 }
