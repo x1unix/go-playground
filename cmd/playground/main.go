@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	langserver2 "github.com/x1unix/go-playground/internal/langserver"
+	"github.com/x1unix/go-playground/internal/langserver/webutil"
 	"net/http"
 	"path/filepath"
 	"sync"
@@ -15,8 +17,6 @@ import (
 	"github.com/x1unix/go-playground/pkg/compiler/storage"
 	"github.com/x1unix/go-playground/pkg/config"
 	"github.com/x1unix/go-playground/pkg/goplay"
-	"github.com/x1unix/go-playground/pkg/langserver"
-	"github.com/x1unix/go-playground/pkg/langserver/webutil"
 	"github.com/x1unix/go-playground/pkg/util/cmdutil"
 	"github.com/x1unix/go-playground/pkg/util/osutil"
 	"go.uber.org/zap"
@@ -79,12 +79,12 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 
 	// Initialize API endpoints
 	r := mux.NewRouter()
-	svcCfg := langserver.ServiceConfig{Version: Version}
-	langserver.New(svcCfg, playgroundClient, packages, buildSvc).
+	svcCfg := langserver2.ServiceConfig{Version: Version}
+	langserver2.New(svcCfg, playgroundClient, packages, buildSvc).
 		Mount(r.PathPrefix("/api").Subrouter())
 
 	// Web UI routes
-	tplVars := langserver.TemplateArguments{
+	tplVars := langserver2.TemplateArguments{
 		GoogleTagID: cfg.Services.GoogleAnalyticsID,
 	}
 	if tplVars.GoogleTagID != "" {
@@ -96,8 +96,8 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 	}
 
 	assetsDir := cfg.HTTP.AssetsDir
-	indexHandler := langserver.NewTemplateFileServer(zap.L(), filepath.Join(assetsDir, langserver.IndexFileName), tplVars)
-	spaHandler := langserver.NewSpaFileServer(assetsDir, tplVars)
+	indexHandler := langserver2.NewTemplateFileServer(zap.L(), filepath.Join(assetsDir, langserver2.IndexFileName), tplVars)
+	spaHandler := langserver2.NewSpaFileServer(assetsDir, tplVars)
 	r.Path("/").
 		Handler(indexHandler)
 	r.Path("/snippet/{snippetID:[A-Za-z0-9_-]+}").
