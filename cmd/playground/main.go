@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/x1unix/go-playground/internal/config"
 	langserver2 "github.com/x1unix/go-playground/internal/langserver"
 	"github.com/x1unix/go-playground/internal/langserver/webutil"
 	"net/http"
@@ -15,7 +16,6 @@ import (
 	"github.com/x1unix/go-playground/pkg/analyzer"
 	"github.com/x1unix/go-playground/pkg/compiler"
 	"github.com/x1unix/go-playground/pkg/compiler/storage"
-	"github.com/x1unix/go-playground/pkg/config"
 	"github.com/x1unix/go-playground/pkg/goplay"
 	"github.com/x1unix/go-playground/pkg/util/cmdutil"
 	"github.com/x1unix/go-playground/pkg/util/osutil"
