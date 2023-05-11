@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"runtime/debug"
 	"sync"
 	"sync/atomic"
 	"syscall/js"
@@ -108,6 +109,14 @@ func (h *Handler) HandleUpdateGoProxyAddress(_ context.Context, args []js.Value)
 }
 
 func (h *Handler) runProgram(ctx context.Context, src []byte) {
+	defer func() {
+		if r := recover(); r != nil {
+			uihost.ReportEvalError(
+				fmt.Errorf("Go WebAssembly worker panicked. Please report this issue!\n\n"+
+					"panic: %s\nStacktrace:\n%s", r, debug.Stack()),
+			)
+		}
+	}()
 	defer h.releaseLock()
 
 	uihost.ReportEvalState(uihost.EvalStateBegin)
