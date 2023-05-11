@@ -1,11 +1,12 @@
-import React from 'react';
+import React, {useMemo} from 'react';
+import { nsToMs } from "~/utils/duration";
+
 import './EvalEventView.css';
 
 const imageSectionPrefix = 'IMAGE:';
 const base64RegEx = /^[A-Za-z0-9+/]+[=]{0,2}$/;
-const nanosec = 1000000;
 
-interface ViewData {
+interface Props {
   message: string,
   kind: string,
   delay: number
@@ -23,26 +24,34 @@ const isImageLine = (message: string) => {
   return [base64RegEx.test(payload), payload];
 };
 
-export default class EvalEventView extends React.Component<ViewData> {
-  get delay() {
-    const msec = this.props.delay / nanosec;
-    return `T+${pad(msec, 4)}ms`
-  }
-
-  get domClassName() {
-    return `evalEvent__msg evalEvent__msg--${this.props.kind}`;
-  }
-
-  render() {
-    const { message, showDelay } = this.props;
-    const [isImage, payload] = isImageLine(message);
-    return <div className="evalEvent">
-      { isImage ? (
-        <img src={`data:image;base64,${payload}`} alt=""/>
-      ) : (
-        <pre className={this.domClassName}>{message}</pre>
-      )}
-      <span className="evalEvent__delay">{showDelay ? `[${this.delay}]` : ''}</span>
-    </div>
-  }
+const formatDelay = (delay: number) => {
+  const msec = nsToMs(delay);
+  return `T+${pad(msec, 4)}ms`
 }
+
+const EvalEventView: React.FC<Props> = ({delay, kind, message, showDelay}) => {
+  const [isImage, payload] = useMemo(() => (
+    isImageLine(message)
+  ), [message]);
+
+  return (
+    <div className="evalEvent">
+      {
+        isImage ? (
+          <img src={`data:image;base64,${payload}`} alt=""/>
+        ) : (
+          <pre
+            className={`evalEvent__msg evalEvent__msg--${kind}`}
+          >
+            {message}
+          </pre>
+        )
+      }
+      <span className="evalEvent__delay">
+        {showDelay ? `[${formatDelay(delay)}]` : ''}
+      </span>
+    </div>
+  );
+}
+
+export default EvalEventView;

@@ -1,6 +1,7 @@
 import { TargetType } from '~/services/config';
 import { getWorkerInstance } from "~/services/gorepl";
 import { getImportObject, goRun } from '~/services/go';
+import { setTimeoutNanos } from "~/utils/duration";
 import client, {
   EvalEvent,
   EvalEventKind,
@@ -19,28 +20,6 @@ import {
 } from "../actions";
 
 import { Dispatcher } from "./utils";
-
-/**
- * Number of milliseconds in nanosecond
- */
-const MSEC_IN_NANOSEC = 1000000;
-
-/**
- * Converts nanoseconds to milliseconds
- * @param ns
- */
-const nsToMs = (ns: number) => (
-  ns < MSEC_IN_NANOSEC ? 0 : Math.floor(ns / MSEC_IN_NANOSEC)
-);
-
-/**
- * Calls setTimeout with duration in nanoseconds
- * @param cb
- * @param timeoutNs
- */
-const setTimeoutNanos = (cb: Function, timeoutNs: number) => (
-  setTimeout(cb, nsToMs(timeoutNs))
-);
 
 const dispatchEvalEvents = (dispatch: DispatchFn, events: EvalEvent[]) => {
   // TODO: support cancellation
