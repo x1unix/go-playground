@@ -36,7 +36,7 @@ export class Client implements IAPIClient {
 
   async getArtifact(fileName: string): Promise<Response> {
     const resp = await fetch(`${this.baseUrl}/artifacts/${fileName}`);
-    if (resp.status >= 300) {
+    if (resp.status >= 400) {
       const err = await resp.json();
       throw new Error(err.message ?? resp.statusText);
     }
