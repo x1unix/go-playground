@@ -1,22 +1,27 @@
 import clsx from "clsx";
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {connect} from "react-redux";
 import {Dropdown, IDropdownStyles} from '@fluentui/react';
-import {
-  newRunTargetChangeDispatcher,
-  State,
-  StateDispatch
-} from "~/store";
+import {newRunTargetChangeDispatcher, State, StateDispatch} from "~/store";
 import {RunTargetConfig} from "~/services/config";
 
-import {DropdownOption, dropdownOptions, keyFromOption} from "./options";
 import {onRenderOption, onRenderTitle} from "./dropdown";
+import {
+  createDropdownOptions,
+  DropdownOption,
+  dropdownOptionsFromResponse,
+  keyFromOption,
+} from "./options";
 
 import "./RunTargetSelector.css";
+import {VersionsInfo} from "@services/api";
 
 const dropdownStyles: Partial<IDropdownStyles> = {
   callout: {
     minWidth: "256px"
+  },
+  dropdown: {
+    maxWidth: "10rem"
   },
   dropdownOptionText: { overflow: 'visible', whiteSpace: 'normal' },
   dropdownItem: {
@@ -34,6 +39,7 @@ const dropdownStyles: Partial<IDropdownStyles> = {
 interface OwnProps {
   disabled?: boolean
   responsive?: boolean
+  goVersions?: VersionsInfo
 }
 
 interface StateProps {
@@ -48,18 +54,26 @@ const RunTargetSelector: React.FC<Props> = ({
   responsive,
   disabled,
   runTarget,
+  goVersions,
   dispatch
 }) => {
   const selectedKey = useMemo(() => (
     keyFromOption(runTarget.target, runTarget.backend)
   ), [runTarget]);
 
+  // FIXME: investigate what causes multiple component remount from Header
+  const options = useMemo<DropdownOption[]>(() => {
+    return goVersions ?
+      dropdownOptionsFromResponse(goVersions) :
+      createDropdownOptions();
+  }, [goVersions]);
+
   return (
     <Dropdown
       className={clsx({
         'RunTargetSelector--responsive': responsive
       })}
-      options={dropdownOptions}
+      options={options}
       selectedKey={selectedKey}
       onRenderTitle={(opt) => onRenderTitle(opt, disabled)}
       onRenderOption={onRenderOption}

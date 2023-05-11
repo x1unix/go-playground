@@ -4,6 +4,8 @@ import {
   ICommandBarItemProps, Stack,
 } from '@fluentui/react';
 
+import environment from "~/environment";
+import apiClient, {VersionsInfo} from "~/services/api";
 import SettingsModal, { SettingsChanges } from '~/components/settings/SettingsModal';
 import ThemeableComponent from '~/components/utils/ThemeableComponent';
 import AboutModal from '~/components/modals/AboutModal';
@@ -26,7 +28,7 @@ import {
   shareSnippetDispatcher
 } from '~/store';
 import './Header.css';
-import environment from "~/environment";
+import {newAddNotificationAction, NotificationType} from "@store/notifications";
 
 /**
  * Uniquie class name for share button to use as popover target.
@@ -39,6 +41,7 @@ interface HeaderState {
   showChangelog?: boolean
   loading?: boolean
   showShareMessage?: boolean
+  goVersions?: VersionsInfo
 }
 
 interface Props {
@@ -49,6 +52,7 @@ interface Props {
   dispatch: (d: Dispatcher) => void
 }
 
+// FIXME: rewrite to function component and refactor all that re-render mess.
 @Connect(({ settings, status, ui }) => ({
   darkMode: settings.darkMode,
   loading: status?.loading,
@@ -76,6 +80,20 @@ export class Header extends ThemeableComponent<any, HeaderState> {
     fileElement.accept = '.go';
     fileElement.addEventListener('change', () => this.onItemSelect(), false);
     this.fileInput = fileElement;
+
+    apiClient.getBackendVersions().then(rsp => {
+      this.setState({
+        goVersions: rsp
+      });
+    }).catch(err => this.props.dispatch(
+      newAddNotificationAction({
+        id: 'VERSIONS_FETCH_ERROR',
+        type: NotificationType.Error,
+        title: 'Failed to fetch Go version info',
+        description: err.toString(),
+        canDismiss: true,
+      })
+    ));
   }
 
   onItemSelect() {
@@ -155,20 +173,23 @@ export class Header extends ThemeableComponent<any, HeaderState> {
     return [
       {
         key: 'selectEnvironment',
-        commandBarButtonAs: (_) => (
-          <Stack
-            horizontal
-            verticalAlign="center"
-            style={{
-              marginRight: ".5rem"
-            }}
-          >
-            <RunTargetSelector
-              responsive
-              disabled={this.props.loading}
-            />
-          </Stack>
-        )
+        commandBarButtonAs: (_) => {
+          return (
+            <Stack
+              horizontal
+              verticalAlign="center"
+              style={{
+                marginRight: ".5rem"
+              }}
+            >
+              <RunTargetSelector
+                responsive
+                disabled={this.props.loading}
+                goVersions={this.state.goVersions}
+              />
+            </Stack>
+          )
+        }
       },
       {
         key: 'format',
