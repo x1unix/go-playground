@@ -2,7 +2,7 @@ import { connectRouter } from 'connected-react-router';
 import { combineReducers } from 'redux';
 import {editor} from 'monaco-editor';
 
-import { RunResponse, EvalEvent } from '~/services/api';
+import { EvalEvent } from '~/services/api';
 import config, {
   MonacoSettings,
   RunTargetConfig
