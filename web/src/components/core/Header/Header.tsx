@@ -10,7 +10,7 @@ import SettingsModal, { SettingsChanges } from '~/components/settings/SettingsMo
 import ThemeableComponent from '~/components/utils/ThemeableComponent';
 import AboutModal from '~/components/modals/AboutModal';
 import ChangeLogModal from '~/components/modals/ChangeLogModal';
-import { getSnippetsMenuItems, SnippetMenuItem } from '~/utils/headerutils';
+import { getSnippetsMenuItems, SnippetMenuItem } from '@components/core/Header/utils';
 import RunTargetSelector from '~/components/inputs/RunTargetSelector';
 import SharePopup from '~/components/utils/SharePopup';
 import {
