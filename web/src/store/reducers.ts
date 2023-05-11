@@ -62,10 +62,11 @@ const reducers = {
         events: a.payload.events,
       }
     },
-    [ActionType.IMPORT_FILE]: (s: StatusState, a: Action<string>) => (
+    [ActionType.IMPORT_FILE]: (_: StatusState) => (
       {
-        ...s,
         loading: false,
+        running: false,
+        dirty: false,
         lastError: null,
       }
     ),
@@ -74,6 +75,7 @@ const reducers = {
         ...s,
         loading: false,
         running: false,
+        dirty: true,
         lastError: a.payload
       }
     ),
