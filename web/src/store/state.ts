@@ -19,6 +19,8 @@ export interface EditorState {
 
 export interface StatusState {
   loading: boolean,
+  running?: boolean,
+  dirty?: boolean,
   lastError?: string | null,
   events?: EvalEvent[],
   markers?: editor.IMarkerData[]

@@ -6,10 +6,12 @@ import client, {EvalEventKind, instantiateStreaming} from "~/services/api";
 import { StateProvider, DispatchFn } from "../helpers";
 import { newAddNotificationAction, NotificationType } from "../notifications";
 import {
-  ActionType,
   newBuildResultAction,
   newErrorAction,
-  newLoadingAction, newProgramWriteAction,
+  newLoadingAction,
+  newProgramFinishAction,
+  newProgramStartAction,
+  newProgramWriteAction,
 } from "../actions";
 
 import { Dispatcher } from "./utils";
@@ -29,7 +31,7 @@ export const runFileDispatcher: Dispatcher =
           let resp = await client.build(editor.code, settings.autoFormat);
           let wasmFile = await client.getArtifact(resp.fileName);
           let instance = await instantiateStreaming(wasmFile, getImportObject());
-          dispatch({ type: ActionType.EVAL_START });
+          dispatch(newProgramStartAction());
           dispatch(newBuildResultAction({ formatted: resp.formatted, events: [] }));
           goRun(instance)
             .then(result => console.log('exit code: %d', result))
@@ -42,7 +44,7 @@ export const runFileDispatcher: Dispatcher =
                 canDismiss: true,
               }));
             })
-            .finally(() => dispatch({ type: ActionType.EVAL_FINISH }));
+            .finally(() => dispatch(newProgramFinishAction()));
           break;
         case TargetType.Interpreter:
           try {

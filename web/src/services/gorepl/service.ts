@@ -2,8 +2,8 @@ import {Client} from "~/lib/wrpc";
 import {EvalEventKind} from "../api";
 import {ConsoleStreamType} from "~/lib/gowasm/bindings/stdio";
 import {
-  ActionType,
   newErrorAction,
+  newLoadingAction, newProgramFinishAction,
   newProgramWriteAction,
 } from "~/store/actions";
 import {DispatchFn, StateProvider} from "~/store/helpers";
@@ -185,11 +185,11 @@ const handleWorkerBootEvent = (dispatcher: DispatchFn, {eventType, progress, cod
 const handleProgramStateEvent = (dispatcher: DispatchFn, {state, message}: ProgramStateChangeEvent) => {
   switch (state) {
     case EvalState.Finish:
-      dispatcher({type: ActionType.EVAL_FINISH});
+      dispatcher(newProgramFinishAction());
       return;
     case EvalState.Begin:
       // Keep UI is busy state until program or package manager is running
-      dispatcher({type: ActionType.LOADING});
+      dispatcher(newLoadingAction());
       return;
     case EvalState.Error:
       dispatcher(newErrorAction(message ?? 'Failed to start program'));
