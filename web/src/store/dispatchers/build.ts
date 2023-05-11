@@ -1,25 +1,32 @@
-import { TargetType } from '~/services/config';
-import { getWorkerInstance } from "~/services/gorepl";
-import { getImportObject, goRun } from '~/services/go';
-import { setTimeoutNanos } from "~/utils/duration";
+import {TargetType} from '~/services/config';
+import {getWorkerInstance} from "~/services/gorepl";
+import {getImportObject, goRun} from '~/services/go';
+import {setTimeoutNanos} from "~/utils/duration";
 import client, {
   EvalEvent,
   EvalEventKind,
   instantiateStreaming
 } from "~/services/api";
 
-import { StateProvider, DispatchFn } from "../helpers";
-import { newAddNotificationAction, NotificationType } from "../notifications";
+import {DispatchFn, StateProvider} from "../helpers";
 import {
-  newFormatCodeAction,
+  newAddNotificationAction,
+  newRemoveNotificationAction,
+  NotificationType
+} from "../notifications";
+import {
   newErrorAction,
+  newFormatCodeAction,
   newLoadingAction,
   newProgramFinishAction,
   newProgramStartAction,
   newProgramWriteAction,
 } from "../actions";
 
-import { Dispatcher } from "./utils";
+import {Dispatcher} from "./utils";
+import {wrapResponseWithProgress} from "~/utils/http";
+
+const WASM_APP_DOWNLOAD_NOTIFICATION = 'WASM_APP_DOWNLOAD_NOTIFICATION';
 
 const dispatchEvalEvents = (dispatch: DispatchFn, events: EvalEvent[]) => {
   // TODO: support cancellation
@@ -58,6 +65,39 @@ const dispatchEvalEvents = (dispatch: DispatchFn, events: EvalEvent[]) => {
   }, programEndTime);
 }
 
+const fetchWasmWithProgress = async (dispatch: DispatchFn, fileName: string) => {
+  try {
+    dispatch(newAddNotificationAction({
+      id: WASM_APP_DOWNLOAD_NOTIFICATION,
+      type: NotificationType.Info,
+      title: 'Downloading compiled application',
+      canDismiss: false,
+      progress: {
+        indeterminate: true
+      }
+    }));
+
+    const rsp = await client.getArtifact(fileName);
+    const rspWithProgress = wrapResponseWithProgress(rsp, ({totalBytes, currentBytes}) => {
+      dispatch(newAddNotificationAction({
+        id: WASM_APP_DOWNLOAD_NOTIFICATION,
+        type: NotificationType.Info,
+        title: 'Downloading compiled application',
+        canDismiss: false,
+        progress: {
+          total: totalBytes,
+          current: currentBytes
+        }
+      }));
+    });
+
+    return instantiateStreaming(rspWithProgress, getImportObject());
+  } catch (err) {
+    dispatch(newRemoveNotificationAction(WASM_APP_DOWNLOAD_NOTIFICATION));
+    throw err;
+  }
+}
+
 export const runFileDispatcher: Dispatcher =
   async (dispatch: DispatchFn, getState: StateProvider) => {
     dispatch(newLoadingAction());
@@ -74,12 +114,13 @@ export const runFileDispatcher: Dispatcher =
 
         case TargetType.WebAssembly:
           let resp = await client.build(editor.code, settings.autoFormat);
-          let wasmFile = await client.getArtifact(resp.fileName);
-          let instance = await instantiateStreaming(wasmFile, getImportObject());
-          dispatch(newProgramStartAction());
           if (resp.formatted?.length) {
             dispatch(newFormatCodeAction(resp.formatted));
           }
+
+          const instance = await fetchWasmWithProgress(dispatch, resp.fileName);
+          dispatch(newRemoveNotificationAction(WASM_APP_DOWNLOAD_NOTIFICATION));
+          dispatch(newProgramStartAction());
 
           goRun(instance)
             .then(result => console.log('exit code: %d', result))
