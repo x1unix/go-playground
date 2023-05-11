@@ -6,11 +6,11 @@ import {
 
 import environment from "~/environment";
 import apiClient, {VersionsInfo} from "~/services/api";
+import {newAddNotificationAction, NotificationType} from "~/store/notifications";
 import SettingsModal, { SettingsChanges } from '~/components/settings/SettingsModal';
 import ThemeableComponent from '~/components/utils/ThemeableComponent';
 import AboutModal from '~/components/modals/AboutModal';
 import ChangeLogModal from '~/components/modals/ChangeLogModal';
-import { getSnippetsMenuItems, SnippetMenuItem } from '@components/core/Header/utils';
 import RunTargetSelector from '~/components/inputs/RunTargetSelector';
 import SharePopup from '~/components/utils/SharePopup';
 import {
@@ -27,8 +27,9 @@ import {
   saveFileDispatcher,
   shareSnippetDispatcher
 } from '~/store';
+import { getSnippetsMenuItems, SnippetMenuItem } from './utils';
+
 import './Header.css';
-import {newAddNotificationAction, NotificationType} from "@store/notifications";
 
 /**
  * Uniquie class name for share button to use as popover target.
