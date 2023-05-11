@@ -15,6 +15,7 @@ FROM golang:1.19-alpine as build
 WORKDIR /tmp/playground
 COPY cmd ./cmd
 COPY pkg ./pkg
+COPY internal ./internal
 COPY go.mod .
 COPY go.sum .
 ARG APP_VERSION=1.0.0
