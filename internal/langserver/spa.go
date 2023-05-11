@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -54,13 +55,15 @@ func (fs *SpaFileServer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	name := path.Join(dir, filepath.FromSlash(upath))
 
 	//check if file exists
-	if _, err := os.Stat(name); err != nil {
+	s, err := os.Stat(name)
+	if err != nil {
 		if os.IsNotExist(err) {
 			fs.NotFoundHandler.ServeHTTP(rw, r)
 			return
 		}
 	}
 
+	rw.Header().Set(rawContentLengthHeader, strconv.FormatInt(s.Size(), 10))
 	http.ServeFile(rw, r, name)
 }
 
