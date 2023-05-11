@@ -1,11 +1,11 @@
 import { ActionType } from "./actions";
 
-import { RunResponse, EvalEvent } from '~/services/api';
+import { EvalEvent } from '~/services/api';
 
-export const newBuildResultAction = (resp: RunResponse) => (
+export const newFormatCodeAction = (newText?: string) => (
   {
-    type: ActionType.COMPILE_RESULT,
-    payload: resp,
+    type: ActionType.FORMAT_CODE,
+    payload: newText,
   }
 );
 

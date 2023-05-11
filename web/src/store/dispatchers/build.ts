@@ -1,12 +1,16 @@
 import { TargetType } from '~/services/config';
 import { getWorkerInstance } from "~/services/gorepl";
 import { getImportObject, goRun } from '~/services/go';
-import client, {EvalEventKind, instantiateStreaming} from "~/services/api";
+import client, {
+  EvalEvent,
+  EvalEventKind,
+  instantiateStreaming
+} from "~/services/api";
 
 import { StateProvider, DispatchFn } from "../helpers";
 import { newAddNotificationAction, NotificationType } from "../notifications";
 import {
-  newBuildResultAction,
+  newFormatCodeAction,
   newErrorAction,
   newLoadingAction,
   newProgramFinishAction,
@@ -16,6 +20,65 @@ import {
 
 import { Dispatcher } from "./utils";
 
+/**
+ * Number of milliseconds in nanosecond
+ */
+const MSEC_IN_NANOSEC = 1000000;
+
+/**
+ * Converts nanoseconds to milliseconds
+ * @param ns
+ */
+const nsToMs = (ns: number) => (
+  ns < MSEC_IN_NANOSEC ? 0 : Math.floor(ns / MSEC_IN_NANOSEC)
+);
+
+/**
+ * Calls setTimeout with duration in nanoseconds
+ * @param cb
+ * @param timeoutNs
+ */
+const setTimeoutNanos = (cb: Function, timeoutNs: number) => (
+  setTimeout(cb, nsToMs(timeoutNs))
+);
+
+const dispatchEvalEvents = (dispatch: DispatchFn, events: EvalEvent[]) => {
+  // TODO: support cancellation
+
+  if (!events?.length) {
+    dispatch(newProgramFinishAction());
+    return;
+  }
+
+  // Each eval event contains time since previous event.
+  // Convert relative delay into absolute delay since program start.
+  const eventsWithDelay = events.map((event, i, arr) => (
+    i === 0 ? event : (
+      {
+        ...event,
+        Delay: arr[i - 1].Delay + event.Delay
+      }
+    )
+  ));
+
+  // Try to guess program end time by checking last message delay.
+  //
+  // This won't work if "time.Sleep()" occurs after final message but the same
+  // approach used in official playground, so should be enough for us.
+  const programEndTime = eventsWithDelay?.slice(-1)?.[0]?.Delay ?? 0;
+
+  dispatch(newProgramStartAction());
+  eventsWithDelay.forEach(event => {
+    setTimeoutNanos(() => {
+      dispatch(newProgramWriteAction(event))
+    }, event.Delay);
+  });
+
+  setTimeoutNanos(() => {
+    dispatch(newProgramFinishAction());
+  }, programEndTime);
+}
+
 export const runFileDispatcher: Dispatcher =
   async (dispatch: DispatchFn, getState: StateProvider) => {
     dispatch(newLoadingAction());
@@ -24,15 +87,21 @@ export const runFileDispatcher: Dispatcher =
       switch (target) {
         case TargetType.Server:
           const res = await client.evaluateCode(editor.code, settings.autoFormat, backend);
-          console.log(res);
-          dispatch(newBuildResultAction(res));
+          if (res.formatted?.length) {
+            dispatch(newFormatCodeAction(res.formatted));
+          }
+          dispatchEvalEvents(dispatch, res.events);
           break;
+
         case TargetType.WebAssembly:
           let resp = await client.build(editor.code, settings.autoFormat);
           let wasmFile = await client.getArtifact(resp.fileName);
           let instance = await instantiateStreaming(wasmFile, getImportObject());
           dispatch(newProgramStartAction());
-          dispatch(newBuildResultAction({ formatted: resp.formatted, events: [] }));
+          if (resp.formatted?.length) {
+            dispatch(newFormatCodeAction(resp.formatted));
+          }
+
           goRun(instance)
             .then(result => console.log('exit code: %d', result))
             .catch(err => {

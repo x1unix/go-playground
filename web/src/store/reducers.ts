@@ -43,25 +43,14 @@ const reducers = {
         fileName,
       };
     },
-    [ActionType.COMPILE_RESULT]: (s: EditorState, {payload}: Action<RunResponse>) => {
-      if (payload.formatted) {
-        return {
-          ...s,
-          code: payload.formatted
-        };
+    [ActionType.FORMAT_CODE]: (s: EditorState, {payload: code}: Action<string>) => (
+      {
+        ...s,
+        code,
       }
-
-      return s;
-    },
+    ),
   }, { fileName: 'main.go', code: '' }),
   status: mapByAction<StatusState>({
-    [ActionType.COMPILE_RESULT]: (s: StatusState, a: Action<RunResponse>) => {
-      return {
-        loading: false,
-        lastError: null,
-        events: a.payload.events,
-      }
-    },
     [ActionType.IMPORT_FILE]: (_: StatusState) => (
       {
         loading: false,

@@ -7,7 +7,7 @@ import {DEMO_CODE} from '~/components/editor/props';
 import { StateProvider, DispatchFn } from "../helpers";
 import { newAddNotificationAction, NotificationType } from "../notifications";
 import {
-  newBuildResultAction,
+  newFormatCodeAction,
   newErrorAction,
   newImportFileAction,
   newLoadingAction,
@@ -99,8 +99,8 @@ export const formatFileDispatcher: Dispatcher =
       const { editor: {code}, runTarget: { backend } } = getState();
       const res = await client.formatCode(code, backend);
 
-      if (res.formatted) {
-        dispatch(newBuildResultAction(res));
+      if (res.formatted?.length) {
+        dispatch(newFormatCodeAction(res.formatted));
       }
     } catch (err: any) {
       dispatch(newErrorAction(err.message));
