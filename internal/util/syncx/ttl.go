@@ -35,7 +35,7 @@ func (v *TTLValue[T]) Get() (result T) {
 		return v.value
 	}
 
-	passed := time.Now().Sub(v.createdAt)
+	passed := time.Since(v.createdAt)
 	if passed >= v.ttl {
 		// Return empty value on expire
 		return result
