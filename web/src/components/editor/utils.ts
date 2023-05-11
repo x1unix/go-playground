@@ -44,3 +44,27 @@ export const getTimeNowUsageMarkers = (code: string, editorInstance: editor.ISta
     };
   });
 }
+
+/**
+ * Wraps async function with debounce timer.
+ *
+ * @param fn Function
+ * @param delay Debounce time
+ */
+export const wrapAsyncWithDebounce = <T>(fn: (...args) => Promise<T>, delay: number) => {
+  let lastTimeoutId: NodeJS.Timeout|null = null;
+
+  return (...args) => {
+    if (lastTimeoutId) {
+      clearTimeout(lastTimeoutId);
+    }
+
+    return new Promise<T>((res, rej) => {
+      lastTimeoutId = setTimeout(() => {
+        fn(...args)
+          .then(res)
+          .catch(rej);
+      }, delay);
+    })
+  }
+}

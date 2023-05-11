@@ -1,6 +1,7 @@
-import * as monaco from 'monaco-editor';
-import { IAPIClient } from '~/services/api';
-import snippets from './snippets';
+import * as monaco from "monaco-editor";
+import {IAPIClient} from "~/services/api";
+import snippets from "./snippets";
+import {wrapAsyncWithDebounce} from "./utils";
 
 // Import aliases
 type CompletionList = monaco.languages.CompletionList;
@@ -15,6 +16,7 @@ let alreadyRegistered = false;
 const COMPL_REGEXP = /([a-zA-Z0-9_]+)(\.([A-Za-z0-9_]+))?$/;
 const R_GROUP_PKG = 1;
 const R_GROUP_METHOD = 3;
+const SUGGESTIONS_DEBOUNCE_DELAY = 500;
 
 const parseExpression = (expr: string) => {
   COMPL_REGEXP.lastIndex = 0; // Reset regex state
@@ -37,7 +39,14 @@ const parseExpression = (expr: string) => {
 };
 
 class GoCompletionItemProvider implements monaco.languages.CompletionItemProvider {
-  constructor(private client: IAPIClient) { }
+  private getSuggestionFunc: IAPIClient['getSuggestions'];
+
+  constructor(private client: IAPIClient) {
+    this.getSuggestionFunc = wrapAsyncWithDebounce(
+      query => client.getSuggestions(query),
+      SUGGESTIONS_DEBOUNCE_DELAY
+    );
+  }
 
   async provideCompletionItems(model: ITextModel, position: Position, context: CompletionContext, token: CancellationToken): Promise<CompletionList> {
     const val = model.getValueInRange({
@@ -67,7 +76,7 @@ class GoCompletionItemProvider implements monaco.languages.CompletionItemProvide
       .map(s => ({ ...s, range }));
 
     try {
-      const { suggestions } = await this.client.getSuggestions(query);
+      const { suggestions } = await this.getSuggestionFunc(query);
       if (!suggestions) {
         return {
           suggestions: relatedSnippets
