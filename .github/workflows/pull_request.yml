@@ -8,15 +8,25 @@
 
 name: Check Pull Request
 on: [pull_request]
-env:
-  GO_VERSION: 1.19
-  PREV_GO_VERSION: 1.18
-  RELEASE_VERSION: 1.13.0
 jobs:
-  node-test:
+  test:
     runs-on: ubuntu-latest
     steps:
+      - id: go-cache-paths
+        run: |
+          echo "::set-output name=go-build::$(go env GOCACHE)"
+          echo "::set-output name=go-mod::$(go env GOMODCACHE)"
       - uses: actions/checkout@v3
+      - name: Go Build Cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.go-cache-paths.outputs.go-build }}
+          key: ${{ runner.os }}-go-build-${{ hashFiles('**/go.sum') }}
+      - name: Go Mod Cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.go-cache-paths.outputs.go-mod }}
+          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
       - uses: actions/cache@v3
         env:
           cache-name: npm-cache
@@ -25,66 +35,19 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
-
-      - run: |
-          echo ${{ github.workspace }} && \
-          ls ${{ github.workspace }}/web
-      - run: |
-          [ -d "${{ github.workspace }}/web/node_modules" ] && echo "node_modules exists" || echo "node_modules not exist" 
-
-      - name: Init node
-        uses: actions/setup-node@v3
+      - name: Install modules
+        run: yarn
+        working-directory: ./web
+      - name: Run ESLint
+        run: yarn lint
+        working-directory: ./web
+      - name: Setup Go
+        uses: actions/setup-go@v4
         with:
-          node-version: 'lts/gallium'
-
-      - name: Install Dependencies
-        run: yarn --cwd='${{ github.workspace }}/web' install --silent
-
-      - run: |
-          yarn --cwd='${{ github.workspace }}/web' build
-        env:
-          NODE_ENV: "production"
-          REACT_APP_VERSION: "${{ env.RELEASE_VERSION }}"
-          REACT_APP_GITHUB_URL: "${{ github.server_url }}/${{ github.repository }}"
-          REACT_APP_GO_VERSION: "${{ env.GO_VERSION }}"
-          REACT_APP_PREV_GO_VERSION: "${{ env.PREV_GO_VERSION }}"
-      - run: |
-          ls ${{ github.workspace }}/web/build
-#  test:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - id: go-cache-paths
-#        run: |
-#          echo "::set-output name=go-build::$(go env GOCACHE)"
-#          echo "::set-output name=go-mod::$(go env GOMODCACHE)"
-#      - uses: actions/checkout@v3
-#      - name: Go Build Cache
-#        uses: actions/cache@v3
-#        with:
-#          path: ${{ steps.go-cache-paths.outputs.go-build }}
-#          key: ${{ runner.os }}-go-build-${{ hashFiles('**/go.sum') }}
-#      - name: Go Mod Cache
-#        uses: actions/cache@v3
-#        with:
-#          path: ${{ steps.go-cache-paths.outputs.go-mod }}
-#          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
-#      - uses: actions/cache@v3
-#        with:
-#          path: "**/node_modules"
-#          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-#      - name: Install modules
-#        run: yarn
-#        working-directory: ./web
-#      - name: Run ESLint
-#        run: yarn lint
-#        working-directory: ./web
-#      - name: Setup Go
-#        uses: actions/setup-go@v4
-#        with:
-#          go-version: "^1.18.0"
-#      - name: golangci-lint
-#        uses: golangci/golangci-lint-action@v3.4.0
-#        with:
-#          version: v1.52.2
-#      - run: go version
-#      - run: go test ./...
+          go-version: "^1.18.0"
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3.4.0
+        with:
+          version: v1.52.2
+      - run: go version
+      - run: go test ./...
