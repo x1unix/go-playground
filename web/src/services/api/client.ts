@@ -11,11 +11,14 @@ import {
 import { IAPIClient } from "./interface";
 
 export class Client implements IAPIClient {
+  private readonly client: axios.AxiosInstance;
+
   get axiosClient() {
     return this.client;
   }
 
-  constructor(private client: axios.AxiosInstance) {
+  constructor(private baseUrl: string) {
+    this.client = axios.default.create({ baseURL: baseUrl });
   }
 
   async getVersion(): Promise<VersionResponse> {
@@ -32,7 +35,7 @@ export class Client implements IAPIClient {
   }
 
   async getArtifact(fileName: string): Promise<Response> {
-    const resp = await fetch(`/artifacts/${fileName}`);
+    const resp = await fetch(`${this.baseUrl}/artifacts/${fileName}`);
     if (resp.status >= 300) {
       const err = await resp.json();
       throw new Error(err.message ?? resp.statusText);
