@@ -3,7 +3,11 @@ import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
 import { Switch, Route } from "react-router-dom";
 
-import { configureStore, createGoConsoleAdapter } from './store';
+import {
+  configureStore,
+  createGoConsoleAdapter,
+  createGoLifecycleAdapter
+} from './store';
 import { history } from '~/store/configure';
 import { bootstrapGo } from '~/services/go';
 import config from './services/config';
@@ -18,7 +22,10 @@ const store = configureStore();
 config.sync();
 
 // Bootstrap Go and storage bridge
-bootstrapGo(createGoConsoleAdapter(a => store.dispatch(a)));
+bootstrapGo(
+  createGoConsoleAdapter(a => store.dispatch(a)),
+  createGoLifecycleAdapter(a => store.dispatch(a))
+);
 
 const App = () => {
   return (

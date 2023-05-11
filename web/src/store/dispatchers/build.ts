@@ -27,6 +27,7 @@ import {Dispatcher} from "./utils";
 import {wrapResponseWithProgress} from "~/utils/http";
 
 const WASM_APP_DOWNLOAD_NOTIFICATION = 'WASM_APP_DOWNLOAD_NOTIFICATION';
+const WASM_APP_EXIT_ERROR = 'WASM_APP_EXIT_ERROR';
 
 const dispatchEvalEvents = (dispatch: DispatchFn, events: EvalEvent[]) => {
   // TODO: support cancellation
@@ -101,6 +102,8 @@ const fetchWasmWithProgress = async (dispatch: DispatchFn, fileName: string) => 
 export const runFileDispatcher: Dispatcher =
   async (dispatch: DispatchFn, getState: StateProvider) => {
     dispatch(newLoadingAction());
+    dispatch(newRemoveNotificationAction(WASM_APP_EXIT_ERROR));
+
     try {
       const { settings, editor, runTarget: {target, backend} } = getState();
       switch (target) {
@@ -126,7 +129,7 @@ export const runFileDispatcher: Dispatcher =
             .then(result => console.log('exit code: %d', result))
             .catch(err => {
               dispatch(newAddNotificationAction({
-                id: 'WASM_APP_ERROR',
+                id: WASM_APP_EXIT_ERROR,
                 type: NotificationType.Error,
                 title: 'Failed to run WebAssembly program',
                 description: err.toString(),
@@ -152,8 +155,8 @@ export const runFileDispatcher: Dispatcher =
     }
   };
 
-export const createGoConsoleAdapter = (dispatch: DispatchFn) =>
-  ({
+export const createGoConsoleAdapter = (dispatch: DispatchFn) => (
+  {
     log: (eventType: EvalEventKind, message: string) => {
       console.log('%s:\t%s', eventType, message);
       dispatch(newProgramWriteAction({
@@ -162,4 +165,25 @@ export const createGoConsoleAdapter = (dispatch: DispatchFn) =>
         Delay: 0,
       }));
     }
-  });
+  }
+);
+
+export const createGoLifecycleAdapter = (dispatch: DispatchFn) => (
+  {
+    onExit: (code: number) => {
+      dispatch(newProgramFinishAction());
+
+      if (isNaN(code) || code === 0) {
+        return;
+      }
+
+      dispatch(newAddNotificationAction({
+        id: WASM_APP_EXIT_ERROR,
+        type: NotificationType.Warning,
+        title: 'Go program finished',
+        description: `Go program exited with non zero code: ${code}`,
+        canDismiss: true,
+      }));
+    }
+  }
+);

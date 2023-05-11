@@ -9,6 +9,10 @@ import {GoWebAssemblyInstance, GoWrapper, wrapGlobal} from "~/lib/go";
 let instance: GoWrapper;
 let wrapper: StdioWrapper;
 
+interface LifecycleListener {
+  onExit: (code: number) => void
+}
+
 export const goRun = async (m: WebAssembly.WebAssemblyInstantiatedSource) => {
   if (!instance) {
     throw new Error('Go runner instance is not initialized');
@@ -20,7 +24,7 @@ export const goRun = async (m: WebAssembly.WebAssemblyInstantiatedSource) => {
 
 export const getImportObject = () => instance.importObject;
 
-export const bootstrapGo = (logger: ConsoleLogger) => {
+export const bootstrapGo = (logger: ConsoleLogger, listener: LifecycleListener) => {
   if (instance) {
     // Skip double initialization
     return;
@@ -40,4 +44,9 @@ export const bootstrapGo = (logger: ConsoleLogger) => {
   instance = new GoWrapper(new globalThis.Go(), {
     globalValue: wrapGlobal(mocks, globalThis),
   });
+
+  instance.onExit = (code: number) => {
+    console.log('Go: WebAssembly program finished with code:', code);
+    listener.onExit(code);
+  }
 };
