@@ -18,18 +18,31 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/cache@v3
+        env:
+          cache-name: npm-cache
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
       - run: |
           echo ${{ github.workspace }} && \
-          ls ${{ github.workspace }}
-      - name: Build frontend
+          ls ${{ github.workspace }}/web
+      - run: |
+          [ -d "${{ github.workspace }}/web/node_modules" ] && echo "node_modules exists" || echo "node_modules not exist" 
+
+      - name: Init node
         uses: actions/setup-node@v3
         with:
           node-version: 'lts/gallium'
-          cache: 'yarn'
-          cache-dependency-path: "${{ github.workspace }}/web"
+
+      - name: Install Dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+        run: yarn --cwd='${{ github.workspace }}/web' install --silent
+
       - run: |
           yarn --cwd='${{ github.workspace }}/web' install --silent && yarn --cwd='${{ github.workspace }}/web' build
         env:
@@ -38,6 +51,8 @@ jobs:
           REACT_APP_GITHUB_URL: "${{ github.server_url }}/${{ github.repository }}"
           REACT_APP_GO_VERSION: "${{ env.GO_VERSION }}"
           REACT_APP_PREV_GO_VERSION: "${{ env.PREV_GO_VERSION }}"
+      - run: |
+          ls ${{ github.workspace }}/web/build
 #  test:
 #    runs-on: ubuntu-latest
 #    steps:
