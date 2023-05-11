@@ -25,9 +25,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/cache@v3
+        env:
+          cache-name: npm-cache
         with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          path: "web/node_modules"
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
 
       - name: Set release version
         run: |
@@ -53,7 +57,7 @@ jobs:
         with:
           images: |
             x1unix/go-playground
-            ghcr.io/x1unix/go-playground/go-playground
+            ghcr.io/${{ github.repository }}/go-playground
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -65,14 +69,13 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Build frontend
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 'lts/gallium'
-          cache: 'yarn'
-          cache-dependency-path: "${{ github.workspace }}/web"
+
       - run: |
-          yarn --cwd='${{ github.workspace }}/work' install --silent && yarn --cwd='${{ github.workspace }}/work' build
+          yarn install --silent && yarn build
+        working-directory: ./web
         env:
           NODE_ENV: "production"
           REACT_APP_VERSION: "${{ env.RELEASE_VERSION }}"
@@ -91,5 +94,6 @@ jobs:
           build-args: |
             APP_VERSION=${{ env.RELEASE_VERSION }}
           push: true
+
       - name: Print image digest
         run: echo ${{ steps.docker_build.outputs.digest }}

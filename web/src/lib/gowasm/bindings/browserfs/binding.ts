@@ -7,7 +7,6 @@ import {
   SliceHeader,
   SliceHeaderType,
   StackReader,
-  stringDecoder,
   stringEncoder,
 } from '~/lib/go';
 import {Errno, SyscallError} from '~/lib/go/pkg/syscall';
