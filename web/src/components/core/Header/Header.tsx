@@ -4,11 +4,13 @@ import {
   ICommandBarItemProps, Stack,
 } from '@fluentui/react';
 
+import environment from "~/environment";
+import apiClient, {VersionsInfo} from "~/services/api";
+import {newAddNotificationAction, NotificationType} from "~/store/notifications";
 import SettingsModal, { SettingsChanges } from '~/components/settings/SettingsModal';
 import ThemeableComponent from '~/components/utils/ThemeableComponent';
 import AboutModal from '~/components/modals/AboutModal';
 import ChangeLogModal from '~/components/modals/ChangeLogModal';
-import { getSnippetsMenuItems, SnippetMenuItem } from '~/utils/headerutils';
 import RunTargetSelector from '~/components/inputs/RunTargetSelector';
 import SharePopup from '~/components/utils/SharePopup';
 import {
@@ -25,8 +27,9 @@ import {
   saveFileDispatcher,
   shareSnippetDispatcher
 } from '~/store';
+import { getSnippetsMenuItems, SnippetMenuItem } from './utils';
+
 import './Header.css';
-import environment from "~/environment";
 
 /**
  * Uniquie class name for share button to use as popover target.
@@ -39,19 +42,27 @@ interface HeaderState {
   showChangelog?: boolean
   loading?: boolean
   showShareMessage?: boolean
+  goVersions?: VersionsInfo
 }
 
 interface Props {
   darkMode: boolean
   loading: boolean
+  running: boolean
   snippetName?: string
   hideThemeToggle?: boolean,
   dispatch: (d: Dispatcher) => void
 }
 
-@Connect(({ settings, status, ui }) => ({
+// FIXME: rewrite to function component and refactor all that re-render mess.
+@Connect((
+  {
+    settings, status, ui
+  }
+) => ({
   darkMode: settings.darkMode,
   loading: status?.loading,
+  running: status?.running,
   hideThemeToggle: settings.useSystemTheme,
   snippetName: ui?.shareCreated && ui?.snippetId
 }))
@@ -76,6 +87,20 @@ export class Header extends ThemeableComponent<any, HeaderState> {
     fileElement.accept = '.go';
     fileElement.addEventListener('change', () => this.onItemSelect(), false);
     this.fileInput = fileElement;
+
+    apiClient.getBackendVersions().then(rsp => {
+      this.setState({
+        goVersions: rsp
+      });
+    }).catch(err => this.props.dispatch(
+      newAddNotificationAction({
+        id: 'VERSIONS_FETCH_ERROR',
+        type: NotificationType.Error,
+        title: 'Failed to fetch Go version info',
+        description: err.toString(),
+        canDismiss: true,
+      })
+    ));
   }
 
   onItemSelect() {
@@ -94,6 +119,10 @@ export class Header extends ThemeableComponent<any, HeaderState> {
     this.props.dispatch(dispatcher);
   }
 
+  get isDisabled() {
+    return this.props.loading || this.props.running;
+  }
+
   get menuItems(): ICommandBarItemProps[] {
     return [
       {
@@ -101,7 +130,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         text: 'Open',
         split: true,
         iconProps: { iconName: 'OpenFile' },
-        disabled: this.props.loading,
+        disabled: this.isDisabled,
         onClick: () => this.fileInput?.click(),
         subMenuProps: {
           items: this.snippetMenuItems,
@@ -113,7 +142,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         ariaLabel: 'Run program (Ctrl+Enter)',
         title: 'Run program (Ctrl+Enter)',
         iconProps: { iconName: 'Play' },
-        disabled: this.props.loading,
+        disabled: this.isDisabled,
         onClick: () => {
           this.props.dispatch(runFileDispatcher);
         }
@@ -123,7 +152,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         text: 'Share',
         className: BTN_SHARE_CLASSNAME,
         iconProps: { iconName: 'Share' },
-        disabled: this.props.loading,
+        disabled: this.isDisabled,
         onClick: () => {
           this.setState({ showShareMessage: true });
           this.props.dispatch(shareSnippetDispatcher);
@@ -133,7 +162,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         key: 'download',
         text: 'Download',
         iconProps: { iconName: 'Download' },
-        disabled: this.props.loading,
+        disabled: this.isDisabled,
         onClick: () => {
           this.props.dispatch(saveFileDispatcher);
         },
@@ -143,7 +172,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         text: 'Settings',
         ariaLabel: 'Settings',
         iconProps: { iconName: 'Settings' },
-        disabled: this.props.loading,
+        disabled: this.isDisabled,
         onClick: () => {
           this.setState({ showSettings: true });
         }
@@ -155,27 +184,30 @@ export class Header extends ThemeableComponent<any, HeaderState> {
     return [
       {
         key: 'selectEnvironment',
-        commandBarButtonAs: (_) => (
-          <Stack
-            horizontal
-            verticalAlign="center"
-            style={{
-              marginRight: ".5rem"
-            }}
-          >
-            <RunTargetSelector
-              responsive
-              disabled={this.props.loading}
-            />
-          </Stack>
-        )
+        commandBarButtonAs: (_) => {
+          return (
+            <Stack
+              horizontal
+              verticalAlign="center"
+              style={{
+                marginRight: ".5rem"
+              }}
+            >
+              <RunTargetSelector
+                responsive
+                disabled={this.isDisabled}
+                goVersions={this.state.goVersions}
+              />
+            </Stack>
+          )
+        }
       },
       {
         key: 'format',
         text: 'Format Code',
         ariaLabel: 'Format Code (Ctrl+Shift+F)',
         iconOnly: true,
-        disabled: this.props.loading,
+        disabled: this.isDisabled,
         iconProps: { iconName: 'Code' },
         onClick: () => {
           this.props.dispatch(formatFileDispatcher);
@@ -216,7 +248,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         text: 'What\'s new',
         ariaLabel: 'Changelog',
         iconOnly: true,
-        disabled: this.props.loading,
+        disabled: this.isDisabled,
         iconProps: { iconName: 'Giftbox' },
         onClick: () => {
           this.setState({ showChangelog: true });

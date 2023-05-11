@@ -15,7 +15,7 @@ import (
 
 const (
 	DefaultUserAgent     = "goplay.tools/1.0 (http://goplay.tools/)"
-	DefaultPlaygroundURL = "https://play.golang.org"
+	DefaultPlaygroundURL = "https://go.dev/_"
 
 	// maxSnippetSize value taken from
 	// https://github.com/golang/playground/blob/master/app/goplay/share.go

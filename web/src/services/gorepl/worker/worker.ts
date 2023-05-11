@@ -12,8 +12,11 @@ import {ConsoleBinding, ConsoleStreamType} from "~/lib/gowasm/bindings/stdio";
 import {BrowserFSBinding} from "~/lib/gowasm/bindings/browserfs";
 import {PackageDBBinding} from "~/lib/gowasm/bindings/packagedb";
 import {Worker, WorkerBinding} from "~/lib/gowasm/bindings/worker";
+
+import { wrapResponseWithProgress } from "~/utils/http";
 import {FileSystemWrapper} from "~/services/go/fs";
 import ProcessStub from "~/services/go/process";
+
 import {PackageManagerEvent, ProgramStateChangeEvent} from "./types";
 import {PackageCacheDB, PackageFileStore, PackageIndex} from "../pkgcache";
 import {
@@ -27,13 +30,6 @@ import {
 } from "./interface";
 import {UIHostBinding} from "./binding";
 import {StdioWrapper} from "./console";
-
-/**
- * Decompressed content length
- */
-const PAYLOAD_CONTENT_LENGTH_HEADER = 'x-payload-content-length';
-
-const CONTENT_LENGTH_HEADER = 'content-length';
 
 /**
  * Go WASM executable URL
@@ -181,38 +177,10 @@ const fetchWithProgress = async (rspClient: Client, req: RequestInfo): Promise<R
     throw new Error(`Cannot fetch WebAssembly worker: GET ${rsp.url} - ${rsp.status} ${rsp.statusText}`);
   }
 
-  const contentLength = rsp.headers.get(PAYLOAD_CONTENT_LENGTH_HEADER) ??
-    rsp.headers.get(CONTENT_LENGTH_HEADER);
-
-  if (!contentLength) {
-    console.warn('worker: WASM content length is not available');
-    return rsp;
-  }
-
-  const totalBytes = parseInt(contentLength, 10);
-  let readBytes = 0;
-
-  return new Response(new ReadableStream({
-    async start(controller) {
-      const reader = rsp.body!.getReader();
-      for (;;) {
-        const {done, value} = await reader.read();
-        if (done) break;
-        readBytes += value?.byteLength ?? 1;
-        rspClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
-          eventType: GoWorkerBootEventType.Downloading,
-          progress: {
-            totalBytes,
-            currentBytes: readBytes,
-          }
-        });
-        controller.enqueue(value);
-      }
-      controller.close();
-    },
-  }), {
-    headers: rsp.headers,
-    status: rsp.status,
-    statusText: rsp.statusText,
+  return wrapResponseWithProgress(rsp, (progress) => {
+    rspClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
+      eventType: GoWorkerBootEventType.Downloading,
+      progress
+    });
   });
 }

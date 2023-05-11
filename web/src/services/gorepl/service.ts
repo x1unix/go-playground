@@ -2,8 +2,8 @@ import {Client} from "~/lib/wrpc";
 import {EvalEventKind} from "../api";
 import {ConsoleStreamType} from "~/lib/gowasm/bindings/stdio";
 import {
-  ActionType,
   newErrorAction,
+  newLoadingAction, newProgramFinishAction, newProgramStartAction,
   newProgramWriteAction,
 } from "~/store/actions";
 import {DispatchFn, StateProvider} from "~/store/helpers";
@@ -139,6 +139,7 @@ const handleStdoutWrite = (dispatcher: DispatchFn, {msgType, message}: StdoutWri
 const handleWorkerBootEvent = (dispatcher: DispatchFn, {eventType, progress, code}: GoWorkerBootEvent) => {
   switch (eventType) {
     case GoWorkerBootEventType.Crash:
+      dispatcher(newProgramFinishAction());
       dispatcher(newAddNotificationAction({
         id: WORKER_NOTIFICATION_ID,
         type: NotificationType.Error,
@@ -185,11 +186,11 @@ const handleWorkerBootEvent = (dispatcher: DispatchFn, {eventType, progress, cod
 const handleProgramStateEvent = (dispatcher: DispatchFn, {state, message}: ProgramStateChangeEvent) => {
   switch (state) {
     case EvalState.Finish:
-      dispatcher({type: ActionType.EVAL_FINISH});
+      dispatcher(newProgramFinishAction());
       return;
     case EvalState.Begin:
       // Keep UI is busy state until program or package manager is running
-      dispatcher({type: ActionType.LOADING});
+      dispatcher(newProgramStartAction());
       return;
     case EvalState.Error:
       dispatcher(newErrorAction(message ?? 'Failed to start program'));
