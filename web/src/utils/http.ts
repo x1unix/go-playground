@@ -1,7 +1,7 @@
 /**
  * Decompressed content length
  */
-const PAYLOAD_CONTENT_LENGTH_HEADER = 'x-payload-content-length';
+const RAW_CONTENT_LENGTH_HEADER = 'x-raw-content-length';
 const CONTENT_LENGTH_HEADER = 'content-length';
 
 export interface DownloadProgress {
@@ -18,7 +18,7 @@ export type ProgressReporter = (progress: DownloadProgress) => void;
  * @param reporter Progress reporter
  */
 export const wrapResponseWithProgress = (rsp: Response, reporter: ProgressReporter): Response => {
-  const contentLength = rsp.headers.get(PAYLOAD_CONTENT_LENGTH_HEADER) ??
+  const contentLength = rsp.headers.get(RAW_CONTENT_LENGTH_HEADER) ??
     rsp.headers.get(CONTENT_LENGTH_HEADER);
 
   if (!contentLength) {

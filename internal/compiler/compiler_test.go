@@ -3,7 +3,6 @@ package compiler
 import (
 	"context"
 	"errors"
-	"io"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -26,7 +25,7 @@ func (ts *testReadCloser) Close() error {
 
 type testStorage struct {
 	hasItem             func(id storage.ArtifactID) (bool, error)
-	getItem             func(id storage.ArtifactID) (io.ReadCloser, error)
+	getItem             func(id storage.ArtifactID) (storage.ReadCloseSizer, error)
 	createLocationAndDo func(id storage.ArtifactID, data []byte, cb storage.Callback) error
 }
 
@@ -36,7 +35,7 @@ func (ts testStorage) HasItem(id storage.ArtifactID) (bool, error) {
 }
 
 // GetItem returns item by id
-func (ts testStorage) GetItem(id storage.ArtifactID) (io.ReadCloser, error) {
+func (ts testStorage) GetItem(id storage.ArtifactID) (storage.ReadCloseSizer, error) {
 	return ts.getItem(id)
 }
 
@@ -55,7 +54,7 @@ func TestBuildService_GetArtifact(t *testing.T) {
 			artifactID: "test",
 			beforeRun: func(t *testing.T) storage.StoreProvider {
 				return testStorage{
-					getItem: func(id storage.ArtifactID) (io.ReadCloser, error) {
+					getItem: func(id storage.ArtifactID) (storage.ReadCloseSizer, error) {
 						require.Equal(t, "test", string(id))
 						return &testReadCloser{}, nil
 					},
@@ -67,7 +66,7 @@ func TestBuildService_GetArtifact(t *testing.T) {
 			wantErr:    "test error",
 			beforeRun: func(t *testing.T) storage.StoreProvider {
 				return testStorage{
-					getItem: func(id storage.ArtifactID) (io.ReadCloser, error) {
+					getItem: func(id storage.ArtifactID) (storage.ReadCloseSizer, error) {
 						require.Equal(t, "foobar", string(id))
 						return nil, errors.New("test error")
 					},

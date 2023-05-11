@@ -299,7 +299,11 @@ func (s *Service) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) 
 		return err
 	}
 
+	contentLength := strconv.FormatInt(data.Size(), 10)
 	w.Header().Set("Content-Type", wasmMimeType)
+	w.Header().Set("Content-Length", contentLength)
+	w.Header().Set(rawContentLengthHeader, contentLength)
+
 	n, err := io.Copy(w, data)
 	defer data.Close()
 	if err != nil {

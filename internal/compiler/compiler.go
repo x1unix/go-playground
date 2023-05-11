@@ -3,7 +3,6 @@ package compiler
 import (
 	"bytes"
 	"context"
-	"io"
 	"os"
 
 	"github.com/x1unix/go-playground/internal/compiler/storage"
@@ -76,7 +75,7 @@ func (s BuildService) getEnvironmentVariables() []string {
 }
 
 // GetArtifact returns artifact by id
-func (s BuildService) GetArtifact(id storage.ArtifactID) (io.ReadCloser, error) {
+func (s BuildService) GetArtifact(id storage.ArtifactID) (storage.ReadCloseSizer, error) {
 	return s.storage.GetItem(id)
 }
 

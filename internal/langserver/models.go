@@ -8,6 +8,15 @@ import (
 	"github.com/x1unix/go-playground/pkg/goplay"
 )
 
+// rawContentLengthHeader is a custom content length header
+// that contains content raw size before compression.
+//
+// The header is used to properly report download progress when
+// payload is transferred with compression.
+//
+// See: /web/src/utils/http.ts
+const rawContentLengthHeader = "X-Raw-Content-Length"
+
 // SnippetResponse is snippet response
 type SnippetResponse struct {
 	// FileName is snippet file name

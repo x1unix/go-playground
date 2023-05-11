@@ -24,7 +24,13 @@ const (
 
 type cachedFile struct {
 	io.ReadCloser
+
+	size    int64
 	useLock *sync.Mutex
+}
+
+func (c cachedFile) Size() int64 {
+	return c.size
 }
 
 func (c cachedFile) Read(p []byte) (n int, err error) {
@@ -110,7 +116,7 @@ func (s LocalStorage) HasItem(id ArtifactID) (bool, error) {
 }
 
 // GetItem implements storage interface
-func (s LocalStorage) GetItem(id ArtifactID) (io.ReadCloser, error) {
+func (s LocalStorage) GetItem(id ArtifactID) (ReadCloseSizer, error) {
 	s.useLock.Lock()
 	defer s.useLock.Unlock()
 	fPath := s.getOutputLocation(id)
@@ -119,8 +125,15 @@ func (s LocalStorage) GetItem(id ArtifactID) (io.ReadCloser, error) {
 		return nil, ErrNotExists
 	}
 
+	stat, err := f.Stat()
+	if err != nil {
+		_ = f.Close()
+		return nil, err
+	}
+
 	return cachedFile{
 		ReadCloser: f,
+		size:       stat.Size(),
 		useLock:    s.useLock,
 	}, err
 }
