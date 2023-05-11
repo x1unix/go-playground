@@ -21,12 +21,10 @@ jobs:
         env:
           cache-name: npm-cache
         with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          path: "web/node_modules"
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
 
       - run: |
           echo ${{ github.workspace }} && \
@@ -40,11 +38,10 @@ jobs:
           node-version: 'lts/gallium'
 
       - name: Install Dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: yarn --cwd='${{ github.workspace }}/web' install --silent
 
       - run: |
-          yarn --cwd='${{ github.workspace }}/web' install --silent && yarn --cwd='${{ github.workspace }}/web' build
+          yarn --cwd='${{ github.workspace }}/web' build
         env:
           NODE_ENV: "production"
           REACT_APP_VERSION: "${{ env.RELEASE_VERSION }}"
