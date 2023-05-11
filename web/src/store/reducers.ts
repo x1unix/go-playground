@@ -72,7 +72,7 @@ const reducers = {
       {
         ...s,
         loading: true,
-        events: []
+        running: false,
       }
     ),
     [ActionType.EVAL_START]: (s: StatusState, _: Action) => (
