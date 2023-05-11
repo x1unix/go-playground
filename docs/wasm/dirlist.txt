@@ -1,0 +1,9 @@
+js: registered callback handler {value: {…}, id: 1}
+fs.Open - "/go/src/main/vendor/go.uber.org/zap"
+fs.Open - "/go/src/main/go.uber.org/zap"
+fs.Open - "/go/src/vendor/go.uber.org/zap"
+fs.Open - "/go/src/go.uber.org/zap"
+fs.Open - "/go/src/vendor/go.uber.org/zap"
+fs.Open - "/go/src/go.uber.org/zap"
+Result:  <nil>
+Error:  4:2: import "go.uber.org/zap" error: unable to find source related to: "go.uber.org/zap". Either the GOPATH environment variable, or the Interpreter.Options.GoPath needs to be set

@@ -1,0 +1,13 @@
+.RunTargetSelector__Icon {
+  display: flex;
+}
+
+@media (max-width: 479px) {
+  .RunTargetSelector--responsive .RunTargetSelector__Title {
+    display: none;
+  }
+
+  .RunTargetSelector--responsive .RunTargetSelector__Icon {
+    display: block;
+  }
+}

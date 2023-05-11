@@ -1,3 +1,4 @@
+//go:build js
 // +build js
 
 package worker
@@ -40,7 +41,7 @@ func (args Args) Bind(targets ...interface{}) error {
 
 	for i, arg := range args {
 		if err := BindValue(arg, targets[i]); err != nil {
-			return fmt.Errorf("invalid argument %d type: %s", err)
+			return fmt.Errorf("invalid argument %d type: %w", i, err)
 		}
 	}
 
@@ -72,7 +73,7 @@ func BindValue(val js.Value, dest interface{}) error {
 	case ValueUnmarshaler:
 		return v.UnmarshalValue(val)
 	default:
-		return fmt.Errorf("BindValue: unsupported JS type %q", valType)
+		return fmt.Errorf("BindValue: unsupported JS type %q (%d)", valType.String(), valType)
 	}
 
 	return nil

@@ -1,0 +1,19 @@
+package main
+
+import (
+	"go.uber.org/zap"
+	"testing"
+	_ "golang.org/x/tools/internal/imports"
+)
+
+//import "golang.org/x/tools/internal/imports"
+
+func main() {
+	logger, err := zap.NewProduction()
+	if err != nil {
+		panic(err)
+	}
+	defer logger.Sync() // flushes buffer, if any
+	sugar := logger.Sugar()
+	sugar.Infow("hello world!!!")
+}

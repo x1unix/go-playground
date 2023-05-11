@@ -14,9 +14,8 @@ import (
 )
 
 const (
-	DefaultUserAgent          = "goplay.tools/1.0 (http://goplay.tools/)"
-	DefaultPlaygroundURL      = "https://play.golang.org"
-	DefaultGoTipPlaygroundURL = "https://gotipplay.golang.org"
+	DefaultUserAgent     = "goplay.tools/1.0 (http://goplay.tools/)"
+	DefaultPlaygroundURL = "https://go.dev/_"
 
 	// maxSnippetSize value taken from
 	// https://github.com/golang/playground/blob/master/app/goplay/share.go
@@ -35,15 +34,14 @@ type Client struct {
 
 // NewClient returns new Go playground client
 func NewClient(baseUrl, userAgent string, timeout time.Duration) *Client {
+	dialer := &net.Dialer{Timeout: timeout}
 	return &Client{
 		baseUrl:   baseUrl,
 		userAgent: userAgent,
 		client: http.Client{
 			Timeout: timeout,
 			Transport: &http.Transport{
-				DialContext: (&net.Dialer{
-					Timeout: timeout,
-				}).DialContext,
+				DialContext:         dialer.DialContext,
 				TLSHandshakeTimeout: timeout,
 			},
 		},

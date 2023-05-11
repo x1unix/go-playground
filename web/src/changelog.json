@@ -1,16 +1,40 @@
 {
-  "Interface - IDE": [
+  "Interface - General": [
     {
-      "issueId": 194,
-      "url": "/pull/194",
-      "description": "Notify about time.Now() issues when using server environment."
+      "issueId": 213,
+      "url": "/issues/213",
+      "description": "Improve Go versions selection"
     }
   ],
-  "Interface - Vim": [
+  "Interface - IDE": [
     {
-      "issueId": 195,
-      "url": "/pull/195",
-      "description": "Implement :w command for Vim mode"
+      "issueId": 210,
+      "url": "/issues/210",
+      "description": "Properly display delayed messages from Go programs executed on server"
+    },
+    {
+      "issueId": 215,
+      "url": "/pull/215",
+      "description": "Properly handle WebAssembly programs lifecycle"
+    },
+    {
+      "issueId": 218,
+      "url": "/issues/218",
+      "description": "Add debouncing for code completion API calls"
+    }
+  ],
+  "Go - Runtime": [
+    {
+      "issueId": 211,
+      "url": "/pull/211",
+      "description": "Add embedded Go interpreter based on Yaegi"
+    }
+  ],
+  "Go - WebAssembly": [
+    {
+      "issueId": 211,
+      "url": "/pull/211",
+      "description": "Bump Go version to 1.19"
     }
   ]
 }

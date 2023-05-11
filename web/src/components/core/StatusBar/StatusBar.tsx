@@ -1,20 +1,28 @@
-import React, {useState} from 'react';
-import {connect} from 'react-redux';
-import {editor, MarkerSeverity} from 'monaco-editor';
-import { newEnvironmentChangeDispatcher } from '~/store';
-import config, {RuntimeType} from '~/services/config';
-import EllipsisText from '~/components/utils/EllipsisText';
-import StatusBarItem from '~/components/core/StatusBar/StatusBarItem';
-import EnvironmentSelectModal from '~/components/modals/EnvironmentSelectModal';
-import VimStatusBarItem from '~/plugins/vim/VimStatusBarItem';
-import './StatusBar.css';
+import React from "react";
+import clsx from "clsx";
+import {editor, MarkerSeverity} from "monaco-editor";
+import {VscDebugAlt} from "react-icons/vsc";
+import environment from "~/environment";
+import {StateDispatch, connect} from "~/store";
 
-interface Props {
-  loading?: true
-  lastError?: string
-  runtime?: RuntimeType
+import EllipsisText from "~/components/utils/EllipsisText";
+import StatusBarItem from "~/components/core/StatusBar/StatusBarItem";
+import VimStatusBarItem from "~/plugins/vim/VimStatusBarItem";
+
+import "./StatusBar.css";
+
+
+interface OwnProps {}
+
+interface StateProps {
+  loading?: boolean
+  running?: boolean
+  lastError?: string|null
   markers?: editor.IMarkerData[]
-  dispatch?: Function
+}
+
+interface Props extends OwnProps, StateProps {
+  dispatch: StateDispatch
 }
 
 const pluralize = (count: number, label: string) => (
@@ -48,7 +56,7 @@ const getMarkerCounters = (markers?: editor.IMarkerData[]) => {
   return {errors, warnings};
 };
 
-const getStatusItem = ({loading, lastError}) => {
+const getStatusItem = ({loading, running, lastError}: StateProps) => {
   if (loading) {
     return (
       <StatusBarItem icon="Build">
@@ -57,6 +65,16 @@ const getStatusItem = ({loading, lastError}) => {
         </EllipsisText>
       </StatusBarItem>
     );
+  }
+
+  if (running) {
+    return (
+      <StatusBarItem icon={VscDebugAlt}>
+        <EllipsisText>
+          Running program
+        </EllipsisText>
+      </StatusBarItem>
+    )
   }
 
   if (lastError) {
@@ -73,15 +91,24 @@ const getStatusItem = ({loading, lastError}) => {
   return null;
 }
 
+
 const StatusBar: React.FC<Props> = ({
-  loading, lastError, runtime, markers, dispatch
+  loading,
+  running,
+  lastError,
+  markers
 }) => {
-  const [ runSelectorModalVisible, setRunSelectorModalVisible ] = useState(false);
-  const className = loading ? 'StatusBar StatusBar--busy' : 'StatusBar';
-  const {warnings, errors} = getMarkerCounters(markers);
+  const {
+    warnings,
+    errors
+  } = getMarkerCounters(markers);
   return (
     <>
-      <div className={className}>
+      <div
+        className={clsx('StatusBar', {
+          'StatusBar--busy': loading || running,
+        })}
+      >
         <div className="StatusBar__side-left">
           <StatusBarItem
             icon="ErrorBadge"
@@ -98,47 +125,43 @@ const StatusBar: React.FC<Props> = ({
             </StatusBarItem>
           ) : null }
           <VimStatusBarItem />
-          {getStatusItem({loading, lastError})}
+          {
+            getStatusItem({
+              loading,
+              running,
+              lastError
+            })
+          }
         </div>
         <div className="StatusBar__side-right">
           <StatusBarItem
-            icon="Code"
-            title="Select environment"
-            disabled={loading}
-            onClick={() => setRunSelectorModalVisible(true)}
-            hideTextOnMobile
-            button
-          >
-            Environment: {RuntimeType.toString(runtime)}
-          </StatusBarItem>
-          <StatusBarItem
             icon="Feedback"
             title="Send feedback"
-            href={config.issueUrl}
+            href={environment.urls.issue}
             iconOnly
           />
           <StatusBarItem
             imageSrc="/github-mark-light-32px.png"
             title="GitHub"
-            href={config.githubUrl}
+            href={environment.urls.github}
             iconOnly
           />
         </div>
       </div>
-      <EnvironmentSelectModal
-        value={runtime as RuntimeType}
-        isOpen={runSelectorModalVisible}
-        onClose={val => {
-          setRunSelectorModalVisible(false);
-          if (val) {
-            dispatch?.(newEnvironmentChangeDispatcher(val));
-          }
-        }}
-      />
     </>
   );
 };
 
-export default connect(({status: {loading, lastError, markers}, settings: {runtime}}: any) => (
-  {loading, lastError, markers, runtime}
-))(StatusBar);
+const ConnectedStatusBar = connect<StateProps, OwnProps>(
+  ({status}) => {
+    const {
+      loading,
+      lastError,
+      running ,
+      markers
+    } = status!;
+    return { loading, lastError, running, markers };
+  }
+)(StatusBar);
+
+export default ConnectedStatusBar;

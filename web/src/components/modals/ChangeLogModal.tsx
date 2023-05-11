@@ -5,9 +5,9 @@ import { Link } from '@fluentui/react/lib/Link';
 
 import changelog from '~/changelog.json';
 import { getContentStyles, getIconButtonStyles } from '~/styles/modal';
-import config from '~/services/config';
 
 import './ChangeLogModal.css';
+import environment from "~/environment";
 
 const TITLE_ID = 'ChangeLogTitle';
 const SUB_TITLE_ID = 'ChangeLogSubtitle';
@@ -31,7 +31,7 @@ export default function ChangeLogModal(props: ChangeLogModalProps) {
       containerClassName={contentStyles.container}
     >
       <div className={contentStyles.header}>
-        <span id={TITLE_ID}>Changelog for {config.appVersion}</span>
+        <span id={TITLE_ID}>Changelog for {environment.appVersion}</span>
         <IconButton
           iconProps={{ iconName: 'Cancel' }}
           styles={iconButtonStyles}
@@ -48,7 +48,7 @@ export default function ChangeLogModal(props: ChangeLogModalProps) {
                 <li key={issueId}>
                   <Link
                     className='ChangeLogModal__issue-url'
-                    href={`${config.githubUrl}/${url}`}
+                    href={`${environment.urls.github}/${url}`}
                     target='_blank'
                   >
                     #{issueId}
@@ -63,7 +63,7 @@ export default function ChangeLogModal(props: ChangeLogModalProps) {
           And more!
         </p>
         <p>
-          Full release notes are available <Link href={`${config.githubUrl}/releases/latest`} target='_blank'>here</Link>
+          Full release notes are available <Link href={`${environment.urls.github}/releases/latest`} target='_blank'>here</Link>
         </p>
       </div>
     </Modal>

@@ -1,4 +1,4 @@
-import {Dispatcher} from '~/store/dispatch';
+import {Dispatcher} from '~/store/dispatchers';
 
 export enum VimMode {
   Visual = 'visual',

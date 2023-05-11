@@ -1,14 +1,17 @@
 import { FileSystemWrapper } from './fs';
 import ProcessStub from './process';
-import { Global } from './go';
-import { Go } from './wasm_exec';
 import { StdioWrapper, ConsoleLogger } from './stdio';
+import {GoWebAssemblyInstance, GoWrapper, wrapGlobal} from "~/lib/go";
 
-// TODO: Uncomment, when "go.ts" will be fixed
+// TODO: Uncomment, when "types.ts" will be fixed
 // import { Go, Global } from './go';
 
-let instance: Go;
+let instance: GoWrapper;
 let wrapper: StdioWrapper;
+
+interface LifecycleListener {
+  onExit: (code: number) => void
+}
 
 export const goRun = async (m: WebAssembly.WebAssemblyInstantiatedSource) => {
   if (!instance) {
@@ -16,12 +19,12 @@ export const goRun = async (m: WebAssembly.WebAssemblyInstantiatedSource) => {
   }
 
   wrapper.reset();
-  return instance.run(m.instance);
+  return instance.run(m.instance as GoWebAssemblyInstance);
 };
 
 export const getImportObject = () => instance.importObject;
 
-export const bootstrapGo = (logger: ConsoleLogger) => {
+export const bootstrapGo = (logger: ConsoleLogger, listener: LifecycleListener) => {
   if (instance) {
     // Skip double initialization
     return;
@@ -32,15 +35,18 @@ export const bootstrapGo = (logger: ConsoleLogger) => {
 
   // global overlay
   const mocks = {
+    mocked: true,
     fs: new FileSystemWrapper(wrapper.stdoutPipe, wrapper.stderrPipe),
-    process: ProcessStub,
-    Go: Go,
+    process: ProcessStub
   };
 
-  // Wrap global object to make it accessible to Go's wasm bridge
-  const globalWrapper = new Proxy<Global>(window as any, {
-    has: (obj, prop) => prop in obj || prop in mocks,
-    get: (obj, prop) => prop in obj ? obj[prop] : mocks[prop]
+  // Wrap global Window and Go object to intercept console calls.
+  instance = new GoWrapper(new globalThis.Go(), {
+    globalValue: wrapGlobal(mocks, globalThis),
   });
-  instance = new Go(globalWrapper);
+
+  instance.onExit = (code: number) => {
+    console.log('Go: WebAssembly program finished with code:', code);
+    listener.onExit(code);
+  }
 };

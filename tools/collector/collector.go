@@ -8,7 +8,6 @@ import (
 	"go/doc"
 	"go/parser"
 	"go/token"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -100,7 +99,7 @@ func analyzeDir(sdkDir, pathName string) ([]Package, error) {
 		return nil, nil
 	}
 
-	files, err := ioutil.ReadDir(filepath.Join(sdkDir, pathName))
+	files, err := os.ReadDir(filepath.Join(sdkDir, pathName))
 	if err != nil {
 		return nil, fmt.Errorf("failed to open %q: %w", pathName, err)
 	}

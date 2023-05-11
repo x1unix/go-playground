@@ -4,6 +4,10 @@ const CracoAlias = require("craco-alias");
 
 module.exports = {
   webpack: {
+    configure: cfg => {
+      cfg.resolve.extensions.push('.wasm');
+      return cfg;
+    },
     plugins: {
       add: [
         new MonacoWebpackPlugin(),

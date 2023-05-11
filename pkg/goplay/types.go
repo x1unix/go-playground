@@ -2,7 +2,19 @@ package goplay
 
 import (
 	"errors"
+	"net/url"
+	"strconv"
 	"time"
+)
+
+const DefaultVersion = 2
+
+type Backend = string
+
+const (
+	BackendGoCurrent = ""
+	BackendGoPrev    = "goprev"
+	BackendGoTip     = "gotip"
 )
 
 // Snippet represents shared snippet
@@ -25,6 +37,24 @@ func (r *FmtResponse) HasError() error {
 	}
 
 	return CompileFailedError{msg: r.Error}
+}
+
+type CompileRequest struct {
+	Version int
+	WithVet bool
+	Body    []byte
+}
+
+func (r CompileRequest) URLValues() url.Values {
+	if r.Version == 0 {
+		r.Version = DefaultVersion
+	}
+
+	form := make(url.Values, 3)
+	form.Add("version", strconv.Itoa(r.Version))
+	form.Add("withVet", strconv.FormatBool(r.WithVet))
+	form.Add("body", string(r.Body))
+	return form
 }
 
 // CompileEvent represents individual

@@ -1,0 +1,48 @@
+.header {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 44px;
+}
+
+.app__update {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 500px;
+  z-index: 9999;
+}
+
+.app__update.app__update--visible {
+  display: block;
+}
+
+.header__preloader {
+  margin-right: 15px;
+}
+
+.header__logo {
+  height: 1.5em;
+  margin-left: 10px;
+}
+
+.header__commandBar {
+  flex: 1 1 auto;
+  max-width: 100%;
+}
+
+@media only screen and (max-width: 600px) {
+  .header__commandBar .ms-CommandBar {
+    padding: 0 10px;
+  }
+  .header__logo {
+    height: 1em;
+    margin: 0 10px;
+    display: none;
+  }
+}

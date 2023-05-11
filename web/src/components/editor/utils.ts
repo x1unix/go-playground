@@ -1,8 +1,8 @@
 import {editor, MarkerSeverity, Uri} from 'monaco-editor';
-import config from "@services/config";
+import environment from "~/environment";
 
 const segmentLength = 'time.Now()'.length;
-const issueUrl = Uri.parse(`${config.githubUrl}/issues/104`);
+const issueUrl = Uri.parse(`${environment.urls.github}/issues/104`);
 const timeNowUsageWarning = 'Warning: `time.Now()` will always return fake time. ' +
     'Change current environment to WebAssembly in settings to use real date and time.';
 
@@ -43,4 +43,28 @@ export const getTimeNowUsageMarkers = (code: string, editorInstance: editor.ISta
       endColumn: column + segmentLength,
     };
   });
+}
+
+/**
+ * Wraps async function with debounce timer.
+ *
+ * @param fn Function
+ * @param delay Debounce time
+ */
+export const wrapAsyncWithDebounce = <T>(fn: (...args) => Promise<T>, delay: number) => {
+  let lastTimeoutId: NodeJS.Timeout|null = null;
+
+  return (...args) => {
+    if (lastTimeoutId) {
+      clearTimeout(lastTimeoutId);
+    }
+
+    return new Promise<T>((res, rej) => {
+      lastTimeoutId = setTimeout(() => {
+        fn(...args)
+          .then(res)
+          .catch(rej);
+      }, delay);
+    })
+  }
 }

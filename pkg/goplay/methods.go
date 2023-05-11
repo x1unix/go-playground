@@ -2,8 +2,8 @@ package goplay
 
 import (
 	"context"
+	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 )
@@ -19,7 +19,7 @@ func ValidateContentLength(itemLen int) error {
 // GetSnippet returns snippet from Go playground
 func (c *Client) GetSnippet(ctx context.Context, snippetID string) (*Snippet, error) {
 	fileName := snippetID + ".go"
-	resp, err := c.getRequest(ctx, "p/"+fileName)
+	resp, err := c.getRequest(ctx, "share?id="+snippetID)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func (c *Client) GetSnippet(ctx context.Context, snippetID string) (*Snippet, er
 	defer resp.Body.Close()
 	switch resp.StatusCode {
 	case http.StatusOK:
-		snippet, err := ioutil.ReadAll(resp.Body)
+		snippet, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
 		}
@@ -55,23 +55,41 @@ func (c *Client) Share(ctx context.Context, src io.Reader) (string, error) {
 }
 
 // GoImports performs Goimports
-func (c *Client) GoImports(ctx context.Context, src []byte) (*FmtResponse, error) {
+func (c *Client) GoImports(ctx context.Context, src []byte, backend Backend) (*FmtResponse, error) {
 	form := url.Values{}
 	form.Add("imports", "true")
 	form.Add("body", string(src))
 
 	dest := new(FmtResponse)
-	err := c.postJSON(ctx, "fmt", form, dest)
+	urlPath := appendBackendToPath("fmt", backend)
+	err := c.postJSON(ctx, urlPath, form, dest)
 	return dest, err
 }
 
 // Compile runs code in goplayground and returns response
-func (c *Client) Compile(ctx context.Context, src []byte) (*CompileResponse, error) {
-	form := url.Values{}
-	form.Add("body", string(src))
-	form.Add("version", "2")
-
+func (c *Client) Compile(ctx context.Context, req CompileRequest, backend string) (*CompileResponse, error) {
 	dest := new(CompileResponse)
-	err := c.postJSON(ctx, "compile", form, dest)
+
+	form := req.URLValues()
+	urlPath := appendBackendToPath("compile", backend)
+	err := c.postJSON(ctx, urlPath, form, dest)
 	return dest, err
+}
+
+// ValidateBackend validates Go Playground backend name.
+func ValidateBackend(backend Backend) bool {
+	switch backend {
+	case BackendGoCurrent, BackendGoTip, BackendGoPrev:
+		return true
+	}
+
+	return false
+}
+
+func appendBackendToPath(urlPath string, backend Backend) string {
+	if backend == "" {
+		return urlPath
+	}
+
+	return fmt.Sprintf("%s?backend=%s", urlPath, backend)
 }
