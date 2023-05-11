@@ -3,7 +3,8 @@ import {EvalEventKind} from "../api";
 import {ConsoleStreamType} from "~/lib/gowasm/bindings/stdio";
 import {
   newErrorAction,
-  newLoadingAction, newProgramFinishAction, newProgramStartAction,
+  newProgramFinishAction,
+  newProgramStartAction,
   newProgramWriteAction,
 } from "~/store/actions";
 import {DispatchFn, StateProvider} from "~/store/helpers";

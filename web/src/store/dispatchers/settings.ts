@@ -1,7 +1,7 @@
 import {isDarkModeEnabled} from "~/utils/theme";
 import config, {RunTargetConfig} from '~/services/config';
 
-import { Dispatcher, StateDispatch } from "./utils";
+import { Dispatcher } from "./utils";
 import {PanelState, SettingsState} from "../state";
 import { StateProvider, DispatchFn } from "../helpers";
 import {
