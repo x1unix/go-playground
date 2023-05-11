@@ -1,9 +1,12 @@
 import clsx from "clsx";
 import React, { useMemo } from 'react';
-import {connect} from "react-redux";
 import {Dropdown, IDropdownStyles} from '@fluentui/react';
-import {newRunTargetChangeDispatcher, State, StateDispatch} from "~/store";
 import {RunTargetConfig} from "~/services/config";
+import {
+  StateDispatch,
+  connect,
+  newRunTargetChangeDispatcher,
+} from "~/store";
 
 import {onRenderOption, onRenderTitle} from "./dropdown";
 import {
@@ -94,9 +97,9 @@ const RunTargetSelector: React.FC<Props> = ({
   )
 }
 
-const ConnectedRunTargetSelector = connect<StateProps, any, OwnProps, State>
+const ConnectedRunTargetSelector = connect<StateProps, OwnProps>
 (({runTarget}) => ({runTarget}))(
-  RunTargetSelector as any // Temporary hack to avoid TS complains on StateDispatch.
+  RunTargetSelector
 );
 
 export default ConnectedRunTargetSelector;
