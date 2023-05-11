@@ -2,13 +2,14 @@ import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import * as monaco from 'monaco-editor';
 import {editor, IKeyboardEvent} from 'monaco-editor';
+
 import {
   createVimModeAdapter,
   StatusBarAdapter,
   VimModeKeymap
 } from '~/plugins/vim/editor';
-import {attachCustomCommands} from './commands';
-
+import {Analyzer} from '~/services/analyzer';
+import {TargetType} from "~/services/config";
 import {
   Connect,
   formatFileDispatcher,
@@ -17,10 +18,9 @@ import {
   newSnippetLoadDispatcher,
   runFileDispatcher,
 } from '~/store';
-import {Analyzer} from '~/services/analyzer';
+import { getTimeNowUsageMarkers, wrapAsyncWithDebounce } from './utils';
+import {attachCustomCommands} from './commands';
 import {LANGUAGE_GOLANG, stateToOptions} from './props';
-import {getTimeNowUsageMarkers} from './utils';
-import {TargetType} from "~/services/config";
 
 const ANALYZE_DEBOUNCE_TIME = 500;
 
@@ -45,6 +45,10 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
   private editorInstance?: editor.IStandaloneCodeEditor;
   private vimAdapter?: VimModeKeymap;
   private vimCommandAdapter?: StatusBarAdapter;
+
+  private debouncedAnalyzeFunc = wrapAsyncWithDebounce((code: string) => (
+    this.doAnalyze(code)
+  ), ANALYZE_DEBOUNCE_TIME);
 
   editorDidMount(editorInstance: editor.IStandaloneCodeEditor, _: monaco.editor.IEditorConstructionOptions) {
     this.editorInstance = editorInstance;
@@ -129,7 +133,7 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
   componentDidUpdate(prevProps) {
     if (this.isFileOrEnvironmentChanged(prevProps)) {
       // Update editor markers on file or environment changes;
-      this.doAnalyze(this.props.code);
+      this.debouncedAnalyzeFunc(this.props.code);
     }
 
     this.applyVimModeChanges(prevProps);
@@ -142,45 +146,37 @@ export default class CodeEditor extends React.Component<any, CodeEditorState> {
 
   onChange(newValue: string, _: editor.IModelContentChangedEvent) {
     this.props.dispatch(newFileChangeAction(newValue));
-    this.doAnalyze(newValue);
+    this.debouncedAnalyzeFunc(this.props.code);
   }
 
-  private doAnalyze(code: string) {
-    if (this._previousTimeout) {
-      clearTimeout(this._previousTimeout);
-    }
+  private async doAnalyze(code: string) {
+    // Code analysis contains 2 steps that run on different conditions:
+    // 1. Run Go worker if it's available and check for errors
+    // 2. Add warnings to `time.Now` calls if code runs on server.
+    const promises = [
+      this.analyzer?.getMarkers(code) ?? null,
+      this.props.isServerEnvironment ? (
+        Promise.resolve(getTimeNowUsageMarkers(code, this.editorInstance!))
+      ) : null
+    ].filter(p => !!p);
 
-    this._previousTimeout = setTimeout(async () => {
-      this._previousTimeout = null;
+    const results = await Promise.allSettled(promises);
+    const markers = results.flatMap(r => {
+      // Can't do in beautiful way due of TS strict checks.
+      if (r.status === 'rejected') {
+        console.error(r.reason);
+        return [];
+      }
 
-      // Code analysis contains 2 steps that run on different conditions:
-      // 1. Run Go worker if it's available and check for errors
-      // 2. Add warnings to `time.Now` calls if code runs on server.
-      const promises = [
-        this.analyzer?.getMarkers(code) ?? null,
-        this.props.isServerEnvironment ? (
-          Promise.resolve(getTimeNowUsageMarkers(code, this.editorInstance!))
-        ) : null
-      ].filter(p => !!p);
+      return r.value ?? [];
+    });
 
-      const results = await Promise.allSettled(promises);
-      const markers = results.flatMap(r => {
-        // Can't do in beautiful way due of TS strict checks.
-        if (r.status === 'rejected') {
-          console.error(r.reason);
-          return [];
-        }
-
-        return r.value ?? [];
-      });
-
-      editor.setModelMarkers(
-        this.editorInstance?.getModel() as editor.ITextModel,
-        this.editorInstance?.getId() as string,
-        markers
-      );
-      this.props.dispatch(newMarkerAction(markers));
-    }, ANALYZE_DEBOUNCE_TIME);
+    editor.setModelMarkers(
+      this.editorInstance?.getModel() as editor.ITextModel,
+      this.editorInstance?.getId() as string,
+      markers
+    );
+    this.props.dispatch(newMarkerAction(markers));
   }
 
   private onKeyDown(e: IKeyboardEvent) {

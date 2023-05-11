@@ -1,7 +1,7 @@
 import * as monaco from "monaco-editor";
 import {IAPIClient} from "~/services/api";
 import snippets from "./snippets";
-import {wrapWithDebounce} from "./utils";
+import {wrapAsyncWithDebounce} from "./utils";
 
 // Import aliases
 type CompletionList = monaco.languages.CompletionList;
@@ -42,7 +42,7 @@ class GoCompletionItemProvider implements monaco.languages.CompletionItemProvide
   private getSuggestionFunc: IAPIClient['getSuggestions'];
 
   constructor(private client: IAPIClient) {
-    this.getSuggestionFunc = wrapWithDebounce(
+    this.getSuggestionFunc = wrapAsyncWithDebounce(
       query => client.getSuggestions(query),
       SUGGESTIONS_DEBOUNCE_DELAY
     );
