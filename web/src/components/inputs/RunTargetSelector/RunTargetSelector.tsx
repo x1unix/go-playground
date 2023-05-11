@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React, {useEffect, useMemo, useState} from 'react';
+import React, { useMemo } from 'react';
 import {connect} from "react-redux";
 import {Dropdown, IDropdownStyles} from '@fluentui/react';
 import {newRunTargetChangeDispatcher, State, StateDispatch} from "~/store";
