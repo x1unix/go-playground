@@ -31,7 +31,7 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: "${{ github.workspace }}/web"
       - run: |
-          yarn --cwd='${{ github.workspace }}/work' install --silent && yarn --cwd='${{ github.workspace }}/work' build
+          yarn --cwd='${{ github.workspace }}/web' install --silent && yarn --cwd='${{ github.workspace }}/web' build
         env:
           NODE_ENV: "production"
           REACT_APP_VERSION: "${{ env.RELEASE_VERSION }}"
