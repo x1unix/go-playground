@@ -70,7 +70,7 @@ const fetchWasmWithProgress = async (dispatch: DispatchFn, fileName: string) => 
     dispatch(newAddNotificationAction({
       id: WASM_APP_DOWNLOAD_NOTIFICATION,
       type: NotificationType.Info,
-      title: 'Downloading compiled application',
+      title: 'Downloading compiled program',
       canDismiss: false,
       progress: {
         indeterminate: true
