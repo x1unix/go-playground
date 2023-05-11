@@ -89,7 +89,7 @@ func (svc *BackendVersionService) getPlaygroundVersions(ctx context.Context) (*P
 			result, err := svc.fetchGoBackendVersionWithRetry(gCtx, b)
 			if err != nil {
 				return fmt.Errorf("failed to get Go version from Go playground server for backend %q: %w",
-					backend, err)
+					b, err)
 			}
 
 			// We don't afraid race condition because each backend is written to a separate address
