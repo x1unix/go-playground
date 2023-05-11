@@ -86,7 +86,7 @@ func (svc *BackendVersionService) getPlaygroundVersions(ctx context.Context) (*P
 		b := backend
 		g.Go(func() error {
 			svc.logger.Debug("Fetching go version for backend", zap.String("backend", b))
-			result, err := svc.fetchGoBackendVersionWithRetry(gCtx, backend)
+			result, err := svc.fetchGoBackendVersionWithRetry(gCtx, b)
 			if err != nil {
 				return fmt.Errorf("failed to get Go version from Go playground server for backend %q: %w",
 					backend, err)
