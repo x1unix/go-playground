@@ -44,7 +44,7 @@ var examplePackageSummary = PackageSummary{
 			Detail:          "func() Action",
 			InsertText:      "IfaceFunc()",
 			InsertTextRules: InsertAsSnippet,
-			Documentation:   NewMarkdownString("IfaceFunc is stub with unterminated code block\n```\n\t2 + 2\n\n```\n"),
+			Documentation:   NewMarkdownString("IfaceFunc is stub with unterminated code block\n\n```\n\t2 + 2\n\n```\n"),
 		},
 		{
 			Label:           "FuncReturnFuncAndIface",

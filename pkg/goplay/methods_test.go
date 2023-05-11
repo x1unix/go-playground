@@ -255,8 +255,8 @@ func TestClient_GetSnippet(t *testing.T) {
 	for n, c := range cases {
 		t.Run(n, func(t *testing.T) {
 			srv, client := getTestClientServer(func(w http.ResponseWriter, r *http.Request) {
-				wantPath := "/p/" + c.snippetID + ".go"
-				assert.Equal(t, wantPath, r.URL.Path, "expected path mismatch")
+				wantPath := "/share?id=" + c.snippetID
+				assert.Equal(t, wantPath, r.URL.RequestURI(), "expected path mismatch")
 				w.WriteHeader(c.respStatus)
 				_, _ = w.Write(c.resp)
 			})
