@@ -1,8 +1,10 @@
 package langserver
 
 import (
+	"errors"
 	"github.com/x1unix/go-playground/pkg/goplay"
 	"net/http"
+	"syscall"
 )
 
 // HandlerFunc is langserver request handler
@@ -43,6 +45,11 @@ func handleError(err error, w http.ResponseWriter) {
 
 	if httpErr, ok := err.(*HTTPError); ok {
 		httpErr.WriteResponse(w)
+		return
+	}
+
+	// Ignore broken pipe errors
+	if errors.Is(err, syscall.EPIPE) {
 		return
 	}
 
