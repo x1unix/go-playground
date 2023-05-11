@@ -3,7 +3,6 @@ import {MessageBar, MessageBarType, useTheme} from '@fluentui/react';
 
 import {getDefaultFontFamily} from '~/services/fonts';
 import {connect, StatusState} from '~/store';
-import {TargetType} from '~/services/config';
 
 import EvalEventView from './EvalEventView';
 import './Preview.css';
@@ -11,11 +10,10 @@ import './Preview.css';
 interface OwnProps {}
 
 interface StateProps {
-  targetType?: TargetType
   status?: StatusState
 }
 
-const getContent = (isServer: boolean, status?: StatusState) => {
+const getContent = (status?: StatusState) => {
   if (status?.lastError) {
     return (
       <MessageBar messageBarType={MessageBarType.error} isMultiline={true}>
@@ -33,13 +31,11 @@ const getContent = (isServer: boolean, status?: StatusState) => {
     );
   }
 
-  const content = status.events?.map(({Message, Delay, Kind}, k) => (
+  const content = status.events?.map(({Message, Kind}, k) => (
     <EvalEventView
       key={k}
       message={Message}
-      delay={Delay}
       kind={Kind}
-      showDelay={isServer}
     />
   )) ?? [];
 
@@ -54,12 +50,7 @@ const getContent = (isServer: boolean, status?: StatusState) => {
   return content;
 }
 
-const Preview: React.FC<StateProps & OwnProps> = (
-  {
-    targetType,
-    status
-  }
-) => {
+const Preview: React.FC<StateProps & OwnProps> = ({ status }) => {
   const theme = useTheme();
   const styles = useMemo(() => {
     const { palette } = theme;
@@ -70,14 +61,11 @@ const Preview: React.FC<StateProps & OwnProps> = (
     }
   }, [theme]);
 
-  // Some content should not be displayed in WASM mode (like delay, etc)
-  const isServer = targetType === TargetType.Server;
-
   return (
     <div className="app-preview" style={styles}>
       <div className='app-preview__content'>
         {
-          getContent(isServer, status)
+          getContent(status)
         }
       </div>
     </div>
@@ -85,10 +73,10 @@ const Preview: React.FC<StateProps & OwnProps> = (
 }
 
 const ConnectedPreview = connect<StateProps, OwnProps>((
-  { runTarget: { target }, status }
+  { status }
   // { settings: {darkMode}, runTarget: { target }, status }
 ) => ({
-  status, targetType: target
+  status
 }))(Preview);
 
 export default ConnectedPreview;
