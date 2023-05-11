@@ -12,7 +12,7 @@ import { clientsClaim } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
-import { StaleWhileRevalidate } from 'workbox-strategies';
+import {NetworkFirst, StaleWhileRevalidate} from 'workbox-strategies';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -79,6 +79,23 @@ registerRoute(
     plugins: [
       new ExpirationPlugin({ maxAgeSeconds: 5 * DAY_IN_SECONDS }),
     ],
+  })
+)
+
+const apiEndpointsForCaching = new Set([
+  '/api/backends/info',
+  '/api/version'
+]);
+
+// Cache available Go versions from Go playground
+registerRoute(
+  ({url}) => (
+    url.origin === self.location.origin &&
+    apiEndpointsForCaching.has(url.pathname)
+  ),
+  new NetworkFirst({
+    cacheName: 'api',
+    networkTimeoutSeconds: 15,
   })
 )
 
