@@ -19,7 +19,7 @@ func ValidateContentLength(itemLen int) error {
 // GetSnippet returns snippet from Go playground
 func (c *Client) GetSnippet(ctx context.Context, snippetID string) (*Snippet, error) {
 	fileName := snippetID + ".go"
-	resp, err := c.getRequest(ctx, "p/"+fileName)
+	resp, err := c.getRequest(ctx, "share?id="+snippetID)
 	if err != nil {
 		return nil, err
 	}
