@@ -103,6 +103,7 @@ export const formatFileDispatcher: Dispatcher =
       const { editor: {code}, runTarget: { backend } } = getState();
       const res = await client.formatCode(code, backend);
 
+      dispatch(newLoadingAction(false));
       if (res.formatted?.length) {
         dispatch(newFormatCodeAction(res.formatted));
       }
