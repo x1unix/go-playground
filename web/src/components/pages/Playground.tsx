@@ -2,7 +2,11 @@ import React, {useEffect} from 'react';
 import { useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import { dispatchPanelLayoutChange, newSnippetLoadDispatcher} from '~/store';
+import {
+  dispatchPanelLayoutChange,
+  dispatchUpdateCheck,
+  newSnippetLoadDispatcher,
+} from '~/store';
 import { Header } from '~/components/core/Header';
 import CodeEditor from '~/components/editor/CodeEditor';
 import FlexContainer from '~/components/editor/FlexContainer';
@@ -18,6 +22,10 @@ const CodeContainer = connect()(({dispatch}: any) => {
   useEffect(() => {
     dispatch(newSnippetLoadDispatcher(snippetID));
   }, [snippetID, dispatch]);
+
+  useEffect(() => {
+    dispatch(dispatchUpdateCheck)
+  }, [dispatch]);
   return (
     <CodeEditor />
   );
@@ -33,7 +41,9 @@ const Playground = connect(({panel}: any) => ({panelProps: panel}))(({panelProps
         </FlexContainer>
         <ResizablePreview
           {...panelProps}
-          onViewChange={changes => dispatch(dispatchPanelLayoutChange(changes))}
+          onViewChange={changes => {
+            dispatch(dispatchPanelLayoutChange(changes))
+          }}
         />
         <NotificationHost />
       </Layout>

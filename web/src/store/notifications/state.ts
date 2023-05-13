@@ -15,7 +15,13 @@ export interface Notification {
     indeterminate?: boolean
     total?: number
     current?: number
-  }
+  },
+  actions?: {
+    label: string,
+    key: string,
+    primary?: boolean,
+    onClick?: () => void,
+  }[]
 }
 
 export type NotificationsState = {[k: string]: Notification};
