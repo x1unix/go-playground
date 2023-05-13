@@ -6,23 +6,31 @@ PUBLIC_DIR ?= $(UI)/public
 WEBWORKER_PKG ?= ./cmd/webworker
 INTERPRETER_PKG ?= ./cmd/go-repl
 
+define build_wasm_worker
+	@echo ":: Building WebAssembly worker '$(1)' ..."
+	GOOS=js GOARCH=wasm $(GO) build -ldflags "-s -w" -trimpath \
+		$(3) -o $(PUBLIC_DIR)/$(2) $(1)
+endef
+
+define check_tool
+	@if ! command -v $(1) >/dev/null 2>&1 ; then\
+		echo "ERROR: '$(1)' binary not found. Please ensure that tool is installed or specify binary path with '$(2)' variable." && \
+		exit 1; \
+	fi;
+endef
+
+
 .PHONY: clean
 clean:
 	@echo ":: Cleanup..." && rm -rf $(TARGET) && rm -rf $(UI)/build
 
 .PHONY:check-go
 check-go:
-	@if ! command -v $(GO) >/dev/null 2>&1 ; then\
-		echo "ERROR: '$(GO)' binary not found. Please ensure that Go is installed or specify binary path with 'GO' variable." && \
-		exit 1; \
-	fi;
+	$(call check_tool,$(GO),'GO')
 
 .PHONY:check-yarn
 check-yarn:
-	@if ! command -v $(YARN) >/dev/null 2>&1 ; then\
-		echo "ERROR: '$(YARN)' binary not found. Please ensure that Node.js and Yarn are installed or specify binary path with 'YARN' variable." && \
-		exit 1; \
-	fi;
+	$(call check_tool,$(YARN),'YARN')
 
 # Build targets
 .PHONY: collect-meta
@@ -51,13 +59,11 @@ copy-wasm-exec:
 
 .PHONY:build-webworker
 build-webworker:
-	@echo ":: Building Go Webworker module..." && \
-	GOOS=js GOARCH=wasm $(GO) build -o $(PUBLIC_DIR)/worker.wasm $(WEBWORKER_PKG)
+	$(call build_wasm_worker,$(WEBWORKER_PKG),'worker.wasm')
 
 .PHONY:go-repl
 go-repl:
-	@echo ":: Building Go interpreter module..." && \
-	GOOS=js GOARCH=wasm $(GO) build -o $(PUBLIC_DIR)/go-repl.wasm $(INTERPRETER_PKG)
+	$(call build_wasm_worker,$(INTERPRETER_PKG),'go-repl.wasm')
 
 .PHONY:build-wasm
 build-wasm: copy-wasm-exec build-webworker go-repl

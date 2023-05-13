@@ -1,6 +1,9 @@
 import { ActionType} from "./actions";
-
 import { UIState } from "../state";
+
+export interface LoadingStateChanges {
+  loading: boolean
+}
 
 export const newUIStateChangeAction = (changes: Partial<UIState>) => (
   {
@@ -16,9 +19,9 @@ export const newErrorAction = (err: string) => (
   }
 );
 
-export const newLoadingAction = () => (
+export const newLoadingAction = (loading = true) => (
   {
-    type: ActionType.LOADING,
-    payload: null,
+    type: ActionType.LOADING_STATE_CHANGE,
+    payload: { loading },
   }
 );

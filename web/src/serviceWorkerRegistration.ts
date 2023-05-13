@@ -61,6 +61,33 @@ export function register(config?: Config) {
   }
 }
 
+/**
+ * Manually registers service worker
+ *
+ * @param config
+ */
+export function manualRegister(config?: Config) {
+  if (process.env.NODE_ENV !== 'production') {
+    return;
+  }
+  if (!('serviceWorker' in navigator)) {
+    return;
+  }
+
+  const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
+  if (publicUrl.origin !== window.location.origin) {
+    return;
+  }
+
+  const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
+  if (isLocalhost) {
+    checkValidServiceWorker(swUrl, config);
+    return;
+  }
+
+  registerValidSW(swUrl, config);
+}
+
 function registerValidSW(swUrl: string, config?: Config) {
   navigator.serviceWorker
     .register(swUrl)
