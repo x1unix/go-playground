@@ -1,5 +1,13 @@
 import React from "react";
-import {IconButton, ISemanticColors, ProgressIndicator, useTheme} from "@fluentui/react";
+import {
+  Stack,
+  IconButton,
+  ISemanticColors,
+  ProgressIndicator,
+  DefaultButton,
+  PrimaryButton,
+  useTheme,
+} from "@fluentui/react";
 import { FontIcon } from "@fluentui/react/lib/Icon";
 
 import "./Notification.css"
@@ -17,6 +25,13 @@ interface ProgressState {
   current?: number
 }
 
+interface NotificationAction {
+  label: string
+  key: string
+  primary?: boolean
+  onClick?: () => void
+}
+
 export interface NotificationProps {
   id: number|string
   type?: NotificationType
@@ -25,6 +40,7 @@ export interface NotificationProps {
   canDismiss?: boolean
   progress?: ProgressState
   onClose?: () => void
+  actions?: NotificationAction[]
 }
 
 const iconColorPaletteMap: {[k in NotificationType]: keyof ISemanticColors} = {
@@ -51,6 +67,19 @@ const getPercentComplete = (progress: NotificationProps['progress']): (number|un
   return percentage / 100;
 }
 
+const NotificationActionButton: React.FC<Omit<NotificationAction, 'key'>> = (
+  {label, primary, onClick}
+) => {
+  const ButtonComponent = primary ? PrimaryButton : DefaultButton;
+  return (
+    <ButtonComponent
+      primary={primary}
+      onClick={onClick}
+      text={label}
+    />
+  );
+}
+
 const Notification: React.FunctionComponent<NotificationProps> = ({
   id,
   title,
@@ -59,6 +88,7 @@ const Notification: React.FunctionComponent<NotificationProps> = ({
   canDismiss = true,
   type = NotificationType.Info,
   onClose,
+  actions
 }) => {
   const {semanticColors, fonts, ...theme} = useTheme();
   return (
@@ -120,6 +150,22 @@ const Notification: React.FunctionComponent<NotificationProps> = ({
             </div>
           )}
         </div>
+      )}
+      { actions?.length && (
+        <Stack
+          horizontal
+          className="Notification__Actions"
+          horizontalAlign="end"
+          tokens={
+            { childrenGap: 10 }
+          }
+        >
+          {
+            actions.map(({key, ...props}, i) => (
+              <NotificationActionButton key={key} {...props} />
+            ))
+          }
+        </Stack>
       )}
 
     </div>
