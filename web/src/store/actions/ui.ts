@@ -1,5 +1,4 @@
 import { ActionType} from "./actions";
-
 import { UIState } from "../state";
 
 export interface LoadingStateChanges {
