@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 
@@ -15,7 +15,9 @@ import './Playground.css';
 
 const CodeContainer = connect()(({dispatch}: any) => {
   const { snippetID } = useParams();
-  dispatch(newSnippetLoadDispatcher(snippetID));
+  useEffect(() => {
+    dispatch(newSnippetLoadDispatcher(snippetID));
+  }, [snippetID, dispatch]);
   return (
     <CodeEditor />
   );

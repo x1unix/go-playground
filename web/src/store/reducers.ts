@@ -10,7 +10,13 @@ import config, {
 
 import vimReducers from './vim/reducers';
 import notificationReducers from './notifications/reducers';
-import { Action, ActionType, FileImportArgs, MonacoParamsChanges } from './actions';
+import {
+  Action,
+  ActionType,
+  FileImportArgs,
+  LoadingStateChanges,
+  MonacoParamsChanges
+} from './actions';
 import { mapByAction } from './helpers';
 
 import {
@@ -68,10 +74,10 @@ const reducers = {
         lastError: a.payload
       }
     ),
-    [ActionType.LOADING]: (s: StatusState, _: Action) => (
+    [ActionType.LOADING_STATE_CHANGE]: (s: StatusState, { payload: { loading } }: Action<LoadingStateChanges>) => (
       {
         ...s,
-        loading: true,
+        loading,
         running: false,
       }
     ),
@@ -155,14 +161,14 @@ const reducers = {
     )
   }, config.panelLayout),
   ui: mapByAction<UIState>({
-    [ActionType.LOADING]: (s: UIState, _: Action<Partial<UIState>>) => {
+    [ActionType.LOADING_STATE_CHANGE]: (s: UIState, {payload: { loading } }: Action<LoadingStateChanges>) => {
       if (!s) {
-        return { shareCreated: false, snippetId: null };
+        return { loading, shareCreated: false, snippetId: null };
       }
 
       return {
         ...s,
-        shareCreated: false, snippetId: null
+        loading,
       };
     },
     [ActionType.UI_STATE_CHANGE]: (s: UIState, { payload }: Action<Partial<UIState>>) => {
