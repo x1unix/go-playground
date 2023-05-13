@@ -6,6 +6,13 @@ PUBLIC_DIR ?= $(UI)/public
 WEBWORKER_PKG ?= ./cmd/webworker
 INTERPRETER_PKG ?= ./cmd/go-repl
 
+define build_wasm_worker
+	@echo ":: Building WebAssembly worker '$(1)' ..."
+	GOOS=js GOARCH=wasm $(GO) build -ldflags "-s -w" -trimpath \
+		$(3) -o $(PUBLIC_DIR)/$(2) $(1)
+endef
+
+
 .PHONY: clean
 clean:
 	@echo ":: Cleanup..." && rm -rf $(TARGET) && rm -rf $(UI)/build
@@ -51,13 +58,11 @@ copy-wasm-exec:
 
 .PHONY:build-webworker
 build-webworker:
-	@echo ":: Building Go Webworker module..." && \
-	GOOS=js GOARCH=wasm $(GO) build -o $(PUBLIC_DIR)/worker.wasm $(WEBWORKER_PKG)
+	$(call build_wasm_worker,$(WEBWORKER_PKG),'worker.wasm')
 
 .PHONY:go-repl
 go-repl:
-	@echo ":: Building Go interpreter module..." && \
-	GOOS=js GOARCH=wasm $(GO) build -o $(PUBLIC_DIR)/go-repl.wasm $(INTERPRETER_PKG)
+	$(call build_wasm_worker,$(INTERPRETER_PKG),'go-repl.wasm')
 
 .PHONY:build-wasm
 build-wasm: copy-wasm-exec build-webworker go-repl
