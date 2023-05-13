@@ -12,6 +12,13 @@ define build_wasm_worker
 		$(3) -o $(PUBLIC_DIR)/$(2) $(1)
 endef
 
+define check_tool
+	@if ! command -v $(1) >/dev/null 2>&1 ; then\
+		echo "ERROR: '$(1)' binary not found. Please ensure that tool is installed or specify binary path with '$(2)' variable." && \
+		exit 1; \
+	fi;
+endef
+
 
 .PHONY: clean
 clean:
@@ -19,17 +26,11 @@ clean:
 
 .PHONY:check-go
 check-go:
-	@if ! command -v $(GO) >/dev/null 2>&1 ; then\
-		echo "ERROR: '$(GO)' binary not found. Please ensure that Go is installed or specify binary path with 'GO' variable." && \
-		exit 1; \
-	fi;
+	$(call check_tool,$(GO),'GO')
 
 .PHONY:check-yarn
 check-yarn:
-	@if ! command -v $(YARN) >/dev/null 2>&1 ; then\
-		echo "ERROR: '$(YARN)' binary not found. Please ensure that Node.js and Yarn are installed or specify binary path with 'YARN' variable." && \
-		exit 1; \
-	fi;
+	$(call check_tool,$(YARN),'YARN')
 
 # Build targets
 .PHONY: collect-meta
