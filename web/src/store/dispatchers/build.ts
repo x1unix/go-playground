@@ -86,8 +86,6 @@ const dispatchEvalEvents = (dispatch: DispatchFn, events: EvalEvent[]) => {
       });
   }
 
-  console.log(eventsWithDelay);
-
   // Try to guess program end time by checking last message delay.
   //
   // This won't work if "time.Sleep()" occurs after final message but the same
