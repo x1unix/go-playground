@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"strconv"
 	"testing"
 	"time"
 
@@ -15,24 +14,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/x1unix/go-playground/pkg/testutil"
 )
-
-func TestValidateContentLength(t *testing.T) {
-	cases := map[int]bool{
-		maxSnippetSize:      false,
-		maxSnippetSize + 10: true,
-		10:                  false,
-	}
-	for i, c := range cases {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			err := ValidateContentLength(i)
-			if !c {
-				require.NoError(t, err)
-				return
-			}
-			require.Error(t, err)
-		})
-	}
-}
 
 func TestClient_Compile(t *testing.T) {
 	cases := map[string]struct {

@@ -1,7 +1,7 @@
 import {TargetType} from '~/services/config';
 import {getWorkerInstance} from "~/services/gorepl";
 import {getImportObject, goRun} from '~/services/go';
-import {setTimeoutNanos} from "~/utils/duration";
+import {setTimeoutNanos, SECOND} from "~/utils/duration";
 import client, {
   EvalEvent,
   EvalEventKind,
@@ -29,6 +29,29 @@ import {wrapResponseWithProgress} from "~/utils/http";
 const WASM_APP_DOWNLOAD_NOTIFICATION = 'WASM_APP_DOWNLOAD_NOTIFICATION';
 const WASM_APP_EXIT_ERROR = 'WASM_APP_EXIT_ERROR';
 
+/**
+ * Go program execution timeout in nanoseconds
+ */
+const runTimeoutNs = 5 * SECOND;
+
+const lastElem = <T>(items: T[]): T|undefined => (
+  items?.slice(-1)?.[0]
+);
+
+const hasProgramTimeoutError = (events: EvalEvent[]) => {
+  if (!events.length) {
+    return false;
+  }
+
+  const { Message, Kind } = events[0];
+  if (Kind === 'stderr' && Message.trim() === 'timeout running program') {
+    const lastEvent = lastElem(events);
+    return lastEvent!.Delay >= runTimeoutNs;
+  }
+
+  return false;
+}
+
 const dispatchEvalEvents = (dispatch: DispatchFn, events: EvalEvent[]) => {
   // TODO: support cancellation
 
@@ -39,20 +62,35 @@ const dispatchEvalEvents = (dispatch: DispatchFn, events: EvalEvent[]) => {
 
   // Each eval event contains time since previous event.
   // Convert relative delay into absolute delay since program start.
-  const eventsWithDelay = events.map((event, i, arr) => (
-    i === 0 ? event : (
-      {
-        ...event,
-        Delay: arr[i - 1].Delay + event.Delay
-      }
-    )
-  ));
+  let eventsWithDelay = events
+    .reduce((accum: EvalEvent[], {Delay: delay, ...item}) => (
+      [
+        ...accum,
+        {
+          ...item,
+          Delay: (lastElem(accum)?.Delay ?? 0) + delay,
+        }
+      ]
+    ), []);
+
+  // Sometimes Go playground fails to detect execution timeout error and still sends all events.
+  // This dirty hack attempts to normalize this case.
+  if (hasProgramTimeoutError(eventsWithDelay)) {
+    eventsWithDelay = eventsWithDelay
+      .slice(1)
+      .filter(({Delay}) => Delay <= runTimeoutNs)
+      .concat({
+        Kind: EvalEventKind.Stderr,
+        Message: `Go program execution timeout exceeded (max: ${runTimeoutNs / SECOND}s)`,
+        Delay: runTimeoutNs,
+      });
+  }
 
   // Try to guess program end time by checking last message delay.
   //
   // This won't work if "time.Sleep()" occurs after final message but the same
   // approach used in official playground, so should be enough for us.
-  const programEndTime = eventsWithDelay?.slice(-1)?.[0]?.Delay ?? 0;
+  let programEndTime = lastElem(eventsWithDelay)?.Delay ?? 0;
 
   dispatch(newProgramStartAction());
   eventsWithDelay.forEach(event => {

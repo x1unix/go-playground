@@ -8,14 +8,6 @@ import (
 	"net/url"
 )
 
-// ValidateContentLength validates snippet size
-func ValidateContentLength(itemLen int) error {
-	if itemLen > maxSnippetSize {
-		return ErrSnippetTooLarge
-	}
-	return nil
-}
-
 // GetSnippet returns snippet from Go playground
 func (c *Client) GetSnippet(ctx context.Context, snippetID string) (*Snippet, error) {
 	fileName := snippetID + ".go"

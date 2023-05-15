@@ -1,6 +1,7 @@
 package langserver
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -70,13 +71,13 @@ func (s *Service) Mount(r *mux.Router) {
 	r.Path("/suggest").
 		HandlerFunc(WrapHandler(s.HandleGetSuggestion))
 	r.Path("/run").Methods(http.MethodPost).
-		HandlerFunc(WrapHandler(s.HandleRunCode, ValidateContentLength))
+		HandlerFunc(WrapHandler(s.HandleRunCode))
 	r.Path("/compile").Methods(http.MethodPost).
-		HandlerFunc(WrapHandler(s.HandleCompile, ValidateContentLength))
+		HandlerFunc(WrapHandler(s.HandleCompile))
 	r.Path("/format").Methods(http.MethodPost).
-		HandlerFunc(WrapHandler(s.HandleFormatCode, ValidateContentLength))
+		HandlerFunc(WrapHandler(s.HandleFormatCode))
 	r.Path("/share").Methods(http.MethodPost).
-		HandlerFunc(WrapHandler(s.HandleShare, ValidateContentLength))
+		HandlerFunc(WrapHandler(s.HandleShare))
 	r.Path("/snippet/{id}").Methods(http.MethodGet).
 		HandlerFunc(WrapHandler(s.HandleGetSnippet))
 	r.Path("/backends/info").Methods(http.MethodGet).
@@ -159,7 +160,7 @@ func (s *Service) HandleGetSuggestion(w http.ResponseWriter, r *http.Request) er
 
 // HandleFormatCode handles goimports action
 func (s *Service) HandleFormatCode(w http.ResponseWriter, r *http.Request) error {
-	src, err := getPayloadFromRequest(r)
+	src, err := s.getPayloadFromRequest(r)
 	if err != nil {
 		return err
 	}
@@ -186,8 +187,8 @@ func (s *Service) HandleShare(w http.ResponseWriter, r *http.Request) error {
 	shareID, err := s.client.Share(r.Context(), r.Body)
 	defer r.Body.Close()
 	if err != nil {
-		if errors.Is(err, goplay.ErrSnippetTooLarge) {
-			return NewHTTPError(http.StatusRequestEntityTooLarge, err)
+		if isContentLengthError(err) {
+			return ErrSnippetTooLarge
 		}
 
 		s.log.Error("failed to share code: ", err)
@@ -225,7 +226,7 @@ func (s *Service) HandleGetSnippet(w http.ResponseWriter, r *http.Request) error
 // HandleRunCode handles code run
 func (s *Service) HandleRunCode(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
-	src, err := getPayloadFromRequest(r)
+	src, err := s.getPayloadFromRequest(r)
 	if err != nil {
 		return err
 	}
@@ -304,9 +305,8 @@ func (s *Service) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) 
 	w.Header().Set("Content-Length", contentLength)
 	w.Header().Set(rawContentLengthHeader, contentLength)
 
-	n, err := io.Copy(w, data)
 	defer data.Close()
-	if err != nil {
+	if _, err := io.Copy(w, data); err != nil {
 		s.log.Errorw("failed to send artifact",
 			"artifactID", artifactId,
 			"err", err,
@@ -314,7 +314,6 @@ func (s *Service) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) 
 		return err
 	}
 
-	w.Header().Set("Content-Length", strconv.FormatInt(n, 10))
 	return nil
 }
 
@@ -329,7 +328,7 @@ func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) error {
 		return NewHTTPError(http.StatusTooManyRequests, err)
 	}
 
-	src, err := getPayloadFromRequest(r)
+	src, err := s.getPayloadFromRequest(r)
 	if err != nil {
 		return err
 	}
@@ -391,8 +390,8 @@ func backendFromRequest(r *http.Request) (goplay.Backend, error) {
 func (s *Service) goImportsCode(ctx context.Context, src []byte, backend goplay.Backend) ([]byte, bool, error) {
 	resp, err := s.client.GoImports(ctx, src, backend)
 	if err != nil {
-		if errors.Is(err, goplay.ErrSnippetTooLarge) {
-			return nil, false, NewHTTPError(http.StatusRequestEntityTooLarge, err)
+		if isContentLengthError(err) {
+			return nil, false, ErrSnippetTooLarge
 		}
 
 		s.log.Error(err)
@@ -405,4 +404,32 @@ func (s *Service) goImportsCode(ctx context.Context, src []byte, backend goplay.
 
 	changed := resp.Body != string(src)
 	return []byte(resp.Body), changed, nil
+}
+
+func (s *Service) getPayloadFromRequest(r *http.Request) ([]byte, error) {
+	// see: https://github.com/golang/playground/blob/master/share.go#L69
+	var buff bytes.Buffer
+	buff.Grow(goplay.MaxSnippetSize)
+
+	defer r.Body.Close()
+	_, err := io.Copy(&buff, io.LimitReader(r.Body, goplay.MaxSnippetSize+1))
+	if err != nil {
+		return nil, Errorf(http.StatusBadGateway, "failed to read request: %w", err)
+	}
+
+	if buff.Len() > goplay.MaxSnippetSize {
+		return nil, ErrSnippetTooLarge
+	}
+
+	return buff.Bytes(), nil
+}
+
+func isContentLengthError(err error) bool {
+	if httpErr, ok := goplay.IsHTTPError(err); ok {
+		if httpErr.StatusCode == http.StatusRequestEntityTooLarge {
+			return true
+		}
+	}
+
+	return false
 }
