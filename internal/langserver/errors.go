@@ -3,6 +3,15 @@ package langserver
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/x1unix/go-playground/pkg/goplay"
+)
+
+// ErrSnippetTooLarge is snippet max size limit error
+var ErrSnippetTooLarge = Errorf(
+	http.StatusRequestEntityTooLarge,
+	"code snippet too large (max %d bytes)",
+	goplay.MaxSnippetSize,
 )
 
 // HTTPError is HTTP response error
