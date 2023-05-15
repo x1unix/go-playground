@@ -3,7 +3,6 @@ package langserver
 import (
 	"encoding/json"
 	"go.uber.org/zap"
-	"io"
 	"net/http"
 	"strconv"
 )
@@ -59,14 +58,4 @@ func shouldFormatCode(r *http.Request) (bool, error) {
 	}
 
 	return boolVal, nil
-}
-
-func getPayloadFromRequest(r *http.Request) ([]byte, error) {
-	src, err := io.ReadAll(r.Body)
-	if err != nil {
-		return nil, Errorf(http.StatusBadGateway, "failed to read request: %s", err)
-	}
-
-	r.Body.Close()
-	return src, nil
 }

@@ -2,7 +2,6 @@ package langserver
 
 import (
 	"errors"
-	"github.com/x1unix/go-playground/pkg/goplay"
 	"net/http"
 	"syscall"
 )
@@ -27,15 +26,6 @@ func WrapHandler(h HandlerFunc, guards ...GuardFn) http.HandlerFunc {
 
 		handleError(h(w, r), w)
 	}
-}
-
-// ValidateContentLength validates Go code snippet size
-func ValidateContentLength(r *http.Request) error {
-	if err := goplay.ValidateContentLength(int(r.ContentLength)); err != nil {
-		return NewHTTPError(http.StatusRequestEntityTooLarge, err)
-	}
-
-	return nil
 }
 
 func handleError(err error, w http.ResponseWriter) {

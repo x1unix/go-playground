@@ -17,13 +17,10 @@ const (
 	DefaultUserAgent     = "goplay.tools/1.0 (http://goplay.tools/)"
 	DefaultPlaygroundURL = "https://go.dev/_"
 
-	// maxSnippetSize value taken from
+	// MaxSnippetSize value taken from
 	// https://github.com/golang/playground/blob/master/app/goplay/share.go
-	maxSnippetSize = 64 * 1024
+	MaxSnippetSize = 64 * 1024
 )
-
-// ErrSnippetTooLarge is snippet max size limit error
-var ErrSnippetTooLarge = fmt.Errorf("code snippet too large (max %d bytes)", maxSnippetSize)
 
 // Client is Go Playground API client
 type Client struct {
@@ -89,12 +86,9 @@ func (c *Client) doRequest(ctx context.Context, method, url, contentType string,
 		return nil, NewHTTPError(response)
 	}
 
-	bodyBytes := &bytes.Buffer{}
-	_, err = io.Copy(bodyBytes, io.LimitReader(response.Body, maxSnippetSize+1))
+	bodyBytes := bytes.Buffer{}
+	_, err = io.Copy(&bodyBytes, response.Body)
 	if err != nil {
-		return nil, err
-	}
-	if err = ValidateContentLength(bodyBytes.Len()); err != nil {
 		return nil, err
 	}
 
