@@ -4,6 +4,11 @@
 export const MSEC_IN_NANOSEC = 1000000;
 
 /**
+ * Number of nanoseconds in a second.
+ */
+export const SECOND = 1000 * MSEC_IN_NANOSEC;
+
+/**
  * Converts nanoseconds to milliseconds
  * @param ns Delay in anoseconds
  * @param round Round to integer
