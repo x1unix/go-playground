@@ -1,0 +1,3 @@
+.ChangeLog .ChangeLog__issue-url:after {
+  content: " - ";
+}

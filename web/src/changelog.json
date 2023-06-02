@@ -1,40 +1,16 @@
 {
   "Interface - General": [
     {
-      "issueId": 213,
-      "url": "/issues/213",
-      "description": "Improve Go versions selection"
+      "issueId": 251,
+      "url": "/pull/251",
+      "description": "Redesign command bar to reduce number of items."
     }
   ],
-  "Interface - IDE": [
+  "Interface - Hotfixes": [
     {
-      "issueId": 210,
-      "url": "/issues/210",
-      "description": "Properly display delayed messages from Go programs executed on server"
-    },
-    {
-      "issueId": 215,
-      "url": "/pull/215",
-      "description": "Properly handle WebAssembly programs lifecycle"
-    },
-    {
-      "issueId": 218,
-      "url": "/issues/218",
-      "description": "Add debouncing for code completion API calls"
-    }
-  ],
-  "Go - Runtime": [
-    {
-      "issueId": 211,
-      "url": "/pull/211",
-      "description": "Add embedded Go interpreter based on Yaegi"
-    }
-  ],
-  "Go - WebAssembly": [
-    {
-      "issueId": 211,
-      "url": "/pull/211",
-      "description": "Bump Go version to 1.19"
+      "issueId": 250,
+      "url": "/pull/250",
+      "description": "Remove broken web worker update mechanism."
     }
   ]
 }
