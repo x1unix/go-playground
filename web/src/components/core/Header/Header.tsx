@@ -4,13 +4,11 @@ import {
   ICommandBarItemProps, Stack,
 } from '@fluentui/react';
 
-import environment from "~/environment";
-import apiClient, {VersionsInfo} from "~/services/api";
-import {newAddNotificationAction, NotificationType} from "~/store/notifications";
+import apiClient, { VersionsInfo } from "~/services/api";
+import { newAddNotificationAction, NotificationType } from "~/store/notifications";
 import SettingsModal, { SettingsChanges } from '~/components/settings/SettingsModal';
 import ThemeableComponent from '~/components/utils/ThemeableComponent';
 import AboutModal from '~/components/modals/AboutModal';
-import ChangeLogModal from '~/components/modals/ChangeLogModal';
 import RunTargetSelector from '~/components/inputs/RunTargetSelector';
 import SharePopup from '~/components/utils/SharePopup';
 import {
@@ -39,7 +37,6 @@ const BTN_SHARE_CLASSNAME = 'Header__btn--share';
 interface HeaderState {
   showSettings?: boolean
   showAbout?: boolean
-  showChangelog?: boolean
   loading?: boolean
   showShareMessage?: boolean
   goVersions?: VersionsInfo
@@ -75,7 +72,6 @@ export class Header extends ThemeableComponent<any, HeaderState> {
     this.state = {
       showSettings: false,
       showAbout: false,
-      showChangelog: false,
       loading: false,
       showShareMessage: false
     };
@@ -176,6 +172,15 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         onClick: () => {
           this.setState({ showSettings: true });
         }
+      },
+      {
+        key: 'about',
+        text: 'About',
+        ariaLabel: 'About',
+        iconProps: { iconName: 'Info' },
+        onClick: () => {
+          this.setState({ showAbout: true });
+        }
       }
     ];
   }
@@ -227,45 +232,6 @@ export class Header extends ThemeableComponent<any, HeaderState> {
     ];
   }
 
-  get overflowItems(): ICommandBarItemProps[] {
-    return [
-      {
-        key: 'new-issue',
-        text: 'Submit Issue',
-        ariaLabel: 'Submit Issue',
-        iconProps: { iconName: 'Bug' },
-        onClick: () => window.open(environment.urls.issue, '_blank')
-      },
-      {
-        key: 'donate',
-        text: 'Donate',
-        ariaLabel: 'Donate',
-        iconProps: { iconName: 'Heart' },
-        onClick: () => window.open(environment.urls.donate, '_blank')
-      },
-      {
-        key: 'changelog',
-        text: 'What\'s new',
-        ariaLabel: 'Changelog',
-        iconOnly: true,
-        disabled: this.isDisabled,
-        iconProps: { iconName: 'Giftbox' },
-        onClick: () => {
-          this.setState({ showChangelog: true });
-        }
-      },
-      {
-        key: 'about',
-        text: 'About',
-        ariaLabel: 'About',
-        iconProps: { iconName: 'Info' },
-        onClick: () => {
-          this.setState({ showAbout: true });
-        }
-      }
-    ]
-  }
-
   private onSettingsClose(changes: SettingsChanges) {
     if (changes.monaco) {
       // Update monaco state if some of its settings were changed
@@ -285,7 +251,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
     return (
       <header
         className='header'
-        style={{backgroundColor: this.theme.palette.white}}
+        style={{ backgroundColor: this.theme.palette.white }}
       >
         <img
           src='/go-logo-blue.svg'
@@ -295,8 +261,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         <CommandBar
           className='header__commandBar'
           items={this.menuItems}
-          farItems={this.asideItems.filter(({hidden}) => !hidden)}
-          overflowItems={this.overflowItems}
+          farItems={this.asideItems.filter(({ hidden }) => !hidden)}
           ariaLabel='CodeEditor menu'
         />
         <SharePopup
@@ -312,10 +277,6 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         <AboutModal
           onClose={() => this.setState({ showAbout: false })}
           isOpen={this.state.showAbout}
-        />
-        <ChangeLogModal
-          onClose={() => this.setState({ showChangelog: false })}
-          isOpen={this.state.showChangelog}
         />
       </header>
     );
