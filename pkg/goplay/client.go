@@ -38,6 +38,7 @@ func NewClient(baseUrl, userAgent string, timeout time.Duration) *Client {
 		client: http.Client{
 			Timeout: timeout,
 			Transport: &http.Transport{
+				Proxy:               http.ProxyFromEnvironment,
 				DialContext:         dialer.DialContext,
 				TLSHandshakeTimeout: timeout,
 			},
