@@ -42,7 +42,7 @@ jobs:
         run: yarn lint
         working-directory: ./web
       - name: Setup Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: "^1.18.0"
       - name: golangci-lint
