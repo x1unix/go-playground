@@ -59,11 +59,11 @@ copy-wasm-exec:
 
 .PHONY:build-webworker
 build-webworker:
-	$(call build_wasm_worker,$(WEBWORKER_PKG),'worker.wasm')
+	$(call build_wasm_worker,$(WEBWORKER_PKG),worker.wasm)
 
 .PHONY:go-repl
 go-repl:
-	$(call build_wasm_worker,$(INTERPRETER_PKG),'go-repl.wasm')
+	$(call build_wasm_worker,$(INTERPRETER_PKG),go-repl.wasm)
 
 .PHONY:build-wasm
 build-wasm: copy-wasm-exec build-webworker go-repl
