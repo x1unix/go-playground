@@ -35,7 +35,7 @@ See [wiki](https://github.com/x1unix/go-playground/wiki/Docker) for usage info.
 
 ### Building from source
 
-Service can be built from source (**Go 1.17+** and **Node.js** required):
+Service can be built from source (**Go 1.21+** and **Node.js** required):
 
 ```bash
 git clone https://github.com/x1unix/go-playground.git

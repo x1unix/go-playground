@@ -6,6 +6,8 @@ PUBLIC_DIR ?= $(UI)/public
 WEBWORKER_PKG ?= ./cmd/webworker
 INTERPRETER_PKG ?= ./cmd/go-repl
 
+MIN_GO_VERSION ?= 1.21
+
 define build_wasm_worker
 	@echo ":: Building WebAssembly worker '$(1)' ..."
 	GOOS=js GOARCH=wasm $(GO) build -ldflags "-s -w" -trimpath \
@@ -27,6 +29,10 @@ clean:
 .PHONY:check-go
 check-go:
 	$(call check_tool,$(GO),'GO')
+	@if [ "$$(printf '%s\n' "$$($(GO) version)" $(MIN_GO_VERSION) | sort -V | head -n1)" != "1.21" ]; then \
+		echo "Error: Go version should be $(MIN_GO_VERSION) or above"; \
+		exit 1; \
+	fi
 
 .PHONY:check-yarn
 check-yarn:
