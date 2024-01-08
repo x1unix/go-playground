@@ -1,6 +1,6 @@
 GO ?= go
 YARN ?= yarn
-GOROOT ?= $(shell go env GOROOT)
+GOROOT ?= $(shell $(GO) env GOROOT)
 TOOLS ?= ./tools
 PUBLIC_DIR ?= $(UI)/public
 WEBWORKER_PKG ?= ./cmd/webworker

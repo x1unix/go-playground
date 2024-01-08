@@ -1,4 +1,4 @@
-FROM node:17-alpine as ui-build
+FROM node:20-alpine as ui-build
 COPY web /tmp/web
 WORKDIR /tmp/web
 ARG APP_VERSION=1.0.0
@@ -11,7 +11,7 @@ RUN yarn install --silent && \
     REACT_APP_PREV_GO_VERSION=$PREV_GO_VERSION \
     yarn build
 
-FROM golang:1.19-alpine as build
+FROM golang:1.21-alpine as build
 WORKDIR /tmp/playground
 COPY cmd ./cmd
 COPY pkg ./pkg
@@ -25,7 +25,7 @@ RUN echo "Building server with version $APP_VERSION" && \
     GOOS=js GOARCH=wasm go build -ldflags "-s -w" -trimpath -o ./worker.wasm ./cmd/webworker && \
     cp $(go env GOROOT)/misc/wasm/wasm_exec.js .
 
-FROM golang:1.19-alpine as production
+FROM golang:1.21-alpine as production
 WORKDIR /opt/playground
 ENV GOROOT /usr/local/go
 ENV APP_CLEAN_INTERVAL=10m
