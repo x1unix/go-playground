@@ -1,16 +1,9 @@
 {
-  "Interface - General": [
+  "Go - WebAssembly": [
     {
-      "issueId": 251,
-      "url": "/pull/251",
-      "description": "Redesign command bar to reduce number of items."
-    }
-  ],
-  "Interface - Hotfixes": [
-    {
-      "issueId": 250,
-      "url": "/pull/250",
-      "description": "Remove broken web worker update mechanism."
+      "issueId": 290,
+      "url": "/issues/290",
+      "description": "Update Go WebAssembly compiler to 1.21"
     }
   ]
 }
