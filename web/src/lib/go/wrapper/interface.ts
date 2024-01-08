@@ -13,13 +13,32 @@ type ImportFunction = (sp: number) => any;
 type FuncWrapper = () => PendingEvent['result'];
 
 export interface ImportObject {
-  go: {[k: string]: ImportFunction}
+  /**
+   * Legacy Go import namespace. Used in Go 1.20.x and below.
+   *
+   * @deprecated
+   * **WARNING:** Since Go 1.21.x this attribute was replaced by `gojs` namespace.
+   * @
+   */
+  go: { [k: string]: ImportFunction }
+
+  /**
+   * Go import namespace since Go 1.21.x.
+   */
+  gojs: { [k: string]: ImportFunction }
+
+  /**
+   * The go.test namespace. Used by `testing` package.
+   *
+   * Introduced in Go 1.21.x.
+   */
+  _gotest: { [k: string]: ImportFunction }
 }
 
 export interface GoInstance {
   mem: DataView;
   argv: string[];
-  env: {[k: string]: string};
+  env: { [k: string]: string };
   importObject: ImportObject;
 
   /**

@@ -80,7 +80,7 @@ export class StackReader {
   }
 
   /**
-   * Skip first reserved 8 bytes of stack.
+   * Skip first reserved 8 bytes (BP) of stack.
    * @returns {number}
    */
   skipHeader() {
@@ -96,7 +96,7 @@ export class StackReader {
    * @param typeSpec Value type
    * @param count number of times to repeat
    */
-  nextN<T=any>(typeSpec: AbstractTypeSpec, count: number): T[] {
+  nextN<T = any>(typeSpec: AbstractTypeSpec, count: number): T[] {
     const results: any[] = [];
     for (let i = 0; i < count; i++) {
       results.push(this.next(typeSpec));
@@ -111,7 +111,7 @@ export class StackReader {
    * @param typeSpec Value type
    * @returns {*}
    */
-  next<T=any>(typeSpec: AbstractTypeSpec): T {
+  next<T = any>(typeSpec: AbstractTypeSpec): T {
     if (!typeSpec) {
       throw new ReferenceError('StackReader.pop: missing type reader');
     }
@@ -136,7 +136,7 @@ export class StackReader {
    * Reads next `syscall/js.ref` argument and returns
    * JS value referenced by it.
    */
-  nextRef<T=any>(): T {
+  nextRef<T = any>(): T {
     const ref = this.next<Ref>(RefType);
     return ref.toValue(this._values) as T;
   }
@@ -145,7 +145,7 @@ export class StackReader {
    * Reads next `[]syscall/js.ref` slice and
    * returns array of JS values.
    */
-  nextRefSlice<T=any>(): T[] {
+  nextRefSlice<T = any>(): T[] {
     const refsSlice = this.next<Ref[]>(RefSlice);
     return refsSlice.map(ref => ref.toValue(this._values)) as T[];
   }
