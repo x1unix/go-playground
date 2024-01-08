@@ -1,6 +1,4 @@
 package uihost
 
-//go:generate go run ../../../tools/gowasm-gen-import $GOFILE
-
-//gowasm:import
+//go:wasmimport gojs github.com/x1unix/go-playground/internal/gowasm/packagedb.onPackageManagerEvent
 func onPackageManagerEvent(e packageManagerEvent)

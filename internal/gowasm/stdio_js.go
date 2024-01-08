@@ -1,6 +1,4 @@
 package gowasm
 
-//go:generate go run ../../tools/gowasm-gen-import $GOFILE
-
-//gowasm:import
+//go:wasmimport gojs github.com/x1unix/go-playground/internal/gowasm.wasmConsoleWrite
 func wasmConsoleWrite(fd int, data []byte)

@@ -1,6 +1,6 @@
-import {WasmExport, Package, PackageBinding} from '~/lib/gowasm/binder';
-import {GoWrapper, js, StackReader} from '~/lib/go';
-import {Errno, SyscallError} from '~/lib/go/pkg/syscall';
+import { WasmExport, Package, PackageBinding } from '~/lib/gowasm/binder';
+import { GoWrapper, js, StackReader } from '~/lib/go';
+import { Errno, SyscallError } from '~/lib/go/pkg/syscall';
 
 // list of syscall errors which should not be logged.
 const suppressedErrors = new Set([
@@ -39,7 +39,7 @@ export default class SyscallHelper extends PackageBinding {
     }
 
     if (this.debug) {
-      console.log('SyscallHelper: sendCallbackResult', { callbackId, result});
+      console.log('SyscallHelper: sendCallbackResult', { callbackId, result });
     }
 
     this.go.callFunc(this.callbackFunc, [callbackId, result]);
