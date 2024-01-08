@@ -15,7 +15,7 @@ import {
  * @param go Go instance
  * @returns
  */
-export const getImportObject = (go: GoInstance) => (
+export const getImportNamespace = (go: GoInstance) => (
   // Since Go 1.21, exported functions are stored in 'gojs' object.
   go.importObject.gojs ?? go.importObject.go
 );
@@ -101,7 +101,7 @@ export class GoWrapper {
     return this.go.mem;
   }
 
-  private get importObject(): ImportObject {
+  get importObject(): ImportObject {
     return this.go.importObject;
   }
 
@@ -155,7 +155,7 @@ export class GoWrapper {
       this.valueCall(sp, reader);
     });
 
-    const wasmExitFunc = getImportObject(this.go)['runtime.wasmExit'];
+    const wasmExitFunc = getImportNamespace(this.go)['runtime.wasmExit'];
     this.exportFunction('runtime.wasmExit', (sp, reader) => {
       reader.skipHeader();
       const code = reader.next<number>(Int32);
@@ -289,7 +289,7 @@ export class GoWrapper {
    * @param func handler
    */
   exportFunction(name: string, func: CallImportHandler) {
-    const importObject = getImportObject(this.go);
+    const importObject = getImportNamespace(this.go);
     importObject[name] = this._wrapExportHandler(name, func);
   }
 
