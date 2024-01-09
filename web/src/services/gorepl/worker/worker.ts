@@ -13,6 +13,7 @@ import { BrowserFSBinding } from "~/lib/gowasm/bindings/browserfs";
 import { PackageDBBinding } from "~/lib/gowasm/bindings/packagedb";
 import { Worker, WorkerBinding } from "~/lib/gowasm/bindings/worker";
 
+import { getWasmUrl } from "~/services/api/utils";
 import { wrapResponseWithProgress } from "~/utils/http";
 import { FileSystemWrapper } from "~/services/go/fs";
 import ProcessStub from "~/services/go/process";
@@ -34,7 +35,7 @@ import { StdioWrapper } from "./console";
 /**
  * Go WASM executable URL
  */
-const GO_WASM_URL = process.env.REACT_APP_GO_WASM_URL ?? '/go-repl.wasm';
+const wasmWorkerUrl = getWasmUrl('go-repl');
 
 export interface GoReplWorker extends Worker {
   runProgram(strSize: number, data: Uint8Array)
@@ -147,7 +148,7 @@ export const startGoWorker = (globalScope: any, rpcClient: Client, cfg: WorkerCo
       });
     };
 
-    instantiateStreaming(fetchWithProgress(rpcClient, GO_WASM_URL), go.importObject)
+    instantiateStreaming(fetchWithProgress(rpcClient, wasmWorkerUrl), go.importObject)
       .then(({ instance }) => {
         rpcClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
           eventType: GoWorkerBootEventType.Starting,
