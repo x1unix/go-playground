@@ -16,7 +16,9 @@ on:
     types: manual-deploy
 
 env:
-  GO_VERSION: 1.21.1
+  GO_VERSION: 1.21
+  NODE_VERSION: lts/iron
+  WASM_API_VER: v2
   PREV_GO_VERSION: 1.19
 
 jobs:
@@ -71,7 +73,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "lts/iron"
+          node-version: "${{env.NODE_VERSION}}"
 
       - run: |
           yarn install --silent && yarn build
@@ -82,6 +84,7 @@ jobs:
           REACT_APP_GITHUB_URL: "${{ github.server_url }}/${{ github.repository }}"
           REACT_APP_GO_VERSION: "${{ env.GO_VERSION }}"
           REACT_APP_PREV_GO_VERSION: "${{ env.PREV_GO_VERSION }}"
+          REACT_APP_WASM_API_VER: "${{ env.WASM_API_VER }}"
 
       - name: Build and push image
         uses: docker/build-push-action@v5
@@ -92,6 +95,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
+            GO_VERSION=${{ env.GO_VERSION }}
+            WASM_API_VER=${{ env.WASM_API_VER }}
             APP_VERSION=${{ env.RELEASE_VERSION }}
           push: true
 

@@ -1,8 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import * as monaco from 'monaco-editor';
 
-const WORKER_PATH = '/worker.js';
-
 enum MessageType {
   Exit = 'EXIT',
   Analyze = 'ANALYZE'
@@ -37,7 +35,7 @@ export class Analyzer {
   private subscriptions = new Map<string, PromiseSubscription<any>>();
 
   constructor() {
-    this.worker = new Worker(WORKER_PATH);
+    this.worker = new Worker(new URL('../workers/analyzer.worker.ts', import.meta.url));
     this.worker.onmessage = (m) => this.onMessage(m);
   }
 

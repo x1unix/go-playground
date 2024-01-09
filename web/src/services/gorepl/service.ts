@@ -86,7 +86,7 @@ export const getWorkerInstance = async (dispatcher: DispatchFn, stateProvider: S
     }
   }));
 
-  const worker = new Worker(new URL('../../workers/go.worker.ts', import.meta.url));
+  const worker = new Worker(new URL('../../workers/repl.worker.ts', import.meta.url));
   const client = new Client(worker);
 
   const state = stateProvider();

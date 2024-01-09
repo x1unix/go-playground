@@ -3,15 +3,14 @@ YARN ?= yarn
 GOROOT ?= $(shell $(GO) env GOROOT)
 TOOLS ?= ./tools
 PUBLIC_DIR ?= $(UI)/public
-WEBWORKER_PKG ?= ./cmd/webworker
-INTERPRETER_PKG ?= ./cmd/go-repl
 
 MIN_GO_VERSION ?= 1.21
+WASM_API_VER ?= $(shell cat ./cmd/wasm/api-version.txt)
 
 define build_wasm_worker
 	@echo ":: Building WebAssembly worker '$(1)' ..."
-	GOOS=js GOARCH=wasm $(GO) build -ldflags "-s -w" -trimpath \
-		$(3) -o $(PUBLIC_DIR)/$(2) $(1)
+	GOOS=js GOARCH=wasm $(GO) build -buildvcs=false -ldflags "-s -w" -trimpath \
+		$(2) -o $(PUBLIC_DIR)/$(1)@$(WASM_API_VER).wasm ./cmd/wasm/$(1)
 endef
 
 define check_tool
@@ -20,7 +19,6 @@ define check_tool
 		exit 1; \
 	fi;
 endef
-
 
 .PHONY: clean
 clean:
@@ -59,23 +57,23 @@ build-ui:
 	@echo ":: Building UI..." && \
 	$(YARN) --cwd="$(UI)" build
 
-.PHONY:copy-wasm-exec
-copy-wasm-exec:
+.PHONY: wasm_exec.js
+wasm_exec.js:
 	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(PUBLIC_DIR)
 
 .PHONY:build-webworker
-build-webworker:
-	$(call build_wasm_worker,$(WEBWORKER_PKG),worker.wasm)
+analyzer.wasm:
+	$(call build_wasm_worker,analyzer)
 
-.PHONY:go-repl
-go-repl:
-	$(call build_wasm_worker,$(INTERPRETER_PKG),go-repl.wasm)
+.PHONY:go-repl.wasm
+go-repl.wasm:
+	$(call build_wasm_worker,go-repl)
 
-.PHONY:build-wasm
-build-wasm: copy-wasm-exec build-webworker go-repl
+.PHONY:wasm
+wasm: wasm_exec.js analyzer.wasm go-repl.wasm
 
 .PHONY: build
-build: check-go check-yarn clean preinstall collect-meta build-server build-wasm build-ui
+build: check-go check-yarn clean preinstall gen collect-meta build-server wasm build-ui
 	@echo ":: Copying assets..." && \
 	cp -rfv ./data $(TARGET)/data && \
 	mv -v $(UI)/build $(TARGET)/public && \

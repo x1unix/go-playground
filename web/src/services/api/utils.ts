@@ -1,9 +1,11 @@
+const {
+  REACT_APP_WASM_API_VER: wasmApiVersion = 'v1',
+  REACT_APP_WASM_BASE_URL: wasmBaseUrl = '',
+} = process.env;
 
-export const instantiateStreaming = async (resp, importObject) => {
-  if ('instantiateStreaming' in WebAssembly) {
-    return await WebAssembly.instantiateStreaming(resp, importObject);
-  }
-
-  const source = await (await resp).arrayBuffer();
-  return await WebAssembly.instantiate(source, importObject);
-};
+/**
+ * Formats and returns the URL for the WASM binary.
+ *
+ * @param name
+ */
+export const getWasmUrl = name => `${wasmBaseUrl}/${name}@${wasmApiVersion}.wasm`;
