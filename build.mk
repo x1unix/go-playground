@@ -83,4 +83,4 @@ build: check-go check-yarn clean preinstall collect-meta build-server build-wasm
 
 .PHONY:gen
 gen:
-	@find . -name '*_js.go' -print0 | xargs -0 -n1 go generate
+	@find . -name '*_gen.go' -exec go generate -v {} \;
