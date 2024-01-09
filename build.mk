@@ -10,7 +10,7 @@ WASM_API_VER ?= $(shell cat ./cmd/wasm/api-version.txt)
 define build_wasm_worker
 	@echo ":: Building WebAssembly worker '$(1)' ..."
 	GOOS=js GOARCH=wasm $(GO) build -buildvcs=false -ldflags "-s -w" -trimpath \
-		$(2) -o $(PUBLIC_DIR)/$(1)@$(WASM_API_VER).wasm ./cmd/wasm/$(1)
+		$(2) -o $(PUBLIC_DIR)/wasm/$(1)@$(WASM_API_VER).wasm ./cmd/wasm/$(1)
 endef
 
 define check_tool
@@ -59,7 +59,7 @@ build-ui:
 
 .PHONY: wasm_exec.js
 wasm_exec.js:
-	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(PUBLIC_DIR)
+	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(PUBLIC_DIR)/wasm/wasm_exec@$(WASM_API_VER).js
 
 .PHONY:build-webworker
 analyzer.wasm:

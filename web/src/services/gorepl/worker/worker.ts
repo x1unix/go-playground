@@ -13,7 +13,7 @@ import { BrowserFSBinding } from "~/lib/gowasm/bindings/browserfs";
 import { PackageDBBinding } from "~/lib/gowasm/bindings/packagedb";
 import { Worker, WorkerBinding } from "~/lib/gowasm/bindings/worker";
 
-import { getWasmUrl } from "~/services/api/utils";
+import { getWasmUrl } from "~/services/api/resources";
 import { wrapResponseWithProgress } from "~/utils/http";
 import { FileSystemWrapper } from "~/services/go/fs";
 import ProcessStub from "~/services/go/process";

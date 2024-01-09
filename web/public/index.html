@@ -123,7 +123,7 @@
       </div>
     </div>
   </div>
-  <script src="/wasm_exec.js"></script>
+  <script src="%REACT_APP_WASM_BASE_URL%/wasm_exec@%REACT_APP_WASM_API_VER%.js"></script>
   <% if (process.env.NODE_ENV === 'production') { %>
   {{ if .GoogleTagID }}
   <script async src="https://www.googletagmanager.com/gtag/js?id={{.GoogleTagID}}"></script>

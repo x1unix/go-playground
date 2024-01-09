@@ -21,6 +21,7 @@ RUN yarn install --silent && \
     REACT_APP_GO_VERSION=$GO_VERSION \
     REACT_APP_PREV_GO_VERSION=$PREV_GO_VERSION \
     REACT_APP_WASM_API_VER=$WASM_API_VER \
+    REACT_APP_WASM_BASE_URL=/wasm \
     yarn build
 
 FROM golang:${GO_VERSION}-alpine as build
@@ -45,7 +46,7 @@ RUN echo "Building server with version $APP_VERSION" && \
       -ldflags "-s -w" \
       -trimpath \
       -o ./analyzer@$WASM_API_VER.wasm ./cmd/wasm/analyzer && \
-    cp $(go env GOROOT)/misc/wasm/wasm_exec.js .
+    cp $(go env GOROOT)/misc/wasm/wasm_exec.js ./wasm_exec@$WASM_API_VER.js
 
 FROM golang:${GO_VERSION}-alpine as production
 ARG GO_VERSION
@@ -60,8 +61,8 @@ ENV APP_GTAG_ID=''
 COPY data ./data
 COPY --from=ui-build /tmp/web/build ./public
 COPY --from=build /tmp/playground/server .
-COPY --from=build /tmp/playground/*.wasm ./public
-COPY --from=build /tmp/playground/wasm_exec.js ./public
+COPY --from=build /tmp/playground/*.wasm ./public/wasm/
+COPY --from=build /tmp/playground/*.js ./public/wasm/
 EXPOSE 8000
 ENTRYPOINT /opt/playground/server \
     -f='/opt/playground/data/packages.json' \
