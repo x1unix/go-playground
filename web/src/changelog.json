@@ -9,6 +9,11 @@
       "issueId": 292,
       "url": "/issues/292",
       "description": "Expose syscall/js package for Yaegi"
+    },
+    {
+      "issueId": 293,
+      "url": "/issues/293",
+      "description": "Fix UI freeze on Go program panic"
     }
   ]
 }
