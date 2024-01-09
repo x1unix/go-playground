@@ -5,11 +5,12 @@ import {
   GoReplWorker,
   startGoWorker, WorkerConfig,
 } from "~/services/gorepl/worker";
+import { wasmExecUrl } from "~/services/api/resources";
 
 declare const self: DedicatedWorkerGlobalScope;
 export default {} as typeof Worker & { new (): Worker };
 
-self.importScripts('/wasm_exec.js');
+self.importScripts(wasmExecUrl);
 
 let worker: GoReplWorker|null = null;
 const rpcClient = new Client(globalThis, {

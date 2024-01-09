@@ -47,8 +47,8 @@ ENV APP_GTAG_ID=''
 COPY data ./data
 COPY web/build ./public
 COPY --from=build /tmp/playground/server .
-COPY --from=build /tmp/playground/*.wasm ./public
-COPY --from=build /tmp/playground/wasm_exec.js ./public
+COPY --from=build /tmp/playground/*.wasm ./public/wasm/
+COPY --from=build /tmp/playground/wasm_exec.js ./public/wasm/wasm_exec.js
 EXPOSE 8000
 ENTRYPOINT /opt/playground/server \
     -f='/opt/playground/data/packages.json' \
