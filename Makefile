@@ -6,15 +6,32 @@ GOPATH ?= $(shell go env GOPATH)
 PKG := ./cmd/playground
 UI := ./web
 TARGET := ./target
+
+# App version
+APP_VERSION ?= snapshot
+
+# Debug mode
 DEBUG ?= true
-GTAG ?=	# Set GTAG to enable Google Analytics
+
+# Google Analytics ID (optional)
+GTAG ?=
+
+# API server listen address
 LISTEN_ADDR := 127.0.0.1:8000
+
+# Repository URL for issues.
+REPO_URL := $(shell git remote get-url origin | sed -e 's/:/\//' -e 's/git@/https:\/\//' -e 's/\.git//')
 
 .PHONY:all
 all: build
 
 include build.mk
 include docker.mk
+
+# Exports
+export REACT_APP_VERSION=$(APP_VERSION)
+export REACT_APP_WASM_API_VER=$(WASM_API_VER)
+export REACT_APP_GITHUB_URL=$(REPO_URL)
 
 .PHONY:run
 run:
@@ -28,6 +45,7 @@ run:
 
 .PHONY:ui
 ui:
+	@[ ! -d "$(UI)/node_modules" ] && yarn --cwd="$(UI)" install || true
 	@LISTEN_ADDR=$(LISTEN_ADDR) yarn --cwd="$(UI)" start
 
 .PHONY: cover

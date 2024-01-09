@@ -10,6 +10,7 @@ import (
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
 	"github.com/x1unix/go-playground/internal/gorepl/pacman"
+	"github.com/x1unix/go-playground/internal/gorepl/symbols"
 	"github.com/x1unix/go-playground/internal/gowasm"
 	"github.com/x1unix/go-playground/pkg/goproxy"
 )
@@ -51,6 +52,9 @@ func (w *Runner) Evaluate(ctx context.Context, code []byte) error {
 	}
 
 	vm := interp.New(interp.Options{
+		BuildTags: []string{
+			"wasm", "js",
+		},
 		Stderr:               gowasm.Stderr,
 		Stdout:               gowasm.Stdout,
 		GoPath:               w.goPath,
@@ -58,6 +62,11 @@ func (w *Runner) Evaluate(ctx context.Context, code []byte) error {
 	})
 	if err := vm.Use(stdlib.Symbols); err != nil {
 		return newBuildError(err, "failed to load Go runtime")
+	}
+
+	// Load additional symbols
+	if err := vm.Use(symbols.Symbols); err != nil {
+		return newBuildError(err, "failed to load syscall/js symbols")
 	}
 
 	prog, err := vm.Compile(string(code))

@@ -37,6 +37,15 @@ func NewMap[K comparable, V any]() Map[K, V] {
 	}
 }
 
+func (m Map[K, V]) Keys() []K {
+	var keys []K
+	m.m.Range(func(key, _ any) bool {
+		keys = append(keys, key.(K))
+		return true
+	})
+	return keys
+}
+
 func (m Map[K, V]) Put(key K, val V) {
 	m.m.Store(key, val)
 }
@@ -50,7 +59,12 @@ func (m Map[K, V]) Has(item K) bool {
 	return ok
 }
 
-func (m Map[K, V]) Get(item K) (V, bool) {
+func (m Map[K, V]) Get(item K) (res V, ok bool) {
 	v, ok := m.m.Load(item)
-	return v.(V), ok
+	if !ok {
+		return res, false
+	}
+
+	res, ok = v.(V)
+	return res, ok
 }

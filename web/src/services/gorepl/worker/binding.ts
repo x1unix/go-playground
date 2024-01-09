@@ -1,4 +1,4 @@
-import {Package, PackageBinding, WasmExport} from "~/lib/gowasm";
+import { Package, PackageBinding, WasmExport } from "~/lib/gowasm";
 import {
   Bool,
   GoStringType,
@@ -8,8 +8,8 @@ import {
   Struct,
   Uint8
 } from "~/lib/go";
-import {newPackageSymbolFunc} from "~/lib/gowasm/utils";
-import {EvalEventHandler, EvalState, PackageManagerEvent} from "./types";
+import { newPackageSymbolFunc } from "~/lib/gowasm/utils";
+import { EvalEventHandler, EvalState, PackageManagerEvent } from "./types";
 
 const pkgName = 'github.com/x1unix/go-playground/internal/gorepl/uihost';
 const sym = newPackageSymbolFunc(pkgName);
@@ -51,6 +51,6 @@ export class UIHostBinding extends PackageBinding {
     const state = stack.next<EvalState>(Uint8);
     const message = stack.next<string>(GoStringType);
 
-    this.handler.onProgramEvalStateChange({state, message});
+    this.handler.onProgramEvalStateChange({ state, message });
   }
 }

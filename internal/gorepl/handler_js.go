@@ -131,7 +131,8 @@ func (h *Handler) runProgram(ctx context.Context, src []byte) {
 		return
 	}
 
-	if p, ok := err.(interp.Panic); ok {
+	var p interp.Panic
+	if errors.As(err, &p) {
 		uihost.ReportEvalPanic(p.Value, p.Stack)
 		return
 	}
