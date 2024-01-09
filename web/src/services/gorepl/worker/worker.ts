@@ -4,21 +4,21 @@ import {
   instantiateStreaming,
   wrapGlobal,
 } from "~/lib/go";
-import {Client} from "~/lib/wrpc";
-import {registerExportObject} from "~/lib/gowasm";
+import { Client } from "~/lib/wrpc";
+import { registerExportObject } from "~/lib/gowasm";
 import SyscallHelper from "~/lib/gowasm/syscall";
-import {LoggerBinding} from "~/lib/gowasm/bindings/wlog";
-import {ConsoleBinding, ConsoleStreamType} from "~/lib/gowasm/bindings/stdio";
-import {BrowserFSBinding} from "~/lib/gowasm/bindings/browserfs";
-import {PackageDBBinding} from "~/lib/gowasm/bindings/packagedb";
-import {Worker, WorkerBinding} from "~/lib/gowasm/bindings/worker";
+import { LoggerBinding } from "~/lib/gowasm/bindings/wlog";
+import { ConsoleBinding, ConsoleStreamType } from "~/lib/gowasm/bindings/stdio";
+import { BrowserFSBinding } from "~/lib/gowasm/bindings/browserfs";
+import { PackageDBBinding } from "~/lib/gowasm/bindings/packagedb";
+import { Worker, WorkerBinding } from "~/lib/gowasm/bindings/worker";
 
 import { wrapResponseWithProgress } from "~/utils/http";
-import {FileSystemWrapper} from "~/services/go/fs";
+import { FileSystemWrapper } from "~/services/go/fs";
 import ProcessStub from "~/services/go/process";
 
-import {PackageManagerEvent, ProgramStateChangeEvent} from "./types";
-import {PackageCacheDB, PackageFileStore, PackageIndex} from "../pkgcache";
+import { PackageManagerEvent, ProgramStateChangeEvent } from "./types";
+import { PackageCacheDB, PackageFileStore, PackageIndex } from "../pkgcache";
 import {
   defaultWorkerConfig,
   GoWorkerBootEvent,
@@ -28,8 +28,8 @@ import {
   WorkerConfig,
   WorkerEvent
 } from "./interface";
-import {UIHostBinding} from "./binding";
-import {StdioWrapper} from "./console";
+import { UIHostBinding } from "./binding";
+import { StdioWrapper } from "./console";
 
 /**
  * Go WASM executable URL
@@ -60,7 +60,7 @@ class BootTimeoutGuard {
     });
   }
 
-  cancel(isStarted=true) {
+  cancel(isStarted = true) {
     this.started = isStarted;
     clearTimeout(this.timeout!);
   }
@@ -148,7 +148,7 @@ export const startGoWorker = (globalScope: any, rpcClient: Client, cfg: WorkerCo
     };
 
     instantiateStreaming(fetchWithProgress(rpcClient, GO_WASM_URL), go.importObject)
-      .then(({instance}) => {
+      .then(({ instance }) => {
         rpcClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
           eventType: GoWorkerBootEventType.Starting,
         });

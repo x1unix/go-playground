@@ -82,7 +82,7 @@ func ReleaseCallback(cbId CallbackID) {
 func NotifyResult(cb CallbackID, result Result) {
 	ch, ok := callbacks.Get(cb)
 	if !ok {
-		panic(fmt.Sprint("gowasm: invalid callback ID: ", cb))
+		panic(fmt.Sprintf("gowasm: invalid callback ID: %d. Known IDs: %d", cb, callbacks.Keys()))
 	}
 
 	wlog.Debugf("NotifyWrite: ID=%d Result=%d", cb, result)

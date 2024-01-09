@@ -28,6 +28,7 @@ run:
 
 .PHONY:ui
 ui:
+	@[ ! -d "$(UI)/node_modules" ] && yarn --cwd="$(UI)" install || true
 	@LISTEN_ADDR=$(LISTEN_ADDR) yarn --cwd="$(UI)" start
 
 .PHONY: cover

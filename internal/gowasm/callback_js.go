@@ -1,16 +1,15 @@
 package gowasm
 
 import (
-	"github.com/x1unix/go-playground/internal/gowasm/wlog"
 	"syscall/js"
-)
 
-//go:generate go run ../../tools/gowasm-gen-import $GOFILE
+	"github.com/x1unix/go-playground/internal/gowasm/wlog"
+)
 
 // registerCallbackHandler registers a global callback
 // to receive capture async operations from JavaScript side.
 //
-//gowasm:import
+//go:wasmimport gojs github.com/x1unix/go-playground/internal/gowasm.registerCallbackHandler
 func registerCallbackHandler(fn js.Func)
 
 var callbackHandler = js.FuncOf(func(_ js.Value, args []js.Value) any {

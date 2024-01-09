@@ -1,14 +1,24 @@
 import { StackReader } from "../stack";
-import { MemoryInspector} from "../debug";
-import {Bool, GoStringType, Int32} from "../types";
+import { MemoryInspector } from "../debug";
+import { Bool, GoStringType, Int32 } from "../types";
 import { GoInstance, ImportObject, PendingEvent } from "./interface";
-import {Func, Ref, RefType} from "../pkg/syscall/js";
+import { Func, Ref, RefType } from "../pkg/syscall/js";
 import { MemoryView } from "../memory/view";
 
 import {
   GoWebAssemblyInstance,
   wrapWebAssemblyInstance
 } from "./instance";
+
+/**
+ * Returns object which contains WebAssembly imports.
+ * @param go Go instance
+ * @returns
+ */
+export const getImportNamespace = (go: GoInstance) => (
+  // Since Go 1.21, exported functions are stored in 'gojs' object.
+  go.importObject.gojs ?? go.importObject.go
+);
 
 /**
  * Wraps global namespace with specified overlay and replaces Go class instance
@@ -60,8 +70,8 @@ export interface Options {
 }
 
 export class GoWrapper {
-  private _inspector: MemoryInspector|null = null;
-  private _memView: MemoryView|null = null;
+  private _inspector: MemoryInspector | null = null;
+  private _memView: MemoryView | null = null;
   private _debug = false;
   private _debugCalls: Set<string>;
   private _globalValue: object;
@@ -99,7 +109,7 @@ export class GoWrapper {
     return this.go._inst!.exports;
   }
 
-  constructor(parent: GoInstance, {debug = false, debugCalls, globalValue}: Options = {}) {
+  constructor(parent: GoInstance, { debug = false, debugCalls, globalValue }: Options = {}) {
     this.go = parent;
     this._debug = debug;
     this._debugCalls = new Set(debugCalls ?? []);
@@ -145,7 +155,7 @@ export class GoWrapper {
       this.valueCall(sp, reader);
     });
 
-    const wasmExitFunc = this.go.importObject.go['runtime.wasmExit'];
+    const wasmExitFunc = getImportNamespace(this.go)['runtime.wasmExit'];
     this.exportFunction('runtime.wasmExit', (sp, reader) => {
       reader.skipHeader();
       const code = reader.next<number>(Int32);
@@ -279,7 +289,8 @@ export class GoWrapper {
    * @param func handler
    */
   exportFunction(name: string, func: CallImportHandler) {
-    this.go.importObject.go[name] = this._wrapExportHandler(name, func);
+    const importObject = getImportNamespace(this.go);
+    importObject[name] = this._wrapExportHandler(name, func);
   }
 
   /**
@@ -289,8 +300,7 @@ export class GoWrapper {
    * @returns {*}
    * @private
    */
-  private _wrapExportHandler(name: string, func: CallImportHandler)
-  {
+  private _wrapExportHandler(name: string, func: CallImportHandler) {
     return (sp: number) => {
       sp >>>= 0;
       const isDebug = this.isCallDebuggable(name);
@@ -302,7 +312,7 @@ export class GoWrapper {
         this.go.mem,
         this.go._values,
         sp,
-        {debug: isDebug}
+        { debug: isDebug }
       );
 
       return func(sp, reader, this._memView!);
@@ -313,13 +323,13 @@ export class GoWrapper {
     return (...args): any => {
 
       if (this._debug) {
-       console.log('Go._makeFuncWrapper:', { id, args });
-     }
+        console.log('Go._makeFuncWrapper:', { id, args });
+      }
 
-     const event: any = { id, this: this.go, args }
-     this.go._pendingEvent = event;
-     this.go._resume();
-     return event.result;
+      const event: any = { id, this: this.go, args }
+      this.go._pendingEvent = event;
+      this.go._resume();
+      return event.result;
     }
   }
 
@@ -349,8 +359,8 @@ export class GoWrapper {
     this._memView = MemoryView.fromInstance(
       wrappedInstance,
       this.go._values, {
-        debug: this._debug
-      }
+      debug: this._debug
+    }
     );
 
     const r = await this.go.run(wrappedInstance);

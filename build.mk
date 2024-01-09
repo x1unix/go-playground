@@ -1,10 +1,12 @@
 GO ?= go
 YARN ?= yarn
-GOROOT ?= $(shell go env GOROOT)
+GOROOT ?= $(shell $(GO) env GOROOT)
 TOOLS ?= ./tools
 PUBLIC_DIR ?= $(UI)/public
 WEBWORKER_PKG ?= ./cmd/webworker
 INTERPRETER_PKG ?= ./cmd/go-repl
+
+MIN_GO_VERSION ?= 1.21
 
 define build_wasm_worker
 	@echo ":: Building WebAssembly worker '$(1)' ..."
@@ -27,6 +29,10 @@ clean:
 .PHONY:check-go
 check-go:
 	$(call check_tool,$(GO),'GO')
+	@if [ "$$(printf '%s\n' "$$($(GO) version)" $(MIN_GO_VERSION) | sort -V | head -n1)" != "1.21" ]; then \
+		echo "Error: Go version should be $(MIN_GO_VERSION) or above"; \
+		exit 1; \
+	fi
 
 .PHONY:check-yarn
 check-yarn:
@@ -59,11 +65,11 @@ copy-wasm-exec:
 
 .PHONY:build-webworker
 build-webworker:
-	$(call build_wasm_worker,$(WEBWORKER_PKG),'worker.wasm')
+	$(call build_wasm_worker,$(WEBWORKER_PKG),worker.wasm)
 
 .PHONY:go-repl
 go-repl:
-	$(call build_wasm_worker,$(INTERPRETER_PKG),'go-repl.wasm')
+	$(call build_wasm_worker,$(INTERPRETER_PKG),go-repl.wasm)
 
 .PHONY:build-wasm
 build-wasm: copy-wasm-exec build-webworker go-repl
@@ -77,4 +83,4 @@ build: check-go check-yarn clean preinstall collect-meta build-server build-wasm
 
 .PHONY:gen
 gen:
-	@find . -name '*_js.go' -print0 | xargs -0 -n1 go generate
+	@find . -name '*_gen.go' -exec go generate -v {} \;

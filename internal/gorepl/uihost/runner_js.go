@@ -1,8 +1,6 @@
 package uihost
 
-//go:generate go run ../../../tools/gowasm-gen-import $GOFILE
-
 // onProgramEvalStateChange reports program execution result to UI
 //
-//gowasm:import
+//go:wasmimport gojs github.com/x1unix/go-playground/internal/gorepl/uihost.onProgramEvalStateChange
 func onProgramEvalStateChange(state EvalState, msg string)

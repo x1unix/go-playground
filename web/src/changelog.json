@@ -1,16 +1,19 @@
 {
-  "Interface - General": [
+  "Go - WebAssembly": [
     {
-      "issueId": 251,
-      "url": "/pull/251",
-      "description": "Redesign command bar to reduce number of items."
-    }
-  ],
-  "Interface - Hotfixes": [
+      "issueId": 290,
+      "url": "/issues/290",
+      "description": "Update Go WebAssembly compiler to 1.21"
+    },
     {
-      "issueId": 250,
-      "url": "/pull/250",
-      "description": "Remove broken web worker update mechanism."
+      "issueId": 292,
+      "url": "/issues/292",
+      "description": "Expose syscall/js package for Yaegi"
+    },
+    {
+      "issueId": 293,
+      "url": "/issues/293",
+      "description": "Fix UI freeze on Go program panic"
     }
   ]
 }

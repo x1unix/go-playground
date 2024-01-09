@@ -101,6 +101,8 @@ export const getWorkerInstance = async (dispatcher: DispatchFn, stateProvider: S
 
     await client.call<WorkerConfig>('init', {
       ...defaultWorkerConfig,
+      debugWasm: !!localStorage.getItem('go.debugWasm'),
+      debugRuntime: !!localStorage.getItem('go.debugRuntime'),
       env: {
         GOPROXY: state.settings.goProxyUrl
       }
@@ -202,6 +204,7 @@ const handleProgramStateEvent = (dispatcher: DispatchFn, {state, message}: Progr
         Message: message!,
         Delay: 0,
       }));
+      dispatcher(newProgramFinishAction());
       return;
     default:
       return;

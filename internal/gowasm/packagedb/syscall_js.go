@@ -1,12 +1,10 @@
 package packagedb
 
-//go:generate go run ../../../tools/gowasm-gen-import $GOFILE
-
-//gowasm:import
+//go:wasmimport gojs github.com/x1unix/go-playground/internal/gowasm/packagedb.lookupPackage
 func lookupPackage(pkgName string, out *[]byte, cb int)
 
-//gowasm:import
+//go:wasmimport gojs github.com/x1unix/go-playground/internal/gowasm/packagedb.registerPackage
 func registerPackage(pkgName, version string, cb int)
 
-//gowasm:import
+//go:wasmimport gojs github.com/x1unix/go-playground/internal/gowasm/packagedb.removePackage
 func removePackage(pkgName string, cb int)
