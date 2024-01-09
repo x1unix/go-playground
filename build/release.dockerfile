@@ -7,21 +7,29 @@
 #
 # Use Dockerfile for simple single-arch build process
 
-FROM golang:1.19-alpine as build
+ARG GO_VERSION=1.21
+ARG APP_VERSION=1.0.0
+ARG WASM_API_VER=v2
+
+FROM golang:${GO_VERSION}-alpine as build
+ARG GO_VERSION
+ARG WASM_API_VER
+ARG APP_VERSION
 WORKDIR /tmp/playground
 COPY cmd ./cmd
 COPY pkg ./pkg
 COPY internal ./internal
 COPY go.mod .
 COPY go.sum .
-ARG APP_VERSION=1.0.0
 RUN echo "Building server with version $APP_VERSION" && \
     go build -o server -ldflags="-X 'main.Version=$APP_VERSION'" ./cmd/playground && \
-    GOOS=js GOARCH=wasm go build -ldflags "-s -w" -trimpath -o ./worker.wasm ./cmd/webworker && \
-    GOOS=js GOARCH=wasm go build -ldflags "-s -w" -trimpath -o ./go-repl.wasm ./cmd/go-repl && \
+    GOOS=js GOARCH=wasm go build -ldflags "-s -w" -trimpath -o ./worker@$WASM_API_VER.wasm ./cmd/webworker && \
+    GOOS=js GOARCH=wasm go build -ldflags "-s -w" -trimpath -o ./go-repl@$WASM_API_VER.wasm ./cmd/go-repl && \
     cp $(go env GOROOT)/misc/wasm/wasm_exec.js .
 
-FROM golang:1.19-alpine as production
+FROM golang:${GO_VERSION}-alpine as production
+ARG GO_VERSION
+ARG WASM_API_VER
 WORKDIR /opt/playground
 ENV GOROOT /usr/local/go
 ENV APP_CLEAN_INTERVAL=10m
@@ -31,8 +39,8 @@ ENV APP_GTAG_ID=''
 COPY data ./data
 COPY web/build ./public
 COPY --from=build /tmp/playground/server .
-COPY --from=build /tmp/playground/worker.wasm ./public
-COPY --from=build /tmp/playground/go-repl.wasm ./public
+COPY --from=build /tmp/playground/worker-$WASM_API_VER.wasm ./public
+COPY --from=build /tmp/playground/go-repl-$WASM_API_VER.wasm ./public
 COPY --from=build /tmp/playground/wasm_exec.js ./public
 EXPOSE 8000
 ENTRYPOINT /opt/playground/server \

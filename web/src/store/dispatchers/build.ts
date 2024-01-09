@@ -2,10 +2,10 @@ import {TargetType} from '~/services/config';
 import {getWorkerInstance} from "~/services/gorepl";
 import {getImportObject, goRun} from '~/services/go';
 import {setTimeoutNanos, SECOND} from "~/utils/duration";
+import { instantiateStreaming } from "~/lib/go";
 import client, {
   EvalEvent,
   EvalEventKind,
-  instantiateStreaming
 } from "~/services/api";
 
 import {DispatchFn, StateProvider} from "../helpers";

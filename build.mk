@@ -3,15 +3,14 @@ YARN ?= yarn
 GOROOT ?= $(shell $(GO) env GOROOT)
 TOOLS ?= ./tools
 PUBLIC_DIR ?= $(UI)/public
-WEBWORKER_PKG ?= ./cmd/webworker
-INTERPRETER_PKG ?= ./cmd/go-repl
 
 MIN_GO_VERSION ?= 1.21
+WASM_API_VER ?= v2
 
 define build_wasm_worker
 	@echo ":: Building WebAssembly worker '$(1)' ..."
 	GOOS=js GOARCH=wasm $(GO) build -ldflags "-s -w" -trimpath \
-		$(3) -o $(PUBLIC_DIR)/$(2) $(1)
+		$(3) -o $(PUBLIC_DIR)/$(2)@$(WASM_API_VER).wasm $(1)
 endef
 
 define check_tool
@@ -20,7 +19,6 @@ define check_tool
 		exit 1; \
 	fi;
 endef
-
 
 .PHONY: clean
 clean:
@@ -65,11 +63,11 @@ copy-wasm-exec:
 
 .PHONY:build-webworker
 build-webworker:
-	$(call build_wasm_worker,$(WEBWORKER_PKG),worker.wasm)
+	$(call build_wasm_worker,./cmd/webworker,worker)
 
 .PHONY:go-repl
 go-repl:
-	$(call build_wasm_worker,$(INTERPRETER_PKG),go-repl.wasm)
+	$(call build_wasm_worker,./cmd/go-repl,go-repl)
 
 .PHONY:build-wasm
 build-wasm: copy-wasm-exec build-webworker go-repl
