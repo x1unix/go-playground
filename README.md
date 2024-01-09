@@ -1,5 +1,3 @@
-[![SWUbanner](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
-
 # Better Go Playground
 
 [![Docker Hub](https://img.shields.io/docker/pulls/x1unix/go-playground.svg)](https://hub.docker.com/r/x1unix/go-playground)
@@ -7,6 +5,7 @@
 [![Build Status](https://travis-ci.org/x1unix/go-playground.svg?branch=master)](https://travis-ci.org/x1unix/go-playground) 
 [![Coverage Status](https://coveralls.io/repos/github/x1unix/go-playground/badge.svg?branch=dev)](https://coveralls.io/github/x1unix/go-playground?branch=dev)
 [![Goreportcard](https://goreportcard.com/badge/github.com/x1unix/go-playground)](https://goreportcard.com/report/github.com/x1unix/go-playground)
+[![StandWithUkraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
 
 Improved Go Playground powered by Monaco Editor and React - [https://goplay.tools/](https://goplay.tools)
 
@@ -27,7 +26,7 @@ And more !
 
 ## Installation
 
-### Docker Container
+### Docker Container (recommended)
 
 Playground is available as Docker image in [Docker Hub](https://hub.docker.com/r/x1unix/go-playground) and [GitHub Container Registry](https://github.com/x1unix/go-playground/pkgs/container/go-playground%2Fgo-playground).
 
