@@ -1,5 +1,5 @@
 const {
-  REACT_APP_WASM_API_VERSION: wasmApiVersion = 'v1',
+  REACT_APP_WASM_API_VER: wasmApiVersion = 'v1',
   REACT_APP_WASM_BASE_URL: wasmBaseUrl = '',
 } = process.env;
 

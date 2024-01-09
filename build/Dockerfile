@@ -35,8 +35,16 @@ COPY go.mod .
 COPY go.sum .
 RUN echo "Building server with version $APP_VERSION" && \
     go build -o server -ldflags="-X 'main.Version=$APP_VERSION'" ./cmd/playground && \
-    GOOS=js GOARCH=wasm go build -ldflags "-s -w" -trimpath -o ./go-repl@$WASM_API_VER.wasm ./cmd/go-repl && \
-    GOOS=js GOARCH=wasm go build -ldflags "-s -w" -trimpath -o ./worker@$WASM_API_VER.wasm ./cmd/webworker && \
+    GOOS=js GOARCH=wasm go build \
+      -buildvcs=false \
+      -ldflags "-s -w" \
+      -trimpath \
+      -o ./go-repl@$WASM_API_VER.wasm ./cmd/wasm/go-repl && \
+    GOOS=js GOARCH=wasm go build \
+      -buildvcs=false \
+      -ldflags "-s -w" \
+      -trimpath \
+      -o ./analyzer@$WASM_API_VER.wasm ./cmd/wasm/analyzer && \
     cp $(go env GOROOT)/misc/wasm/wasm_exec.js .
 
 FROM golang:${GO_VERSION}-alpine as production
