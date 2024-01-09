@@ -147,7 +147,6 @@ export const startGoWorker = (globalScope: any, rpcClient: Client, cfg: WorkerCo
       });
     };
 
-    debugger;
     instantiateStreaming(fetchWithProgress(rpcClient, GO_WASM_URL), go.importObject)
       .then(({ instance }) => {
         rpcClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
