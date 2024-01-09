@@ -204,6 +204,7 @@ const handleProgramStateEvent = (dispatcher: DispatchFn, {state, message}: Progr
         Message: message!,
         Delay: 0,
       }));
+      dispatcher(newProgramFinishAction());
       return;
     default:
       return;
