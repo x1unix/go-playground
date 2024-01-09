@@ -1,2 +1,2 @@
-wasm_exec.js
+*.js
 *.wasm

@@ -13,4 +13,4 @@ export const getWasmUrl = name => `${wasmBaseUrl}/${name}@${wasmApiVersion}.wasm
 /**
  * URL for Go Wasm executor
  */
-export const wasmExecUrl = `${wasmBaseUrl}/wasm_exec.js`;
+export const wasmExecUrl = `${wasmBaseUrl}/wasm_exec@${wasmApiVersion}.js`;
