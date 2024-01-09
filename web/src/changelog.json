@@ -4,6 +4,11 @@
       "issueId": 290,
       "url": "/issues/290",
       "description": "Update Go WebAssembly compiler to 1.21"
+    },
+    {
+      "issueId": 292,
+      "url": "/issues/292",
+      "description": "Expose syscall/js package for Yaegi"
     }
   ]
 }
