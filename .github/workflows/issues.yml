@@ -10,7 +10,7 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - uses: actions/stale@v5
+      - uses: actions/stale@v9
         with:
           stale-issue-label: "stale"
           exempt-issue-labels: "override-stale,question,enhancement,bug,in-progress"
