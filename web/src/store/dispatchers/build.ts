@@ -54,6 +54,7 @@ const hasProgramTimeoutError = (events: EvalEvent[]) => {
 
 const dispatchEvalEvents = (dispatch: DispatchFn, events: EvalEvent[]) => {
   // TODO: support cancellation
+  dispatch(newProgramStartAction());
 
   if (!events?.length) {
     dispatch(newProgramFinishAction());
@@ -92,7 +93,6 @@ const dispatchEvalEvents = (dispatch: DispatchFn, events: EvalEvent[]) => {
   // approach used in official playground, so should be enough for us.
   let programEndTime = lastElem(eventsWithDelay)?.Delay ?? 0;
 
-  dispatch(newProgramStartAction());
   eventsWithDelay.forEach(event => {
     setTimeoutNanos(() => {
       dispatch(newProgramWriteAction(event))
