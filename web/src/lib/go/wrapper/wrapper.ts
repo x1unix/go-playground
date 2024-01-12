@@ -27,7 +27,7 @@ export const getImportNamespace = (go: GoInstance) => (
  * @param overlay Overlay object
  * @param globalValue global namespace
  */
-export const wrapGlobal = (overlay: object = {}, globalValue: object = window || globalThis || DedicatedWorkerGlobalScope) => {
+export const wrapGlobal = (overlay: object = {}, globalValue: object = window || globalThis) => {
   const mockObject = {
     ...overlay,
     Go: GoWrapper,

@@ -18,7 +18,6 @@ export interface ImportObject {
    *
    * @deprecated
    * **WARNING:** Since Go 1.21.x this attribute was replaced by `gojs` namespace.
-   * @
    */
   go: { [k: string]: ImportFunction }
 
