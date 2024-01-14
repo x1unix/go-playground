@@ -1,11 +1,13 @@
 import React, {useMemo, useEffect, useState, useRef} from 'react';
 import {MessageBar, MessageBarType, useTheme} from '@fluentui/react';
 
+import { ITerminalOptions } from "xterm";
+import { FitAddon } from 'xterm-addon-fit';
+
 import {getDefaultFontFamily} from '~/services/fonts';
 import {connect, StatusState} from '~/store';
 
 import { XTerm } from '~/components/utils/XTerm';
-import { FitAddon } from 'xterm-addon-fit';
 import { formatEvalEvent, createDebouncableResizeObserver } from './utils';
 
 import './Preview.css';
@@ -19,6 +21,11 @@ interface StateProps {
 interface PreviewContentProps {
   status?: StatusState
 }
+
+const defaultTermConfig: ITerminalOptions = {
+  convertEol: true,
+  fontSize: 13,
+};
 
 const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
   const [offset, setOffset] = useState(0);
@@ -78,12 +85,14 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
 
   if (status?.lastError) {
     return (
-      <MessageBar messageBarType={MessageBarType.error} isMultiline={true}>
-        <b className='app-preview__label'>Error</b>
-        <pre className='app-preview__errors'>
+      <div className="app-preview__container">
+        <MessageBar messageBarType={MessageBarType.error} isMultiline={true}>
+          <b className='app-preview__label'>Error</b>
+          <pre className='app-preview__errors'>
             {status.lastError}
           </pre>
-      </MessageBar>
+        </MessageBar>
+      </div>
     );
   }
 
@@ -92,12 +101,16 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
       {
         (
           isClean ? (
-            <span>Press "Run" to compile program.</span>
+            <div className="app-preview__container">
+              Press "Run" to compile program.
+            </div>
           ) : (
             <XTerm
               ref={xtermRef}
               className='app-preview__terminal'
-              options={{convertEol: true}}
+              options={{
+                ...defaultTermConfig
+              }}
               addons={[fitAddonRef.current]}
             />
           )

@@ -4,33 +4,40 @@
 }
 
 .app-preview__content {
-  padding: 0 15px 15px 15px;
   font-size: 10pt;
-
   height: 100%;
+}
+
+.app-preview__container {
+  padding: 0 15px 0px 15px;
   box-sizing: border-box;
 }
 
+/** Terminal */
 .app-preview__terminal,
 .app-preview__terminal > .xterm {
+  font-size: 9.75pt;
   height: 100%;
   width: 100%;
   overflow-x: hidden;
 }
 
+.app-preview__terminal .xterm {
+  padding: 0 15px 0 15px;
+  box-sizing: border-box;
+}
+
+/** Errors & Messages */
 .app-preview__error {
   color: white;
   background: #cc0000;
 }
 
-.app-preview__epilogue {
-  color: #999;
-  margin-top: 15px;
-}
-
 .app-preview__build-error {
   margin: 0 0 5px;
 }
+
+/** Misc **/
 
 .app-preview__label {
   display: block;
