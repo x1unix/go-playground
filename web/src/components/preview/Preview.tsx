@@ -4,9 +4,10 @@ import {MessageBar, MessageBarType, useTheme} from '@fluentui/react';
 import {getDefaultFontFamily} from '~/services/fonts';
 import {connect, StatusState} from '~/store';
 
-import EvalEventView from './EvalEventView';
-import './Preview.css';
 import { XTerm } from '~/components/utils/XTerm';
+import { formatEvalEvent } from './utils';
+
+import './Preview.css';
 
 interface OwnProps {}
 
@@ -42,7 +43,7 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
       return;
     }
 
-    batch.forEach(({Message: msg}) => terminal?.write(msg));
+    batch.map(formatEvalEvent).forEach((msg) => terminal?.write(msg));
     setOffset(offset + batch.length);
   }, [terminal, offset, events ])
 
