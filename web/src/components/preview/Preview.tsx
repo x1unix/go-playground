@@ -57,6 +57,7 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
 
     batch.map(formatEvalEvent).forEach((msg) => terminal?.write(msg));
     terminal?.scrollToBottom();
+    console.log('setOffset', offset + batch.length);
     setOffset(offset + batch.length);
   }, [terminal, offset, events ])
 
