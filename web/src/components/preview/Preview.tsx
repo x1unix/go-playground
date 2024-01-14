@@ -28,7 +28,12 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
 
   const terminal = xtermRef.current?.terminal;
   useEffect(() => {
-    if (offset === 0 || !events?.length) {
+    if (!events?.length) {
+      setOffset(0);
+      terminal?.clear();
+      return;
+    }
+    if (offset === 0) {
       terminal?.clear();
     }
 
@@ -37,11 +42,9 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
       return;
     }
 
-    batch.forEach(({Message: msg}) => {
-     terminal?.write(msg);
-    });
+    batch.forEach(({Message: msg}) => terminal?.write(msg));
     setOffset(offset + batch.length);
-  }, [terminal, offset, events])
+  }, [terminal, offset, events ])
 
   useEffect(() => {
     if (isClean) {
@@ -75,27 +78,8 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
           )
         )
       }
-      {
-        !isRunning && (
-          <div className="app-preview__epilogue" key="exit">
-            Program exited.
-          </div>
-        )
-      }
     </>
   );
-
-  // const content = status.events?.map(({Message, Kind}, k) => (
-  //   <EvalEventView
-  //     key={k}
-  //     message={Message}
-  //     kind={Kind}
-  //   />
-  // )) ?? [];
-  //
-  // return (
-  //   <>{content}</>
-  // );
 }
 
 const Preview: React.FC<StateProps & OwnProps> = ({ status }) => {
