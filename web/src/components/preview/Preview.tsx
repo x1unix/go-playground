@@ -5,6 +5,7 @@ import {getDefaultFontFamily} from '~/services/fonts';
 import {connect, StatusState} from '~/store';
 
 import { XTerm } from '~/components/utils/XTerm';
+import { FitAddon } from 'xterm-addon-fit';
 import { formatEvalEvent } from './utils';
 
 import './Preview.css';
@@ -22,6 +23,9 @@ interface PreviewContentProps {
 const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
   const [offset, setOffset] = useState(0);
   const xtermRef = useRef<XTerm>(null);
+  const addonsRef = useRef([
+    new FitAddon(),
+  ]);
 
   const isClean = !status || !status?.dirty;
   const isRunning = status?.running;
@@ -75,6 +79,7 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
             <XTerm
               ref={xtermRef}
               options={{convertEol: true}}
+              addons={addonsRef.current}
             />
           )
         )
