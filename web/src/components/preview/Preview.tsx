@@ -8,7 +8,7 @@ import {getDefaultFontFamily} from '~/services/fonts';
 import {connect, StatusState} from '~/store';
 
 import {buildXtermTheme, XTerm} from '~/components/utils/XTerm';
-import { formatEvalEvent, createDebouncableResizeObserver } from './utils';
+import { formatEvalEvent, createDebounceResizeObserver } from './utils';
 
 import './Preview.css';
 
@@ -38,7 +38,7 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
   const xtermRef = useRef<XTerm>(null);
   const fitAddonRef = useRef(new FitAddon());
   const resizeObserver = useMemo(() => (
-   createDebouncableResizeObserver(() => fitAddonRef.current.fit(), RESIZE_DELAY)
+   createDebounceResizeObserver(() => fitAddonRef.current.fit(), RESIZE_DELAY)
   ), [fitAddonRef]);
 
   const isClean = !status || !status?.dirty;
