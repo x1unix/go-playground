@@ -7,7 +7,7 @@ import { FitAddon } from 'xterm-addon-fit';
 import {getDefaultFontFamily} from '~/services/fonts';
 import {connect, StatusState} from '~/store';
 
-import { XTerm } from '~/components/utils/XTerm';
+import {buildXtermTheme, XTerm} from '~/components/utils/XTerm';
 import { formatEvalEvent, createDebouncableResizeObserver } from './utils';
 
 import './Preview.css';
@@ -22,18 +22,24 @@ interface PreviewContentProps {
   status?: StatusState
 }
 
+const RESIZE_DELAY = 50;
+
 const defaultTermConfig: ITerminalOptions = {
   convertEol: true,
   fontSize: 13,
 };
 
 const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
+  const theme = useTheme();
   const [offset, setOffset] = useState(0);
+
+  // Xterm
+  const xtermTheme = useMemo(() => buildXtermTheme(theme), [theme]);
   const xtermRef = useRef<XTerm>(null);
   const fitAddonRef = useRef(new FitAddon());
-  const resizeObserver = useMemo(() => {
-    return createDebouncableResizeObserver(() => fitAddonRef.current.fit(), 50)
-  }, [fitAddonRef]);
+  const resizeObserver = useMemo(() => (
+   createDebouncableResizeObserver(() => fitAddonRef.current.fit(), RESIZE_DELAY)
+  ), [fitAddonRef]);
 
   const isClean = !status || !status?.dirty;
   const events = status?.events;
@@ -57,7 +63,6 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
 
     batch.map(formatEvalEvent).forEach((msg) => terminal?.write(msg));
     terminal?.scrollToBottom();
-    console.log('setOffset', offset + batch.length);
     setOffset(offset + batch.length);
   }, [terminal, offset, events ])
 
@@ -71,19 +76,26 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
 
   // Track terminal resize
   useEffect(() => {
-    console.log('terminal changed!', {terminal});
     if (!terminal?.element) {
       resizeObserver.disconnect();
       return;
     }
 
-    console.log('resize observer installed', {terminal});
     resizeObserver.observe(terminal.element);
     return () => {
-      console.log('destroying observer', {terminal});
       resizeObserver.disconnect();
     }
   }, [terminal, resizeObserver])
+
+  // Theme
+  useEffect(() => {
+    if (!terminal) {
+      return;
+    }
+
+    console.log('updating theme!');
+    terminal.options = { theme: xtermTheme };
+  }, [xtermTheme, terminal]);
 
   if (status?.lastError) {
     return (
@@ -111,7 +123,8 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
               ref={xtermRef}
               className='app-preview__terminal'
               options={{
-                ...defaultTermConfig
+                ...defaultTermConfig,
+                theme: xtermTheme,
               }}
               addons={[fitAddonRef.current]}
             />
@@ -126,6 +139,8 @@ const Preview: React.FC<StateProps & OwnProps> = ({ status }) => {
   const theme = useTheme();
   const styles = useMemo(() => {
     const { palette } = theme;
+    // console.log(JSON.stringify(palette));
+    // console.log(JSON.stringify(theme.semanticColors));
     return {
       backgroundColor: palette.neutralLight,
       color: palette.neutralDark,
