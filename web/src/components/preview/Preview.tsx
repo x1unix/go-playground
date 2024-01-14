@@ -13,7 +13,11 @@ interface StateProps {
   status?: StatusState
 }
 
-const getContent = (status?: StatusState) => {
+interface PreviewContentProps {
+  status?: StatusState
+}
+
+const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
   if (status?.lastError) {
     return (
       <MessageBar messageBarType={MessageBarType.error} isMultiline={true}>
@@ -47,7 +51,9 @@ const getContent = (status?: StatusState) => {
     );
   }
 
-  return content;
+  return (
+    <>{content}</>
+  );
 }
 
 const Preview: React.FC<StateProps & OwnProps> = ({ status }) => {
@@ -64,9 +70,7 @@ const Preview: React.FC<StateProps & OwnProps> = ({ status }) => {
   return (
     <div className="app-preview" style={styles}>
       <div className='app-preview__content'>
-        {
-          getContent(status)
-        }
+        <PreviewContent status={status} />
       </div>
     </div>
   )
