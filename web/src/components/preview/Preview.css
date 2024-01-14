@@ -6,6 +6,16 @@
 .app-preview__content {
   padding: 0 15px 15px 15px;
   font-size: 10pt;
+
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.app-preview__terminal,
+.app-preview__terminal > .xterm {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .app-preview__error {

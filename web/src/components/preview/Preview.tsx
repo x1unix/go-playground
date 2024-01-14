@@ -6,7 +6,7 @@ import {connect, StatusState} from '~/store';
 
 import { XTerm } from '~/components/utils/XTerm';
 import { FitAddon } from 'xterm-addon-fit';
-import { formatEvalEvent } from './utils';
+import { formatEvalEvent, createDebouncableResizeObserver } from './utils';
 
 import './Preview.css';
 
@@ -23,15 +23,16 @@ interface PreviewContentProps {
 const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
   const [offset, setOffset] = useState(0);
   const xtermRef = useRef<XTerm>(null);
-  const addonsRef = useRef([
-    new FitAddon(),
-  ]);
+  const fitAddonRef = useRef(new FitAddon());
+  const resizeObserver = useMemo(() => {
+    return createDebouncableResizeObserver(() => fitAddonRef.current.fit(), 50)
+  }, [fitAddonRef]);
 
   const isClean = !status || !status?.dirty;
-  const isRunning = status?.running;
   const events = status?.events;
-
   const terminal = xtermRef.current?.terminal;
+
+  // Track output events
   useEffect(() => {
     if (!events?.length) {
       setOffset(0);
@@ -51,12 +52,29 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
     setOffset(offset + batch.length);
   }, [terminal, offset, events ])
 
+  // Reset output offset on clean
   useEffect(() => {
     if (isClean) {
       setOffset(0)
     }
 
   }, [isClean])
+
+  // Track terminal resize
+  useEffect(() => {
+    console.log('terminal changed!', {terminal});
+    if (!terminal?.element) {
+      resizeObserver.disconnect();
+      return;
+    }
+
+    console.log('resize observer installed', {terminal});
+    resizeObserver.observe(terminal.element);
+    return () => {
+      console.log('destroying observer', {terminal});
+      resizeObserver.disconnect();
+    }
+  }, [terminal, resizeObserver])
 
   if (status?.lastError) {
     return (
@@ -78,8 +96,9 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
           ) : (
             <XTerm
               ref={xtermRef}
+              className='app-preview__terminal'
               options={{convertEol: true}}
-              addons={addonsRef.current}
+              addons={[fitAddonRef.current]}
             />
           )
         )
