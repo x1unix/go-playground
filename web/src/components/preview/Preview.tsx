@@ -1,15 +1,20 @@
 import React, {useMemo, useEffect, useState, useRef} from 'react';
 import {MessageBar, MessageBarType, useTheme} from '@fluentui/react';
 
-import { ITerminalOptions } from '@xterm/xterm';
+import type { ITerminalOptions, ITerminalAddon } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { ImageAddon } from '@xterm/addon-image';
 import { CanvasAddon } from '@xterm/addon-canvas';
 
-import {getDefaultFontFamily} from '~/services/fonts';
-import {connect, StatusState} from '~/store';
+import {connect, type StatusState} from '~/store';
+import type {MonacoSettings} from "~/services/config";
+import {
+  DEFAULT_FONT,
+  getDefaultFontFamily,
+  getFontFamily
+} from '~/services/fonts';
 
-import {buildXtermTheme, XTerm} from '~/components/utils/XTerm';
+import { buildXtermTheme, XTerm } from '~/components/utils/XTerm';
 import { formatEvalEvent, createDebounceResizeObserver } from './utils';
 
 import './Preview.css';
@@ -18,10 +23,12 @@ interface OwnProps {}
 
 interface StateProps {
   status?: StatusState
+  monaco?: MonacoSettings
 }
 
 interface PreviewContentProps {
   status?: StatusState
+  fontFamily: string
 }
 
 const RESIZE_DELAY = 50;
@@ -31,7 +38,7 @@ const defaultTermConfig: ITerminalOptions = {
   fontSize: 13,
 };
 
-const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
+const PreviewContent: React.FC<PreviewContentProps> = ({fontFamily, status}) => {
   const theme = useTheme();
   const [offset, setOffset] = useState(0);
 
@@ -42,22 +49,19 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
   const resizeObserver = useMemo(() => (
    createDebounceResizeObserver(() => fitAddonRef.current.fit(), RESIZE_DELAY)
   ), [fitAddonRef]);
-  const addons = useMemo(() => [
-    fitAddonRef.current,
-    new CanvasAddon(),
-    new ImageAddon({
-      enableSizeReports: true,    // whether to enable CSI t reports (see below)
-      pixelLimit: 16777216,       // max. pixel size of a single image
-      sixelSupport: true,         // enable sixel support
-      sixelScrolling: true,       // whether to scroll on image output
-      sixelPaletteLimit: 256,     // initial sixel palette size
-      sixelSizeLimit: 25000000,   // size limit of a single sixel sequence
-      storageLimit: 128,          // FIFO storage limit in MB
-      showPlaceholder: true,      // whether to show a placeholder for evicted images
-      iipSupport: true,           // enable iTerm IIP support
-      iipSizeLimit: 20000000      // size limit of a single IIP sequence
-    }),
-  ], [fitAddonRef]);
+  const addons = useMemo<ITerminalAddon[]>(
+    () => [
+      fitAddonRef.current,
+      new CanvasAddon(),
+      new ImageAddon({
+        enableSizeReports: true,    // whether to enable CSI t reports (see below)
+        sixelSupport: true,         // enable sixel support
+        sixelScrolling: true,       // whether to scroll on image output
+        iipSupport: true,           // enable iTerm IIP support
+      })
+    ],
+    [fitAddonRef]
+  );
 
   const isClean = !status || !status?.dirty;
   const events = status?.events;
@@ -111,8 +115,11 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
       return;
     }
 
-    terminal.options = { theme: xtermTheme };
-  }, [xtermTheme, terminal]);
+    terminal.options = {
+      theme: xtermTheme,
+      fontFamily,
+    };
+  }, [xtermTheme, terminal, fontFamily]);
 
   if (status?.lastError) {
     return (
@@ -132,7 +139,12 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
       {
         (
           isClean ? (
-            <div className="app-preview__container">
+            <div
+              className="app-preview__container"
+              style={{
+                fontFamily, fontSize: `${defaultTermConfig.fontSize}px`
+              }}
+            >
               Press "Run" to compile program.
             </div>
           ) : (
@@ -143,6 +155,7 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
               options={{
                 ...defaultTermConfig,
                 theme: xtermTheme,
+                fontFamily: fontFamily,
               }}
             />
           )
@@ -152,33 +165,33 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
   );
 }
 
-const Preview: React.FC<StateProps & OwnProps> = ({ status }) => {
+const Preview: React.FC<StateProps & OwnProps> = ({ status, monaco }) => {
   const theme = useTheme();
   const styles = useMemo(() => {
     const { palette } = theme;
-    // console.log(JSON.stringify(palette));
-    // console.log(JSON.stringify(theme.semanticColors));
     return {
       backgroundColor: palette.neutralLight,
       color: palette.neutralDark,
       fontFamily: getDefaultFontFamily(),
     }
   }, [theme]);
+  const fontFamily = useMemo(() => (
+    getFontFamily(monaco?.fontFamily ?? DEFAULT_FONT)
+  ), [monaco]);
 
   return (
     <div className="app-preview" style={styles}>
       <div className='app-preview__content'>
-        <PreviewContent status={status} />
+        <PreviewContent status={status} fontFamily={fontFamily} />
       </div>
     </div>
   )
 }
 
 const ConnectedPreview = connect<StateProps, OwnProps>((
-  { status }
-  // { settings: {darkMode}, runTarget: { target }, status }
+  { status, monaco }
 ) => ({
-  status
+  status, monaco
 }))(Preview);
 
 export default ConnectedPreview;
