@@ -12,7 +12,7 @@ export const buildXtermTheme = (theme: Theme): ITheme => {
 
   return {
     foreground: palette.neutralPrimary,
-    background: palette.neutralLight,
+    background: semanticColors.bodyBackgroundChecked,
     cursor: palette.neutralSecondary,
     cursorAccent: palette.neutralSecondaryAlt,
     selectionBackground: palette.blue,
