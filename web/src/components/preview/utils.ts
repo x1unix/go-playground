@@ -1,7 +1,6 @@
 import type { EvalEvent } from '~/services/api';
 
-const imageSectionPrefix = 'IMAGE:';
-const imgRegEx = /^IMAGE:([A-Za-z0-9=+/]+)$/;
+const imgRegEx = /\bIMAGE:([A-Za-z0-9=+/]+)\b/;
 
 export enum Colors {
   Red = '\x1b[31m',
@@ -24,13 +23,10 @@ export const formatEvalEvent = ({Message: msg, Kind: type}: EvalEvent) => {
   // See:
   // - https://iterm2.com/documentation-images.html
   // - https://github.com/sindresorhus/ansi-escapes/blob/main/index.js
-  if (msg.startsWith(imageSectionPrefix) && imgRegEx.test(msg)) {
-    const base64 = msg.slice(imageSectionPrefix.length).trim();
-    //return `\033]1337;File=;inline=1:${base64}\a\n`;
-    return `${OSC}1337;File=inline=1:${base64}${BEL}\n`;
-  }
-
-  return msg;
+  return msg.replace(
+    imgRegEx,
+    `\u001b]1337;File=;inline=1:$1${BEL}`
+  );
 }
 
 export const createDebounceResizeObserver = (callback: () => void, delay: number) => {

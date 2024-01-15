@@ -1,11 +1,11 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 
-import 'xterm/css/xterm.css'
+import '@xterm/xterm/css/xterm.css'
 
 // We are using these as types.
 // eslint-disable-next-line no-unused-vars
-import { Terminal, ITerminalOptions, ITerminalAddon } from 'xterm'
+import { Terminal, ITerminalOptions, ITerminalAddon } from '@xterm/xterm'
 
 interface IProps {
   /**

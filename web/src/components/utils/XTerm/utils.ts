@@ -1,5 +1,5 @@
 import type { Theme } from '@fluentui/theme';
-import type { ITheme } from 'xterm';
+import type { ITheme } from '@xterm/xterm';
 
 /**
  * Constructs XTerm theme from FluentUI theme
@@ -9,13 +9,14 @@ import type { ITheme } from 'xterm';
  */
 export const buildXtermTheme = (theme: Theme): ITheme => {
   const { palette, semanticColors } = theme
+
   return {
     foreground: palette.neutralPrimary,
     background: palette.neutralLight,
-    cursor: palette.neutralPrimary,
-    cursorAccent: palette.neutralPrimary,
-    selectionForeground: palette.neutralLight,
-    selectionBackground: semanticColors.inputPlaceholderBackgroundChecked,
+    cursor: palette.neutralSecondary,
+    cursorAccent: palette.neutralSecondaryAlt,
+    selectionBackground: palette.blue,
+    selectionForeground: palette.neutralDark,
     black: palette.neutralPrimary,
     red: palette.red,
     green: palette.green,

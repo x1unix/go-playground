@@ -1,8 +1,10 @@
 import React, {useMemo, useEffect, useState, useRef} from 'react';
 import {MessageBar, MessageBarType, useTheme} from '@fluentui/react';
 
-import { ITerminalOptions } from "xterm";
-import { FitAddon } from 'xterm-addon-fit';
+import { ITerminalOptions } from '@xterm/xterm';
+import { FitAddon } from '@xterm/addon-fit';
+import { ImageAddon } from '@xterm/addon-image';
+import { CanvasAddon } from '@xterm/addon-canvas';
 
 import {getDefaultFontFamily} from '~/services/fonts';
 import {connect, StatusState} from '~/store';
@@ -40,6 +42,22 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
   const resizeObserver = useMemo(() => (
    createDebounceResizeObserver(() => fitAddonRef.current.fit(), RESIZE_DELAY)
   ), [fitAddonRef]);
+  const addons = useMemo(() => [
+    fitAddonRef.current,
+    new CanvasAddon(),
+    new ImageAddon({
+      enableSizeReports: true,    // whether to enable CSI t reports (see below)
+      pixelLimit: 16777216,       // max. pixel size of a single image
+      sixelSupport: true,         // enable sixel support
+      sixelScrolling: true,       // whether to scroll on image output
+      sixelPaletteLimit: 256,     // initial sixel palette size
+      sixelSizeLimit: 25000000,   // size limit of a single sixel sequence
+      storageLimit: 128,          // FIFO storage limit in MB
+      showPlaceholder: true,      // whether to show a placeholder for evicted images
+      iipSupport: true,           // enable iTerm IIP support
+      iipSizeLimit: 20000000      // size limit of a single IIP sequence
+    }),
+  ], [fitAddonRef]);
 
   const isClean = !status || !status?.dirty;
   const events = status?.events;
@@ -93,7 +111,6 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
       return;
     }
 
-    console.log('updating theme!');
     terminal.options = { theme: xtermTheme };
   }, [xtermTheme, terminal]);
 
@@ -122,11 +139,11 @@ const PreviewContent: React.FC<PreviewContentProps> = ({status}) => {
             <XTerm
               ref={xtermRef}
               className='app-preview__terminal'
+              addons={addons}
               options={{
                 ...defaultTermConfig,
                 theme: xtermTheme,
               }}
-              addons={[fitAddonRef.current]}
             />
           )
         )
