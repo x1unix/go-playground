@@ -8,7 +8,7 @@ import {
 } from '@fluentui/react';
 import {Pivot, PivotItem} from '@fluentui/react/lib/Pivot';
 
-import ThemeableComponent from '@components/utils/ThemeableComponent';
+import ThemeableComponent from '~/components/utils/ThemeableComponent';
 import {getContentStyles, getIconButtonStyles} from '~/styles/modal';
 import SettingsProperty from './SettingsProperty';
 import {MonacoSettings} from '~/services/config';
