@@ -1,4 +1,5 @@
 import React, {useMemo} from 'react';
+import clsx from 'clsx';
 import {MessageBar, MessageBarType, useTheme} from '@fluentui/react';
 
 import { Console } from '~/components/inspector/Console';
@@ -38,7 +39,14 @@ const RunOutput: React.FC<StateProps & OwnProps> = ({ status, monaco }) => {
 
   return (
     <div className="RunOutput" style={styles}>
-      <div className='RunOutput__content'>
+      <div
+        className={
+          clsx(
+            'RunOutput__content',
+            {'RunOutput__content--padded': isClean || status?.lastError}
+          )
+        }
+      >
         {
           status?.lastError ? (
             <MessageBar messageBarType={MessageBarType.error} isMultiline={true}>

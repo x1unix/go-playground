@@ -33,7 +33,10 @@ export const Console: React.FC<Props> = ({fontFamily, fontSize, status}) => {
   const xtermRef = useRef<XTerm>(null);
   const fitAddonRef = useRef(new FitAddon());
   const resizeObserver = useMemo(() => (
-    createDebounceResizeObserver(() => fitAddonRef.current.fit(), RESIZE_DELAY)
+    createDebounceResizeObserver(() => {
+      fitAddonRef.current.fit();
+      console.log('resize!');
+    }, RESIZE_DELAY)
   ), [fitAddonRef]);
 
   const addons = useMemo<ITerminalAddon[]>(
@@ -53,6 +56,7 @@ export const Console: React.FC<Props> = ({fontFamily, fontSize, status}) => {
   const isClean = !status?.dirty;
   const events = status?.events;
   const terminal = xtermRef.current?.terminal;
+  const elemRef = xtermRef?.current?.terminalRef;
 
   // Track output events
   useEffect(() => {
@@ -85,16 +89,16 @@ export const Console: React.FC<Props> = ({fontFamily, fontSize, status}) => {
 
   // Track terminal resize
   useEffect(() => {
-    if (!terminal?.element) {
+    if (!elemRef?.current) {
       resizeObserver.disconnect();
       return;
     }
 
-    resizeObserver.observe(terminal.element);
+    resizeObserver.observe(elemRef.current);
     return () => {
       resizeObserver.disconnect();
     }
-  }, [terminal, resizeObserver]);
+  }, [elemRef, resizeObserver]);
 
   // Theme
   useEffect(() => {
@@ -109,16 +113,18 @@ export const Console: React.FC<Props> = ({fontFamily, fontSize, status}) => {
   }, [theme, terminal, fontFamily]);
 
   return (
-    <XTerm
-      ref={xtermRef}
-      className='app-console'
-      addons={addons}
-      options={{
-        ...config,
-        theme,
-        fontSize,
-        fontFamily,
-      }}
-    />
+    <div className="app-Console">
+      <XTerm
+        ref={xtermRef}
+        className='app-Console__xterm'
+        addons={addons}
+        options={{
+          ...config,
+          theme,
+          fontSize,
+          fontFamily,
+        }}
+      />
+    </div>
   );
 }

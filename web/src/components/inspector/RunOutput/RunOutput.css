@@ -1,13 +1,26 @@
 .RunOutput {
   box-sizing: border-box;
   overflow: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .RunOutput__content {
   font-size: 10pt;
-  height: 100%;
-  padding: 0 15px;
   box-sizing: border-box;
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+  flex-wrap: wrap;
+  align-content: stretch;
+  overflow: hidden;
+}
+
+.RunOutput__content.RunOutput__content--padded {
+  padding: 0 15px;
+  overflow: auto;
 }
 
 /** Errors & Messages */

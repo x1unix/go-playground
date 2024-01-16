@@ -1,11 +1,14 @@
-.app-console {
-  margin: 0 -15px;
-  padding: 0 15px;
+.app-Console {
+  flex: 1 1 auto;
+  position: relative;
+  box-sizing: border-box;
 }
 
-.app-console,
-.app-console > .xterm {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
+.app-Console__xterm {
+  position: absolute;
+  inset: 0;
+}
+
+.app-Console .terminal > * {
+  padding: 0 15px;
 }
