@@ -17,6 +17,31 @@ export const isTouchDevice = () => (
   navigator['msMaxTouchPoints'] > 0
 );
 
+/**
+ * Calculates number of payload bytes in base64 encoded string.
+ * @param b64 Base64-encoded string.
+ */
+const base64ByteCount = (b64: string) => {
+  let padding = 0;
+  if (b64.endsWith('==')) {
+    padding = 2
+  } else if (b64.endsWith('=')) {
+    padding = 1
+  }
+  return (b64.length / 4) * 3 - padding;
+}
+
+/**
+ * Creates a new inline (iterm) image protocol string from base64-encoded image.
+ * @param b64 Base64-encoded image.
+ *
+ * @see https://iterm2.com/documentation-images.html
+ * @see https://github.com/sindresorhus/ansi-escapes/blob/main/index.js
+ */
+const newInlineImage = (b64: string) => {
+  const length = base64ByteCount(b64);
+  return `\u001b]1337;File=size=${length};inline=1:${b64}${BEL}`;
+}
 
 /**
  * Formats output event from program.
@@ -27,13 +52,7 @@ export const formatEvalEvent = ({Message: msg, Kind: type}: EvalEvent) => {
   }
 
   // Convert Go-playground inline images to iTerm2 inline images protocol.
-  // See:
-  // - https://iterm2.com/documentation-images.html
-  // - https://github.com/sindresorhus/ansi-escapes/blob/main/index.js
-  return msg.replace(
-    imgRegEx,
-    `\u001b]1337;File=;inline=1:$1${BEL}`
-  );
+  return msg.replace(imgRegEx, (_, b64) => newInlineImage(b64));
 }
 
 export const createDebounceResizeObserver = (callback: () => void, delay: number) => {
