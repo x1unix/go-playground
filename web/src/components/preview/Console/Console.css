@@ -1,0 +1,11 @@
+.app-console {
+  margin: 0 -15px;
+  padding: 0 15px;
+}
+
+.app-console,
+.app-console > .xterm {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}

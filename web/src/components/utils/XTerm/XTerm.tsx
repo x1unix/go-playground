@@ -102,7 +102,7 @@ interface IProps {
   customKeyEventHandler?(event: KeyboardEvent): boolean
 }
 
-export default class Xterm extends React.Component<IProps> {
+export class XTerm extends React.Component<IProps> {
   /**
    * The ref for the containing element.
    */

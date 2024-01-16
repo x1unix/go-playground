@@ -1,4 +1,4 @@
-import type { EvalEvent } from '~/services/api';
+import type { EvalEvent } from '@services/api';
 
 const imgRegEx = /\bIMAGE:([A-Za-z0-9=+/]+)\b/;
 
@@ -10,12 +10,6 @@ export enum Colors {
 const ESC = '\u001B[';
 const OSC = '\u001B]';
 const BEL = '\u0007';
-
-export const isTouchDevice = () => (
-  'ontouchstart' in window ||
-  navigator.maxTouchPoints > 0 ||
-  navigator['msMaxTouchPoints'] > 0
-);
 
 /**
  * Calculates number of payload bytes in base64 encoded string.
@@ -54,15 +48,3 @@ export const formatEvalEvent = ({Message: msg, Kind: type}: EvalEvent) => {
   // Convert Go-playground inline images to iTerm2 inline images protocol.
   return msg.replace(imgRegEx, (_, b64) => newInlineImage(b64));
 }
-
-export const createDebounceResizeObserver = (callback: () => void, delay: number) => {
-  let timeoutId: NodeJS.Timeout | null = null;
-
-  return new ResizeObserver(() => {
-    if (timeoutId !== null) {
-      clearTimeout(timeoutId);
-    }
-
-    timeoutId = setTimeout(callback, delay);
-  });
-};

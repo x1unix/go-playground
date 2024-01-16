@@ -1,4 +1,3 @@
-import XTerm from './XTerm'
-
-export { XTerm }
+export { XTerm } from './XTerm'
 export * from './utils'
+export * from './hooks'
