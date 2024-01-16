@@ -39,31 +39,27 @@ const RunOutput: React.FC<StateProps & OwnProps> = ({ status, monaco }) => {
 
   return (
     <div className="RunOutput" style={styles}>
-      <div
-        className={
-          clsx(
-            'RunOutput__content',
-            {'RunOutput__content--padded': isClean || status?.lastError}
-          )
-        }
-      >
+      <div className="RunOutput__content">
         {
           status?.lastError ? (
-            <MessageBar messageBarType={MessageBarType.error} isMultiline={true}>
-              <b className='RunOutput__label'>Error</b>
-              <pre className='RunOutput__errors'>
+            <div className="RunOutput__container">
+              <MessageBar messageBarType={MessageBarType.error} isMultiline={true}>
+                <b className='RunOutput__label'>Error</b>
+                <pre className='RunOutput__errors'>
                 {status.lastError}
               </pre>
-            </MessageBar>
+              </MessageBar>
+            </div>
           ) : isClean ? (
-            <span
+            <div
+              className="RunOutput__container"
               style={{
                 fontFamily,
                 fontSize: `${fontSize}px`
               }}
             >
               Press "Run" to compile program.
-            </span>
+            </div>
           ) : (
             <Console
               fontFamily={fontFamily}

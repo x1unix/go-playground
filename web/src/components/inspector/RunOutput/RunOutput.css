@@ -18,9 +18,11 @@
   overflow: hidden;
 }
 
-.RunOutput__content.RunOutput__content--padded {
+.RunOutput__container {
   padding: 0 15px;
   overflow: auto;
+  position: static;
+  display: block;
 }
 
 /** Errors & Messages */
