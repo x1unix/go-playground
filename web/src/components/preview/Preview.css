@@ -6,14 +6,15 @@
 .app-preview__content {
   font-size: 10pt;
   height: 100%;
-}
-
-.app-preview__container {
-  padding: 0 15px 0px 15px;
+  padding: 0 15px;
   box-sizing: border-box;
 }
 
 /** Terminal */
+.app-preview__terminal {
+  margin: 0 -15px;
+}
+
 .app-preview__terminal,
 .app-preview__terminal > .xterm {
   font-size: 9.75pt;

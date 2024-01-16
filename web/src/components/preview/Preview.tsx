@@ -15,7 +15,7 @@ import {
 } from '~/services/fonts';
 
 import { buildXtermTheme, XTerm } from '~/components/utils/XTerm';
-import { formatEvalEvent, createDebounceResizeObserver } from './utils';
+import { formatEvalEvent, createDebounceResizeObserver } from './format';
 
 import './Preview.css';
 
@@ -123,14 +123,12 @@ const PreviewContent: React.FC<PreviewContentProps> = ({fontFamily, status}) => 
 
   if (status?.lastError) {
     return (
-      <div className="app-preview__container">
-        <MessageBar messageBarType={MessageBarType.error} isMultiline={true}>
-          <b className='app-preview__label'>Error</b>
-          <pre className='app-preview__errors'>
-            {status.lastError}
-          </pre>
-        </MessageBar>
-      </div>
+      <MessageBar messageBarType={MessageBarType.error} isMultiline={true}>
+        <b className='app-preview__label'>Error</b>
+        <pre className='app-preview__errors'>
+          {status.lastError}
+        </pre>
+      </MessageBar>
     );
   }
 
@@ -139,14 +137,13 @@ const PreviewContent: React.FC<PreviewContentProps> = ({fontFamily, status}) => 
       {
         (
           isClean ? (
-            <div
-              className="app-preview__container"
+            <span
               style={{
                 fontFamily, fontSize: `${defaultTermConfig.fontSize}px`
               }}
             >
               Press "Run" to compile program.
-            </div>
+            </span>
           ) : (
             <XTerm
               ref={xtermRef}
