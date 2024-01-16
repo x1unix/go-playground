@@ -42,7 +42,7 @@ export const Console: React.FC<Props> = ({fontFamily, fontSize, status}) => {
   const addons = useMemo<ITerminalAddon[]>(
     () => [
       fitAddonRef.current,
-      // new CanvasAddon(),
+      new CanvasAddon(),
       new ImageAddon({
         enableSizeReports: true,
         sixelSupport: true,
