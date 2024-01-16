@@ -1,5 +1,4 @@
 import React, {useMemo} from 'react';
-import clsx from 'clsx';
 import {MessageBar, MessageBarType, useTheme} from '@fluentui/react';
 
 import { Console } from '~/components/inspector/Console';

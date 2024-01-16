@@ -35,7 +35,6 @@ export const Console: React.FC<Props> = ({fontFamily, fontSize, status}) => {
   const resizeObserver = useMemo(() => (
     createDebounceResizeObserver(() => {
       fitAddonRef.current.fit();
-      console.log('resize!');
     }, RESIZE_DELAY)
   ), [fitAddonRef]);
 
