@@ -3,8 +3,18 @@
   flex-direction: column;
 }
 
-.InspectorPanel .RunOutput {
+.InspectorPanel__container {
+  display: flex;
+  flex-direction: column;
   flex: 1 1 auto;
+}
+
+.InspectorPanel__container > * {
+  flex: 1 1 auto;
+}
+
+.InspectorPanel__container[hidden] {
+  display: none;
 }
 
 .InspectorPanel__controls {

@@ -115,9 +115,9 @@ const InspectorPanel: React.FC<Props> = ({
 
         }}
       />
-      { isCollapsed ? null : (
+      <div className="InspectorPanel__container" hidden={isCollapsed}>
         <RunOutput />
-      )}
+      </div>
     </Resizable>
   );
 };
