@@ -1,7 +1,7 @@
 import React, {useMemo} from 'react';
 import {MessageBar, MessageBarType, useTheme} from '@fluentui/react';
 
-import { Console } from '~/components/preview/Console';
+import { Console } from '~/components/inspector/Console';
 import {connect, type StatusState} from '~/store';
 import type {MonacoSettings} from '~/services/config';
 import {
@@ -10,7 +10,7 @@ import {
   getFontFamily
 } from '~/services/fonts';
 
-import './Preview.css';
+import './RunOutput.css';
 
 interface OwnProps {}
 
@@ -21,7 +21,7 @@ interface StateProps {
 
 const fontSize = 13;
 
-const Preview: React.FC<StateProps & OwnProps> = ({ status, monaco }) => {
+const RunOutput: React.FC<StateProps & OwnProps> = ({ status, monaco }) => {
   const theme = useTheme();
   const styles = useMemo(() => {
     const { palette } = theme;
@@ -37,13 +37,13 @@ const Preview: React.FC<StateProps & OwnProps> = ({ status, monaco }) => {
   const isClean = !status || !status?.dirty;
 
   return (
-    <div className="app-preview" style={styles}>
-      <div className='app-preview__content'>
+    <div className="RunOutput" style={styles}>
+      <div className='RunOutput__content'>
         {
           status?.lastError ? (
             <MessageBar messageBarType={MessageBarType.error} isMultiline={true}>
-              <b className='app-preview__label'>Error</b>
-              <pre className='app-preview__errors'>
+              <b className='RunOutput__label'>Error</b>
+              <pre className='RunOutput__errors'>
                 {status.lastError}
               </pre>
             </MessageBar>
@@ -69,10 +69,10 @@ const Preview: React.FC<StateProps & OwnProps> = ({ status, monaco }) => {
   )
 }
 
-const ConnectedPreview = connect<StateProps, OwnProps>((
+const ConnectedRunOutput = connect<StateProps, OwnProps>((
   { status, monaco }
 ) => ({
   status, monaco
-}))(Preview);
+}))(RunOutput);
 
-export default ConnectedPreview;
+export default ConnectedRunOutput;

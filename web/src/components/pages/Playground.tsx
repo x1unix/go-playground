@@ -9,7 +9,7 @@ import {
 import { Header } from '~/components/core/Header';
 import CodeEditor from '~/components/editor/CodeEditor';
 import FlexContainer from '~/components/editor/FlexContainer';
-import ResizablePreview from '~/components/preview/ResizablePreview';
+import InspectorPanel from '~/components/inspector/InspectorPanel/InspectorPanel';
 import { NotificationHost } from "~/components/modals/Notification";
 import Layout from '~/components/core/Layout/Layout';
 import StatusBar from '~/components/core/StatusBar';
@@ -35,7 +35,7 @@ const Playground = connect(({ panel }: any) => ({ panelProps: panel }))(({ panel
         <FlexContainer>
           <CodeContainer />
         </FlexContainer>
-        <ResizablePreview
+        <InspectorPanel
           {...panelProps}
           onViewChange={changes => {
             dispatch(dispatchPanelLayoutChange(changes))
