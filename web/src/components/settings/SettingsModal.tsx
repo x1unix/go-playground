@@ -5,7 +5,6 @@ import {
   Dropdown,
   IconButton,
   Modal,
-  Stack,
   Pivot,
   PivotItem
 } from '@fluentui/react';
