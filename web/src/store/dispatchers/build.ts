@@ -196,7 +196,6 @@ export const runFileDispatcher: Dispatcher =
 export const createGoConsoleAdapter = (dispatch: DispatchFn) => (
   {
     log: (eventType: EvalEventKind, message: string) => {
-      console.log('%s:\t%s', eventType, message);
       dispatch(newProgramWriteAction({
         Kind: eventType,
         Message: message,
