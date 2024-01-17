@@ -175,7 +175,8 @@ export const Console: React.FC<Props> = ({fontFamily, fontSize, status, backend}
       fontSize,
       fontFamily,
     };
-  }, [theme, terminal, fontFamily, fontSize]);
+    fitAddonRef.current.fit();
+  }, [theme, terminal, fitAddonRef, fontFamily, fontSize]);
 
   // Rendering backend
   useEffect(() => {
