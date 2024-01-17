@@ -278,26 +278,6 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
             </PivotItem>
             <PivotItem headerText='Terminal'>
               <SettingsProperty
-                key='emulateTerminal'
-                title='Enable Terminal Emulation'
-                control={(
-                  <Checkbox
-                    defaultChecked={this.props.terminal?.emulateTerminal}
-                    onRenderLabel={() => (
-                      <Stack style={{marginLeft: 4}}>
-                        <span>Enables colored output and terminal sequences support.</span>
-                        <span>
-                          Text selection <a href="https://github.com/xtermjs/xterm.js/issues/1291" target="_blank" rel="noreferrer">doesn't work</a> on mobile devices.
-                        </span>
-                      </Stack>
-                    )}
-                    onChange={(_, val) => {
-                      this.touchTerminalSettings({emulateTerminal: val});
-                    }}
-                  />
-                )}
-              />
-              <SettingsProperty
                 title='Font Size'
                 description='Controls the font size in pixels of the terminal.'
                 control={(
