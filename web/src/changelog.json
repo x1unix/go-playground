@@ -1,19 +1,19 @@
 {
-  "Go - WebAssembly": [
+  "Interface - Terminal": [
     {
-      "issueId": 290,
-      "url": "/issues/290",
-      "description": "Update Go WebAssembly compiler to 1.21"
+      "issueId": 303,
+      "url": "/pull/303",
+      "description": "Support terminal sequences and colored output"
     },
     {
-      "issueId": 292,
-      "url": "/issues/292",
-      "description": "Expose syscall/js package for Yaegi"
+      "issueId": 264,
+      "url": "/issues/264",
+      "description": "Cleanup output before run"
     },
     {
-      "issueId": 293,
-      "url": "/issues/293",
-      "description": "Fix UI freeze on Go program panic"
+      "issueId": 267,
+      "url": "/issues/267",
+      "description": "Fix new line formatting in output"
     }
   ]
 }
