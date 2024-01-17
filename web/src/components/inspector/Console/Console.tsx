@@ -160,9 +160,10 @@ export const Console: React.FC<Props> = ({fontFamily, fontSize, status}) => {
 
     terminal.options = {
       theme,
+      fontSize,
       fontFamily,
     };
-  }, [theme, terminal, fontFamily]);
+  }, [theme, terminal, fontFamily, fontSize]);
 
   // Register button on focus
   useEffect(() => {

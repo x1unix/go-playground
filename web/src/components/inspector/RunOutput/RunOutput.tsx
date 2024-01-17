@@ -3,6 +3,7 @@ import {MessageBar, MessageBarType, useTheme} from '@fluentui/react';
 
 import { Console } from '~/components/inspector/Console';
 import {connect, type StatusState} from '~/store';
+import type { TerminalState } from '~/store/terminal';
 import type {MonacoSettings} from '~/services/config';
 import {
   DEFAULT_FONT,
@@ -17,12 +18,12 @@ interface OwnProps {}
 interface StateProps {
   status?: StatusState
   monaco?: MonacoSettings
+  terminal: TerminalState
 }
 
-const fontSize = 13;
-
-const RunOutput: React.FC<StateProps & OwnProps> = ({ status, monaco }) => {
+const RunOutput: React.FC<StateProps & OwnProps> = ({ status, monaco, terminal }) => {
   const theme = useTheme();
+  const { fontSize } = terminal.settings;
   const styles = useMemo(() => {
     const { palette } = theme;
     return {
@@ -73,9 +74,9 @@ const RunOutput: React.FC<StateProps & OwnProps> = ({ status, monaco }) => {
 }
 
 const ConnectedRunOutput = connect<StateProps, OwnProps>((
-  { status, monaco }
+  { status, monaco, terminal }
 ) => ({
-  status, monaco
+  status, monaco, terminal
 }))(RunOutput);
 
 export default ConnectedRunOutput;
