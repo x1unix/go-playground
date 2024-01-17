@@ -1,10 +1,12 @@
 import React from 'react';
 import {
   Checkbox,
+  TextField,
   Dropdown,
   IconButton,
   IDropdownOption,
-  Modal
+  Modal,
+  Stack
 } from '@fluentui/react';
 import {Pivot, PivotItem} from '@fluentui/react/lib/Pivot';
 
@@ -124,7 +126,7 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
         </div>
         <div id={this.subtitleID} className={contentStyles.body}>
           <Pivot aria-label='Settings'>
-            <PivotItem headerText='Editor'>
+            <PivotItem headerText='General'>
               <SettingsProperty
                 key='fontFamily'
                 title='Font Family'
@@ -194,7 +196,7 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                 )}
               />
             </PivotItem>
-            <PivotItem headerText='Advanced'>
+            <PivotItem headerText='Editor'>
               <SettingsProperty
                 key='cursorBlinking'
                 title='Cursor Blinking'
@@ -272,6 +274,53 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                     onChange={(_, val) => {
                       this.touchMonacoProperty('mouseWheelZoom', val);
                     }}
+                  />
+                )}
+              />
+            </PivotItem>
+            <PivotItem headerText='Terminal'>
+              <SettingsProperty
+                key='emulateTerminal'
+                title='Enable Terminal Emulation'
+                control={(
+                  <Checkbox
+                    onRenderLabel={() => (
+                      <Stack style={{marginLeft: 4}}>
+                        <span>Enables colored output and terminal sequences support.</span>
+                        <span>
+                          Text selection <a href="https://github.com/xtermjs/xterm.js/issues/1291" target="_blank" rel="noreferrer">doesn't work</a> on mobile devices.
+                        </span>
+                      </Stack>
+                    )}
+                  />
+                )}
+              />
+              <SettingsProperty
+                title='Font Size'
+                description='Controls the font size in pixels of the terminal.'
+                control={(
+                  <TextField
+                    type='number'
+                    min={1}
+                    max={128}
+                    // value={this.props.monaco?.fontSize}
+                    onChange={(_, val) => {
+                      // this.touchMonacoProperty('fontSize', val);
+                    }}
+                  />
+                )}
+              />
+              <SettingsProperty
+                key='terminalBackend'
+                title='Rendering Backend'
+                description='Set the rendering backend for the terminal.'
+                control={(
+                  <Dropdown
+                    options={[
+                      { key: 'canvas', text: 'Canvas (default)' },
+                      { key: 'dom', text: 'DOM' },
+                      { key: 'webgl', text: 'WebGL (experimental)' },
+                    ]}
                   />
                 )}
               />

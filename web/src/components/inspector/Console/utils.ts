@@ -9,9 +9,3 @@ export const createDebounceResizeObserver = (callback: () => void, delay: number
     timeoutId = setTimeout(callback, delay);
   });
 };
-
-export const isTouchDevice = () => (
-  'ontouchstart' in window ||
-  navigator.maxTouchPoints > 0 ||
-  navigator['msMaxTouchPoints'] > 0
-);

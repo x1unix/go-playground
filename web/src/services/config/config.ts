@@ -2,10 +2,10 @@ import { loadTheme } from '@fluentui/react';
 import { DarkTheme, LightTheme } from '../colors';
 import {PanelState} from '~/store';
 import { defaultPanelProps } from '~/styles/layout';
-import { supportsPreferColorScheme } from "~/utils/theme";
+import { supportsPreferColorScheme } from '~/utils/theme';
 
-import { RunTargetConfig, defaultRunTarget } from "./target";
-import { MonacoSettings, defaultMonacoSettings } from "./monaco";
+import { RunTargetConfig, defaultRunTarget } from './target';
+import { MonacoSettings, defaultMonacoSettings } from './monaco';
 
 const DARK_THEME_KEY = 'ui.darkTheme.enabled';
 const USE_SYSTEM_THEME_KEY = 'ui.darkTheme.useSystem';
@@ -19,6 +19,8 @@ const GOPROXY_URL = 'go.env.GOPROXY';
 const setThemeStyles = (isDark: boolean) => (
   loadTheme(isDark ? DarkTheme : LightTheme)
 );
+
+// TODO: move key operations to store.
 
 const Config = {
   _cache: new Map<string, any>(),
@@ -48,7 +50,7 @@ const Config = {
   },
 
   get goProxyUrl() {
-    return this.getString(GOPROXY_URL, "https://proxy.golang.org");
+    return this.getString(GOPROXY_URL, 'https://proxy.golang.org');
   },
 
   set goProxyUrl(newVal: string) {
@@ -134,8 +136,9 @@ const Config = {
 
     try {
       const obj = JSON.parse(val) as T;
-      this._cache.set(key, obj);
-      return obj;
+      const result = fallback ? { ...fallback, ...obj } : obj;
+      this._cache.set(key, result);
+      return result;
     } catch (err) {
       console.warn(`failed to read settings key ${key}`, err);
       this._cache.set(key, fallback);
