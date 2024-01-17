@@ -7,8 +7,6 @@ export enum Colors {
   Reset = '\x1b[0m'
 }
 
-const ESC = '\u001B[';
-const OSC = '\u001B]';
 const BEL = '\u0007';
 
 /**
