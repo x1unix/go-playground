@@ -59,13 +59,16 @@ export const Console: React.FC<Props> = ({fontFamily, fontSize, status}) => {
 
   // Track output events
   useEffect(() => {
-    if (!events?.length) {
+    if (!events?.length || !terminal) {
       setOffset(0);
       terminal?.clear();
+      terminal?.reset();
       return;
     }
+
     if (offset === 0) {
       terminal?.clear();
+      terminal?.reset();
     }
 
     const batch = events?.slice(offset);
