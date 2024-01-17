@@ -1,0 +1,61 @@
+.RunOutput {
+  box-sizing: border-box;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.RunOutput__content {
+  font-size: 10pt;
+  box-sizing: border-box;
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+  flex-wrap: wrap;
+  align-content: stretch;
+  overflow: hidden;
+}
+
+.RunOutput__container {
+  padding: 0 15px;
+  overflow: auto;
+  position: static;
+  display: block;
+}
+
+/** Errors & Messages */
+.RunOutput__error {
+  color: white;
+  background: #cc0000;
+}
+
+.RunOutput__build-error {
+  margin: 0 0 5px;
+}
+
+/** Misc **/
+
+.RunOutput__label {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.RunOutput__errors {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  word-wrap: break-word;
+  white-space: break-spaces;
+}
+
+.RunOutput__progress {
+  position: relative;
+  bottom: 8px;
+  margin-bottom: -18px;
+}
+
+.RunOutput__progress--hidden {
+  display: none;
+}

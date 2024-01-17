@@ -10,6 +10,10 @@ import config, {
 
 import vimReducers from './vim/reducers';
 import notificationReducers from './notifications/reducers';
+
+import { initialTerminalState } from './terminal/state';
+import { reducers as terminalReducers } from './terminal/reducers';
+
 import {
   Action,
   ActionType,
@@ -27,6 +31,15 @@ import {
   PanelState,
   UIState,
 } from './state';
+
+// TODO: move settings reducers and state to store/settings
+const initialSettingsState: SettingsState = {
+  darkMode: config.darkThemeEnabled,
+  autoFormat: true,
+  useSystemTheme: config.useSystemTheme,
+  enableVimMode: config.enableVimMode,
+  goProxyUrl: config.goProxyUrl,
+};
 
 const reducers = {
   runTarget: mapByAction<RunTargetConfig>({
@@ -136,13 +149,7 @@ const reducers = {
       }
     )
   },
-    {
-      darkMode: config.darkThemeEnabled,
-      autoFormat: true,
-      useSystemTheme: config.useSystemTheme,
-      enableVimMode: config.enableVimMode,
-      goProxyUrl: config.goProxyUrl,
-    }
+   initialSettingsState,
   ),
   monaco: mapByAction<MonacoSettings>({
     [ActionType.MONACO_SETTINGS_CHANGE]: (s: MonacoSettings, {payload}: Action<MonacoParamsChanges>) => (
@@ -181,6 +188,7 @@ const reducers = {
   }, {}),
   vim: vimReducers,
   notifications: notificationReducers,
+  terminal: terminalReducers,
 };
 
 export const getInitialState = (): State => ({
@@ -191,18 +199,13 @@ export const getInitialState = (): State => ({
     fileName: 'prog.go',
     code: ''
   },
-  settings: {
-    darkMode: config.darkThemeEnabled,
-    autoFormat: config.autoFormat,
-    useSystemTheme: config.useSystemTheme,
-    enableVimMode: config.enableVimMode,
-    goProxyUrl: config.goProxyUrl,
-  },
+  settings: initialSettingsState,
   runTarget: config.runTargetConfig,
   monaco: config.monacoSettings,
   panel: config.panelLayout,
   notifications: {},
-  vim: null
+  vim: null,
+  terminal: initialTerminalState,
 });
 
 export const createRootReducer = history => combineReducers({

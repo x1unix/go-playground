@@ -9,16 +9,16 @@ import {
   VscSplitVertical
 } from 'react-icons/vsc';
 
-import Preview from './Preview';
+import RunOutput from '~/components/inspector/RunOutput';
 import PanelHeader from '~/components/core/Panel/PanelHeader';
 import {LayoutType, DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_WIDTH} from '~/styles/layout';
-import './ResizablePreview.css';
+import './InspectorPanel.css';
 
 const MIN_HEIGHT = 36;
 const MIN_WIDTH = 120;
 const handleClasses = {
-  top: 'ResizablePreview__handle--top',
-  left: 'ResizablePreview__handle--left',
+  top: 'InspectorPanel__handle--top',
+  left: 'InspectorPanel__handle--left',
 }
 
 export interface ResizePanelParams {
@@ -32,7 +32,7 @@ interface Props extends ResizePanelParams {
   onViewChange?: (changes: ResizePanelParams) => void
 }
 
-const ResizablePreview: React.FC<Props> = ({
+const InspectorPanel: React.FC<Props> = ({
   layout = LayoutType.Vertical,
   height = DEFAULT_PANEL_HEIGHT,
   width= DEFAULT_PANEL_WIDTH,
@@ -74,9 +74,9 @@ const ResizablePreview: React.FC<Props> = ({
     <Resizable
       className={
         clsx(
-          'ResizablePreview',
-          isCollapsed && 'ResizablePreview--collapsed',
-          `ResizablePreview--${layout}`
+          'InspectorPanel',
+          isCollapsed && 'InspectorPanel--collapsed',
+          `InspectorPanel--${layout}`
         )
       }
       handleClasses={handleClasses}
@@ -115,11 +115,11 @@ const ResizablePreview: React.FC<Props> = ({
 
         }}
       />
-      { isCollapsed ? null : (
-        <Preview />
-      )}
+      <div className="InspectorPanel__container" hidden={isCollapsed}>
+        <RunOutput />
+      </div>
     </Resizable>
   );
 };
 
-export default ResizablePreview;
+export default InspectorPanel;

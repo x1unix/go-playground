@@ -1,0 +1,48 @@
+.app-Console {
+  flex: 1 1 auto;
+  position: relative;
+  box-sizing: border-box;
+
+  --terminal-padding-x: 15px;
+}
+
+.app-Console__xterm {
+  position: absolute;
+  inset: 0;
+}
+
+.app-Console .terminal > * {
+  padding: 0 var(--terminal-padding-x);
+}
+
+/**
+ xterm.js canvas plugin fixes.
+
+ The plugin places a few canvas elements inside with absolute positioning
+ relative to parent and doesn't respect parent's paddings.
+ */
+.app-Console .xterm .xterm-screen canvas {
+  transform: translate3d(var(--terminal-padding-x), 0, 0);
+}
+
+/**
+Copy button for touch devices
+ */
+.app-Console__copy {
+  position: absolute;
+  display: none;
+  z-index: 999;
+  top: 0;
+  right: var(--terminal-padding-x);
+}
+
+.app-Console__copy[hidden] {
+  display: none;
+}
+
+/* Enable copy button only on touch devices */
+@media (hover: none) {
+  .app-Console__copy {
+      display: block;
+  }
+}

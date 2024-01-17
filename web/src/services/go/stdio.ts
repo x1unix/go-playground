@@ -4,34 +4,26 @@
 
 import { decoder } from './foundation';
 import { IWriter } from './fs';
-import { EvalEventKind } from "../api";
+import { EvalEventKind } from '../api';
 
 export interface ConsoleLogger {
-  log(eventType: EvalEventKind, message: string)
+  log(eventType: EvalEventKind, message: string): void
 }
 
 export class StdioWrapper {
-  outputBuf = '';
-
   constructor(private logger: ConsoleLogger) { }
 
   private getWriter(kind: EvalEventKind) {
     return {
       write: (data: Uint8Array) => {
-        this.outputBuf += decoder.decode(data);
-        const nl = this.outputBuf.lastIndexOf('\n');
-        if (nl !== -1) {
-          const message = this.outputBuf.substr(0, nl);
-          this.logger.log(kind, message);
-          this.outputBuf = this.outputBuf.substr(nl + 1);
-        }
+        const msg = decoder.decode(data);
+        this.logger.log(kind, msg);
         return data.length;
       }
     };
   }
 
   reset() {
-    this.outputBuf = '';
   }
 
   get stdoutPipe(): IWriter {

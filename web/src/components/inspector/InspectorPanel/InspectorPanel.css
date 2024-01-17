@@ -1,28 +1,39 @@
-.ResizablePreview {
+.InspectorPanel {
   display: flex;
   flex-direction: column;
 }
 
-.ResizablePreview .app-preview {
+.InspectorPanel__container {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+.InspectorPanel__container > * {
   flex: 1 1 auto;
 }
 
-.ResizablePreview__controls {
+.InspectorPanel__container[hidden] {
+  display: none;
+}
+
+.InspectorPanel__controls {
   padding: 10px 15px 0 15px;
 }
 
 /** Collapsed state **/
-.ResizablePreview.ResizablePreview--collapsed {
+.InspectorPanel.InspectorPanel--collapsed {
   height: auto !important;
 }
 
-.ResizablePreview.ResizablePreview--collapsed:before {
+.InspectorPanel.InspectorPanel--collapsed:before {
   content: "";
   position: absolute;
   background: var(--pg-handle-default-color);
 }
 
-.ResizablePreview.ResizablePreview--collapsed.ResizablePreview--vertical:before {
+.InspectorPanel.InspectorPanel--collapsed.InspectorPanel--vertical:before {
   top: 0;
   left: 0;
   right: 0;
@@ -30,7 +41,7 @@
 }
 
 /** Handles - vertical **/
-.ResizablePreview__handle--left:before {
+.InspectorPanel__handle--left:before {
   content: "";
   position: absolute;
   background: var(--pg-handle-default-color);
@@ -41,18 +52,18 @@
   left: 50%;
 }
 
-.ResizablePreview__handle--left {
+.InspectorPanel__handle--left {
   transition: background-color 0.1s ease-in 0s;
 }
 
-.ResizablePreview__handle--left:hover:before,
-.ResizablePreview__handle--left:active:before {
+.InspectorPanel__handle--left:hover:before,
+.InspectorPanel__handle--left:active:before {
   background: var(--pg-handle-active-color);
   width: 3px;
 }
 
 @media (hover: none), (pointer: coarse) {
-  .ResizablePreview__handle--left {
+  .InspectorPanel__handle--left {
     background: black;
     display: flex;
     flex-direction: column;
@@ -61,17 +72,17 @@
     color: #999;
   }
 
-  .ResizablePreview__handle--left:hover,
-  .ResizablePreview__handle--left:active {
+  .InspectorPanel__handle--left:hover,
+  .InspectorPanel__handle--left:active {
     background: black;
     color: white;
   }
 
-  .ResizablePreview__handle--left:before {
+  .InspectorPanel__handle--left:before {
     display: none;
   }
 
-  .ResizablePreview__handle--left:after {
+  .InspectorPanel__handle--left:after {
     content: "";
     background: currentColor;
     height: 20%;
@@ -84,7 +95,7 @@
 }
 
 /** Handles - Horizontal **/
-.ResizablePreview__handle--top:before {
+.InspectorPanel__handle--top:before {
   content: "";
   position: absolute;
   background: var(--pg-handle-default-color);
@@ -95,18 +106,18 @@
   height: 1px;
 }
 
-.ResizablePreview__handle--top {
+.InspectorPanel__handle--top {
   transition: background-color 0.1s ease-in 0s;
 }
 
-.ResizablePreview__handle--top:hover:before,
-.ResizablePreview__handle--top:active:before {
+.InspectorPanel__handle--top:hover:before,
+.InspectorPanel__handle--top:active:before {
   background: var(--pg-handle-active-color);
   height: 3px;
 }
 
 @media (hover: none), (pointer: coarse) {
-  .ResizablePreview__handle--top {
+  .InspectorPanel__handle--top {
     background: black;
     display: flex;
     flex-direction: column;
@@ -115,17 +126,17 @@
     color: #999;
   }
 
-  .ResizablePreview__handle--top:hover,
-  .ResizablePreview__handle--top:active {
+  .InspectorPanel__handle--top:hover,
+  .InspectorPanel__handle--top:active {
     background: black;
     color: #fff;
   }
 
-  .ResizablePreview__handle--top:before {
+  .InspectorPanel__handle--top:before {
     display: none;
   }
 
-  .ResizablePreview__handle--top:after {
+  .InspectorPanel__handle--top:after {
     content: "";
     background: currentColor;
     width: 20%;
