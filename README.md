@@ -16,6 +16,7 @@ Improved Go Playground powered by Monaco Editor and React - [https://goplay.tool
 * 🌚 Dark theme
 * 💡 Code autocomplete
 * ⌨️ VIM mode support
+* 🌈 Color and image output
 * 💾 Load and save files
 * 📔 Snippets and tutorials
 * ⚙ Customization (fonts, ligatures, etc)
