@@ -23,7 +23,7 @@ interface StateProps {
 
 const RunOutput: React.FC<StateProps & OwnProps> = ({ status, monaco, terminal }) => {
   const theme = useTheme();
-  const { fontSize } = terminal.settings;
+  const { fontSize, renderingBackend } = terminal.settings;
   const styles = useMemo(() => {
     const { palette } = theme;
     return {
@@ -65,6 +65,7 @@ const RunOutput: React.FC<StateProps & OwnProps> = ({ status, monaco, terminal }
               fontFamily={fontFamily}
               fontSize={fontSize}
               status={status}
+              backend={renderingBackend}
             />
           )
         }

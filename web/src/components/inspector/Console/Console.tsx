@@ -1,20 +1,32 @@
-import React, { useMemo, useCallback, useEffect, useState, useRef } from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import copy from 'copy-to-clipboard';
-import { DefaultButton, useTheme } from '@fluentui/react';
-import type { ITerminalOptions, ITerminalAddon } from '@xterm/xterm';
-import { FitAddon } from '@xterm/addon-fit';
-import { ImageAddon } from '@xterm/addon-image';
-import { CanvasAddon } from '@xterm/addon-canvas';
 
-import type { StatusState } from '~/store';
-import { useXtermTheme, XTerm } from '~/components/utils/XTerm';
+import {DefaultButton, useTheme} from '@fluentui/react';
 
-import { formatEvalEvent } from './format';
-import { createDebounceResizeObserver } from './utils';
+import type {ITerminalAddon, ITerminalOptions} from '@xterm/xterm';
+import {FitAddon} from '@xterm/addon-fit';
+import {ImageAddon} from '@xterm/addon-image';
+import {CanvasAddon} from '@xterm/addon-canvas';
+import {WebglAddon} from '@xterm/addon-webgl';
+
+import type {StatusState} from '~/store';
+import {RenderingBackend} from '~/store/terminal';
+import {useXtermTheme, XTerm} from '~/components/utils/XTerm';
+
+import {formatEvalEvent} from './format';
+import {createDebounceResizeObserver} from './utils';
 
 import './Console.css';
 
 const RESIZE_DELAY = 50;
+
+const imageAddonConfig = {
+    enableSizeReports: true,
+    sixelSupport: true,
+    sixelScrolling: true,
+    iipSupport: true,
+};
+
 const config: ITerminalOptions = {
   convertEol: true,
 };
@@ -23,6 +35,18 @@ interface Props {
   status?: StatusState
   fontFamily: string
   fontSize: number
+  backend: RenderingBackend
+}
+
+const getAddonFromBackend = (backend: RenderingBackend): ITerminalAddon | null => {
+  switch (backend) {
+  case RenderingBackend.WebGL:
+    return new WebglAddon();
+  case RenderingBackend.Canvas:
+    return new CanvasAddon();
+  default:
+    return null;
+  }
 }
 
 const CopyButton: React.FC<{
@@ -58,32 +82,20 @@ const CopyButton: React.FC<{
 /**
  * Console is Go program events output component based on xterm.js
  */
-export const Console: React.FC<Props> = ({fontFamily, fontSize, status}) => {
+export const Console: React.FC<Props> = ({fontFamily, fontSize, status, backend}) => {
   const theme = useXtermTheme();
   const [offset, setOffset] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
 
   const xtermRef = useRef<XTerm>(null);
   const fitAddonRef = useRef(new FitAddon());
+  const imageAddonRef = useRef(new ImageAddon(imageAddonConfig));
+
   const resizeObserver = useMemo(() => (
     createDebounceResizeObserver(() => {
       fitAddonRef.current.fit();
     }, RESIZE_DELAY)
   ), [fitAddonRef]);
-
-  const addons = useMemo<ITerminalAddon[]>(
-    () => [
-      fitAddonRef.current,
-      new CanvasAddon(),
-      new ImageAddon({
-        enableSizeReports: true,
-        sixelSupport: true,
-        sixelScrolling: true,
-        iipSupport: true,
-      })
-    ],
-    [fitAddonRef]
-  );
 
   const isClean = !status?.dirty;
   const events = status?.events;
@@ -165,6 +177,25 @@ export const Console: React.FC<Props> = ({fontFamily, fontSize, status}) => {
     };
   }, [theme, terminal, fontFamily, fontSize]);
 
+  // Rendering backend
+  useEffect(() => {
+    if (!terminal) {
+      return;
+    }
+
+    console.log('xterm: switched backend:', backend);
+    const addon = getAddonFromBackend(backend);
+    if (!addon) {
+      return;
+    }
+
+    terminal.loadAddon(addon);
+    return () => {
+      console.log('xterm: unloading old backend:', backend);
+      addon.dispose();
+    };
+  }, [terminal, backend]);
+
   // Register button on focus
   useEffect(() => {
     if (!terminal?.textarea) {
@@ -192,7 +223,10 @@ export const Console: React.FC<Props> = ({fontFamily, fontSize, status}) => {
       <XTerm
         ref={xtermRef}
         className='app-Console__xterm'
-        addons={addons}
+        addons={[
+            fitAddonRef.current,
+            imageAddonRef.current,
+        ]}
         options={{
           ...config,
           theme,

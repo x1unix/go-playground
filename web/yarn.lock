@@ -2540,6 +2540,11 @@
   resolved "https://registry.yarnpkg.com/@xterm/addon-image/-/addon-image-0.7.0-beta.1.tgz#8d1df39db103442d18e61d05f1665f49ac7f19a9"
   integrity sha512-c+wB+ODtKgWaQHvw1442R63Ivu10cYjelOYob1J6r5VKFD9DQCofyiMC9BLJsS7kJMmg9A7KWtUCTwvcbR3HQg==
 
+"@xterm/addon-webgl@^0.17.0-beta.1":
+  version "0.17.0-beta.1"
+  resolved "https://registry.yarnpkg.com/@xterm/addon-webgl/-/addon-webgl-0.17.0-beta.1.tgz#905a6bb98b14ab5799b8f2349838a6f061b068c1"
+  integrity sha512-SRUh8dFYmD8U37gGGl9+oV+D304wumkV7eoxvD53J5HQERSKAwk3YeIIVUGWu6q6pifjUgGqfiKCIQwbHZ6QIQ==
+
 "@xterm/xterm@^5.4.0-beta.1":
   version "5.4.0-beta.1"
   resolved "https://registry.yarnpkg.com/@xterm/xterm/-/xterm-5.4.0-beta.1.tgz#4937b0c4171e5ee7b05839f4438b4b7192852e0f"
