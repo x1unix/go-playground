@@ -13,7 +13,7 @@ export interface TerminalSettings {
 }
 
 export const defaultTerminalSettings: TerminalSettings = {
-  emulateTerminal: isTouchDevice(),
+  emulateTerminal: !isTouchDevice(),
   renderingBackend: RenderingBackend.Canvas,
   fontSize: 14,
 }

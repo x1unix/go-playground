@@ -4,51 +4,35 @@ import {
   TextField,
   Dropdown,
   IconButton,
-  IDropdownOption,
   Modal,
-  Stack
+  Stack,
+  Pivot,
+  PivotItem
 } from '@fluentui/react';
-import {Pivot, PivotItem} from '@fluentui/react/lib/Pivot';
 
 import ThemeableComponent from '~/components/utils/ThemeableComponent';
-import {getContentStyles, getIconButtonStyles} from '~/styles/modal';
+import { getContentStyles, getIconButtonStyles } from '~/styles/modal';
 import SettingsProperty from './SettingsProperty';
-import {MonacoSettings} from '~/services/config';
-import {DEFAULT_FONT, getAvailableFonts} from '~/services/fonts';
+import { DEFAULT_FONT } from '~/services/fonts';
+import type { MonacoSettings } from '~/services/config';
+import type { TerminalSettings, RenderingBackend } from '~/store/terminal';
 import {
   Connect,
-  MonacoParamsChanges,
-  SettingsState
+  type MonacoParamsChanges,
+  type SettingsState
 } from '~/store';
 
-const CURSOR_BLINK_STYLE_OPTS: IDropdownOption[] = [
-  { key: 'blink', text: 'Blink (default)' },
-  { key: 'smooth', text: 'Smooth' },
-  { key: 'phase', text: 'Phase' },
-  { key: 'expand', text: 'Expand' },
-  { key: 'solid', text: 'Solid' },
-];
-
-const CURSOR_LINE_OPTS: IDropdownOption[] = [
-  { key: 'line', text: 'Line (default)' },
-  { key: 'block', text: 'Block' },
-  { key: 'underline', text: 'Underline' },
-  { key: 'line-thin', text: 'Line thin' },
-  { key: 'block-outline', text: 'Block outline' },
-  { key: 'underline-thin', text: 'Underline thin' },
-];
-
-const FONT_OPTS: IDropdownOption[] = [
-  { key: DEFAULT_FONT, text: 'System default' },
-  ...getAvailableFonts().map(f => ({
-    key: f.family,
-    text: f.label,
-  }))
-];
+import {
+  cursorBlinkOptions,
+  cursorLineOptions,
+  fontOptions,
+  terminalBackendOptions
+} from './options';
 
 export interface SettingsChanges {
   monaco?: MonacoParamsChanges
   settings?: Partial<SettingsState>
+  terminal?: Partial<TerminalSettings>
 }
 
 export interface SettingsProps {
@@ -56,6 +40,7 @@ export interface SettingsProps {
   onClose: (changes: SettingsChanges) => void
   settings?: SettingsState
   monaco?: MonacoSettings
+  terminal?: TerminalSettings
   dispatch?: (action) => void
 }
 
@@ -66,6 +51,7 @@ interface SettingsModalState {
 @Connect(state => ({
   settings: state.settings,
   monaco: state.monaco,
+  terminal: state.terminal.settings,
 }))
 export default class SettingsModal extends ThemeableComponent<SettingsProps, SettingsModalState> {
   private titleID = 'Settings';
@@ -104,6 +90,18 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
     };
   }
 
+  private touchTerminalSettings(changes: Partial<TerminalSettings>) {
+    if (!this.changes.terminal) {
+      this.changes.terminal = changes;
+      return;
+    }
+
+    this.changes.terminal = {
+      ...this.changes.terminal,
+      ...changes,
+    };
+  }
+
   render() {
     const contentStyles = getContentStyles(this.theme);
     const iconButtonStyles = getIconButtonStyles(this.theme);
@@ -133,7 +131,7 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                 description='Controls editor font family'
                 control={(
                   <Dropdown
-                    options={FONT_OPTS}
+                    options={fontOptions}
                     defaultSelectedKey={this.props.monaco?.fontFamily ?? DEFAULT_FONT}
                     onChange={(_, num) => {
                       this.touchMonacoProperty('fontFamily', num?.key);
@@ -203,7 +201,7 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                 description='Set cursor animation style'
                 control={(
                   <Dropdown
-                    options={CURSOR_BLINK_STYLE_OPTS}
+                    options={cursorBlinkOptions}
                     defaultSelectedKey={this.props.monaco?.cursorBlinking}
                     onChange={(_, num) => {
                       this.touchMonacoProperty('cursorBlinking', num?.key);
@@ -217,7 +215,7 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                 description='Set the cursor style'
                 control={(
                   <Dropdown
-                    options={CURSOR_LINE_OPTS}
+                    options={cursorLineOptions}
                     defaultSelectedKey={this.props.monaco?.cursorStyle}
                     onChange={(_, num) => {
                       this.touchMonacoProperty('cursorStyle', num?.key);
@@ -284,6 +282,7 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                 title='Enable Terminal Emulation'
                 control={(
                   <Checkbox
+                    defaultChecked={this.props.terminal?.emulateTerminal}
                     onRenderLabel={() => (
                       <Stack style={{marginLeft: 4}}>
                         <span>Enables colored output and terminal sequences support.</span>
@@ -292,6 +291,9 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                         </span>
                       </Stack>
                     )}
+                    onChange={(_, val) => {
+                      this.touchTerminalSettings({emulateTerminal: val});
+                    }}
                   />
                 )}
               />
@@ -301,11 +303,21 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                 control={(
                   <TextField
                     type='number'
-                    min={1}
+                    min={4}
                     max={128}
-                    // value={this.props.monaco?.fontSize}
-                    onChange={(_, val) => {
-                      // this.touchMonacoProperty('fontSize', val);
+                    deferredValidationTime={0}
+                    defaultValue={this.props.terminal?.fontSize.toString()}
+                    onGetErrorMessage={val => {
+                      const fontSize = Number(val);
+                      if (isNaN(fontSize)) {
+                        return 'Please enter a valid number';
+                      }
+
+                      if (fontSize < 4) {
+                        return 'Please enter a number greater than 0';
+                      }
+
+                      this.touchTerminalSettings({fontSize});
                     }}
                   />
                 )}
@@ -316,11 +328,13 @@ export default class SettingsModal extends ThemeableComponent<SettingsProps, Set
                 description='Set the rendering backend for the terminal.'
                 control={(
                   <Dropdown
-                    options={[
-                      { key: 'canvas', text: 'Canvas (default)' },
-                      { key: 'dom', text: 'DOM' },
-                      { key: 'webgl', text: 'WebGL (experimental)' },
-                    ]}
+                    options={terminalBackendOptions}
+                    defaultSelectedKey={this.props.terminal?.renderingBackend}
+                    onChange={(_, val) => {
+                      this.touchTerminalSettings({
+                        renderingBackend: val?.key.toString() as RenderingBackend
+                      });
+                    }}
                   />
                 )}
               />

@@ -4,16 +4,18 @@ import {
   ICommandBarItemProps, Stack,
 } from '@fluentui/react';
 
-import apiClient, { VersionsInfo } from "~/services/api";
+import apiClient, { type VersionsInfo } from "~/services/api";
 import { newAddNotificationAction, NotificationType } from "~/store/notifications";
-import SettingsModal, { SettingsChanges } from '~/components/settings/SettingsModal';
+import SettingsModal, { type SettingsChanges } from '~/components/settings/SettingsModal';
 import ThemeableComponent from '~/components/utils/ThemeableComponent';
 import AboutModal from '~/components/modals/AboutModal';
 import RunTargetSelector from '~/components/inputs/RunTargetSelector';
 import SharePopup from '~/components/utils/SharePopup';
+
+import { dispatchTerminalSettingsChange } from '~/store/terminal';
 import {
   Connect,
-  Dispatcher,
+  type Dispatcher,
   dispatchToggleTheme,
   formatFileDispatcher,
   newCodeImportDispatcher,
@@ -25,6 +27,7 @@ import {
   saveFileDispatcher,
   shareSnippetDispatcher
 } from '~/store';
+
 import { getSnippetsMenuItems, SnippetMenuItem } from './utils';
 
 import './Header.css';
@@ -240,6 +243,10 @@ export class Header extends ThemeableComponent<any, HeaderState> {
 
     if (changes.settings) {
       this.props.dispatch(newSettingsChangeDispatcher(changes.settings));
+    }
+
+    if (changes.terminal) {
+      this.props.dispatch(dispatchTerminalSettingsChange(changes.terminal));
     }
 
     this.setState({ showSettings: false });
