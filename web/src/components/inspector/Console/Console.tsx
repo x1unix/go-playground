@@ -1,4 +1,6 @@
-import React, { useMemo, useEffect, useState, useRef } from 'react';
+import React, { useMemo, useCallback, useEffect, useState, useRef } from 'react';
+import copy from 'copy-to-clipboard';
+import { DefaultButton, useTheme } from '@fluentui/react';
 import type { ITerminalOptions, ITerminalAddon } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { ImageAddon } from '@xterm/addon-image';
@@ -23,12 +25,43 @@ interface Props {
   fontSize: number
 }
 
+const CopyButton: React.FC<{
+  onClick?: () => void
+  hidden?: boolean
+}> = ({onClick, hidden}) => {
+  const theme = useTheme();
+  const styles = useMemo(() => ({
+    root: {
+      color: theme?.palette.neutralPrimary,
+      marginLeft: 'auto',
+      marginTop: '4px',
+      marginRight: '2px',
+      padding: '4px 8px',
+      minWidth: 'initial'
+    },
+    rootHovered: {
+      color: theme?.palette.neutralDark
+    }
+  }), [theme]);
+  return (
+    <DefaultButton
+        className='app-Console__copy'
+        iconProps={{iconName: 'Copy'}}
+        ariaLabel='Copy'
+        onClick={onClick}
+        styles={styles}
+        hidden={hidden}
+    />
+  );
+}
+
 /**
  * Console is Go program events output component based on xterm.js
  */
 export const Console: React.FC<Props> = ({fontFamily, fontSize, status}) => {
   const theme = useXtermTheme();
   const [offset, setOffset] = useState(0);
+  const [isFocused, setIsFocused] = useState(false);
 
   const xtermRef = useRef<XTerm>(null);
   const fitAddonRef = useRef(new FitAddon());
@@ -56,6 +89,23 @@ export const Console: React.FC<Props> = ({fontFamily, fontSize, status}) => {
   const events = status?.events;
   const terminal = xtermRef.current?.terminal;
   const elemRef = xtermRef?.current?.terminalRef;
+
+  const copySelection = useCallback(() => {
+    if (!terminal) {
+      return;
+    }
+
+    const shouldTrim = !terminal.hasSelection();
+    if (!terminal.hasSelection()) {
+      terminal.selectAll();
+    }
+
+    const str = terminal.getSelection();
+    terminal.clearSelection();
+
+    // TODO: notify about copy result
+    copy(shouldTrim ? str.trim() : str);
+  }, [terminal]);
 
   // Track output events
   useEffect(() => {
@@ -114,8 +164,30 @@ export const Console: React.FC<Props> = ({fontFamily, fontSize, status}) => {
     };
   }, [theme, terminal, fontFamily]);
 
+  // Register button on focus
+  useEffect(() => {
+    if (!terminal?.textarea) {
+      return;
+    }
+
+    terminal.textarea.addEventListener('focus', () => {
+      setIsFocused(true);
+    });
+
+    terminal.textarea.addEventListener('blur', () => {
+      // Delay before blur to keep enough time for btn click
+      setTimeout(() => setIsFocused(false), 150);
+    });
+
+    return () => setIsFocused(false);
+  }, [terminal?.textarea, setIsFocused]);
+
   return (
     <div className="app-Console">
+      <CopyButton
+          hidden={!isFocused}
+          onClick={copySelection}
+      />
       <XTerm
         ref={xtermRef}
         className='app-Console__xterm'

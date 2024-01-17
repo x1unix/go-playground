@@ -24,3 +24,25 @@
 .app-Console .xterm .xterm-screen canvas {
   transform: translate3d(var(--terminal-padding-x), 0, 0);
 }
+
+/**
+Copy button for touch devices
+ */
+.app-Console__copy {
+  position: absolute;
+  display: none;
+  z-index: 999;
+  top: 0;
+  right: var(--terminal-padding-x);
+}
+
+.app-Console__copy[hidden] {
+  display: none;
+}
+
+/* Enable copy button only on touch devices */
+@media (hover: none) {
+  .app-Console__copy {
+      display: block;
+  }
+}
