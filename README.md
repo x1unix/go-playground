@@ -2,7 +2,7 @@
 
 [![Docker Hub](https://img.shields.io/docker/pulls/x1unix/go-playground.svg)](https://hub.docker.com/r/x1unix/go-playground)
 [![Docker Hub](https://img.shields.io/docker/v/x1unix/go-playground.svg?sort=semver)](https://hub.docker.com/r/x1unix/go-playground)
-[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v1/monitor/100nk.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
+[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v1/monitor/100nk.svg)](https://status.goplay.tools/?utm_source=status_badge)
 [![Coverage Status](https://coveralls.io/repos/github/x1unix/go-playground/badge.svg?branch=dev)](https://coveralls.io/github/x1unix/go-playground?branch=dev)
 [![Goreportcard](https://goreportcard.com/badge/github.com/x1unix/go-playground)](https://goreportcard.com/report/github.com/x1unix/go-playground)
 [![StandWithUkraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
