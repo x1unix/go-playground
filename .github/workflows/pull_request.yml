@@ -18,16 +18,16 @@ jobs:
           echo "::set-output name=go-mod::$(go env GOMODCACHE)"
       - uses: actions/checkout@v4
       - name: Go Build Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.go-cache-paths.outputs.go-build }}
           key: ${{ runner.os }}-go-build-${{ hashFiles('**/go.sum') }}
       - name: Go Mod Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.go-cache-paths.outputs.go-mod }}
           key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         env:
           cache-name: npm-cache
         with:
