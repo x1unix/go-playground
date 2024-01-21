@@ -14,7 +14,7 @@ import { NotificationHost } from "~/components/modals/Notification";
 import { Layout } from '~/components/layout/Layout/Layout';
 import { ConnectedStatusBar } from '~/components/layout/StatusBar';
 
-import './PlaygroundPage.css';
+import styles from './PlaygroundPage.module.css';
 
 interface PageParams {
   snippetID: string
@@ -33,7 +33,7 @@ const CodeContainer = connect()(({ dispatch }: any) => {
 
 export const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }))(({ panelProps, dispatch }: any) => {
   return (
-    <div className="Playground">
+    <div className={styles.Playground}>
       <Header />
       <Layout layout={panelProps.layout}>
         <FlexContainer>
