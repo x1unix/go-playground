@@ -21,7 +21,7 @@ interface StateProps {
   terminal: TerminalState
 }
 
-const RunOutputBase: React.FC<StateProps & OwnProps> = ({ status, monaco, terminal }) => {
+const RunOutput: React.FC<StateProps & OwnProps> = ({ status, monaco, terminal }) => {
   const theme = useTheme();
   const { fontSize, renderingBackend } = terminal.settings;
   const styles = useMemo(() => {
@@ -74,9 +74,9 @@ const RunOutputBase: React.FC<StateProps & OwnProps> = ({ status, monaco, termin
   )
 }
 
-export const RunOutput = connect<StateProps, OwnProps>((
+export const ConnectedRunOutput = connect<StateProps, OwnProps>((
   { status, monaco, terminal }
 ) => ({
   status, monaco, terminal
-}))(RunOutputBase);
+}))(RunOutput);
 

@@ -12,7 +12,7 @@ import { FlexContainer } from '~/components/features/editor/FlexContainer';
 import { InspectorPanel } from '~/components/features/inspector/InspectorPanel/InspectorPanel';
 import { NotificationHost } from "~/components/modals/Notification";
 import { Layout } from '~/components/layout/Layout/Layout';
-import { StatusBar } from '~/components/layout/StatusBar';
+import { ConnectedStatusBar } from '~/components/layout/StatusBar';
 
 import './PlaygroundPage.css';
 
@@ -47,7 +47,7 @@ export const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }
         />
         <NotificationHost />
       </Layout>
-      <StatusBar />
+      <ConnectedStatusBar />
     </div>
   );
 });

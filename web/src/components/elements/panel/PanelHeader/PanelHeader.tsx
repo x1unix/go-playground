@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import {ITheme, ThemeContext} from '@fluentui/react';
-import {PanelAction, PanelActionProps} from '~/components/layout/Panel/PanelAction';
+import { PanelAction, type PanelActionProps } from '../PanelAction';
 import './PanelHeader.css';
 
 interface Props {

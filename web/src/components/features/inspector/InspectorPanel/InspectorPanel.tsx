@@ -9,8 +9,8 @@ import {
   VscSplitVertical
 } from 'react-icons/vsc';
 
-import { RunOutput } from '../RunOutput';
-import { PanelHeader } from '~/components/layout/Panel/PanelHeader';
+import { ConnectedRunOutput } from '../RunOutput';
+import { PanelHeader } from '~/components/elements/panel/PanelHeader';
 import {LayoutType, DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_WIDTH} from '~/styles/layout';
 import './InspectorPanel.css';
 
@@ -116,7 +116,7 @@ export const InspectorPanel: React.FC<Props> = ({
         }}
       />
       <div className="InspectorPanel__container" hidden={isCollapsed}>
-        <RunOutput />
+        <ConnectedRunOutput />
       </div>
     </Resizable>
   );

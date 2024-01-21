@@ -92,7 +92,7 @@ const getStatusItem = ({loading, running, lastError}: StateProps) => {
 }
 
 
-const StatusBarBase: React.FC<Props> = ({
+const StatusBar: React.FC<Props> = ({
   loading,
   running,
   lastError,
@@ -152,7 +152,7 @@ const StatusBarBase: React.FC<Props> = ({
   );
 };
 
-export const StatusBar = connect<StateProps, OwnProps>(
+export const ConnectedStatusBar = connect<StateProps, OwnProps>(
   ({status}) => {
     const {
       loading,
@@ -162,4 +162,4 @@ export const StatusBar = connect<StateProps, OwnProps>(
     } = status!;
     return { loading, lastError, running, markers };
   }
-)(StatusBarBase);
+)(StatusBar);
