@@ -39,7 +39,7 @@ interface CodeEditorState {
   options: s.monaco,
   vim: s.vim,
 }))
-export default class CodeEditor extends React.Component<any, CodeEditorState> {
+export class CodeEditor extends React.Component<any, CodeEditorState> {
   private analyzer?: Analyzer;
   private _previousTimeout: any;
   private editorInstance?: editor.IStandaloneCodeEditor;

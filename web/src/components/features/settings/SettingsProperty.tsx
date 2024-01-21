@@ -7,7 +7,7 @@ interface SettingsSectionProps {
   control: JSX.Element
 }
 
-export default function SettingsProperty(props: SettingsSectionProps) {
+export function SettingsProperty(props: SettingsSectionProps) {
   if (props.description) {
     return (
       <div className={settingsPropStyles.block}>

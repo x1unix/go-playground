@@ -6,13 +6,13 @@ import {
   dispatchPanelLayoutChange,
   newSnippetLoadDispatcher,
 } from '~/store';
-import { Header } from '~/components/core/Header';
-import CodeEditor from '~/components/editor/CodeEditor';
-import FlexContainer from '~/components/editor/FlexContainer';
-import InspectorPanel from '~/components/inspector/InspectorPanel/InspectorPanel';
+import { Header } from '~/components/layout/Header';
+import { CodeEditor } from '~/components/features/editor/CodeEditor';
+import { FlexContainer } from '~/components/features/editor/FlexContainer';
+import { InspectorPanel } from '~/components/features/inspector/InspectorPanel/InspectorPanel';
 import { NotificationHost } from "~/components/modals/Notification";
-import Layout from '~/components/core/Layout/Layout';
-import StatusBar from '~/components/core/StatusBar';
+import { Layout } from '~/components/layout/Layout/Layout';
+import { StatusBar } from '~/components/layout/StatusBar';
 
 import './PlaygroundPage.css';
 
@@ -31,7 +31,7 @@ const CodeContainer = connect()(({ dispatch }: any) => {
   );
 })
 
-const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }))(({ panelProps, dispatch }: any) => {
+export const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }))(({ panelProps, dispatch }: any) => {
   return (
     <div className="Playground">
       <Header />
@@ -51,5 +51,3 @@ const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }))(({ p
     </div>
   );
 });
-
-export default PlaygroundPage;

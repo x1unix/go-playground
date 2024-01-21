@@ -80,7 +80,7 @@ const NotificationActionButton: React.FC<Omit<NotificationAction, 'key'>> = (
   );
 }
 
-const Notification: React.FunctionComponent<NotificationProps> = ({
+export const Notification: React.FunctionComponent<NotificationProps> = ({
   id,
   title,
   progress,
@@ -171,5 +171,3 @@ const Notification: React.FunctionComponent<NotificationProps> = ({
     </div>
   );
 }
-
-export default Notification;

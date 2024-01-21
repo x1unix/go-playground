@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from "react-redux";
 import {StateDispatch, State} from "~/store";
 import { NotificationsState, newRemoveNotificationAction } from "~/store/notifications";
-import Notification from "./Notification";
+import { Notification } from "./Notification";
 import "./NotificationHost.css";
 
 
@@ -11,7 +11,7 @@ interface Props {
   dispatch?: StateDispatch
 }
 
-const NotificationHost: React.FunctionComponent<Props> = ({notifications, dispatch}) => {
+const NotificationHostBase: React.FunctionComponent<Props> = ({notifications, dispatch}) => {
   return (
     <div className="NotificationHost">
       { notifications ? (
@@ -27,6 +27,6 @@ const NotificationHost: React.FunctionComponent<Props> = ({notifications, dispat
   )
 };
 
-export default connect<Props, any, any, State>(({notifications}) => ({notifications}))(
-  NotificationHost
+export const NotificationHost = connect<Props, any, any, State>(({notifications}) => ({notifications}))(
+  NotificationHostBase
 );

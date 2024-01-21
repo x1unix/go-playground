@@ -9,8 +9,8 @@ import {
   VscSplitVertical
 } from 'react-icons/vsc';
 
-import RunOutput from '~/components/inspector/RunOutput';
-import PanelHeader from '~/components/core/Panel/PanelHeader';
+import { RunOutput } from '../RunOutput';
+import { PanelHeader } from '~/components/layout/Panel/PanelHeader';
 import {LayoutType, DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_WIDTH} from '~/styles/layout';
 import './InspectorPanel.css';
 
@@ -32,7 +32,7 @@ interface Props extends ResizePanelParams {
   onViewChange?: (changes: ResizePanelParams) => void
 }
 
-const InspectorPanel: React.FC<Props> = ({
+export const InspectorPanel: React.FC<Props> = ({
   layout = LayoutType.Vertical,
   height = DEFAULT_PANEL_HEIGHT,
   width= DEFAULT_PANEL_WIDTH,
@@ -121,5 +121,3 @@ const InspectorPanel: React.FC<Props> = ({
     </Resizable>
   );
 };
-
-export default InspectorPanel;

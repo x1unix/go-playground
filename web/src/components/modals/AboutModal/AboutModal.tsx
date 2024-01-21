@@ -11,7 +11,7 @@ import {
 import { Modal } from '@fluentui/react/lib/Modal';
 import { Link } from '@fluentui/react/lib/Link';
 
-import ChangeLog from './ChangeLog';
+import { ChangeLog } from './ChangeLog';
 import { getContentStyles, getIconButtonStyles } from '~/styles/modal';
 import environment from "~/environment";
 
@@ -23,7 +23,7 @@ interface AboutModalProps {
   onClose: () => void
 }
 
-const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) => {
+export const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) => {
   const theme = useTheme();
   const contentStyles = getContentStyles(theme);
   const iconButtonStyles = getIconButtonStyles(theme);
@@ -135,4 +135,3 @@ const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) => {
 }
 
 AboutModal.defaultProps = { isOpen: false };
-export default AboutModal;

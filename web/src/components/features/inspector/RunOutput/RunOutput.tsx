@@ -1,7 +1,7 @@
 import React, {useMemo} from 'react';
 import {MessageBar, MessageBarType, useTheme} from '@fluentui/react';
 
-import { Console } from '~/components/inspector/Console';
+import { Console } from '~/components/features/inspector/Console';
 import {connect, type StatusState} from '~/store';
 import type { TerminalState } from '~/store/terminal';
 import type {MonacoSettings} from '~/services/config';
@@ -21,7 +21,7 @@ interface StateProps {
   terminal: TerminalState
 }
 
-const RunOutput: React.FC<StateProps & OwnProps> = ({ status, monaco, terminal }) => {
+const RunOutputBase: React.FC<StateProps & OwnProps> = ({ status, monaco, terminal }) => {
   const theme = useTheme();
   const { fontSize, renderingBackend } = terminal.settings;
   const styles = useMemo(() => {
@@ -74,10 +74,9 @@ const RunOutput: React.FC<StateProps & OwnProps> = ({ status, monaco, terminal }
   )
 }
 
-const ConnectedRunOutput = connect<StateProps, OwnProps>((
+export const RunOutput = connect<StateProps, OwnProps>((
   { status, monaco, terminal }
 ) => ({
   status, monaco, terminal
-}))(RunOutput);
+}))(RunOutputBase);
 
-export default ConnectedRunOutput;

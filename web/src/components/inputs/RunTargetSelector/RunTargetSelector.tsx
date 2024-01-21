@@ -53,7 +53,7 @@ interface Props extends OwnProps, StateProps {
   dispatch: StateDispatch
 }
 
-const RunTargetSelector: React.FC<Props> = ({
+const RunTargetSelectorBase: React.FC<Props> = ({
   responsive,
   disabled,
   runTarget,
@@ -97,9 +97,7 @@ const RunTargetSelector: React.FC<Props> = ({
   )
 }
 
-const ConnectedRunTargetSelector = connect<StateProps, OwnProps>
+export const RunTargetSelector = connect<StateProps, OwnProps>
 (({runTarget}) => ({runTarget}))(
-  RunTargetSelector
+  RunTargetSelectorBase
 );
-
-export default ConnectedRunTargetSelector;

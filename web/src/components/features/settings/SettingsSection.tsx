@@ -6,7 +6,7 @@ interface SettingsSectionProps {
   children: JSX.Element | JSX.Element[]
 }
 
-export default function SettingsSection(props: SettingsSectionProps) {
+export function SettingsSection(props: SettingsSectionProps) {
   return (
     <div className={settingsSectionStyles.section}>
       <div className={settingsSectionStyles.title}>{props.title}</div>

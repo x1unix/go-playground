@@ -5,9 +5,9 @@ import {VscDebugAlt} from "react-icons/vsc";
 import environment from "~/environment";
 import {StateDispatch, connect} from "~/store";
 
-import EllipsisText from "~/components/utils/EllipsisText";
-import StatusBarItem from "~/components/core/StatusBar/StatusBarItem";
-import VimStatusBarItem from "~/plugins/vim/VimStatusBarItem";
+import { EllipsisText } from "~/components/utils/EllipsisText";
+import { StatusBarItem } from "~/components/layout/StatusBar/StatusBarItem";
+import { VimStatusBarItem } from "~/plugins/vim/VimStatusBarItem";
 
 import "./StatusBar.css";
 
@@ -92,7 +92,7 @@ const getStatusItem = ({loading, running, lastError}: StateProps) => {
 }
 
 
-const StatusBar: React.FC<Props> = ({
+const StatusBarBase: React.FC<Props> = ({
   loading,
   running,
   lastError,
@@ -152,7 +152,7 @@ const StatusBar: React.FC<Props> = ({
   );
 };
 
-const ConnectedStatusBar = connect<StateProps, OwnProps>(
+export const StatusBar = connect<StateProps, OwnProps>(
   ({status}) => {
     const {
       loading,
@@ -162,6 +162,4 @@ const ConnectedStatusBar = connect<StateProps, OwnProps>(
     } = status!;
     return { loading, lastError, running, markers };
   }
-)(StatusBar);
-
-export default ConnectedStatusBar;
+)(StatusBarBase);

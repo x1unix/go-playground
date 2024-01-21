@@ -9,7 +9,7 @@ import './ChangeLog.css';
 
 interface Props extends Pick<React.HTMLProps<HTMLDivElement>, 'className' | 'style'> { }
 
-const ChangeLog: React.FC<Props> = ({ className, ...props }) => {
+export const ChangeLog: React.FC<Props> = ({ className, ...props }) => {
   return (
     <div
       className={
@@ -42,5 +42,3 @@ const ChangeLog: React.FC<Props> = ({ className, ...props }) => {
     </div>
   );
 }
-
-export default ChangeLog;

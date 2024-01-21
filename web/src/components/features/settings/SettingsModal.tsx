@@ -9,9 +9,9 @@ import {
   PivotItem
 } from '@fluentui/react';
 
-import ThemeableComponent from '~/components/utils/ThemeableComponent';
+import { ThemeableComponent } from '~/components/utils/ThemeableComponent';
 import { getContentStyles, getIconButtonStyles } from '~/styles/modal';
-import SettingsProperty from './SettingsProperty';
+import { SettingsProperty } from './SettingsProperty';
 import { DEFAULT_FONT } from '~/services/fonts';
 import type { MonacoSettings } from '~/services/config';
 import type { TerminalSettings, RenderingBackend } from '~/store/terminal';
@@ -52,7 +52,7 @@ interface SettingsModalState {
   monaco: state.monaco,
   terminal: state.terminal.settings,
 }))
-export default class SettingsModal extends ThemeableComponent<SettingsProps, SettingsModalState> {
+export class SettingsModal extends ThemeableComponent<SettingsProps, SettingsModalState> {
   private titleID = 'Settings';
   private subtitleID = 'SettingsSubText';
   private changes: SettingsChanges = {};

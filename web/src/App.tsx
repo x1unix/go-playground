@@ -11,9 +11,9 @@ import {
 import { history } from '~/store/configure';
 import { bootstrapGo } from '~/services/go';
 import config from './services/config';
-import PlaygroundPage from '~/components/pages/PlaygroundPage';
-import NotFoundPage from "~/components/pages/NotFoundPage";
-import ConnectedThemeProvider from '~/components/utils/ConnectedThemeProvider';
+import { PlaygroundPage } from '~/components/pages/PlaygroundPage';
+import { NotFoundPage } from "~/components/pages/NotFoundPage";
+import { ConnectedThemeProvider } from '~/components/utils/ConnectedThemeProvider';
 import {ApiClientProvider} from '~/services/api';
 
 import './App.css';
@@ -28,7 +28,7 @@ bootstrapGo(
   createGoLifecycleAdapter(a => store.dispatch(a))
 );
 
-const App = () => {
+export const App = () => {
   return (
     <Provider store={store}>
       <ApiClientProvider>
@@ -51,5 +51,3 @@ const App = () => {
     </Provider>
   );
 }
-
-export default App;

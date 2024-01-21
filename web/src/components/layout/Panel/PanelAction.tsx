@@ -10,7 +10,7 @@ export interface PanelActionProps {
   onClick?: () => void
 }
 
-const PanelAction: React.FC<PanelActionProps> = ({hidden, icon, desktopOnly, label, onClick}) => {
+export const PanelAction: React.FC<PanelActionProps> = ({hidden, icon, desktopOnly, label, onClick}) => {
   if (hidden) {
     return null;
   }
@@ -25,5 +25,3 @@ const PanelAction: React.FC<PanelActionProps> = ({hidden, icon, desktopOnly, lab
     </button>
   );
 };
-
-export default PanelAction;

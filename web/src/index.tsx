@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { initializeIcons } from '@fluentui/react/lib/Icons';
-import { registerGoLanguageProvider } from '~/components/editor/provider';
+import { registerGoLanguageProvider } from '~/components/features/editor/provider';
 import apiClient from '~/services/api';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
-import App from './App';
+import { App } from './App';
 import './index.css';
 
 // Polyfills

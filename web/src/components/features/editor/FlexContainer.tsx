@@ -1,6 +1,6 @@
 import React, { FC, PropsWithChildren } from 'react';
 
-const FlexContainer: FC<PropsWithChildren<{}>> = ({ children }) => (
+export const FlexContainer: FC<PropsWithChildren<{}>> = ({ children }) => (
   <div style={{
     background: '#000',
     flex: '1 1',
@@ -9,5 +9,3 @@ const FlexContainer: FC<PropsWithChildren<{}>> = ({ children }) => (
     {children}
   </div>
 );
-
-export default FlexContainer;

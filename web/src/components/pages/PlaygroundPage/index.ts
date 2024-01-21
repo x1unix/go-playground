@@ -1,1 +1,1 @@
-export { default } from './PlaygroundPage';
+export * from './PlaygroundPage';

@@ -5,7 +5,7 @@ import { SiVim } from 'react-icons/si';
 import { State } from '~/store';
 import { Nullable } from '~/utils/types';
 import { VimMode, VimState, VimSubMode } from '~/store/vim/state';
-import StatusBarItem from '~/components/core/StatusBar/StatusBarItem';
+import { StatusBarItem } from '~/components/layout/StatusBar/StatusBarItem';
 import './VimStatusBarItem.css'
 
 
@@ -38,7 +38,7 @@ const getItemText = (state: Nullable<VimState>): Nullable<string> => {
   }
 }
 
-const VimStatusBarItem: React.FC<Props> = ({vimState}) => {
+const VimStatusBarItemBase: React.FC<Props> = ({vimState}) => {
   if (!vimState) {
     return null;
   }
@@ -57,6 +57,6 @@ const VimStatusBarItem: React.FC<Props> = ({vimState}) => {
   )
 }
 
-export default connect(
+export const VimStatusBarItem = connect(
   ({vim}: State) => ({ vimState: vim})
-)(VimStatusBarItem);
+)(VimStatusBarItemBase);

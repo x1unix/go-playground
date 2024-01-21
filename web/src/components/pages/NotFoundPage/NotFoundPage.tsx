@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './NotFoundPage.css';
 
-const NotFoundPage: React.FC = () => {
+export const NotFoundPage: React.FC = () => {
   const [catVisible, setCatVisible] = useState(false);
   return (
     <div className="errorPage">
@@ -53,5 +53,3 @@ const NotFoundPage: React.FC = () => {
     </div>
   );
 };
-
-export default NotFoundPage;

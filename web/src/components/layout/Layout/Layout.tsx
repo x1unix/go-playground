@@ -6,10 +6,8 @@ interface Props {
   layout?: LayoutType;
 }
 
-const Layout: React.FC<Props> = ({layout = LayoutType.Vertical, children}) => (
+export const Layout: React.FC<Props> = ({layout = LayoutType.Vertical, children}) => (
   <div className={`Layout Layout--${layout}`}>
     {children}
   </div>
 );
-
-export default Layout;

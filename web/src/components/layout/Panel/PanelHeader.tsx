@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import {ITheme, ThemeContext} from '@fluentui/react';
-import PanelAction, {PanelActionProps} from '~/components/core/Panel/PanelAction';
+import {PanelAction, PanelActionProps} from '~/components/layout/Panel/PanelAction';
 import './PanelHeader.css';
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
   commands?: {[key: string]: PanelActionProps},
 }
 
-const PanelHeader: React.FC<Props> = ({label, commands}) => {
+export const PanelHeader: React.FC<Props> = ({label, commands}) => {
   const theme = useContext(ThemeContext);
   const {
     palette: { neutralLight, neutralDark, neutralQuaternaryAlt }
@@ -43,5 +43,3 @@ const PanelHeader: React.FC<Props> = ({label, commands}) => {
     </div>
   );
 };
-
-export default PanelHeader;

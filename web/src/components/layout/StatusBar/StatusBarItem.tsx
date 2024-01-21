@@ -48,7 +48,7 @@ const getItemContents = ({icon, iconOnly, imageSrc, title, children}) => (
   </>
 )
 
-const StatusBarItem: React.FC<StatusBarItemProps> = ({
+export const StatusBarItem: React.FC<StatusBarItemProps> = ({
   title,
   className,
   icon,
@@ -107,5 +107,3 @@ const StatusBarItem: React.FC<StatusBarItemProps> = ({
     </div>
   );
 };
-
-export default StatusBarItem;
