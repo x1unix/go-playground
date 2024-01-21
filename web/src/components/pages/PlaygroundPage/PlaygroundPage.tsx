@@ -14,7 +14,7 @@ import { NotificationHost } from "~/components/modals/Notification";
 import Layout from '~/components/core/Layout/Layout';
 import StatusBar from '~/components/core/StatusBar';
 
-import './Playground.css';
+import './PlaygroundPage.css';
 
 const CodeContainer = connect()(({ dispatch }: any) => {
   const { snippetID } = useParams();
@@ -27,7 +27,7 @@ const CodeContainer = connect()(({ dispatch }: any) => {
   );
 })
 
-const Playground = connect(({ panel }: any) => ({ panelProps: panel }))(({ panelProps, dispatch }: any) => {
+const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }))(({ panelProps, dispatch }: any) => {
   return (
     <div className="Playground">
       <Header />
@@ -48,4 +48,4 @@ const Playground = connect(({ panel }: any) => ({ panelProps: panel }))(({ panel
   );
 });
 
-export default Playground;
+export default PlaygroundPage;
