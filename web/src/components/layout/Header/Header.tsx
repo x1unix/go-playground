@@ -9,7 +9,7 @@ import { newAddNotificationAction, NotificationType } from "~/store/notification
 import { SettingsModal, type SettingsChanges } from '~/components/features/settings/SettingsModal';
 import { ThemeableComponent } from '~/components/utils/ThemeableComponent';
 import { AboutModal } from '~/components/modals/AboutModal';
-import { RunTargetSelector } from '~/components/inputs/RunTargetSelector';
+import { RunTargetSelector } from '~/components/elements/inputs/RunTargetSelector';
 import { SharePopup } from '~/components/utils/SharePopup';
 
 import { dispatchTerminalSettingsChange } from '~/store/terminal';
