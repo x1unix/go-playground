@@ -1,5 +1,5 @@
 import {useState, useEffect} from "react";
-import {DarkTheme, LightTheme} from "@services/colors";
+import {DarkTheme, LightTheme} from "~/services/colors";
 
 const query = '(prefers-color-scheme)';
 

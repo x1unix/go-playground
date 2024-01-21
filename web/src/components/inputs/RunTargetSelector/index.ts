@@ -1,1 +1,1 @@
-export {default} from './RunTargetSelector';
+export * from './RunTargetSelector';

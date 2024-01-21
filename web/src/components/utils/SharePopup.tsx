@@ -1,4 +1,4 @@
-import React, {FC, useMemo} from 'react';
+import React, {type FC, useMemo} from 'react';
 import copy from 'copy-to-clipboard';
 import { Target } from '@fluentui/react-hooks';
 import {
@@ -17,7 +17,7 @@ interface Props {
   onDismiss?: () => void
 }
 
-const SharePopup: FC<Props> = ({ visible, snippetId, originUrl, onDismiss, target }) => {
+export const SharePopup: FC<Props> = ({ visible, snippetId, originUrl, onDismiss, target }) => {
   const { semanticColors: { bodyBackground } } = useTheme();
   const primaryButtonProps: IButtonProps = useMemo(
     () => ({
@@ -67,5 +67,3 @@ const SharePopup: FC<Props> = ({ visible, snippetId, originUrl, onDismiss, targe
 SharePopup.defaultProps = {
   originUrl: window?.location?.origin
 }
-
-export default SharePopup;

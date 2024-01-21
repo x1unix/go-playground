@@ -1,41 +1,41 @@
-import clsx from "clsx";
+import clsx from 'clsx';
 import React, { useMemo } from 'react';
 import {Dropdown, IDropdownStyles} from '@fluentui/react';
-import {RunTargetConfig} from "~/services/config";
+import {RunTargetConfig} from '~/services/config';
+import {VersionsInfo} from '~/services/api';
 import {
   StateDispatch,
   connect,
   newRunTargetChangeDispatcher,
-} from "~/store";
+} from '~/store';
 
-import {onRenderOption, onRenderTitle} from "./dropdown";
+import {onRenderOption, onRenderTitle} from './dropdown';
 import {
   createDropdownOptions,
   DropdownOption,
   dropdownOptionsFromResponse,
   keyFromOption,
-} from "./options";
+} from './options';
 
-import "./RunTargetSelector.css";
-import {VersionsInfo} from "@services/api";
+import './RunTargetSelector.css';
 
 const dropdownStyles: Partial<IDropdownStyles> = {
   callout: {
-    minWidth: "256px"
+    minWidth: '256px'
   },
   dropdown: {
-    maxWidth: "10rem"
+    maxWidth: '10rem'
   },
   dropdownOptionText: { overflow: 'visible', whiteSpace: 'normal' },
   dropdownItem: {
     height: 'auto',
-    paddingTop: ".3rem",
-    paddingBottom: ".3rem"
+    paddingTop: '.3rem',
+    paddingBottom: '.3rem'
   },
   dropdownItemSelected: {
     height: 'auto',
-    paddingTop: ".3rem",
-    paddingBottom: ".3rem"
+    paddingTop: '.3rem',
+    paddingBottom: '.3rem'
   },
 };
 
@@ -53,7 +53,7 @@ interface Props extends OwnProps, StateProps {
   dispatch: StateDispatch
 }
 
-const RunTargetSelector: React.FC<Props> = ({
+const RunTargetSelectorBase: React.FC<Props> = ({
   responsive,
   disabled,
   runTarget,
@@ -97,9 +97,7 @@ const RunTargetSelector: React.FC<Props> = ({
   )
 }
 
-const ConnectedRunTargetSelector = connect<StateProps, OwnProps>
+export const RunTargetSelector = connect<StateProps, OwnProps>
 (({runTarget}) => ({runTarget}))(
-  RunTargetSelector
+  RunTargetSelectorBase
 );
-
-export default ConnectedRunTargetSelector;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route } from 'react-router-dom';
 
 import {
   configureStore,
@@ -11,11 +11,12 @@ import {
 import { history } from '~/store/configure';
 import { bootstrapGo } from '~/services/go';
 import config from './services/config';
-import Playground from '~/components/pages/Playground';
-import NotFoundPage from "~/components/pages/NotFoundPage";
-import ConnectedThemeProvider from '~/components/utils/ConnectedThemeProvider';
+import { PlaygroundPage } from '~/components/pages/PlaygroundPage';
+import { NotFoundPage } from "~/components/pages/NotFoundPage";
+import { ConnectedThemeProvider } from '~/components/utils/ConnectedThemeProvider';
+import {ApiClientProvider} from '~/services/api';
+
 import './App.css';
-import {ApiClientProvider} from "@services/api";
 
 // Configure store and import config from localStorage
 const store = configureStore();
@@ -27,7 +28,7 @@ bootstrapGo(
   createGoLifecycleAdapter(a => store.dispatch(a))
 );
 
-const App = () => {
+export const App = () => {
   return (
     <Provider store={store}>
       <ApiClientProvider>
@@ -40,7 +41,7 @@ const App = () => {
                   "/snippet/:snippetID"
                 ]}
                 exact
-                component={Playground}
+                component={PlaygroundPage}
               />
               <Route path="*" component={NotFoundPage}/>
             </Switch>
@@ -50,5 +51,3 @@ const App = () => {
     </Provider>
   );
 }
-
-export default App;

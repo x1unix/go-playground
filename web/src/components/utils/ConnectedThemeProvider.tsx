@@ -23,7 +23,7 @@ const getInitialTheme = ({darkMode, useSystemTheme}: SettingsState) => {
   return { currentTheme: darkMode ? ThemeVariant.dark : ThemeVariant.light, matchMedia: false};
 };
 
-const ConnectedThemeProvider: React.FunctionComponent<Props> = ({settings, children, dispatch, ...props}) => {
+const ThemeProviderContainer: React.FunctionComponent<Props> = ({settings, children, dispatch, ...props}) => {
   const { currentTheme, matchMedia } = getInitialTheme(settings as SettingsState);
   const systemTheme = usePrefersColorScheme(currentTheme, matchMedia);
   useEffect(() => {
@@ -37,5 +37,5 @@ const ConnectedThemeProvider: React.FunctionComponent<Props> = ({settings, child
   );
 };
 
-export default connect(({settings, dispatch}: any) =>
-  ({settings, dispatch}))(ConnectedThemeProvider);
+export const ConnectedThemeProvider = connect(({settings, dispatch}: any) =>
+  ({settings, dispatch}))(ThemeProviderContainer);
