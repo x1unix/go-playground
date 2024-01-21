@@ -1,5 +1,5 @@
 import * as packagedb from "~/lib/gowasm/bindings/packagedb";
-import {PackageCacheDB} from "@services/gorepl/pkgcache/db";
+import {PackageCacheDB} from "~/services/gorepl/pkgcache/db";
 
 export class PackageIndex implements packagedb.PackageIndex {
   constructor(private db: PackageCacheDB) {}

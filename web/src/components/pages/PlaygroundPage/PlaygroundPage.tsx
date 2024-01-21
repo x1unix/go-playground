@@ -16,8 +16,12 @@ import StatusBar from '~/components/core/StatusBar';
 
 import './PlaygroundPage.css';
 
+interface PageParams {
+  snippetID: string
+}
+
 const CodeContainer = connect()(({ dispatch }: any) => {
-  const { snippetID } = useParams();
+  const { snippetID } = useParams<PageParams>();
   useEffect(() => {
     dispatch(newSnippetLoadDispatcher(snippetID));
   }, [snippetID, dispatch]);

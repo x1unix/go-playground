@@ -1,5 +1,5 @@
 import { ContextualMenuItemType, IContextualMenuItem, IIconProps } from '@fluentui/react';
-import snippets, { Snippet, SnippetType } from '@services/go/snippets';
+import snippets, { Snippet, SnippetType } from '~/services/go/snippets';
 
 const snippetIconTypeMapping: { [type: string]: IIconProps } = {
   [SnippetType.Test]: {
