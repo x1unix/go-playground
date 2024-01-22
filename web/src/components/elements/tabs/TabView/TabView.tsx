@@ -17,7 +17,6 @@ export const TabView: React.FC<Props> = () => {
     >
       <Stack.Item styles={tabHeaderStyles}>
         <TabHeader />
-        {/*<div style={{background: 'red', flex: 1}}>Header</div>*/}
       </Stack.Item>
       <Stack.Item
         grow

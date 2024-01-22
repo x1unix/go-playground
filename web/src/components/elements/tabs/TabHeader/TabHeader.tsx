@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import { Stack, type IStackStyles } from '@fluentui/react';
+import { TabLabel } from '../TabLabel';
 
 const headerStyles: IStackStyles = {
   root: {
@@ -39,12 +40,13 @@ export const TabHeader: React.FC<Props> = () => {
     >
       {
         Array.from({length: tabCount}, (_, i) => i).map(i => (
-          <Stack.Item styles={tabStyles}>
-            <div style={{
-              background: i % 2 === 0 ? '#f08' : '#faf',
-              flex: 1,
-            }}>Tab {i}</div>
-          </Stack.Item>
+          // <Stack.Item styles={tabStyles}>
+          //   <div style={{
+          //     background: i % 2 === 0 ? '#f08' : '#faf',
+          //     flex: 1,
+          //   }}>Tab {i}</div>
+          // </Stack.Item>
+          <TabLabel label={`Tab ${i}`} active={i === 0} />
         ))
       }
       <Stack.Item styles={cmdStyles}>
