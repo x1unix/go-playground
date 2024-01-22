@@ -40,12 +40,15 @@ export const TabHeader: React.FC<Props> = () => {
       {
         Array.from({length: tabCount}, (_, i) => i).map(i => (
           <Stack.Item styles={tabStyles}>
-            <div style={{background: i % 2 === 0 ? '#f08' : '#faf', flex: 1}}>Node {i}</div>
+            <div style={{
+              background: i % 2 === 0 ? '#f08' : '#faf',
+              flex: 1,
+            }}>Tab {i}</div>
           </Stack.Item>
         ))
       }
       <Stack.Item styles={cmdStyles}>
-        <div style={{background: '#04f', flex: 1}} onClick={() => setTabCount(tabCount + 1)}>UP</div>
+        <div style={{background: '#04f', flex: 1}} onClick={() => setTabCount(tabCount + 1)}>+</div>
       </Stack.Item>
       <Stack.Item styles={cmdStyles}>
         <div style={{background: '#0cf', flex: 1}}>DL</div>
