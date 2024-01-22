@@ -14,6 +14,8 @@ import { NotificationHost } from "~/components/modals/Notification";
 import { Layout } from '~/components/layout/Layout/Layout';
 import { ConnectedStatusBar } from '~/components/layout/StatusBar';
 
+import { TabView } from '~/components/elements/tabs/TabView';
+
 import styles from './PlaygroundPage.module.css';
 
 interface PageParams {
@@ -36,9 +38,10 @@ export const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }
     <div className={styles.Playground}>
       <Header />
       <Layout layout={panelProps.layout}>
-        <FlexContainer>
-          <CodeContainer />
-        </FlexContainer>
+        {/*<FlexContainer>*/}
+        {/*  <CodeContainer />*/}
+        {/*</FlexContainer>*/}
+        <TabView />
         <InspectorPanel
           {...panelProps}
           onViewChange={changes => {
