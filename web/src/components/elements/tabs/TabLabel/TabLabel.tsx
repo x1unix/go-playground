@@ -2,21 +2,16 @@ import React, { useMemo } from 'react';
 import {
   Stack,
   FontSizes,
+  IconButton,
   useTheme,
-  type IStackStyles
+  type IStackStyles,
+  type IButtonStyles,
 } from '@fluentui/react';
 
 const labelCellStyles: IStackStyles = {
   root: {
     flex: 1,
-    // background: '#888',
     fontSize: FontSizes.smallPlus,
-  }
-};
-
-const closeCellStyles: IStackStyles = {
-  root: {
-    // background: '#f33',
   }
 };
 
@@ -32,7 +27,8 @@ export const TabLabel: React.FC<Props> = (
   {label, active, disabled, onClick}
 ) => {
   const theme = useTheme();
-  const containerStyles = useMemo(() => {
+
+  const containerStyles: IStackStyles = useMemo(() => {
     const { palette , semanticColors } = theme;
     const background = active ? palette.white : semanticColors.bodyStandoutBackground;
 
@@ -47,18 +43,42 @@ export const TabLabel: React.FC<Props> = (
         borderRight: 'none',
         borderTopColor: active ? palette.themePrimary : semanticColors.variantBorder,
         borderBottomColor: active ? background : semanticColors.variantBorder,
-        padding: '.3rem .5rem',
+        padding: '.3rem .3rem .3rem .5rem',
         fontSize: FontSizes.smallPlus,
         color: active ? semanticColors.bodyText : palette.neutralSecondary,
-        ':hover': {
-          background: active ? background : semanticColors.bodyBackgroundHovered,
-        },
-        ':active': {
-          background: active ? background : semanticColors.buttonBackgroundPressed,
+        ':hover button': {
+          opacity: '1',
         }
-      }
+      },
     }
   }, [theme, active, disabled]);
+
+  const btnStyles: IButtonStyles = useMemo(() => {
+    return {
+      icon: {
+        height: 'auto',
+        lineHeight: 'inherit',
+        fontSize: FontSizes.smallPlus,
+      },
+      root: {
+        height: FontSizes.smallPlus,
+        width: FontSizes.smallPlus,
+        padding: '.5rem .5rem',
+        lineHeight: 'auto',
+        fontSize: FontSizes.smallPlus,
+        color: 'inherit',
+        opacity: active ? '1' : '0',
+      },
+      rootHovered: {
+        color: 'inherit',
+        opacity: '1'
+      },
+      rootPressed: {
+        color: 'inherit',
+      }
+    };
+  }, [active]);
+
   return (
     <Stack
       grow
@@ -74,10 +94,14 @@ export const TabLabel: React.FC<Props> = (
       >
         {label}
       </Stack.Item>
-      <Stack.Item
-        styles={closeCellStyles}
-      >
-        &times;
+      <Stack.Item>
+        <IconButton
+          title='Close'
+          ariaLabel='Close tab'
+          disabled={disabled}
+          iconProps={{iconName: 'Cancel'}}
+          styles={btnStyles}
+        />
       </Stack.Item>
     </Stack>
   );
