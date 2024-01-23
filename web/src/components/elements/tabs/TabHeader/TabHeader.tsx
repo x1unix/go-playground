@@ -17,14 +17,23 @@ const cmdStyles: IStackStyles = {
   }
 };
 
+const tabContainerStyles: IStackStyles = {
+  root: {
+    flex: 1,
+  }
+};
+
 interface Props {}
 
+const mockTabName = i => `github.com/pkg/username/internal/main${i}.go`
+
 export const TabHeader: React.FC<Props> = () => {
-  const [tabCount, setTabCount] = useState(4);
+  const [tabCount, setTabCount] = useState(10);
   const [ activeTab, setActiveTab ] = useState(0);
   return (
     <Stack
       grow
+      wrap
       horizontal
       verticalFill
       horizontalAlign='stretch'
@@ -33,11 +42,13 @@ export const TabHeader: React.FC<Props> = () => {
     >
       {
         Array.from({length: tabCount}, (_, i) => i).map(i => (
-          <TabLabel
-            label={`Tab ${i}`}
-            active={i === activeTab}
-            onClick={() => setActiveTab(i)}
-          />
+          <Stack.Item styles={tabContainerStyles}>
+            <TabLabel
+              label={mockTabName(i)}
+              active={i === activeTab}
+              onClick={() => setActiveTab(i)}
+            />
+          </Stack.Item>
         ))
       }
       <Stack.Item styles={cmdStyles}>
