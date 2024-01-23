@@ -23,11 +23,14 @@ const closeCellStyles: IStackStyles = {
 interface Props {
   label: string
   active?: boolean
+  disabled?: boolean
   onClick?: () => void
   onClose?: () => void
 }
 
-export const TabLabel: React.FC<Props> = ({label, active, onClick}) => {
+export const TabLabel: React.FC<Props> = (
+  {label, active, disabled, onClick}
+) => {
   const theme = useTheme();
   const containerStyles = useMemo(() => {
     const { palette , semanticColors } = theme;
@@ -36,6 +39,7 @@ export const TabLabel: React.FC<Props> = ({label, active, onClick}) => {
     return {
       root: {
         flex: 1,
+        cursor: disabled ? 'default' : 'pointer',
         background,
         borderWidth: 1,
         borderStyle: 'solid',
@@ -45,9 +49,10 @@ export const TabLabel: React.FC<Props> = ({label, active, onClick}) => {
         borderBottomColor: active ? background : semanticColors.variantBorder,
         padding: '.3rem .5rem',
         fontSize: FontSizes.smallPlus,
+        color: active ? semanticColors.bodyText : palette.neutralSecondary,
       }
     }
-  }, [theme, active]);
+  }, [theme, active, disabled]);
   return (
     <Stack
       grow
