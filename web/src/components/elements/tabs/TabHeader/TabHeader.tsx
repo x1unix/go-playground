@@ -1,20 +1,18 @@
 import React, {useState, useMemo} from 'react'
 import {
+  useTheme,
   Stack,
   FocusZone,
-  useTheme,
   type IStackStyles,
 } from '@fluentui/react';
 
 import { TabLabel } from '../TabLabel';
+import { TabActionBar } from '../TabActionBar';
+import { TabBarAction } from '../types';
 
-const cmdStyles: IStackStyles = {
-  root: {
-    display: 'flex',
-    alignItems: 'stretch',
-    flexDirection: 'column',
-  }
-};
+interface Props {
+  disabled?: boolean
+}
 
 const tabContainerStyles: IStackStyles = {
   root: {
@@ -22,13 +20,24 @@ const tabContainerStyles: IStackStyles = {
   }
 };
 
-interface Props {}
-
 const mockTabName = i => `github.com/pkg/username/internal/main${i}.go`
 
-export const TabHeader: React.FC<Props> = () => {
-  const theme = useTheme();
-  const [tabCount, setTabCount] = useState(10);
+const actions: TabBarAction[] = [
+  {
+    label: 'New file',
+    icon: { iconName: 'Add' },
+    onClick: () => console.log('new-file'),
+  },
+  {
+    label: 'Upload',
+    icon: { iconName: 'Upload' },
+    onClick: () => console.log('upload'),
+  }
+];
+
+export const TabHeader: React.FC<Props> = ({disabled}) => {
+  const { semanticColors } = useTheme();
+  const [tabCount, setTabCount] = useState(5);
   const [ activeTab, setActiveTab ] = useState(0);
 
   const headerStyles = useMemo(() => {
@@ -36,13 +45,22 @@ export const TabHeader: React.FC<Props> = () => {
       root: {
         flex: '1 0',
         flexShrink: 0,
-        background: theme.semanticColors.bodyStandoutBackground,
+        background: semanticColors.bodyStandoutBackground,
       }
     };
-  }, [theme]);
+  }, [semanticColors]);
+
+  const cmdToolbarStyles: IStackStyles = {
+    root: {
+      // flex: 1,
+      display: 'flex',
+    }
+  };
 
   return (
-    <FocusZone>
+    <FocusZone
+      style={{flex: 1}}
+    >
       <Stack
         grow
         wrap
@@ -58,16 +76,14 @@ export const TabHeader: React.FC<Props> = () => {
               <TabLabel
                 label={mockTabName(i)}
                 active={i === activeTab}
+                canClose={tabCount > 1}
                 onClick={() => setActiveTab(i)}
               />
             </Stack.Item>
           ))
         }
-        <Stack.Item styles={cmdStyles}>
-          <div style={{background: '#04f', flex: 1}} onClick={() => setTabCount(tabCount + 1)}>+</div>
-        </Stack.Item>
-        <Stack.Item styles={cmdStyles}>
-          <div style={{background: '#0cf', flex: 1}}>DL</div>
+        <Stack.Item styles={cmdToolbarStyles}>
+          <TabActionBar actions={actions} disabled={disabled}/>
         </Stack.Item>
       </Stack>
     </FocusZone>

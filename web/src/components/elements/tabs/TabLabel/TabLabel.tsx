@@ -18,13 +18,14 @@ const labelCellStyles: IStackStyles = {
 interface Props {
   label: string
   active?: boolean
+  canClose?: boolean
   disabled?: boolean
   onClick?: () => void
   onClose?: () => void
 }
 
 export const TabLabel: React.FC<Props> = (
-  {label, active, disabled, onClick}
+  {label, active, disabled, onClick, canClose}
 ) => {
   const theme = useTheme();
 
@@ -105,15 +106,21 @@ export const TabLabel: React.FC<Props> = (
       >
         {label}
       </Stack.Item>
-      <Stack.Item>
-        <IconButton
-          title='Close'
-          ariaLabel='Close tab'
-          disabled={disabled}
-          iconProps={{iconName: 'Cancel'}}
-          styles={btnStyles}
-        />
-      </Stack.Item>
+      {canClose ? (
+        <Stack.Item>
+          <IconButton
+            title='Close'
+            ariaLabel='Close tab'
+            disabled={disabled}
+            iconProps={{iconName: 'Cancel'}}
+            styles={btnStyles}
+          />
+        </Stack.Item>
+      ) : null}
     </Stack>
   );
+};
+
+TabLabel.defaultProps = {
+  canClose: true,
 };
