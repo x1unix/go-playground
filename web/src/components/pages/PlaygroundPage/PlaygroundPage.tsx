@@ -41,7 +41,11 @@ export const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }
         {/*<FlexContainer>*/}
         {/*  <CodeContainer />*/}
         {/*</FlexContainer>*/}
-        <TabView />
+        <TabView>
+          <FlexContainer>
+            <CodeContainer />
+          </FlexContainer>
+        </TabView>
         <InspectorPanel
           {...panelProps}
           onViewChange={changes => {

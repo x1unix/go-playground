@@ -10,6 +10,7 @@ export const tabHeaderStyles: IStackStyles = {
     display: 'flex',
     // justifyContent: 'center',
     overflow: 'hidden',
+    flexShrink: 0,
   },
 };
 

@@ -4,16 +4,8 @@ import { TabLabel } from '../TabLabel';
 
 const headerStyles: IStackStyles = {
   root: {
-    flex: 1,
-  }
-};
-
-const tabStyles: IStackStyles = {
-  root: {
-    flex: 1,
-    display: 'flex',
-    alignItems: 'stretch',
-    flexDirection: 'column',
+    flex: '1 0',
+    flexShrink: 0,
   }
 };
 
@@ -28,7 +20,8 @@ const cmdStyles: IStackStyles = {
 interface Props {}
 
 export const TabHeader: React.FC<Props> = () => {
-  const [tabCount, setTabCount] = useState(1);
+  const [tabCount, setTabCount] = useState(4);
+  const [ activeTab, setActiveTab ] = useState(0);
   return (
     <Stack
       grow
@@ -40,13 +33,11 @@ export const TabHeader: React.FC<Props> = () => {
     >
       {
         Array.from({length: tabCount}, (_, i) => i).map(i => (
-          // <Stack.Item styles={tabStyles}>
-          //   <div style={{
-          //     background: i % 2 === 0 ? '#f08' : '#faf',
-          //     flex: 1,
-          //   }}>Tab {i}</div>
-          // </Stack.Item>
-          <TabLabel label={`Tab ${i}`} active={i === 0} />
+          <TabLabel
+            label={`Tab ${i}`}
+            active={i === activeTab}
+            onClick={() => setActiveTab(i)}
+          />
         ))
       }
       <Stack.Item styles={cmdStyles}>

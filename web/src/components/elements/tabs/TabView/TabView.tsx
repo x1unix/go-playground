@@ -6,7 +6,7 @@ import { TabHeader } from '../TabHeader';
 
 interface Props {}
 
-export const TabView: React.FC<Props> = () => {
+export const TabView: React.FC<Props> = ({children}) => {
   return (
     <Stack
       grow
@@ -23,7 +23,8 @@ export const TabView: React.FC<Props> = () => {
         disableShrink
         styles={tabContentStyles}
       >
-        <div style={{background: 'green', flex: 1}}>Content</div>
+        {/*<div style={{background: 'green', flex: 1}}>Content</div>*/}
+        { children }
       </Stack.Item>
     </Stack>
   )
