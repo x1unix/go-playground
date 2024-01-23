@@ -2,7 +2,7 @@ import {saveAs} from 'file-saver';
 import {replace} from "connected-react-router";
 
 import client from "~/services/api";
-import {DEMO_CODE} from '~/components/features/editor/props';
+import {DEMO_CODE} from '~/components/features/workspace/props';
 
 import { StateProvider, DispatchFn } from "../helpers";
 import { newAddNotificationAction, NotificationType } from "../notifications";

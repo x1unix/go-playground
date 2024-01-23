@@ -7,14 +7,11 @@ import {
   newSnippetLoadDispatcher,
 } from '~/store';
 import { Header } from '~/components/layout/Header';
-import { CodeEditor } from '~/components/features/editor/CodeEditor';
-import { FlexContainer } from '~/components/features/editor/FlexContainer';
+import { Workspace } from '~/components/features/workspace/Workspace';
 import { InspectorPanel } from '~/components/features/inspector/InspectorPanel/InspectorPanel';
 import { NotificationHost } from "~/components/modals/Notification";
 import { Layout } from '~/components/layout/Layout/Layout';
 import { ConnectedStatusBar } from '~/components/layout/StatusBar';
-
-import { TabView } from '~/components/elements/tabs/TabView';
 
 import styles from './PlaygroundPage.module.css';
 
@@ -22,30 +19,17 @@ interface PageParams {
   snippetID: string
 }
 
-const CodeContainer = connect()(({ dispatch }: any) => {
+export const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }))(({ panelProps, dispatch }: any) => {
   const { snippetID } = useParams<PageParams>();
   useEffect(() => {
     dispatch(newSnippetLoadDispatcher(snippetID));
   }, [snippetID, dispatch]);
 
   return (
-    <CodeEditor />
-  );
-})
-
-export const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }))(({ panelProps, dispatch }: any) => {
-  return (
     <div className={styles.Playground}>
       <Header />
       <Layout layout={panelProps.layout}>
-        {/*<FlexContainer>*/}
-        {/*  <CodeContainer />*/}
-        {/*</FlexContainer>*/}
-        <TabView>
-          <FlexContainer>
-            <CodeContainer />
-          </FlexContainer>
-        </TabView>
+        <Workspace />
         <InspectorPanel
           {...panelProps}
           onViewChange={changes => {

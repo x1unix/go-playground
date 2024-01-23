@@ -18,9 +18,9 @@ import {
   newSnippetLoadDispatcher,
   runFileDispatcher,
 } from '~/store';
-import { getTimeNowUsageMarkers, wrapAsyncWithDebounce } from './utils';
-import {attachCustomCommands} from './commands';
-import {LANGUAGE_GOLANG, stateToOptions} from './props';
+import { getTimeNowUsageMarkers, wrapAsyncWithDebounce } from '../utils';
+import {attachCustomCommands} from '../commands';
+import {LANGUAGE_GOLANG, stateToOptions} from '../props';
 
 const ANALYZE_DEBOUNCE_TIME = 500;
 

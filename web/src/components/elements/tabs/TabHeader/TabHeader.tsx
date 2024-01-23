@@ -16,8 +16,8 @@ interface Props {
   actions?: TabBarAction[]
   selectedTab?: TabKey
   allowEmpty?: boolean
-  onSelected?: (key: TabKey) => void,
-  onClosed?: (key: TabKey) => void,
+  onSelected?: (key: TabKey, i: number) => void,
+  onClosed?: (key: TabKey, i: number) => void,
 }
 
 const tabContainerStyles: IStackStyles = {
@@ -62,15 +62,15 @@ export const TabHeader: React.FC<Props> = ({tabs, actions, allowEmpty, selectedT
         styles={headerStyles}
       >
         {
-          tabs?.map(({ key, label}) => (
+          tabs?.map(({ key, label}, i) => (
             <Stack.Item key={key} styles={tabContainerStyles}>
               <TabLabel
                 label={label}
                 active={key === selectedTab}
                 canClose={allowEmpty || (!!tabs?.length)}
                 disabled={disabled}
-                onClick={() => key !== selectedTab && onSelected?.(key)}
-                onClose={() => onClosed?.(key)}
+                onClick={() => key !== selectedTab && onSelected?.(key, i)}
+                onClose={() => onClosed?.(key, i)}
               />
             </Stack.Item>
           ))
