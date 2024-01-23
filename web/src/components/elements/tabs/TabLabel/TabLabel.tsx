@@ -48,6 +48,12 @@ export const TabLabel: React.FC<Props> = (
         color: active ? semanticColors.bodyText : palette.neutralSecondary,
         ':hover button': {
           opacity: '1',
+        },
+        ':focus-visible': {
+          outlineColor: palette.themePrimary,
+        },
+        ':focus button': {
+          opacity: '1',
         }
       },
     }
@@ -68,6 +74,9 @@ export const TabLabel: React.FC<Props> = (
         fontSize: FontSizes.smallPlus,
         color: 'inherit',
         opacity: active ? '1' : '0',
+        ':focus': {
+          opacity: '1',
+        }
       },
       rootHovered: {
         color: 'inherit',
@@ -88,6 +97,8 @@ export const TabLabel: React.FC<Props> = (
       verticalAlign='center'
       styles={containerStyles}
       onClick={onClick}
+      aria-label={`Switch to tab ${label}`}
+      data-is-focusable
     >
       <Stack.Item
         styles={labelCellStyles}

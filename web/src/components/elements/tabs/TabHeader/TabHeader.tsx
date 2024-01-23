@@ -1,6 +1,7 @@
 import React, {useState, useMemo} from 'react'
 import {
   Stack,
+  FocusZone,
   useTheme,
   type IStackStyles,
 } from '@fluentui/react';
@@ -41,32 +42,34 @@ export const TabHeader: React.FC<Props> = () => {
   }, [theme]);
 
   return (
-    <Stack
-      grow
-      wrap
-      horizontal
-      verticalFill
-      horizontalAlign='stretch'
-      verticalAlign='stretch'
-      styles={headerStyles}
-    >
-      {
-        Array.from({length: tabCount}, (_, i) => i).map(i => (
-          <Stack.Item styles={tabContainerStyles}>
-            <TabLabel
-              label={mockTabName(i)}
-              active={i === activeTab}
-              onClick={() => setActiveTab(i)}
-            />
-          </Stack.Item>
-        ))
-      }
-      <Stack.Item styles={cmdStyles}>
-        <div style={{background: '#04f', flex: 1}} onClick={() => setTabCount(tabCount + 1)}>+</div>
-      </Stack.Item>
-      <Stack.Item styles={cmdStyles}>
-        <div style={{background: '#0cf', flex: 1}}>DL</div>
-      </Stack.Item>
-    </Stack>
+    <FocusZone>
+      <Stack
+        grow
+        wrap
+        horizontal
+        verticalFill
+        horizontalAlign='stretch'
+        verticalAlign='stretch'
+        styles={headerStyles}
+      >
+        {
+          Array.from({length: tabCount}, (_, i) => i).map(i => (
+            <Stack.Item styles={tabContainerStyles}>
+              <TabLabel
+                label={mockTabName(i)}
+                active={i === activeTab}
+                onClick={() => setActiveTab(i)}
+              />
+            </Stack.Item>
+          ))
+        }
+        <Stack.Item styles={cmdStyles}>
+          <div style={{background: '#04f', flex: 1}} onClick={() => setTabCount(tabCount + 1)}>+</div>
+        </Stack.Item>
+        <Stack.Item styles={cmdStyles}>
+          <div style={{background: '#0cf', flex: 1}}>DL</div>
+        </Stack.Item>
+      </Stack>
+    </FocusZone>
   )
 }
