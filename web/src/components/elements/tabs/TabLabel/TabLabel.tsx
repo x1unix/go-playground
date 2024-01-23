@@ -50,6 +50,12 @@ export const TabLabel: React.FC<Props> = (
         padding: '.3rem .5rem',
         fontSize: FontSizes.smallPlus,
         color: active ? semanticColors.bodyText : palette.neutralSecondary,
+        ':hover': {
+          background: active ? background : semanticColors.bodyBackgroundHovered,
+        },
+        ':active': {
+          background: active ? background : semanticColors.buttonBackgroundPressed,
+        }
       }
     }
   }, [theme, active, disabled]);

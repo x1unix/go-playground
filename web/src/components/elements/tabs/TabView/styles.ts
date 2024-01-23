@@ -1,31 +1,27 @@
 import {
   type IStackStyles,
+  type ITheme,
 } from '@fluentui/react';
 
 export const tabHeaderStyles: IStackStyles = {
   root: {
     alignItems: 'stretch',
-    // background: 'red',
-    // color: DefaultPalette.white,
     display: 'flex',
-    // justifyContent: 'center',
     overflow: 'hidden',
     flexShrink: 0,
   },
 };
 
-export const tabContentStyles: IStackStyles = {
-  root: {
-    // alignItems: 'center',
-    alignItems: 'stretch',
-    // background: DefaultPalette.themePrimary,
-    // color: DefaultPalette.white,
-    display: 'flex',
-    flexDirection: 'column',
-    // height: 50,
-    // justifyContent: 'center',
-    overflow: 'hidden',
-  },
+export const getTabContentStyles = (theme: ITheme): IStackStyles => {
+  return {
+    root: {
+      alignItems: 'stretch',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden',
+      background: theme.palette.white,
+    },
+  }
 };
 
 export const containerStyles: IStackStyles = {

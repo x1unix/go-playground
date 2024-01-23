@@ -1,13 +1,11 @@
-import React, {useState} from 'react'
-import { Stack, type IStackStyles } from '@fluentui/react';
-import { TabLabel } from '../TabLabel';
+import React, {useState, useMemo} from 'react'
+import {
+  Stack,
+  useTheme,
+  type IStackStyles,
+} from '@fluentui/react';
 
-const headerStyles: IStackStyles = {
-  root: {
-    flex: '1 0',
-    flexShrink: 0,
-  }
-};
+import { TabLabel } from '../TabLabel';
 
 const cmdStyles: IStackStyles = {
   root: {
@@ -28,8 +26,20 @@ interface Props {}
 const mockTabName = i => `github.com/pkg/username/internal/main${i}.go`
 
 export const TabHeader: React.FC<Props> = () => {
+  const theme = useTheme();
   const [tabCount, setTabCount] = useState(10);
   const [ activeTab, setActiveTab ] = useState(0);
+
+  const headerStyles = useMemo(() => {
+    return {
+      root: {
+        flex: '1 0',
+        flexShrink: 0,
+        background: theme.semanticColors.bodyStandoutBackground,
+      }
+    };
+  }, [theme]);
+
   return (
     <Stack
       grow
