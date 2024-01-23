@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from 'react'
+import React, {useMemo} from 'react'
 import {
   useTheme,
   Stack,
@@ -8,10 +8,16 @@ import {
 
 import { TabLabel } from '../TabLabel';
 import { TabActionBar } from '../TabActionBar';
-import { TabBarAction } from '../types';
+import type { TabBarAction, TabInfo, TabKey } from '../types';
 
 interface Props {
   disabled?: boolean
+  tabs?: TabInfo[]
+  actions?: TabBarAction[]
+  selectedTab?: TabKey
+  allowEmpty?: boolean
+  onSelected?: (key: TabKey) => void,
+  onClosed?: (key: TabKey) => void,
 }
 
 const tabContainerStyles: IStackStyles = {
@@ -20,32 +26,17 @@ const tabContainerStyles: IStackStyles = {
   }
 };
 
-const mockTabName = i => `github.com/pkg/username/internal/main${i}.go`
-
-const actions: TabBarAction[] = [
-  {
-    label: 'New file',
-    icon: { iconName: 'Add' },
-    onClick: () => console.log('new-file'),
-  },
-  {
-    label: 'Upload',
-    icon: { iconName: 'Upload' },
-    onClick: () => console.log('upload'),
-  }
-];
-
-export const TabHeader: React.FC<Props> = ({disabled}) => {
+export const TabHeader: React.FC<Props> = ({tabs, actions, allowEmpty, selectedTab, onSelected, onClosed, disabled}) => {
   const { semanticColors } = useTheme();
-  const [tabCount, setTabCount] = useState(5);
-  const [ activeTab, setActiveTab ] = useState(0);
-
   const headerStyles = useMemo(() => {
     return {
       root: {
         flex: '1 0',
         flexShrink: 0,
         background: semanticColors.bodyStandoutBackground,
+      },
+      inner: {
+        justifyContent: 'flex-end',
       }
     };
   }, [semanticColors]);
@@ -71,13 +62,15 @@ export const TabHeader: React.FC<Props> = ({disabled}) => {
         styles={headerStyles}
       >
         {
-          Array.from({length: tabCount}, (_, i) => i).map(i => (
-            <Stack.Item styles={tabContainerStyles}>
+          tabs?.map(({ key, label}) => (
+            <Stack.Item key={key} styles={tabContainerStyles}>
               <TabLabel
-                label={mockTabName(i)}
-                active={i === activeTab}
-                canClose={tabCount > 1}
-                onClick={() => setActiveTab(i)}
+                label={label}
+                active={key === selectedTab}
+                canClose={allowEmpty || (!!tabs?.length)}
+                disabled={disabled}
+                onClick={() => key !== selectedTab && onSelected?.(key)}
+                onClose={() => onClosed?.(key)}
               />
             </Stack.Item>
           ))

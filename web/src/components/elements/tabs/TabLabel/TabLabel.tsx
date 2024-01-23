@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import {
   Stack,
   FontSizes,
@@ -25,7 +25,7 @@ interface Props {
 }
 
 export const TabLabel: React.FC<Props> = (
-  {label, active, disabled, onClick, canClose}
+  {label, active, disabled, onClick, onClose, canClose}
 ) => {
   const theme = useTheme();
 
@@ -89,6 +89,11 @@ export const TabLabel: React.FC<Props> = (
     };
   }, [active]);
 
+  const handleClose = useCallback((e) => {
+    e.stopPropagation();
+    onClose?.();
+  }, [onClose]);
+
   return (
     <Stack
       grow
@@ -114,6 +119,7 @@ export const TabLabel: React.FC<Props> = (
             disabled={disabled}
             iconProps={{iconName: 'Cancel'}}
             styles={btnStyles}
+            onClick={handleClose}
           />
         </Stack.Item>
       ) : null}

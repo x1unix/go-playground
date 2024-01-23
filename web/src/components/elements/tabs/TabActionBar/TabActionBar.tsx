@@ -31,8 +31,8 @@ export const TabActionBar: React.FC<Props> = ({actions, disabled}) => {
       }}
     >
       {
-        actions?.map(({label, icon, onClick}) => (
-          <Stack.Item styles={commandCellStyles}>
+        actions?.map(({key, label, icon, onClick}) => (
+          <Stack.Item key={key ?? label} styles={commandCellStyles}>
             <IconButton
               title={label}
               ariaLabel={label}

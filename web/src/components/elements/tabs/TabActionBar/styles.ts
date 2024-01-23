@@ -29,7 +29,7 @@ export const getActionBtnStyle = ({semanticColors}: ITheme): IButtonStyles => ({
     height: 'auto',
     width: 'auto',
     lineHeight: 'auto',
-    padding: '.3rem .3rem',
+    padding: '.5rem .3rem',
     color: 'inherit',
     border: '1px solid',
     borderColor: semanticColors.variantBorder,
