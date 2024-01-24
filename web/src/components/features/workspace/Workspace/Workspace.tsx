@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 
 import { TabView } from '~/components/elements/tabs/TabView';
 import type {TabBarAction, TabInfo} from '~/components/elements/tabs/types';
 
 import { CodeEditor } from '../CodeEditor';
 import { FlexContainer } from '../FlexContainer';
+import { NewFileModal } from '../NewFileModal';
 import { skipIndex } from './utils';
 
 
@@ -13,10 +14,11 @@ interface Props {}
 const mockTabName = i => `main${i}.go`
 
 export const Workspace: React.FC<Props> = () => {
+  const [ modalOpen, setModalOpen ] = useState(false);
   const [selectedTab, setSelectedTab] = useState<string>();
   const [tabs, setTabs] = useState<TabInfo[]>([]);
 
-  const onClose = (key: string, i: number) => {
+  const onTabClose = (key: string, i: number) => {
     if (key === selectedTab) {
       const nextId = i === 0 ? 1 : i - 1;
       const nextKey = tabs[nextId]?.key;
@@ -30,15 +32,7 @@ export const Workspace: React.FC<Props> = () => {
       label: 'New file',
       icon: { iconName: 'Add' },
       onClick: () => {
-        const newTab = mockTabName(Date.now());
-        setTabs((prev) => ([
-          ...prev,
-          {
-            key: newTab,
-            label: newTab,
-          }
-        ]));
-        setSelectedTab(newTab);
+        setModalOpen(true);
       }
     },
     {
@@ -46,7 +40,22 @@ export const Workspace: React.FC<Props> = () => {
       icon: { iconName: 'Upload' },
       onClick: () => console.log('upload'),
     }
-  ], [setTabs, setSelectedTab]);
+  ], [setModalOpen]);
+
+  const onModalClose = (fileName?: string) => {
+    setModalOpen(false);
+    if (!fileName) {
+      return;
+    }
+    setTabs((prev) => ([
+      ...prev,
+      {
+        key: fileName,
+        label: fileName,
+      }
+    ]));
+    setSelectedTab(fileName);
+  };
 
   return (
     <TabView
@@ -54,12 +63,16 @@ export const Workspace: React.FC<Props> = () => {
       actions={actions}
       tabs={tabs}
       selectedTab={selectedTab}
-      onClosed={onClose}
+      onClosed={onTabClose}
       onSelected={setSelectedTab}
     >
       <FlexContainer>
         <CodeEditor />
       </FlexContainer>
+      <NewFileModal
+        isOpen={modalOpen}
+        onClose={onModalClose}
+      />
     </TabView>
   )
 };
