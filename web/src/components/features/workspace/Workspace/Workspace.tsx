@@ -6,6 +6,8 @@ import type {TabBarAction, TabInfo} from '~/components/elements/tabs/types';
 import { CodeEditor } from '../CodeEditor';
 import { FlexContainer } from '../FlexContainer';
 import { NewFileModal } from '../NewFileModal';
+import { ContentPlaceholder } from '../ContentPlaceholder';
+
 import { skipIndex } from './utils';
 
 
@@ -66,11 +68,13 @@ export const Workspace: React.FC<Props> = () => {
       onClosed={onTabClose}
       onSelected={setSelectedTab}
     >
-      <FlexContainer>
-        { !!tabs.length && (
+      { !!tabs.length ? (
+        <FlexContainer>
           <CodeEditor />
-        )}
-      </FlexContainer>
+        </FlexContainer>
+      ) : (
+        <ContentPlaceholder />
+      )}
       <NewFileModal
         isOpen={modalOpen}
         onClose={onModalClose}

@@ -17,7 +17,9 @@ interface Props {
 
 export const TabView: React.FC<Props> = ({children, ...props}) => {
   const theme = useTheme();
-  const tabContentStyles = useMemo(() => getTabContentStyles(theme), [theme]);
+  const tabContentStyles = useMemo(
+    () => getTabContentStyles(theme), [theme]
+  );
 
   return (
     <Stack
