@@ -5,35 +5,27 @@ import type {TabBarAction, TabInfo} from '~/components/elements/tabs/types';
 
 import { CodeEditor } from '../CodeEditor';
 import { FlexContainer } from '../FlexContainer';
+import { skipIndex } from './utils';
 
 
 interface Props {}
 
-const actions: TabBarAction[] = [
-  {
-    label: 'New file',
-    icon: { iconName: 'Add' },
-    onClick: () => console.log('new-file'),
-  },
-  {
-    label: 'Upload',
-    icon: { iconName: 'Upload' },
-    onClick: () => console.log('upload'),
-  }
-];
-
-const mockTabsCount = 2;
-const mockTabName = i => `github.com/pkg/username/internal/main${i}.go`
-const tabs: TabInfo[] = Array.from({length: mockTabsCount}, (_, i) => ({
-  key: mockTabName(i),
-  label: mockTabName(i),
-}))
+const mockTabName = i => `main${i}.go`
 
 export const Workspace: React.FC<Props> = () => {
   const [selectedTab, setSelectedTab] = useState<string>();
   const [tabs, setTabs] = useState<TabInfo[]>([]);
 
-  const actions = useMemo(() => [
+  const onClose = (key: string, i: number) => {
+    if (key === selectedTab) {
+      const nextId = i === 0 ? 1 : i - 1;
+      const nextKey = tabs[nextId]?.key;
+      setSelectedTab(nextKey);
+    }
+    setTabs((prev) => skipIndex(prev, i));
+  };
+
+  const actions: TabBarAction[] = useMemo(() => [
     {
       label: 'New file',
       icon: { iconName: 'Add' },
@@ -55,9 +47,6 @@ export const Workspace: React.FC<Props> = () => {
       onClick: () => console.log('upload'),
     }
   ], [setTabs, setSelectedTab]);
-  const onClose = (key: string, i: number) => {
-    
-  };
 
   return (
     <TabView
@@ -65,6 +54,8 @@ export const Workspace: React.FC<Props> = () => {
       actions={actions}
       tabs={tabs}
       selectedTab={selectedTab}
+      onClosed={onClose}
+      onSelected={setSelectedTab}
     >
       <FlexContainer>
         <CodeEditor />

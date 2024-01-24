@@ -67,7 +67,7 @@ export const TabHeader: React.FC<Props> = ({tabs, actions, allowEmpty, selectedT
               <TabLabel
                 label={label}
                 active={key === selectedTab}
-                canClose={allowEmpty || (!!tabs?.length)}
+                canClose={allowEmpty || (tabs?.length > 1)}
                 disabled={disabled}
                 onClick={() => key !== selectedTab && onSelected?.(key, i)}
                 onClose={() => onClosed?.(key, i)}

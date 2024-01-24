@@ -11,8 +11,8 @@ interface Props {
   disabled?: boolean
   selectedTab?: string
   allowEmpty?: boolean
-  onSelected?: (key: string) => void
-  onClosed?: (key: string) => void
+  onSelected?: (key: string, i: number) => void
+  onClosed?: (key: string, i: number) => void
 }
 
 export const TabView: React.FC<Props> = ({children, ...props}) => {
