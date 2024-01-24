@@ -13,7 +13,7 @@ import { DialogActions } from '~/components/elements/modals/DialogActions';
 
 interface Props {
   isOpen: boolean
-  fileNameValidator?: (fileName?: string) => string|undefined
+  fileNameValidator?: (fileName: string) => string|undefined
   onClose: (fileName?: string) => void
 }
 
@@ -77,12 +77,13 @@ export const NewFileModal: React.FC<Props> = ({ isOpen, onClose, fileNameValidat
             minLength={4}
             maxLength={maxFileNameLength}
             defaultValue={fileName}
-            deferredValidationTime={0}
             placeholder='Example: main.go'
             onChange={(_, value) => setFileName(value)}
             onKeyDown={e => {
               if (e.key === 'Enter' && isValid) {
                 onClose(fileName);
+              } else {
+                setIsDirty(true);
               }
             }}
             onGetErrorMessage={value => {

@@ -11,12 +11,12 @@ import { skipIndex } from './utils';
 
 interface Props {}
 
-const mockTabName = i => `main${i}.go`
-
 export const Workspace: React.FC<Props> = () => {
   const [ modalOpen, setModalOpen ] = useState(false);
   const [selectedTab, setSelectedTab] = useState<string>();
   const [tabs, setTabs] = useState<TabInfo[]>([]);
+
+  const fileNames = useMemo(() => new Set(tabs.map(t => t.label)), [tabs]);
 
   const onTabClose = (key: string, i: number) => {
     if (key === selectedTab) {
@@ -72,6 +72,12 @@ export const Workspace: React.FC<Props> = () => {
       <NewFileModal
         isOpen={modalOpen}
         onClose={onModalClose}
+        fileNameValidator={fileName => {
+          if (fileNames.has(fileName)) {
+            return 'File already exists';
+          }
+          return undefined;
+        }}
       />
     </TabView>
   )
