@@ -67,7 +67,9 @@ export const Workspace: React.FC<Props> = () => {
       onSelected={setSelectedTab}
     >
       <FlexContainer>
-        <CodeEditor />
+        { !!tabs.length && (
+          <CodeEditor />
+        )}
       </FlexContainer>
       <NewFileModal
         isOpen={modalOpen}
