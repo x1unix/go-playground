@@ -1,6 +1,6 @@
 import React from 'react';
 import {useTheme, Spinner, PrimaryButton, DefaultButton} from '@fluentui/react';
-import { Poster } from '../../../elements/misc/Poster';
+import { Poster } from '~/components/elements/misc/Poster';
 
 interface Props {
   isLoading?: boolean
