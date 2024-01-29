@@ -1,12 +1,13 @@
 import { connect } from 'react-redux';
-import {editor} from 'monaco-editor';
-import { EvalEvent } from '~/services/api';
-import {MonacoSettings, RunTargetConfig} from '~/services/config';
-import {LayoutType} from '~/styles/layout';
+import type { editor } from 'monaco-editor';
+import type { EvalEvent } from '~/services/api';
+import type {MonacoSettings, RunTargetConfig} from '~/services/config';
+import type {LayoutType} from '~/styles/layout';
 
-import { VimState } from './vim/state';
+import type { VimState } from './vim/state';
 import { NotificationsState } from './notifications/state';
-import { TerminalState } from './terminal/state';
+import type { TerminalState } from './terminal/state';
+import type { WorkspaceState } from './workspace/state';
 
 export interface UIState {
   shareCreated?: boolean
@@ -51,6 +52,7 @@ export interface State {
   panel: PanelState
   ui?: UIState
   vim?: VimState | null
+  workspace: WorkspaceState
   notifications: NotificationsState
   terminal: TerminalState
 }
