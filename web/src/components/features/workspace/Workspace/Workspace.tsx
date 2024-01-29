@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { TabView } from '~/components/elements/tabs/TabView';
 import type {TabBarAction, TabInfo} from '~/components/elements/tabs/types';
@@ -14,6 +14,7 @@ import { skipIndex } from './utils';
 interface Props {}
 
 export const Workspace: React.FC<Props> = () => {
+  const uploadRef = useRef<HTMLInputElement>(null);
   const [ modalOpen, setModalOpen ] = useState(false);
   const [selectedTab, setSelectedTab] = useState<string>();
   const [tabs, setTabs] = useState<TabInfo[]>([]);
@@ -40,7 +41,7 @@ export const Workspace: React.FC<Props> = () => {
     {
       label: 'Upload',
       icon: { iconName: 'Upload' },
-      onClick: () => console.log('upload'),
+      onClick: () => uploadRef.current?.click(),
     }
   ], [setModalOpen]);
 
@@ -73,7 +74,10 @@ export const Workspace: React.FC<Props> = () => {
           <CodeEditor />
         </FlexContainer>
       ) : (
-        <ContentPlaceholder />
+        <ContentPlaceholder
+          onNewFileClick={() => setModalOpen(true)}
+          onUploadClick={() => uploadRef.current?.click()}
+        />
       )}
       <NewFileModal
         isOpen={modalOpen}
@@ -84,6 +88,14 @@ export const Workspace: React.FC<Props> = () => {
           }
           return undefined;
         }}
+      />
+      <input
+        ref={uploadRef}
+        type="file"
+        hidden
+        multiple
+        accept=".go"
+        style={{display: 'none'}}
       />
     </TabView>
   )
