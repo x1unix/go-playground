@@ -34,7 +34,7 @@ const iconClass = mergeStyles({
 const stackStyles: IStackStyles = {
   root: {
     flex: 1,
-    padding: DefaultSpacing.l2,
+    padding: `${DefaultSpacing.s1} ${DefaultSpacing.l2}`,
   }
 };
 
