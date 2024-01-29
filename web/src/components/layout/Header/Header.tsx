@@ -24,7 +24,6 @@ import {
   newSnippetLoadDispatcher,
   newSettingsChangeDispatcher,
   runFileDispatcher,
-  saveFileDispatcher,
   shareSnippetDispatcher
 } from '~/store';
 
@@ -67,7 +66,6 @@ interface Props {
   snippetName: ui?.shareCreated && ui?.snippetId
 }))
 export class Header extends ThemeableComponent<any, HeaderState> {
-  private fileInput?: HTMLInputElement;
   private snippetMenuItems = getSnippetsMenuItems(i => this.onSnippetMenuItemClick(i));
 
   constructor(props: Props) {
@@ -81,12 +79,6 @@ export class Header extends ThemeableComponent<any, HeaderState> {
   }
 
   componentDidMount(): void {
-    const fileElement = document.createElement('input') as HTMLInputElement;
-    fileElement.type = 'file';
-    fileElement.accept = '.go';
-    fileElement.addEventListener('change', () => this.onItemSelect(), false);
-    this.fileInput = fileElement;
-
     apiClient.getBackendVersions().then(rsp => {
       this.setState({
         goVersions: rsp
@@ -102,15 +94,6 @@ export class Header extends ThemeableComponent<any, HeaderState> {
     ));
   }
 
-  onItemSelect() {
-    const file = this.fileInput?.files?.item(0);
-    if (!file) {
-      return;
-    }
-
-    this.props.dispatch(newImportFileDispatcher(file));
-  }
-
   onSnippetMenuItemClick(item: SnippetMenuItem) {
     const dispatcher = item.snippet ?
       newSnippetLoadDispatcher(item.snippet) :
@@ -124,17 +107,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
 
   get menuItems(): ICommandBarItemProps[] {
     return [
-      {
-        key: 'openFile',
-        text: 'Open',
-        split: true,
-        iconProps: { iconName: 'OpenFile' },
-        disabled: this.isDisabled,
-        onClick: () => this.fileInput?.click(),
-        subMenuProps: {
-          items: this.snippetMenuItems,
-        },
-      },
+
       {
         key: 'run',
         text: 'Run',
@@ -158,12 +131,14 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         }
       },
       {
-        key: 'download',
-        text: 'Download',
-        iconProps: { iconName: 'Download' },
+        key: 'explore',
+        text: 'Examples',
+        iconProps: {
+          iconName: 'TestExploreSolid'
+        },
         disabled: this.isDisabled,
-        onClick: () => {
-          this.props.dispatch(saveFileDispatcher);
+        subMenuProps: {
+          items: this.snippetMenuItems,
         },
       },
       {

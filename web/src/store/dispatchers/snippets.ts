@@ -75,25 +75,6 @@ export const shareSnippetDispatcher: Dispatcher =
     }
   };
 
-export const saveFileDispatcher: Dispatcher =
-  (dispatch: DispatchFn, getState: StateProvider) => {
-    try {
-      const { fileName, code } = getState().editor;
-      const blob = new Blob([code], {
-        type: 'text/plain;charset=utf-8'
-      });
-      saveAs(blob, fileName);
-    } catch (err: any) {
-      dispatch(newAddNotificationAction({
-        id: 'SAVE_FILE_ERROR',
-        type: NotificationType.Error,
-        title: 'Failed to save file',
-        description: err.toString(),
-        canDismiss: true
-      }));
-    }
-  };
-
 export const formatFileDispatcher: Dispatcher =
   async (dispatch: DispatchFn, getState: StateProvider) => {
     dispatch(newLoadingAction());
