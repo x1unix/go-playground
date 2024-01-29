@@ -19,11 +19,13 @@ export const newProgramWriteAction = (event: EvalEvent) => (
 export const newProgramStartAction = () => (
   {
     type: ActionType.EVAL_START,
+    payload: null
   }
 );
 
 export const newProgramFinishAction = () => (
   {
-    type: ActionType.EVAL_FINISH
+    type: ActionType.EVAL_FINISH,
+    payload: null
   }
 );

@@ -1,4 +1,4 @@
-import type { WorkspaceState } from './types';
+import type { WorkspaceState } from './state';
 
 export enum WorkspaceAction {
   /**
@@ -12,9 +12,9 @@ export enum WorkspaceAction {
   SNIPPET_LOAD_FINISH = 'WORKSPACE_SNIPPET_LOAD_FINISH',
 
   /**
-   * Indicates that snippet loading is skipped.
+   * Implicitly set workspace state.
    */
-  SNIPPET_LOAD_SKIP = 'WORKSPACE_SNIPPET_LOAD_SKIP',
+  WORKSPACE_IMPORT = 'WORKSPACE_IMPORT',
 
   /**
    * Indicates that a new file was added.

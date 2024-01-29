@@ -155,6 +155,10 @@ const Config = {
     }
   },
 
+  delete(key: string) {
+    localStorage.removeItem(key)
+  },
+
   sync() {
     setThemeStyles(this.darkThemeEnabled);
   },
