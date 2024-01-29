@@ -62,7 +62,7 @@ export const Workspace: React.FC<Props> = () => {
 
   return (
     <TabView
-      allowEmpty={false}
+      allowEmpty={true}
       actions={actions}
       tabs={tabs}
       selectedTab={selectedTab}
