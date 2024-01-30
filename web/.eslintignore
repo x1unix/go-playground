@@ -5,4 +5,5 @@ vite.config.ts
 .vscode
 .github
 *.d.ts
+wasm_exec.js
 **/node_modules

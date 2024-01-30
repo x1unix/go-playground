@@ -1,3 +1,4 @@
+import '~/lib/go/wasm_exec.js'
 import { FileSystemWrapper } from './fs'
 import ProcessStub from './process'
 import { StdioWrapper, type ConsoleLogger } from './stdio'

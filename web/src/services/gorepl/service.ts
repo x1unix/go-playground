@@ -80,7 +80,9 @@ export const getWorkerInstance = async (
     }),
   )
 
-  const worker = new Worker(new URL('../../workers/repl.worker.ts', import.meta.url))
+  const worker = new Worker(new URL('../../workers/repl.worker.ts', import.meta.url), {
+    type: 'module',
+  })
   const client = new Client(worker)
 
   const state = stateProvider()

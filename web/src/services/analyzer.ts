@@ -35,7 +35,9 @@ export class Analyzer {
   private readonly subscriptions = new Map<string, PromiseSubscription<any>>()
 
   constructor() {
-    this.worker = new Worker(new URL('../workers/analyzer.worker.ts', import.meta.url))
+    this.worker = new Worker(new URL('../workers/analyzer.worker.ts', import.meta.url), {
+      type: 'module',
+    })
     this.worker.onmessage = (m) => {
       this.onMessage(m)
     }

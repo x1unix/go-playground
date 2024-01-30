@@ -11,7 +11,8 @@ const codeSyscallMap: Record<string, Errno> = {
   DataCloneError: Errno.EPIPE,
 }
 
-const unwrapError = (err: Error): Error => err.inner ?? err
+// eslint-disable-next-line @typescript-eslint/dot-notation
+const unwrapError = (err: Error): Error => err['inner'] ?? err
 
 /**
  * SyscallError is syscall execution error which contains error code.

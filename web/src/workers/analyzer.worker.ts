@@ -1,14 +1,12 @@
+import '~/lib/go/wasm_exec.js'
 import { instantiateStreaming } from '~/lib/go/common'
-import { getWasmUrl, wasmExecUrl } from '~/services/api/resources'
+import { getWasmUrl } from '~/services/api/resources'
 
 declare const self: DedicatedWorkerGlobalScope
-// export default {} as typeof Worker & (new () => Worker)
 
 const FN_EXIT = 'exit'
 const TYPE_ANALYZE = 'ANALYZE'
 const TYPE_EXIT = 'EXIT'
-
-self.importScripts(wasmExecUrl)
 
 function wrapModule(mod) {
   const wrapped = {
@@ -72,7 +70,7 @@ function onModuleInit(module) {
   }
 }
 
-function main() {
+export const main = () => {
   const workerUrl = getWasmUrl('analyzer')
   const go = new globalThis.Go()
 

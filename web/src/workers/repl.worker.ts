@@ -1,15 +1,13 @@
+import '~/lib/go/wasm_exec.js'
 import { Client } from '~/lib/wrpc'
 import { stringEncoder } from '~/lib/go'
 import { defaultWorkerConfig, type GoReplWorker, startGoWorker, type WorkerConfig } from '~/services/gorepl/worker'
-import { wasmExecUrl } from '~/services/api/resources'
 
 declare const self: DedicatedWorkerGlobalScope
 
-self.importScripts(wasmExecUrl)
-
 let worker: GoReplWorker | null = null
-// @ts-expect-error: globalThis is not defined in the TS lib
-const rpcClient = new Client(globalThis, {
+
+export const rpcClient = new Client(self, {
   init: async (cfg: WorkerConfig = defaultWorkerConfig) => {
     worker = await startGoWorker(self, rpcClient, cfg)
   },
