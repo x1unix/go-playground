@@ -10,7 +10,7 @@ const defaultWorkspace: WorkspaceState = {
 
 export const saveWorkspaceState = (state: WorkspaceState) => {
   const sanitized = sanitizeState(state);
-  if (!sanitized.files) {
+  if (!sanitized.files || !Object.keys(sanitized.files).length) {
     // Truncate saved state if workspace is empty.
     config.delete(CONFIG_KEY);
     return;
