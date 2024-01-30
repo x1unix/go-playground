@@ -1,7 +1,11 @@
 import React from 'react';
-import MonacoEditor from 'react-monaco-editor';
-import * as monaco from 'monaco-editor';
-import {editor, IKeyboardEvent} from 'monaco-editor';
+import MonacoEditor from '@monaco-editor/react';
+import {
+  editor,
+  KeyMod,
+  KeyCode,
+  type IKeyboardEvent,
+} from 'monaco-editor';
 
 import {
   createVimModeAdapter,
@@ -66,7 +70,7 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
     this.doAnalyze(fileName, code)
   ), ANALYZE_DEBOUNCE_TIME);
 
-  editorDidMount(editorInstance: editor.IStandaloneCodeEditor, _: monaco.editor.IEditorConstructionOptions) {
+  editorDidMount(editorInstance: editor.IStandaloneCodeEditor, _: editor.IEditorConstructionOptions) {
     this.editorInstance = editorInstance;
     editorInstance.onKeyDown(e => this.onKeyDown(e));
     const [ vimAdapter, statusAdapter ] = createVimModeAdapter(
@@ -101,7 +105,7 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
         label: 'Build And Run Code',
         contextMenuGroupId: 'navigation',
         keybindings: [
-          monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter
+          KeyMod.CtrlCmd | KeyCode.Enter
         ],
         run: (ed, ...args) => {
           this.props.dispatch(runFileDispatcher);
@@ -112,7 +116,7 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
         label: 'Format Code (goimports)',
         contextMenuGroupId: 'navigation',
         keybindings: [
-          monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF
+          KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KeyF
         ],
         run: (ed, ...args) => {
           this.props.dispatch(dispatchFormatFile());
@@ -160,7 +164,11 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
     this.vimAdapter?.dispose();
   }
 
-  onChange(newValue: string, _: editor.IModelContentChangedEvent) {
+  onChange(newValue: string|undefined, _: editor.IModelContentChangedEvent) {
+    if (!newValue) {
+      return;
+    }
+
     this.props.dispatch(dispatchUpdateFile(this.props.fileName, newValue));
     const { fileName, code } = this.props;
     this.debouncedAnalyzeFunc(fileName, code);
@@ -212,10 +220,10 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
         language={LANGUAGE_GOLANG}
         theme={this.props.darkMode ? 'vs-dark' : 'vs-light'}
         value={this.props.code}
-        // path={this.props.fileName}
+        path={this.props.fileName}
         options={options}
         onChange={(newVal, e) => this.onChange(newVal, e)}
-        editorDidMount={(e, m: any) => this.editorDidMount(e, m)}
+        onMount={(e, m: any) => this.editorDidMount(e, m)}
       />
     );
   }
