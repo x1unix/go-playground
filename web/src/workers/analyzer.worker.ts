@@ -2,7 +2,7 @@ import { instantiateStreaming } from '~/lib/go/common'
 import { getWasmUrl, wasmExecUrl } from '~/services/api/resources'
 
 declare const self: DedicatedWorkerGlobalScope
-export default {} as typeof Worker & (new () => Worker)
+// export default {} as typeof Worker & (new () => Worker)
 
 const FN_EXIT = 'exit'
 const TYPE_ANALYZE = 'ANALYZE'
@@ -10,32 +10,34 @@ const TYPE_EXIT = 'EXIT'
 
 self.importScripts(wasmExecUrl)
 
-function wrapModule(module) {
+function wrapModule(mod) {
   const wrapped = {
-    exit: () => module.exit.call(module),
+    // eslint-disable-next-line no-useless-call
+    exit: () => mod.exit.call(mod),
   }
-  Object.keys(module)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  Object.keys(mod)
     .filter((k) => k !== FN_EXIT)
     .forEach((fnName) => {
       wrapped[fnName] = async (...args) =>
-        await new Promise((res, rej) => {
+        await new Promise((resolve, reject) => {
           const cb = (rawResp) => {
             try {
               const resp = JSON.parse(rawResp)
               if (resp.error) {
-                rej(new Error(`${fnName}: ${resp.error}`))
+                reject(new Error(`${fnName}: ${resp.error}`))
                 return
               }
 
-              res(resp.result)
+              resolve(resp.result)
             } catch (ex) {
               console.error(`analyzer: "${fnName}" returned and error`, ex)
-              rej(new Error(`${fnName}: ${ex}`))
+              reject(new Error(`${fnName}: ${ex}`))
             }
           }
 
           const newArgs = args.concat(cb)
-          module[fnName].apply(self, newArgs)
+          mod[fnName].apply(self, newArgs)
         })
     })
   return wrapped

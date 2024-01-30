@@ -79,6 +79,7 @@ class GoCompletionItemProvider implements monaco.languages.CompletionItemProvide
     // filter snippets by prefix.
     // usually monaco does that but not always in right way
     const relatedSnippets = snippets
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
       .filter((s) => s.label.toString().startsWith(query.value))
       .map((s) => ({ ...s, range }))
 

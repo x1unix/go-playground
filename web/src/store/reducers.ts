@@ -65,7 +65,7 @@ const reducers = {
         { markers, ...state }: StatusState,
         { payload: { filename } }: Action<FilePayload>,
       ) => {
-        const { [filename]: _, ...newMarkers } = markers || {}
+        const { [filename]: _, ...newMarkers } = markers ?? {}
         return {
           ...state,
           markers: newMarkers,
@@ -115,7 +115,7 @@ const reducers = {
         ...s,
         markers: {
           ...s.markers,
-          [payload.fileName]: payload.markers || null,
+          [payload.fileName]: payload.markers?.length ? payload.markers : null,
         },
       }),
     },

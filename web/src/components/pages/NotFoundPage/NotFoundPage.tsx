@@ -12,6 +12,7 @@ export const NotFoundPage: React.FC = () => {
           <h2 className={styles.errorPage__statusText}>Page Not Found</h2>
           <div className={styles.errorPage__message}>
             <p>Requested page does not exist or was deleted.</p>
+            {/* eslint-disable-next-line react/no-unescaped-entities */}
             <p>That's all we know 🤷</p>
           </div>
           <div className={styles.errorPage__actions}>

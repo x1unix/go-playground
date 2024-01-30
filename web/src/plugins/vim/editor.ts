@@ -106,6 +106,7 @@ export class StatusBarAdapter {
     //
     // This dirty hack tries to resolve this issue at least partially.
     this.commandResultCallback = null
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const message = result.textContent!
     if (message.startsWith(registryOutputPrefix)) {
       // TODO: implement proper registries display
@@ -125,6 +126,7 @@ export class StatusBarAdapter {
     this.dispatchFn(
       newVimConfirmAction({
         type: isError ? 'error' : 'default',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         message: result.textContent!,
       }),
     )

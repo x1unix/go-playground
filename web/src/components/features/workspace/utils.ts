@@ -30,6 +30,7 @@ export const getTimeNowUsageMarkers = (
     return []
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const model = editorInstance.getModel()!
   return matches.map((index) => {
     // Skip extra character or white-space before expression
@@ -63,11 +64,11 @@ export const wrapAsyncWithDebounce = <T>(fn: (...args) => Promise<T>, delay: num
       clearTimeout(lastTimeoutId)
     }
 
-    return await new Promise<T>((res, rej) => {
+    return await new Promise<T>((resolve, reject) => {
       lastTimeoutId = setTimeout(() => {
         fn(...args)
-          .then(res)
-          .catch(rej)
+          .then(resolve)
+          .catch(reject)
       }, delay)
     })
   }

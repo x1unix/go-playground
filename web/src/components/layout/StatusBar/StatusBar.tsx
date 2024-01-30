@@ -102,6 +102,7 @@ const StatusBar: React.FC<Props> = ({ loading, running, lastError, markers }) =>
     <>
       <div
         className={clsx('StatusBar', {
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
           'StatusBar--busy': loading || running,
         })}
       >

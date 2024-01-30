@@ -2,9 +2,7 @@ import { type Event, type Message, MessageType, type Request, type Response } fr
 
 const MSG_PING = 'WRPC_WORKER_PING'
 
-interface WorkerInterface extends AbstractWorker {
-  postMessage: (message: any, transfer?: Transferable[]) => any
-}
+type WorkerInterface = MessagePort | Worker | DedicatedWorkerGlobalScope
 
 interface Listener {
   resolver: Function
@@ -21,6 +19,7 @@ interface CallOpts {
   timeout?: number
 }
 
+// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 type Handler = Record<string, (...args) => Promise<any> | any | void>
 
 const newRequestID = () => Date.now()
@@ -37,12 +36,15 @@ export class Client<H = Handler> {
     private handler?: H | null,
   ) {
     worker.addEventListener('error', (e) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       this.handleWorkerError(e)
     })
     worker.addEventListener('message', (e) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       this.handleMessage(e)
     })
     worker.addEventListener('messageerror', (e) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       this.handleMessageError(e)
     })
   }
@@ -66,7 +68,7 @@ export class Client<H = Handler> {
   async call<V = any, R = any>(methodName: string, body: V, opts?: CallOpts): Promise<R> {
     const reqId = newRequestID()
 
-    return await new Promise<R>((res, rej) => {
+    return await new Promise<R>((resolve, reject) => {
       const req: Message<Request<V>> = {
         type: MessageType.Request,
         payload: {
@@ -78,8 +80,8 @@ export class Client<H = Handler> {
 
       this.worker.postMessage(req)
       this.responseQueue.set(reqId, {
-        resolver: res,
-        rejector: rej,
+        resolver: resolve,
+        rejector: reject,
         timeoutId: opts?.timeout
           ? setTimeout(() => {
               if (!this.responseQueue.has(reqId)) {
@@ -87,7 +89,7 @@ export class Client<H = Handler> {
               }
 
               this.responseQueue.delete(reqId)
-              rej(new Error('request timeout exceeded'))
+              reject(new Error('request timeout exceeded'))
             }, opts.timeout)
           : null,
       })
@@ -168,6 +170,7 @@ export class Client<H = Handler> {
 
     this.responseQueue.delete(id)
     if (err) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       awaiter.rejector(new Error(err.message ?? err))
       return
     }
@@ -232,7 +235,7 @@ export class Client<H = Handler> {
     const { type, payload } = ev.data as Message
     switch (type) {
       case MessageType.Request:
-        this.handleRequest(payload as Request)
+        void this.handleRequest(payload as Request)
         break
       case MessageType.Response:
         this.handleResponse(payload as Response)
@@ -248,7 +251,7 @@ export class Client<H = Handler> {
 
   private handleMessageError(msg: MessageEvent) {
     console.error('wrpc: message error', msg)
-    const { type, payload } = msg.data as Message
+    const { type, payload } = msg.data as Message<{ id: number }>
     if (type !== MessageType.Response) {
       return
     }

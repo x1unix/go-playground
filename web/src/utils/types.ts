@@ -10,13 +10,15 @@ export const excludeKeys = <T = any, R = Partial<T>>(obj: T, ...keys: Array<keyo
   switch (keys.length) {
     case 0:
       return obj as unknown as R
-    case 1:
+    case 1: {
       const newObj = { ...obj }
       const [key] = keys
       delete newObj[key]
       return obj as unknown as R
-    default:
+    }
+    default: {
       const keysList = new Set(keys as string[])
       return Object.fromEntries(Object.entries(obj).filter(([key]) => !keysList.has(key))) as R
+    }
   }
 }

@@ -53,5 +53,27 @@ module.exports = {
         alwaysTryTypes: true
       }
     }
+  },
+  rules: {
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/strict-boolean-expressions': 'off',
+    '@typescript-eslint/consistent-indexed-object-style': 'off',
+    '@typescript-eslint/no-dynamic-delete': 'off',
+    '@typescript-eslint/no-misused-promises': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-unsafe-argument': 'off',
+    '@typescript-eslint/restrict-template-expressions': 'off',
+    '@typescript-eslint/triple-slash-reference': 'off',
+    'import/no-named-as-default-member': 'off',
+    '@typescript-eslint/ban-types': [
+      "error",
+      {
+        "types": {
+          "Function": false,
+          "{}": false,
+        },
+        "extendDefaults": true
+      }
+    ],
   }
 }

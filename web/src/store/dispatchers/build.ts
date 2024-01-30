@@ -37,7 +37,7 @@ const hasProgramTimeoutError = (events: EvalEvent[]) => {
   const { Message, Kind } = events[0]
   if (Kind === 'stderr' && Message.trim() === 'timeout running program') {
     const lastEvent = lastElem(events)
-    return lastEvent!.Delay >= runTimeoutNs
+    return (lastEvent?.Delay ?? 0) >= runTimeoutNs
   }
 
   return false
@@ -151,15 +151,15 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
     const source = files[selectedFile]
 
     switch (target) {
-      case TargetType.Server:
+      case TargetType.Server: {
         const res = await client.evaluateCode(source, settings.autoFormat, backend)
         if (res.formatted?.length) {
           dispatch(newFormatCodeAction(res.formatted))
         }
         dispatchEvalEvents(dispatch, res.events)
         break
-
-      case TargetType.WebAssembly:
+      }
+      case TargetType.WebAssembly: {
         const resp = await client.build(source, settings.autoFormat)
         if (resp.formatted?.length) {
           dispatch(newFormatCodeAction(resp.formatted))
@@ -186,6 +186,7 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
           })
           .finally(() => dispatch(newProgramFinishAction()))
         break
+      }
       case TargetType.Interpreter:
         try {
           const worker = await getWorkerInstance(dispatch, getState)

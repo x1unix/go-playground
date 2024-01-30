@@ -6,7 +6,7 @@ const MAX_DEDUP_ATTEMPTS = 255
 export const readFile = async (file: File) =>
   await new Promise<FileUpdatePayload>((resolve, reject) => {
     if (file.size > MAX_FILE_SIZE) {
-      reject(`File is too large. Max file size is ${MAX_FILE_SIZE}`)
+      reject(new Error(`File is too large. Max file size is ${MAX_FILE_SIZE}`))
       return
     }
 
@@ -17,7 +17,7 @@ export const readFile = async (file: File) =>
     }
 
     reader.onerror = (e) => {
-      reject(`Failed to read file: ${e}`)
+      reject(new Error(`Failed to read file: ${e.target?.error}`))
     }
 
     reader.readAsText(file, 'UTF-8')

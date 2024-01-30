@@ -4,11 +4,11 @@ import { defaultWorkerConfig, type GoReplWorker, startGoWorker, type WorkerConfi
 import { wasmExecUrl } from '~/services/api/resources'
 
 declare const self: DedicatedWorkerGlobalScope
-export default {} as typeof Worker & (new () => Worker)
 
 self.importScripts(wasmExecUrl)
 
 let worker: GoReplWorker | null = null
+// @ts-expect-error: globalThis is not defined in the TS lib
 const rpcClient = new Client(globalThis, {
   init: async (cfg: WorkerConfig = defaultWorkerConfig) => {
     worker = await startGoWorker(self, rpcClient, cfg)
@@ -34,6 +34,7 @@ const rpcClient = new Client(globalThis, {
     }
 
     try {
+      // eslint-disable-next-line no-new
       new URL(newAddress)
     } catch (ex) {
       throw new Error(`invalid Go module proxy URL "${newAddress}": ${ex}`)

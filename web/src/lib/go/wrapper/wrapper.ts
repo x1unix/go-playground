@@ -62,7 +62,7 @@ export interface Options {
 export class GoWrapper {
   private _inspector: MemoryInspector | null = null
   private _memView: MemoryView | null = null
-  private readonly _debug = false
+  private readonly _debug: boolean = false
   private readonly _debugCalls: Set<string>
   private _globalValue: object
   private readonly go: GoInstance
@@ -96,6 +96,7 @@ export class GoWrapper {
   }
 
   private get exports() {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this.go._inst!.exports
   }
 
@@ -183,6 +184,7 @@ export class GoWrapper {
     }
 
     const resultRef = Ref.fromValue(result, this.storeObject(result))
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     reader.updateStackPointer(this.go._inst!.exports.getsp() >>> 0)
     reader.writer().write(RefType, resultRef).write(Bool, success)
   }
@@ -290,6 +292,7 @@ export class GoWrapper {
 
       const reader = new StackReader(this.go.mem, this.go._values, sp, { debug: isDebug })
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return func(sp, reader, this._memView!)
     }
   }
@@ -334,8 +337,7 @@ export class GoWrapper {
       debug: this._debug,
     })
 
-    const r = await this.go.run(wrappedInstance)
-    return r
+    await this.go.run(wrappedInstance)
   }
 
   exit(code: number) {

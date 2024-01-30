@@ -24,6 +24,7 @@ const getInitialTheme = ({ darkMode, useSystemTheme }: SettingsState) => {
 }
 
 const ThemeProviderContainer: React.FunctionComponent<Props> = ({ settings, children, dispatch, ...props }) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const { currentTheme, matchMedia } = getInitialTheme(settings!)
   const systemTheme = usePrefersColorScheme(currentTheme, matchMedia)
   useEffect(() => {

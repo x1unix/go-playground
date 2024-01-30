@@ -27,6 +27,7 @@ precacheAndRoute(self.__WB_MANIFEST)
 // Set up App Shell-style routing, so that all navigation requests
 // are fulfilled with your index.html shell. Learn more at
 // https://developers.google.com/web/fundamentals/architecture/app-shell
+// eslint-disable-next-line prefer-regex-literals
 const fileExtensionRegexp = new RegExp('/[^/?]+\\.[^/]+$')
 registerRoute(
   // Return false to exempt requests from being fulfilled by index.html.
@@ -70,6 +71,7 @@ registerRoute(
 )
 
 // Cache WebAssembly and Go assets
+// eslint-disable-next-line prefer-regex-literals
 const goWasmAssetsRegExp = new RegExp('^/wasm/(.*)(.js|.wasm)$', 'i')
 const DAY_IN_SECONDS = 24 * 60 * 60
 registerRoute(
@@ -95,7 +97,7 @@ registerRoute(
 // registration.waiting.postMessage({type: 'SKIP_WAITING'})
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting()
+    self.skipWaiting().catch(console.error)
   }
 })
 

@@ -19,7 +19,7 @@ const NotificationHostBase: React.FunctionComponent<Props> = ({ notifications, d
               key={key}
               {...notification}
               onClose={() => {
-                dispatch!(newRemoveNotificationAction(key))
+                dispatch?.(newRemoveNotificationAction(key))
               }}
             />
           ))

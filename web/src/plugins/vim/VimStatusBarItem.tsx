@@ -20,7 +20,7 @@ const getItemText = (state: Nullable<VimState>): Nullable<string> => {
   }
 
   if (commandStarted) {
-    return keyBuffer!
+    return keyBuffer ?? ''
   }
 
   if (mode !== VimMode.Visual) {

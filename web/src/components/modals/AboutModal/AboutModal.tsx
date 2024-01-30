@@ -75,6 +75,7 @@ export const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) =>
         </div>
         <div className={modalStyles.footer}>
           <div>
+            {/* eslint-disable-next-line react/no-unescaped-entities */}
             <h3>What's New</h3>
             <ChangeLog />
           </div>

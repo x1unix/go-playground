@@ -38,7 +38,7 @@ export const getSnippetsMenuItems = (handler: (s: SnippetMenuItem) => void) => {
         onClick: () => {
           handler(item)
         },
-      } as IContextualMenuItem
+      } satisfies IContextualMenuItem
     })
 
     menuItems.push(...[section, ...sectionItems])

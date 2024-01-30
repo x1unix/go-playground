@@ -58,6 +58,7 @@ class BootTimeoutGuard {
 
   cancel(isStarted = true) {
     this.started = isStarted
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     clearTimeout(this.timeout!)
   }
 }
@@ -71,7 +72,7 @@ class BootTimeoutGuard {
  * @param cfg Custom startup config
  */
 export const startGoWorker = async (globalScope: any, rpcClient: Client, cfg: WorkerConfig = defaultWorkerConfig) =>
-  await new Promise<GoReplWorker>((res, rej) => {
+  await new Promise<GoReplWorker>((resolve, reject) => {
     const timeout = new BootTimeoutGuard()
 
     const ioWrapper = new StdioWrapper(rpcClient)
@@ -127,7 +128,7 @@ export const startGoWorker = async (globalScope: any, rpcClient: Client, cfg: Wo
           rpcClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
             eventType: GoWorkerBootEventType.Complete,
           })
-          res(worker)
+          resolve(worker)
         },
       }),
     )
@@ -158,7 +159,7 @@ export const startGoWorker = async (globalScope: any, rpcClient: Client, cfg: Wo
         rpcClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
           eventType: GoWorkerBootEventType.Starting,
         })
-        timeout.startBootTimeout(rej, cfg.startTimeout)
+        timeout.startBootTimeout(reject, cfg.startTimeout)
         await go.run(instance as GoWebAssemblyInstance)
       })
       .then(() => {
@@ -166,7 +167,7 @@ export const startGoWorker = async (globalScope: any, rpcClient: Client, cfg: Wo
       })
       .catch((err) => {
         timeout.cancel()
-        rej(err)
+        reject(err)
       })
   })
 

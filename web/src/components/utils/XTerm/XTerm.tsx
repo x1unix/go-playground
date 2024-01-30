@@ -162,16 +162,27 @@ export class XTerm extends React.Component<IProps> {
     }
 
     // Create Listeners
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onBinary(this.onBinary)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onCursorMove(this.onCursorMove)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onData(this.onData)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onKey(this.onKey)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onLineFeed(this.onLineFeed)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onScroll(this.onScroll)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onSelectionChange(this.onSelectionChange)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onRender(this.onRender)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onResize(this.onResize)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onTitleChange(this.onTitleChange)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
 
     // Add Custom Key Event Handler
     if (this.props.customKeyEventHandler) {

@@ -56,6 +56,7 @@ export default class SyscallHelper extends PackageBinding {
   sendErrorResult(callbackId: number, err: Error | DOMException | Errno) {
     const sysErr = SyscallError.fromError(err)
     if (!suppressedErrors.has(sysErr.errno)) {
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
       console.error(`gowasm: async callback thrown an error: ${err} (errno: ${sysErr.errno}, id: ${callbackId})`)
     }
     this.sendCallbackResult(callbackId, sysErr.errno)

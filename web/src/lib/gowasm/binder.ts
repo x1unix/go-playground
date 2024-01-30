@@ -5,6 +5,7 @@ const goExportMetadataKey = Symbol('@GoExportMetadata')
 /**
  * Base class for all classes who export methods to Go.
  */
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class PackageBinding {
   private static [goExportMetadataKey]?: GoExportMetadata
 }
@@ -55,6 +56,7 @@ export const Package =
 export const WasmExport =
   (funcName: string): MethodDecorator =>
   (target, propertyKey, descriptor) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const func = descriptor.value! as unknown as CallImportHandler
     const meta = getGoExportMetadata(target)
 

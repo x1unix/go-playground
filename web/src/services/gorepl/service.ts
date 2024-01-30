@@ -182,7 +182,7 @@ const handleWorkerBootEvent = (dispatcher: DispatchFn, { eventType, progress, co
       return
     case GoWorkerBootEventType.Complete:
       dispatcher(newRemoveNotificationAction(WORKER_NOTIFICATION_ID))
-
+      break
     default:
   }
 }
@@ -203,12 +203,13 @@ const handleProgramStateEvent = (dispatcher: DispatchFn, { state, message }: Pro
       dispatcher(
         newProgramWriteAction({
           Kind: EvalEventKind.Stderr,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           Message: message!,
           Delay: 0,
         }),
       )
       dispatcher(newProgramFinishAction())
-
+      break
     default:
   }
 }
@@ -289,7 +290,7 @@ const handlePackageManagerEvent = (dispatcher: DispatchFn, event: PackageManager
           },
         }),
       )
-
+      break
     default:
   }
 }

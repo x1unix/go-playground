@@ -14,6 +14,7 @@ import 'core-js/actual/array/flat-map'
 initializeIcons()
 registerGoLanguageProvider(apiClient)
 
+// eslint-disable-next-line import/no-named-as-default-member
 ReactDOM.render(<App />, document.getElementById('root'))
 
 // If you want your app to work offline and load faster, you can change

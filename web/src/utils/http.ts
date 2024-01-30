@@ -31,8 +31,12 @@ export const wrapResponseWithProgress = (rsp: Response, reporter: ProgressReport
   return new Response(
     new ReadableStream({
       async start(controller) {
-        const reader = rsp.body!.getReader()
+        const reader = rsp.body?.getReader()
+        if (!reader) {
+          controller.close()
+        }
         for (;;) {
+          // @ts-expect-error: reader already checked
           const { done, value } = await reader.read()
           if (done) break
           readBytes += value?.byteLength ?? 1

@@ -95,9 +95,10 @@ export class Analyzer {
 
     return await new Promise((resolve, reject) => {
       const id = uuid()
-      this.subscriptions.set(id, { resolve, reject } as PromiseSubscription<O>)
+      const sub: PromiseSubscription<O> = { resolve, reject }
+      this.subscriptions.set(id, sub)
 
-      const msg = { id, type, data } as WorkerRequest<I>
+      const msg: WorkerRequest<I> = { id, type, data }
       this.worker.postMessage(msg)
     })
   }
