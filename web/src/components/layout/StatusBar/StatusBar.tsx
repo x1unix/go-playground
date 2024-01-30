@@ -11,8 +11,6 @@ import { VimStatusBarItem } from '~/plugins/vim/VimStatusBarItem'
 
 import './StatusBar.css'
 
-interface OwnProps {}
-
 interface StateProps {
   loading?: boolean
   running?: boolean
@@ -20,7 +18,7 @@ interface StateProps {
   markers?: Record<string, editor.IMarkerData[] | null>
 }
 
-interface Props extends OwnProps, StateProps {
+interface Props extends StateProps {
   dispatch: StateDispatch
 }
 
@@ -102,7 +100,6 @@ const StatusBar: React.FC<Props> = ({ loading, running, lastError, markers }) =>
     <>
       <div
         className={clsx('StatusBar', {
-          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
           'StatusBar--busy': loading || running,
         })}
       >
@@ -136,7 +133,8 @@ const StatusBar: React.FC<Props> = ({ loading, running, lastError, markers }) =>
   )
 }
 
-export const ConnectedStatusBar = connect<StateProps, OwnProps>(({ status }) => {
+export const ConnectedStatusBar = connect<StateProps, {}>(({ status }) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const { loading, lastError, running, markers } = status!
   return { loading, lastError, running, markers }
 })(StatusBar)

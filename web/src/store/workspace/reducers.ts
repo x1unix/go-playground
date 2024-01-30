@@ -73,7 +73,6 @@ export const reducers = mapByAction<WorkspaceState>(
       _: WorkspaceState,
       { payload: { id, error, files } }: Action<SnippetLoadPayload>,
     ) => {
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
       if (error || !files) {
         return {
           selectedFile: null,

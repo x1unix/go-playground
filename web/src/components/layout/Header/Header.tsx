@@ -96,7 +96,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
   }
 
   onSnippetMenuItemClick(item: SnippetMenuItem) {
-    const dispatcher = item.snippet ? dispatchLoadSnippet(item.snippet) : dispatchImportSource(item.files!)
+    const dispatcher = item.snippet ? dispatchLoadSnippet(item.snippet) : dispatchImportSource(item.files ?? {})
     this.props.dispatch(dispatcher)
   }
 
