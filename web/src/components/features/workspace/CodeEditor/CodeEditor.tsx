@@ -1,9 +1,9 @@
 import React from 'react';
-import MonacoEditor from '@monaco-editor/react';
+import MonacoEditor, { type Monaco } from '@monaco-editor/react';
 import {
-  editor,
   KeyMod,
   KeyCode,
+  type editor,
   type IKeyboardEvent,
 } from 'monaco-editor';
 
@@ -65,13 +65,16 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
   private editorInstance?: editor.IStandaloneCodeEditor;
   private vimAdapter?: VimModeKeymap;
   private vimCommandAdapter?: StatusBarAdapter;
+  private monaco?: Monaco;
 
   private debouncedAnalyzeFunc = wrapAsyncWithDebounce((fileName: string, code: string) => (
     this.doAnalyze(fileName, code)
   ), ANALYZE_DEBOUNCE_TIME);
 
-  editorDidMount(editorInstance: editor.IStandaloneCodeEditor, _: editor.IEditorConstructionOptions) {
+  editorDidMount(editorInstance: editor.IStandaloneCodeEditor, monacoInstance: Monaco) {
     this.editorInstance = editorInstance;
+    this.monaco = monacoInstance;
+
     editorInstance.onKeyDown(e => this.onKeyDown(e));
     const [ vimAdapter, statusAdapter ] = createVimModeAdapter(
       this.props.dispatch,
@@ -153,7 +156,7 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
   componentDidUpdate(prevProps) {
     if (this.isFileOrEnvironmentChanged(prevProps)) {
       // Update editor markers on file or environment changes;
-      this.debouncedAnalyzeFunc(this.props.code);
+      this.debouncedAnalyzeFunc(this.props.fileName, this.props.code);
     }
 
     this.applyVimModeChanges(prevProps);
@@ -196,7 +199,7 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
       return r.value ?? [];
     });
 
-    editor.setModelMarkers(
+    this.monaco?.editor.setModelMarkers(
       this.editorInstance?.getModel() as editor.ITextModel,
       this.editorInstance?.getId() as string,
       markers
@@ -220,10 +223,11 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
         language={LANGUAGE_GOLANG}
         theme={this.props.darkMode ? 'vs-dark' : 'vs-light'}
         value={this.props.code}
+        defaultValue={this.props.code}
         path={this.props.fileName}
         options={options}
         onChange={(newVal, e) => this.onChange(newVal, e)}
-        onMount={(e, m: any) => this.editorDidMount(e, m)}
+        onMount={(e, m) => this.editorDidMount(e, m)}
       />
     );
   }
