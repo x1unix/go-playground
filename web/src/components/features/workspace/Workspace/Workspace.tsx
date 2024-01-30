@@ -16,6 +16,7 @@ import { CodeEditor } from '../CodeEditor';
 import { FlexContainer } from '../FlexContainer';
 import { NewFileModal } from '../NewFileModal';
 import { ContentPlaceholder } from '../ContentPlaceholder';
+import { newEmptyFileContent } from './utils';
 
 interface Props extends WorkspaceState {
   dispatch: StateDispatch
@@ -70,7 +71,7 @@ const Workspace: React.FC<Props> = (
       return;
     }
 
-    dispatch(dispatchCreateFile(fileName, 'package main\n'));
+    dispatch(dispatchCreateFile(fileName, newEmptyFileContent(fileName)));
   };
 
   return (
