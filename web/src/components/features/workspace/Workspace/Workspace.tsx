@@ -74,6 +74,14 @@ const Workspace: React.FC<Props> = (
     dispatch(dispatchCreateFile(fileName, newEmptyFileContent(fileName)));
   };
 
+  const onFilePick = ({target: {files}}: React.ChangeEvent<HTMLInputElement>) => {
+    if (!files?.length) {
+      return;
+    }
+
+    dispatch(dispatchImportFile(files));
+  }
+
   return (
     <TabView
       allowEmpty={true}
@@ -113,6 +121,7 @@ const Workspace: React.FC<Props> = (
         multiple
         accept=".go"
         style={{display: 'none'}}
+        onChange={onFilePick}
       />
     </TabView>
   )

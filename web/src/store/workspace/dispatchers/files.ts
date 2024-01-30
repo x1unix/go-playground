@@ -41,7 +41,7 @@ const fileNamesFromState = (getState: StateProvider) => {
  *
  * @param files
  */
-export const dispatchImportFile = (files: File[]) => (
+export const dispatchImportFile = (files: FileList) => (
   async (dispatch: DispatchFn, getState: StateProvider) => {
     const existingNames = new Set(fileNamesFromState(getState));
     const filePayloads: FileUpdatePayload[] = [];
