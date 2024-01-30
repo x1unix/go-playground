@@ -81,7 +81,8 @@ const Workspace: React.FC<Props> = ({ dispatch, files, selectedFile, snippet }) 
 
   return (
     <TabView
-      allowEmpty={true}
+      allowEmpty
+      responsive
       actions={actions}
       tabs={tabs}
       selectedTab={selectedFile}

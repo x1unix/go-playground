@@ -3,9 +3,11 @@ import { useTheme, Stack, FocusZone, type IStackStyles } from '@fluentui/react'
 
 import { TabLabel } from '../TabLabel'
 import { TabActionBar } from '../TabActionBar'
+import { TabSelector } from '../TabSelector'
 import type { TabBarAction, TabInfo, TabKey } from '../types'
 
 interface Props {
+  compact?: boolean
   disabled?: boolean
   tabs?: TabInfo[] | null
   actions?: TabBarAction[]
@@ -28,6 +30,7 @@ export const TabHeader: React.FC<Props> = ({
   selectedTab,
   onSelected,
   onClosed,
+  compact,
   disabled,
 }) => {
   const { semanticColors } = useTheme()
@@ -46,7 +49,6 @@ export const TabHeader: React.FC<Props> = ({
 
   const cmdToolbarStyles: IStackStyles = {
     root: {
-      // flex: 1,
       display: 'flex',
     },
   }
@@ -54,18 +56,29 @@ export const TabHeader: React.FC<Props> = ({
   return (
     <FocusZone style={{ flex: 1 }}>
       <Stack grow wrap horizontal verticalFill horizontalAlign="stretch" verticalAlign="stretch" styles={headerStyles}>
-        {tabs?.map(({ key, label }, i) => (
-          <Stack.Item key={key} styles={tabContainerStyles}>
-            <TabLabel
-              label={label}
-              active={key === selectedTab}
-              canClose={allowEmpty || tabs?.length > 1}
-              disabled={disabled}
-              onClick={() => key !== selectedTab && onSelected?.(key, i)}
-              onClose={() => onClosed?.(key, i)}
-            />
-          </Stack.Item>
-        ))}
+        {compact ? (
+          <TabSelector
+            tabs={tabs}
+            disabled={disabled}
+            selectedTab={selectedTab}
+            placeholder="No files available"
+            onSelected={onSelected}
+            onClosed={onClosed}
+          />
+        ) : (
+          tabs?.map(({ key, label }, i) => (
+            <Stack.Item key={key} styles={tabContainerStyles}>
+              <TabLabel
+                label={label}
+                active={key === selectedTab}
+                canClose={allowEmpty || tabs?.length > 1}
+                disabled={disabled}
+                onClick={() => key !== selectedTab && onSelected?.(key, i)}
+                onClose={() => onClosed?.(key, i)}
+              />
+            </Stack.Item>
+          ))
+        )}
         <Stack.Item styles={cmdToolbarStyles}>
           <TabActionBar actions={actions} disabled={disabled} />
         </Stack.Item>
