@@ -46,7 +46,7 @@ export const InspectorPanel: React.FC<Props> = ({
           return
         case LayoutType.Horizontal:
           onViewChange?.({ width: width + size.width })
-
+          break
         default:
       }
     },

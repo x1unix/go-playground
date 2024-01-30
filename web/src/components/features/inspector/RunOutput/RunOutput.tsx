@@ -9,15 +9,13 @@ import { DEFAULT_FONT, getDefaultFontFamily, getFontFamily } from '~/services/fo
 
 import './RunOutput.css'
 
-interface OwnProps {}
-
 interface StateProps {
   status?: StatusState
   monaco?: MonacoSettings
   terminal: TerminalState
 }
 
-const RunOutput: React.FC<StateProps & OwnProps> = ({ status, monaco, terminal }) => {
+const RunOutput: React.FC<StateProps & {}> = ({ status, monaco, terminal }) => {
   const theme = useTheme()
   const { fontSize, renderingBackend } = terminal.settings
   const styles = useMemo(() => {
@@ -49,7 +47,7 @@ const RunOutput: React.FC<StateProps & OwnProps> = ({ status, monaco, terminal }
               fontSize: `${fontSize}px`,
             }}
           >
-            Press "Run" to compile program.
+            Press &guot;Run&quot; to compile program.
           </div>
         ) : (
           <Console fontFamily={fontFamily} fontSize={fontSize} status={status} backend={renderingBackend} />
@@ -59,7 +57,7 @@ const RunOutput: React.FC<StateProps & OwnProps> = ({ status, monaco, terminal }
   )
 }
 
-export const ConnectedRunOutput = connect<StateProps, OwnProps>(({ status, monaco, terminal }) => ({
+export const ConnectedRunOutput = connect<StateProps, {}>(({ status, monaco, terminal }) => ({
   status,
   monaco,
   terminal,
