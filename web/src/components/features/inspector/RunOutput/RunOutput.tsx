@@ -47,7 +47,7 @@ const RunOutput: React.FC<StateProps & {}> = ({ status, monaco, terminal }) => {
               fontSize: `${fontSize}px`,
             }}
           >
-            Press &guot;Run&quot; to compile program.
+            Press &quot;Run&quot; to compile program.
           </div>
         ) : (
           <Console fontFamily={fontFamily} fontSize={fontSize} status={status} backend={renderingBackend} />
