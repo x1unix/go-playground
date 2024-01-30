@@ -13,6 +13,10 @@ import notificationReducers from './notifications/reducers';
 import { initialTerminalState } from './terminal/state';
 import { reducers as terminalReducers } from './terminal/reducers';
 
+import { WorkspaceAction } from '~/store/workspace/actions';
+import { initialWorkspaceState } from '~/store/workspace/state';
+import { reducers as workspaceReducers } from '~/store/workspace/reducers';
+
 import {
   Action,
   ActionType,
@@ -20,8 +24,6 @@ import {
   type MonacoParamsChanges,
   type MarkerChangePayload,
 } from './actions';
-import { WorkspaceAction } from '~/store/workspace/actions';
-import { initialWorkspaceState } from '~/store/workspace/state';
 import { mapByAction } from './helpers';
 
 import {
@@ -186,6 +188,7 @@ const reducers = {
   vim: vimReducers,
   notifications: notificationReducers,
   terminal: terminalReducers,
+  workspace: workspaceReducers,
 };
 
 export const getInitialState = (): State => ({
