@@ -132,6 +132,9 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
     actions.forEach(action => editorInstance.addAction(action));
     attachCustomCommands(editorInstance);
     editorInstance.focus();
+
+    const { fileName, code } = this.props;
+    this.debouncedAnalyzeFunc(fileName, code);
   }
 
   private isFileOrEnvironmentChanged(prevProps) {
