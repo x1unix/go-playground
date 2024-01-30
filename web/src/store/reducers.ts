@@ -13,7 +13,7 @@ import notificationReducers from './notifications/reducers';
 import { initialTerminalState } from './terminal/state';
 import { reducers as terminalReducers } from './terminal/reducers';
 
-import { WorkspaceAction } from '~/store/workspace/actions';
+import { type FilePayload, WorkspaceAction } from '~/store/workspace/actions';
 import { initialWorkspaceState } from '~/store/workspace/state';
 import { reducers as workspaceReducers } from '~/store/workspace/reducers';
 
@@ -74,6 +74,13 @@ const reducers = {
         lastError: null,
       }
     ),
+    [WorkspaceAction.REMOVE_FILE]: ({markers, ...state}: StatusState, { payload: {filename}}: Action<FilePayload>) => {
+      const { [filename]: _, ...newMarkers } = markers || {};
+      return {
+        ...state,
+        markers: newMarkers,
+      };
+    },
     [ActionType.ERROR]: (s: StatusState, a: Action<string>) => (
       {
         ...s,
