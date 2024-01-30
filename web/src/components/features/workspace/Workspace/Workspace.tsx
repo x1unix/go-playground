@@ -1,34 +1,53 @@
-import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
+import { type StateDispatch, connect } from '~/store';
+import {
+  type WorkspaceState,
+  dispatchCreateFile,
+  dispatchRemoveFile,
+  dispatchUpdateFile,
+  dispatchImportFile,
+  newFileSelectAction,
+} from '~/store/workspace';
 
 import { TabView } from '~/components/elements/tabs/TabView';
-import type {TabBarAction, TabInfo} from '~/components/elements/tabs/types';
+import type { TabBarAction } from '~/components/elements/tabs/types';
 
 import { CodeEditor } from '../CodeEditor';
 import { FlexContainer } from '../FlexContainer';
 import { NewFileModal } from '../NewFileModal';
 import { ContentPlaceholder } from '../ContentPlaceholder';
 
-import { skipIndex } from './utils';
+interface Props extends WorkspaceState {
+  dispatch: StateDispatch
+}
 
-
-interface Props {}
-
-export const Workspace: React.FC<Props> = () => {
+const Workspace: React.FC<Props> = (
+  {
+    dispatch,
+    files,
+    selectedFile,
+    snippet,
+  }
+) => {
   const uploadRef = useRef<HTMLInputElement>(null);
   const [ modalOpen, setModalOpen ] = useState(false);
-  const [selectedTab, setSelectedTab] = useState<string>();
-  const [tabs, setTabs] = useState<TabInfo[]>([]);
 
-  const fileNames = useMemo(() => new Set(tabs.map(t => t.label)), [tabs]);
+  const tabs = useMemo(() => (
+    files ? (
+      Object.keys(files).map(key => ({
+        key,
+        label: key,
+      }))
+    ) : null
+  ), [files]);
 
-  const onTabClose = (key: string, i: number) => {
-    if (key === selectedTab) {
-      const nextId = i === 0 ? 1 : i - 1;
-      const nextKey = tabs[nextId]?.key;
-      setSelectedTab(nextKey);
-    }
-    setTabs((prev) => skipIndex(prev, i));
+  const onTabClose = (key: string) => {
+    dispatch(dispatchRemoveFile(key));
   };
+
+  const onTabChange = (key: string) => {
+    dispatch(newFileSelectAction(key));
+  }
 
   const actions: TabBarAction[] = useMemo(() => [
     {
@@ -50,14 +69,8 @@ export const Workspace: React.FC<Props> = () => {
     if (!fileName) {
       return;
     }
-    setTabs((prev) => ([
-      ...prev,
-      {
-        key: fileName,
-        label: fileName,
-      }
-    ]));
-    setSelectedTab(fileName);
+
+    dispatch(dispatchCreateFile(fileName, 'package main\n'));
   };
 
   return (
@@ -65,16 +78,19 @@ export const Workspace: React.FC<Props> = () => {
       allowEmpty={true}
       actions={actions}
       tabs={tabs}
-      selectedTab={selectedTab}
+      selectedTab={selectedFile}
       onClosed={onTabClose}
-      onSelected={setSelectedTab}
+      onSelected={onTabChange}
+      disabled={snippet?.loading || !!snippet?.error}
     >
-      { !!tabs.length ? (
+      { !!tabs?.length ? (
         <FlexContainer>
           <CodeEditor />
         </FlexContainer>
       ) : (
         <ContentPlaceholder
+          isLoading={snippet?.loading}
+          error={snippet?.error}
           onNewFileClick={() => setModalOpen(true)}
           onUploadClick={() => uploadRef.current?.click()}
         />
@@ -83,7 +99,7 @@ export const Workspace: React.FC<Props> = () => {
         isOpen={modalOpen}
         onClose={onModalClose}
         fileNameValidator={fileName => {
-          if (fileNames.has(fileName)) {
+          if (files?.[fileName]) {
             return 'File already exists';
           }
           return undefined;
@@ -100,3 +116,7 @@ export const Workspace: React.FC<Props> = () => {
     </TabView>
   )
 };
+
+export const ConnectedWorkspace = connect<WorkspaceState, {}>(
+  ({workspace}) => ({...workspace})
+)(Workspace);

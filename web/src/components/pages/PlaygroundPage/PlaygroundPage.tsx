@@ -7,7 +7,7 @@ import {
 } from '~/store';
 import { dispatchLoadSnippet } from '~/store/workspace';
 import { Header } from '~/components/layout/Header';
-import { Workspace } from '~/components/features/workspace/Workspace';
+import { ConnectedWorkspace } from '~/components/features/workspace/Workspace';
 import { InspectorPanel } from '~/components/features/inspector/InspectorPanel/InspectorPanel';
 import { NotificationHost } from "~/components/modals/Notification";
 import { Layout } from '~/components/layout/Layout/Layout';
@@ -29,7 +29,7 @@ export const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }
     <div className={styles.Playground}>
       <Header />
       <Layout layout={panelProps.layout}>
-        <Workspace />
+        <ConnectedWorkspace />
         <InspectorPanel
           {...panelProps}
           onViewChange={changes => {

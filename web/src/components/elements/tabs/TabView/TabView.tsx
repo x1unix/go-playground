@@ -7,9 +7,9 @@ import { TabBarAction, TabInfo } from '../types';
 
 interface Props {
   actions?: TabBarAction[]
-  tabs?: TabInfo[]
+  tabs?: TabInfo[] | null
   disabled?: boolean
-  selectedTab?: string
+  selectedTab?: string | null
   allowEmpty?: boolean
   onSelected?: (key: string, i: number) => void
   onClosed?: (key: string, i: number) => void

@@ -1,4 +1,5 @@
 import type { DispatchFn, StateProvider } from '~/store/helpers';
+import type { Action } from '~/store/actions';
 import {
   type Notification,
   NotificationType,
@@ -8,7 +9,7 @@ import {
 } from '~/store/notifications';
 
 import { saveWorkspaceState } from '../config';
-import { WorkspaceAction, type FileUpdatePayload } from '../actions';
+import {WorkspaceAction, type FileUpdatePayload, FilePayload} from '../actions';
 import { readFile, dedupFiles } from './utils';
 import { type WorkspaceState, defaultFiles } from '../state';
 
@@ -145,6 +146,13 @@ export const dispatchImportSource = (files: Record<string,string>) => (
     })
   }
 );
+
+export const newFileSelectAction = (filename: string): Action<FilePayload> => ({
+  type: WorkspaceAction.SELECT_FILE,
+  payload: {
+    filename
+  }
+});
 
 export const dispatchResetWorkspace = dispatchImportSource(defaultFiles);
 

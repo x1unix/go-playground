@@ -4,7 +4,7 @@ import { Poster } from '~/components/elements/misc/Poster';
 
 interface Props {
   isLoading?: boolean
-  error?: string
+  error?: string | null
   onNewFileClick?: () => void
   onUploadClick?: () => void
 }
