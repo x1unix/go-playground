@@ -1,15 +1,15 @@
-import React from "react";
-import clsx from "clsx";
-import {type editor, MarkerSeverity} from "monaco-editor";
-import {VscDebugAlt} from "react-icons/vsc";
-import environment from "~/environment";
-import {StateDispatch, connect} from "~/store";
+import React, {useMemo} from 'react';
+import clsx from 'clsx';
+import {type editor, MarkerSeverity} from 'monaco-editor';
+import {VscDebugAlt} from 'react-icons/vsc';
+import environment from '~/environment';
+import {StateDispatch, connect} from '~/store';
 
-import { EllipsisText } from "~/components/utils/EllipsisText";
-import { StatusBarItem } from "~/components/layout/StatusBar/StatusBarItem";
-import { VimStatusBarItem } from "~/plugins/vim/VimStatusBarItem";
+import { EllipsisText } from '~/components/utils/EllipsisText';
+import { StatusBarItem } from '~/components/layout/StatusBar/StatusBarItem';
+import { VimStatusBarItem } from '~/plugins/vim/VimStatusBarItem';
 
-import "./StatusBar.css";
+import './StatusBar.css';
 
 
 interface OwnProps {}
@@ -115,10 +115,7 @@ const StatusBar: React.FC<Props> = ({
   lastError,
   markers
 }) => {
-  const {
-    warnings,
-    errors
-  } = countMarkers(markers);
+  const { warnings, errors } = useMemo(() => countMarkers(markers), [markers]);
   return (
     <>
       <div

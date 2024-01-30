@@ -31,11 +31,13 @@ export const ContentPlaceholder: React.FC<Props> = ({isLoading, error, onUploadC
       >
         { isLoading ? (
           <Spinner
+            key='spinner'
             label='Loading editor...'
             labelPosition='right'
           />
         ) : error?.length ? (
           <Poster
+            key='error-poster'
             label="Failed to load snippet"
             type="error"
             icon="PageRemove"
@@ -43,15 +45,18 @@ export const ContentPlaceholder: React.FC<Props> = ({isLoading, error, onUploadC
           />
         ) : (
           <Poster
+            key='empty-poster'
             label="No open tabs"
             icon="List"
             message="Use buttons below to add files to a project."
           >
             <PrimaryButton
+              key='new-file'
               text="Create new file"
               onClick={onNewFileClick}
             />
             <DefaultButton
+              key='upload-file'
               text="Upload file"
               onClick={onUploadClick}
             />

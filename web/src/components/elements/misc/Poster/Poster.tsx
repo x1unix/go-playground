@@ -45,13 +45,13 @@ const defaultIcons: {[K in PosterType]: string} = {
   default: 'AlertSolid',
 };
 
-const mapChildren = (children: React.ReactNode|undefined, fn: (elem: React.ReactNode) => React.ReactNode) => {
+const mapChildren = (children: React.ReactNode|undefined, fn: (elem: React.ReactNode, i: number) => React.ReactNode) => {
   if (!children) {
     return null
   }
 
   if (!Array.isArray(children)) {
-    return fn(children)
+    return fn(children, 0)
   }
 
   return children.map(fn)
@@ -141,11 +141,11 @@ export const Poster: React.FC<Props> = (
               marginTop: DefaultSpacing.l2
             }}
           >
-            { mapChildren(children, (child => (
-              <Stack.Item>
+            { mapChildren(children, (child, i) => (
+              <Stack.Item key={i}>
                 {child}
               </Stack.Item>
-            )))}
+            ))}
           </Stack>
         </Stack.Item>
       )}
