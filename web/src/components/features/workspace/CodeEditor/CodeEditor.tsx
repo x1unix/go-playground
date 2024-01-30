@@ -1,4 +1,5 @@
 import React from 'react';
+import { Spinner } from '@fluentui/react';
 import MonacoEditor, { type Monaco } from '@monaco-editor/react';
 import {
   KeyMod,
@@ -165,6 +166,12 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
   componentWillUnmount() {
     this.analyzer?.dispose();
     this.vimAdapter?.dispose();
+
+    // Shutdown instance to avoid dangling markers.
+    this.monaco?.editor.removeAllMarkers(
+      this.editorInstance?.getId() as string
+    );
+    this.editorInstance?.dispose();
   }
 
   onChange(newValue: string|undefined, _: editor.IModelContentChangedEvent) {
@@ -228,6 +235,13 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
         options={options}
         onChange={(newVal, e) => this.onChange(newVal, e)}
         onMount={(e, m) => this.editorDidMount(e, m)}
+        loading={(
+          <Spinner
+            key='spinner'
+            label='Loading editor...'
+            labelPosition='right'
+          />
+        )}
       />
     );
   }
