@@ -1,8 +1,7 @@
-import React, { FC, PropsWithChildren } from 'react';
+import React, { type FC, type PropsWithChildren } from 'react';
 
 export const FlexContainer: FC<PropsWithChildren<{}>> = ({ children }) => (
   <div style={{
-    background: '#000',
     flex: '1 1',
     overflow: 'hidden'
   }}>

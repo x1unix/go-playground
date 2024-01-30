@@ -1,5 +1,5 @@
-import { ActionType} from "./actions";
-import { UIState } from "../state";
+import { ActionType} from './actions';
+import { UIState } from '../state';
 
 export interface LoadingStateChanges {
   loading: boolean

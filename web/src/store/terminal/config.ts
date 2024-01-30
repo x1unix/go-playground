@@ -1,5 +1,5 @@
 import config from '~/services/config';
-import { TerminalSettings, defaultTerminalSettings } from './types';
+import { type TerminalSettings, defaultTerminalSettings } from './types';
 
 /**
  * Config key for terminal settings.

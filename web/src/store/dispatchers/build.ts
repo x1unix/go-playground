@@ -143,10 +143,18 @@ export const runFileDispatcher: Dispatcher =
     dispatch(newRemoveNotificationAction(WASM_APP_EXIT_ERROR));
 
     try {
-      const { settings, editor, runTarget: {target, backend} } = getState();
+      const { settings, workspace, runTarget: {target, backend} } = getState();
+      // TODO: support ApiV2
+      const { selectedFile, files } = workspace;
+      if (!files || !selectedFile) {
+        dispatch(newErrorAction('No Go files'));
+        return;
+      }
+      const source = files[selectedFile];
+
       switch (target) {
         case TargetType.Server:
-          const res = await client.evaluateCode(editor.code, settings.autoFormat, backend);
+          const res = await client.evaluateCode(source, settings.autoFormat, backend);
           if (res.formatted?.length) {
             dispatch(newFormatCodeAction(res.formatted));
           }
@@ -154,7 +162,7 @@ export const runFileDispatcher: Dispatcher =
           break;
 
         case TargetType.WebAssembly:
-          let resp = await client.build(editor.code, settings.autoFormat);
+          let resp = await client.build(source, settings.autoFormat);
           if (resp.formatted?.length) {
             dispatch(newFormatCodeAction(resp.formatted));
           }
@@ -179,7 +187,7 @@ export const runFileDispatcher: Dispatcher =
         case TargetType.Interpreter:
           try {
             const worker = await getWorkerInstance(dispatch, getState);
-            await worker.runProgram(editor.code);
+            await worker.runProgram(source);
           } catch (err: any) {
             dispatch(newErrorAction(err.message ?? err.toString()));
           }

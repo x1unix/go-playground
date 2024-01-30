@@ -4,7 +4,7 @@ import {State} from "./state";
 export type Reducer<S, T> = (s: S, a: Action<T>) => S;
 export type ActionReducers<T> = { [k in keyof typeof ActionType | string]: Reducer<T, any> };
 
-export type DispatchFn = (a: Action | any) => any;
+export type DispatchFn = <T=any>(a: Action<T>) => any;
 export type StateProvider = () => State
 
 /**

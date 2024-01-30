@@ -4,41 +4,32 @@ import { connect } from 'react-redux';
 
 import {
   dispatchPanelLayoutChange,
-  newSnippetLoadDispatcher,
 } from '~/store';
+import { dispatchLoadSnippet } from '~/store/workspace';
 import { Header } from '~/components/layout/Header';
-import { CodeEditor } from '~/components/features/editor/CodeEditor';
-import { FlexContainer } from '~/components/features/editor/FlexContainer';
+import { ConnectedWorkspace } from '~/components/features/workspace/Workspace';
 import { InspectorPanel } from '~/components/features/inspector/InspectorPanel/InspectorPanel';
 import { NotificationHost } from "~/components/modals/Notification";
 import { Layout } from '~/components/layout/Layout/Layout';
 import { ConnectedStatusBar } from '~/components/layout/StatusBar';
 
-import './PlaygroundPage.css';
+import styles from './PlaygroundPage.module.css';
 
 interface PageParams {
   snippetID: string
 }
 
-const CodeContainer = connect()(({ dispatch }: any) => {
+export const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }))(({ panelProps, dispatch }: any) => {
   const { snippetID } = useParams<PageParams>();
   useEffect(() => {
-    dispatch(newSnippetLoadDispatcher(snippetID));
+    dispatch(dispatchLoadSnippet(snippetID));
   }, [snippetID, dispatch]);
 
   return (
-    <CodeEditor />
-  );
-})
-
-export const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }))(({ panelProps, dispatch }: any) => {
-  return (
-    <div className="Playground">
+    <div className={styles.Playground}>
       <Header />
       <Layout layout={panelProps.layout}>
-        <FlexContainer>
-          <CodeContainer />
-        </FlexContainer>
+        <ConnectedWorkspace />
         <InspectorPanel
           {...panelProps}
           onViewChange={changes => {

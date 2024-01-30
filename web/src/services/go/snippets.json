@@ -3,7 +3,9 @@
     {
       "label": "New Empty Test",
       "type": "test",
-      "text": "package main\n\nimport \"testing\"\n\nfunc TestExample(t *testing.T) {\n\tt.Log(\"this is unit test sample\")\n}\n"
+      "files": {
+        "main_test.go": "package main\n\nimport \"testing\"\n\nfunc TestExample(t *testing.T) {\n\tt.Log(\"this is unit test sample\")\n}\n"
+      }
     },
     {
       "label": "Example Test",

@@ -3,7 +3,8 @@ import { VimMode } from 'monaco-vim';
 import VimModeKeymap from 'monaco-vim/lib/cm/keymap_vim';
 import type {Nullable} from '~/utils/types';
 
-import {runFileDispatcher, shareSnippetDispatcher} from '~/store';
+import { runFileDispatcher } from '~/store';
+import { dispatchShareSnippet } from '~/store/workspace';
 import {Dispatch} from '~/store/vim/state';
 import {
   newVimCommandDoneAction,
@@ -43,7 +44,7 @@ const customCommands = [
   },
   {
     name: 'share',
-    action: shareSnippetDispatcher,
+    action: dispatchShareSnippet,
   }
 ]
 

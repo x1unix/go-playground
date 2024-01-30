@@ -9,23 +9,23 @@ import { newAddNotificationAction, NotificationType } from "~/store/notification
 import { SettingsModal, type SettingsChanges } from '~/components/features/settings/SettingsModal';
 import { ThemeableComponent } from '~/components/utils/ThemeableComponent';
 import { AboutModal } from '~/components/modals/AboutModal';
-import { RunTargetSelector } from '~/components/inputs/RunTargetSelector';
+import { RunTargetSelector } from '~/components/elements/inputs/RunTargetSelector';
 import { SharePopup } from '~/components/utils/SharePopup';
 
 import { dispatchTerminalSettingsChange } from '~/store/terminal';
 import {
+  dispatchImportSource,
+  dispatchLoadSnippet,
+  dispatchFormatFile,
+  dispatchShareSnippet,
+} from '~/store/workspace/dispatchers';
+import {
   Connect,
   type Dispatcher,
   dispatchToggleTheme,
-  formatFileDispatcher,
-  newCodeImportDispatcher,
-  newImportFileDispatcher,
   newMonacoParamsChangeDispatcher,
-  newSnippetLoadDispatcher,
   newSettingsChangeDispatcher,
   runFileDispatcher,
-  saveFileDispatcher,
-  shareSnippetDispatcher
 } from '~/store';
 
 import { getSnippetsMenuItems, SnippetMenuItem } from './utils';
@@ -33,7 +33,7 @@ import { getSnippetsMenuItems, SnippetMenuItem } from './utils';
 import './Header.css';
 
 /**
- * Uniquie class name for share button to use as popover target.
+ * Unique class name for share button to use as popover target.
  */
 const BTN_SHARE_CLASSNAME = 'Header__btn--share';
 
@@ -67,7 +67,6 @@ interface Props {
   snippetName: ui?.shareCreated && ui?.snippetId
 }))
 export class Header extends ThemeableComponent<any, HeaderState> {
-  private fileInput?: HTMLInputElement;
   private snippetMenuItems = getSnippetsMenuItems(i => this.onSnippetMenuItemClick(i));
 
   constructor(props: Props) {
@@ -81,12 +80,6 @@ export class Header extends ThemeableComponent<any, HeaderState> {
   }
 
   componentDidMount(): void {
-    const fileElement = document.createElement('input') as HTMLInputElement;
-    fileElement.type = 'file';
-    fileElement.accept = '.go';
-    fileElement.addEventListener('change', () => this.onItemSelect(), false);
-    this.fileInput = fileElement;
-
     apiClient.getBackendVersions().then(rsp => {
       this.setState({
         goVersions: rsp
@@ -102,19 +95,10 @@ export class Header extends ThemeableComponent<any, HeaderState> {
     ));
   }
 
-  onItemSelect() {
-    const file = this.fileInput?.files?.item(0);
-    if (!file) {
-      return;
-    }
-
-    this.props.dispatch(newImportFileDispatcher(file));
-  }
-
   onSnippetMenuItemClick(item: SnippetMenuItem) {
     const dispatcher = item.snippet ?
-      newSnippetLoadDispatcher(item.snippet) :
-      newCodeImportDispatcher(item.label, item.text as string);
+      dispatchLoadSnippet(item.snippet) :
+      dispatchImportSource(item.files!);
     this.props.dispatch(dispatcher);
   }
 
@@ -124,17 +108,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
 
   get menuItems(): ICommandBarItemProps[] {
     return [
-      {
-        key: 'openFile',
-        text: 'Open',
-        split: true,
-        iconProps: { iconName: 'OpenFile' },
-        disabled: this.isDisabled,
-        onClick: () => this.fileInput?.click(),
-        subMenuProps: {
-          items: this.snippetMenuItems,
-        },
-      },
+
       {
         key: 'run',
         text: 'Run',
@@ -154,16 +128,18 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         disabled: this.isDisabled,
         onClick: () => {
           this.setState({ showShareMessage: true });
-          this.props.dispatch(shareSnippetDispatcher);
+          this.props.dispatch(dispatchShareSnippet());
         }
       },
       {
-        key: 'download',
-        text: 'Download',
-        iconProps: { iconName: 'Download' },
+        key: 'explore',
+        text: 'Examples',
+        iconProps: {
+          iconName: 'TestExploreSolid'
+        },
         disabled: this.isDisabled,
-        onClick: () => {
-          this.props.dispatch(saveFileDispatcher);
+        subMenuProps: {
+          items: this.snippetMenuItems,
         },
       },
       {
@@ -218,7 +194,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         disabled: this.isDisabled,
         iconProps: { iconName: 'Code' },
         onClick: () => {
-          this.props.dispatch(formatFileDispatcher);
+          this.props.dispatch(dispatchFormatFile());
         }
       },
       {

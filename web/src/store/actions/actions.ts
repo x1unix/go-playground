@@ -1,6 +1,4 @@
 export enum ActionType {
-  IMPORT_FILE             = 'IMPORT_FILE',
-  FILE_CHANGE             = 'FILE_CHANGE',
   LOADING_STATE_CHANGE    = 'LOADING_STATE_CHANGE',
   ERROR                   = 'ERROR',
   FORMAT_CODE             = 'FORMAT_CODE',
@@ -18,7 +16,7 @@ export enum ActionType {
   EVAL_FINISH = 'EVAL_FINISH'
 }
 
-export interface Action<T = any, A = ActionType> {
+export interface Action<T = any, A = string> {
   type: A
   payload: T
 }

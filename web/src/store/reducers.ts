@@ -1,6 +1,5 @@
 import { connectRouter } from 'connected-react-router';
 import { combineReducers } from 'redux';
-import {editor} from 'monaco-editor';
 
 import { EvalEvent } from '~/services/api';
 import config, {
@@ -14,17 +13,20 @@ import notificationReducers from './notifications/reducers';
 import { initialTerminalState } from './terminal/state';
 import { reducers as terminalReducers } from './terminal/reducers';
 
+import { WorkspaceAction } from '~/store/workspace/actions';
+import { initialWorkspaceState } from '~/store/workspace/state';
+import { reducers as workspaceReducers } from '~/store/workspace/reducers';
+
 import {
   Action,
   ActionType,
-  FileImportArgs,
-  LoadingStateChanges,
-  MonacoParamsChanges
+  type LoadingStateChanges,
+  type MonacoParamsChanges,
+  type MarkerChangePayload,
 } from './actions';
 import { mapByAction } from './helpers';
 
 import {
-  EditorState,
   SettingsState,
   State,
   StatusState,
@@ -47,32 +49,26 @@ const reducers = {
       payload
     ),
   }, config.runTargetConfig),
-  editor: mapByAction<EditorState>({
-    [ActionType.FILE_CHANGE]: (s: EditorState, {payload: code}: Action<string>) => (
-      {
-        ...s,
-        code
-      }
-    ),
-    [ActionType.IMPORT_FILE]: (s: EditorState, a: Action<FileImportArgs>) => {
-      const { contents: code, fileName } = a.payload;
-      console.log('Loaded file "%s"', fileName);
-      return {
-        code,
-        fileName,
-      };
-    },
-    [ActionType.FORMAT_CODE]: (s: EditorState, {payload: code}: Action<string>) => (
-      {
-        ...s,
-        code,
-      }
-    ),
-  }, { fileName: 'main.go', code: '' }),
   status: mapByAction<StatusState>({
-    [ActionType.IMPORT_FILE]: (_: StatusState) => (
+    [WorkspaceAction.WORKSPACE_IMPORT]: (_: StatusState) => (
+      {
+          loading: false,
+          running: false,
+          dirty: false,
+          lastError: null,
+      }
+    ),
+    [WorkspaceAction.SNIPPET_LOAD_FINISH]: (_: StatusState) => (
       {
         loading: false,
+        running: false,
+        dirty: false,
+        lastError: null,
+      }
+    ),
+    [WorkspaceAction.SNIPPET_LOAD_START]: (_: StatusState) => (
+      {
+        loading: true,
         running: false,
         dirty: false,
         lastError: null,
@@ -129,10 +125,13 @@ const reducers = {
 
       return s;
     },
-    [ActionType.MARKER_CHANGE]: (s: StatusState, { payload }: Action<editor.IMarkerData[]>) => (
+    [ActionType.MARKER_CHANGE]: (s: StatusState, { payload }: Action<MarkerChangePayload>) => (
       {
         ...s,
-        markers: payload,
+        markers: {
+          ...s.markers,
+          [payload.fileName]: payload.markers || null,
+        },
       }
     )
   }, { loading: false }),
@@ -189,15 +188,12 @@ const reducers = {
   vim: vimReducers,
   notifications: notificationReducers,
   terminal: terminalReducers,
+  workspace: workspaceReducers,
 };
 
 export const getInitialState = (): State => ({
   status: {
     loading: true
-  },
-  editor: {
-    fileName: 'prog.go',
-    code: ''
   },
   settings: initialSettingsState,
   runTarget: config.runTargetConfig,
@@ -206,6 +202,7 @@ export const getInitialState = (): State => ({
   notifications: {},
   vim: null,
   terminal: initialTerminalState,
+  workspace: initialWorkspaceState,
 });
 
 export const createRootReducer = history => combineReducers({

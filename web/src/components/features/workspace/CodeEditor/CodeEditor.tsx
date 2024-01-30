@@ -12,15 +12,18 @@ import {Analyzer} from '~/services/analyzer';
 import {TargetType} from "~/services/config";
 import {
   Connect,
-  formatFileDispatcher,
-  newFileChangeAction,
   newMarkerAction,
-  newSnippetLoadDispatcher,
   runFileDispatcher,
 } from '~/store';
-import { getTimeNowUsageMarkers, wrapAsyncWithDebounce } from './utils';
-import {attachCustomCommands} from './commands';
-import {LANGUAGE_GOLANG, stateToOptions} from './props';
+import {
+  type WorkspaceState,
+  dispatchFormatFile,
+  dispatchResetWorkspace,
+  dispatchUpdateFile,
+} from '~/store/workspace';
+import { getTimeNowUsageMarkers, wrapAsyncWithDebounce } from '../utils';
+import {attachCustomCommands} from '../commands';
+import {LANGUAGE_GOLANG, stateToOptions} from '../props';
 
 const ANALYZE_DEBOUNCE_TIME = 500;
 
@@ -29,9 +32,22 @@ interface CodeEditorState {
   loading?: boolean
 }
 
-@Connect(s => ({
-  code: s.editor.code,
-  fileName: s.editor.fileName,
+const mapWorkspaceProps = ({files, selectedFile}: WorkspaceState) => {
+  if (!selectedFile) {
+    return {
+      code: '',
+      fileName: '',
+    };
+  }
+
+  return {
+    code: files?.[selectedFile],
+    fileName: selectedFile,
+  };
+}
+
+@Connect(({ workspace, ...s }) => ({
+  ...mapWorkspaceProps(workspace),
   darkMode: s.settings.darkMode,
   vimModeEnabled: s.settings.enableVimMode,
   isServerEnvironment: s.runTarget.target === TargetType.Server,
@@ -46,8 +62,8 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
   private vimAdapter?: VimModeKeymap;
   private vimCommandAdapter?: StatusBarAdapter;
 
-  private debouncedAnalyzeFunc = wrapAsyncWithDebounce((code: string) => (
-    this.doAnalyze(code)
+  private debouncedAnalyzeFunc = wrapAsyncWithDebounce((fileName: string, code: string) => (
+    this.doAnalyze(fileName, code)
   ), ANALYZE_DEBOUNCE_TIME);
 
   editorDidMount(editorInstance: editor.IStandaloneCodeEditor, _: monaco.editor.IEditorConstructionOptions) {
@@ -77,7 +93,7 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
         label: 'Reset contents',
         contextMenuGroupId: 'navigation',
         run: () => {
-          this.props.dispatch(newSnippetLoadDispatcher());
+          this.props.dispatch(dispatchResetWorkspace);
         }
       },
       {
@@ -99,7 +115,7 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
           monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF
         ],
         run: (ed, ...args) => {
-          this.props.dispatch(formatFileDispatcher);
+          this.props.dispatch(dispatchFormatFile());
         }
       }
     ];
@@ -145,11 +161,12 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
   }
 
   onChange(newValue: string, _: editor.IModelContentChangedEvent) {
-    this.props.dispatch(newFileChangeAction(newValue));
-    this.debouncedAnalyzeFunc(this.props.code);
+    this.props.dispatch(dispatchUpdateFile(this.props.fileName, newValue));
+    const { fileName, code } = this.props;
+    this.debouncedAnalyzeFunc(fileName, code);
   }
 
-  private async doAnalyze(code: string) {
+  private async doAnalyze(fileName: string, code: string) {
     // Code analysis contains 2 steps that run on different conditions:
     // 1. Run Go worker if it's available and check for errors
     // 2. Add warnings to `time.Now` calls if code runs on server.
@@ -176,7 +193,7 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
       this.editorInstance?.getId() as string,
       markers
     );
-    this.props.dispatch(newMarkerAction(markers));
+    this.props.dispatch(newMarkerAction(fileName, markers));
   }
 
   private onKeyDown(e: IKeyboardEvent) {
@@ -195,6 +212,7 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
         language={LANGUAGE_GOLANG}
         theme={this.props.darkMode ? 'vs-dark' : 'vs-light'}
         value={this.props.code}
+        // path={this.props.fileName}
         options={options}
         onChange={(newVal, e) => this.onChange(newVal, e)}
         editorDidMount={(e, m: any) => this.editorDidMount(e, m)}
