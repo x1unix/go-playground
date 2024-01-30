@@ -29,10 +29,10 @@ include build.mk
 include docker.mk
 
 # Exports
-export REACT_APP_VERSION=$(APP_VERSION)
-export REACT_APP_GITHUB_URL=$(REPO_URL)
-export REACT_APP_WASM_API_VER=$(WASM_API_VER)
-export REACT_APP_WASM_BASE_URL=/wasm
+export VITE_VERSION=$(APP_VERSION)
+export VITE_GITHUB_URL=$(REPO_URL)
+export VITE_WASM_API_VER=$(WASM_API_VER)
+export VITE_WASM_BASE_URL=/wasm
 
 .PHONY:run
 run:

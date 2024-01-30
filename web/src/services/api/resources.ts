@@ -1,7 +1,7 @@
 const {
-  REACT_APP_WASM_API_VER: wasmApiVersion = 'v1',
-  REACT_APP_WASM_BASE_URL: wasmBaseUrl = '/wasm',
-} = process.env;
+  VITE_WASM_API_VER: wasmApiVersion = 'v1',
+  VITE_WASM_BASE_URL: wasmBaseUrl = '/wasm',
+} = import.meta.env;
 
 /**
  * Formats and returns the URL for the WASM binary.
