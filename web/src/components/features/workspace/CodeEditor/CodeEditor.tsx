@@ -62,7 +62,6 @@ const mapWorkspaceProps = ({files, selectedFile}: WorkspaceState) => {
 }))
 export class CodeEditor extends React.Component<any, CodeEditorState> {
   private analyzer?: Analyzer;
-  private _previousTimeout: any;
   private editorInstance?: editor.IStandaloneCodeEditor;
   private vimAdapter?: VimModeKeymap;
   private vimCommandAdapter?: StatusBarAdapter;
