@@ -1,2 +1,7 @@
 build/
 public/
+.eslintrc.cjs
+vite.config.ts
+.vscode
+.github
+**/node_modules
