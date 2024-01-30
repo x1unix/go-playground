@@ -1,13 +1,7 @@
-import React, {type FC, useMemo} from 'react';
-import copy from 'copy-to-clipboard';
-import { Target } from '@fluentui/react-hooks';
-import {
-  TeachingBubble,
-  Link,
-  DirectionalHint,
-  IButtonProps,
-  useTheme
-} from '@fluentui/react';
+import React, { type FC, useMemo } from 'react'
+import copy from 'copy-to-clipboard'
+import { type Target } from '@fluentui/react-hooks'
+import { TeachingBubble, Link, DirectionalHint, type IButtonProps, useTheme } from '@fluentui/react'
 
 interface Props {
   visible?: boolean
@@ -18,21 +12,23 @@ interface Props {
 }
 
 export const SharePopup: FC<Props> = ({ visible, snippetId, originUrl, onDismiss, target }) => {
-  const { semanticColors: { bodyBackground } } = useTheme();
+  const {
+    semanticColors: { bodyBackground },
+  } = useTheme()
   const primaryButtonProps: IButtonProps = useMemo(
     () => ({
       children: 'Copy link',
       onClick: () => {
-        copy(`${originUrl}/snippet/${snippetId}`);
-        onDismiss?.();
-        console.log('snippet:', snippetId);
+        copy(`${originUrl}/snippet/${snippetId}`)
+        onDismiss?.()
+        console.log('snippet:', snippetId)
       },
     }),
     [snippetId, originUrl, onDismiss],
-  );
+  )
 
   if (!visible) {
-    return <></>;
+    return <></>
   }
 
   return (
@@ -53,17 +49,17 @@ export const SharePopup: FC<Props> = ({ visible, snippetId, originUrl, onDismiss
         styles={{
           root: [
             {
-              color: bodyBackground
-            }
-          ]
+              color: bodyBackground,
+            },
+          ],
         }}
       >
         {`${originUrl}/snippet/${snippetId}`}
       </Link>
     </TeachingBubble>
-  );
+  )
 }
 
 SharePopup.defaultProps = {
-  originUrl: window?.location?.origin
+  originUrl: window?.location?.origin,
 }

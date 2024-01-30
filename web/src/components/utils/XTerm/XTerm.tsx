@@ -5,7 +5,7 @@ import '@xterm/xterm/css/xterm.css'
 
 // We are using these as types.
 // eslint-disable-next-line no-unused-vars
-import { Terminal, ITerminalOptions, ITerminalAddon } from '@xterm/xterm'
+import { Terminal, type ITerminalOptions, type ITerminalAddon } from '@xterm/xterm'
 
 interface IProps {
   /**
@@ -21,7 +21,7 @@ interface IProps {
   /**
    * An array of XTerm addons to load along with the terminal.
    */
-  addons?: Array<ITerminalAddon>
+  addons?: ITerminalAddon[]
 
   /**
    * Adds an event listener for when a binary event fires. This is used to
@@ -31,12 +31,12 @@ interface IProps {
    * The event value is a JS string, pass it to the underlying pty as
    * binary data, e.g. `pty.write(Buffer.from(data, 'binary'))`.
    */
-  onBinary?(data: string): void
+  onBinary?: (data: string) => void
 
   /**
    * Adds an event listener for the cursor moves.
    */
-  onCursorMove?(): void
+  onCursorMove?: () => void
 
   /**
    * Adds an event listener for when a data event fires. This happens for
@@ -44,50 +44,50 @@ interface IProps {
    * is whatever `string` results, in a typical setup, this should be passed
    * on to the backing pty.
    */
-  onData?(data: string): void
+  onData?: (data: string) => void
 
   /**
    * Adds an event listener for when a key is pressed. The event value contains the
    * string that will be sent in the data event as well as the DOM event that
    * triggered it.
    */
-  onKey?(event: { key: string; domEvent: KeyboardEvent }): void
+  onKey?: (event: { key: string; domEvent: KeyboardEvent }) => void
 
   /**
    * Adds an event listener for when a line feed is added.
    */
-  onLineFeed?(): void
+  onLineFeed?: () => void
 
   /**
    * Adds an event listener for when a scroll occurs. The event value is the
    * new position of the viewport.
    * @returns an `IDisposable` to stop listening.
    */
-  onScroll?(newPosition: number): void
+  onScroll?: (newPosition: number) => void
 
   /**
    * Adds an event listener for when a selection change occurs.
    */
-  onSelectionChange?(): void
+  onSelectionChange?: () => void
 
   /**
    * Adds an event listener for when rows are rendered. The event value
    * contains the start row and end rows of the rendered area (ranges from `0`
    * to `Terminal.rows - 1`).
    */
-  onRender?(event: { start: number; end: number }): void
+  onRender?: (event: { start: number; end: number }) => void
 
   /**
    * Adds an event listener for when the terminal is resized. The event value
    * contains the new size.
    */
-  onResize?(event: { cols: number; rows: number }): void
+  onResize?: (event: { cols: number; rows: number }) => void
 
   /**
    * Adds an event listener for when an OSC 0 or OSC 2 title change occurs.
    * The event value is the new title.
    */
-  onTitleChange?(newTitle: string): void
+  onTitleChange?: (newTitle: string) => void
 
   /**
    * Attaches a custom key event handler which is run before keys are
@@ -99,7 +99,7 @@ interface IProps {
    * propagation and/or prevent the default action. The function returns
    * whether the event should be processed by xterm.js.
    */
-  customKeyEventHandler?(event: KeyboardEvent): boolean
+  customKeyEventHandler?: (event: KeyboardEvent) => boolean
 }
 
 export class XTerm extends React.Component<IProps> {
@@ -162,16 +162,27 @@ export class XTerm extends React.Component<IProps> {
     }
 
     // Create Listeners
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onBinary(this.onBinary)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onCursorMove(this.onCursorMove)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onData(this.onData)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onKey(this.onKey)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onLineFeed(this.onLineFeed)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onScroll(this.onScroll)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onSelectionChange(this.onSelectionChange)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onRender(this.onRender)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onResize(this.onResize)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.terminal.onTitleChange(this.onTitleChange)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
 
     // Add Custom Key Event Handler
     if (this.props.customKeyEventHandler) {

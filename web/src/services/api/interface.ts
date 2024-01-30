@@ -1,32 +1,32 @@
-import {AxiosInstance} from "axios";
-import { languages } from "monaco-editor";
+import { type AxiosInstance } from 'axios'
+import { type languages } from 'monaco-editor'
 import {
-  VersionResponse,
-  RunResponse,
-  BuildResponse,
-  Snippet,
-  ShareResponse,
-  VersionsInfo
-} from "./models";
+  type VersionResponse,
+  type RunResponse,
+  type BuildResponse,
+  type Snippet,
+  type ShareResponse,
+  type VersionsInfo,
+} from './models'
 
 export interface IAPIClient {
   readonly axiosClient: AxiosInstance
 
-  getVersion(): Promise<VersionResponse>
+  getVersion: () => Promise<VersionResponse>
 
-  getSuggestions(query: { packageName?: string, value?: string }): Promise<languages.CompletionList>
+  getSuggestions: (query: { packageName?: string; value?: string }) => Promise<languages.CompletionList>
 
-  evaluateCode(code: string, format: boolean): Promise<RunResponse>
+  evaluateCode: (code: string, format: boolean) => Promise<RunResponse>
 
-  formatCode(code: string): Promise<RunResponse>
+  formatCode: (code: string) => Promise<RunResponse>
 
-  build(code: string, format: boolean): Promise<BuildResponse>
+  build: (code: string, format: boolean) => Promise<BuildResponse>
 
-  getArtifact(fileName: string): Promise<Response>
+  getArtifact: (fileName: string) => Promise<Response>
 
-  getSnippet(id: string): Promise<Snippet>
+  getSnippet: (id: string) => Promise<Snippet>
 
-  shareSnippet(code: string): Promise<ShareResponse>
+  shareSnippet: (code: string) => Promise<ShareResponse>
 
-  getBackendVersions(): Promise<VersionsInfo>
+  getBackendVersions: () => Promise<VersionsInfo>
 }

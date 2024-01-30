@@ -1,7 +1,4 @@
-import {
-  type IStackStyles,
-  type ITheme,
-} from '@fluentui/react';
+import { type IStackStyles, type ITheme } from '@fluentui/react'
 
 export const tabHeaderStyles: IStackStyles = {
   root: {
@@ -10,7 +7,7 @@ export const tabHeaderStyles: IStackStyles = {
     overflow: 'hidden',
     flexShrink: 0,
   },
-};
+}
 
 export const getTabContentStyles = (theme: ITheme): IStackStyles => {
   return {
@@ -22,12 +19,12 @@ export const getTabContentStyles = (theme: ITheme): IStackStyles => {
       background: theme.palette.white,
     },
   }
-};
+}
 
 export const containerStyles: IStackStyles = {
   root: {
     height: '100%',
     overflow: 'hidden',
     flex: 1,
-  }
+  },
 }

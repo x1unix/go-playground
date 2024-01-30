@@ -1,19 +1,12 @@
-import React, { useMemo, useCallback } from 'react';
-import {
-  Stack,
-  FontSizes,
-  IconButton,
-  useTheme,
-  type IStackStyles,
-  type IButtonStyles,
-} from '@fluentui/react';
+import React, { useMemo, useCallback } from 'react'
+import { Stack, FontSizes, IconButton, useTheme, type IStackStyles, type IButtonStyles } from '@fluentui/react'
 
 const labelCellStyles: IStackStyles = {
   root: {
     flex: 1,
     fontSize: FontSizes.smallPlus,
-  }
-};
+  },
+}
 
 interface Props {
   label: string
@@ -24,14 +17,12 @@ interface Props {
   onClose?: () => void
 }
 
-export const TabLabel: React.FC<Props> = (
-  {label, active, disabled, onClick, onClose, canClose}
-) => {
-  const theme = useTheme();
+export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, onClose, canClose }) => {
+  const theme = useTheme()
 
   const containerStyles: IStackStyles = useMemo(() => {
-    const { palette , semanticColors } = theme;
-    const background = active ? palette.white : semanticColors.bodyStandoutBackground;
+    const { palette, semanticColors } = theme
+    const background = active ? palette.white : semanticColors.bodyStandoutBackground
 
     return {
       root: {
@@ -55,10 +46,10 @@ export const TabLabel: React.FC<Props> = (
         },
         ':focus button': {
           opacity: '1',
-        }
+        },
       },
     }
-  }, [theme, active, disabled]);
+  }, [theme, active, disabled])
 
   const btnStyles: IButtonStyles = useMemo(() => {
     return {
@@ -77,56 +68,55 @@ export const TabLabel: React.FC<Props> = (
         opacity: active ? '1' : '0',
         ':focus': {
           opacity: '1',
-        }
+        },
       },
       rootHovered: {
         color: 'inherit',
-        opacity: '1'
+        opacity: '1',
       },
       rootPressed: {
         color: 'inherit',
-      }
-    };
-  }, [active]);
+      },
+    }
+  }, [active])
 
-  const handleClose = useCallback((e) => {
-    e.stopPropagation();
-    onClose?.();
-  }, [onClose]);
+  const handleClose = useCallback(
+    (e) => {
+      e.stopPropagation()
+      onClose?.()
+    },
+    [onClose],
+  )
 
   return (
     <Stack
       grow
       horizontal
       verticalFill
-      horizontalAlign='stretch'
-      verticalAlign='center'
+      horizontalAlign="stretch"
+      verticalAlign="center"
       styles={containerStyles}
       onClick={onClick}
       aria-label={`Switch to tab ${label}`}
       data-is-focusable
     >
-      <Stack.Item
-        styles={labelCellStyles}
-      >
-        {label}
-      </Stack.Item>
+      <Stack.Item styles={labelCellStyles}>{label}</Stack.Item>
       {canClose ? (
         <Stack.Item>
           <IconButton
-            title='Close'
-            ariaLabel='Close tab'
+            title="Close"
+            ariaLabel="Close tab"
             disabled={disabled}
-            iconProps={{iconName: 'Cancel'}}
+            iconProps={{ iconName: 'Cancel' }}
             styles={btnStyles}
             onClick={handleClose}
           />
         </Stack.Item>
       ) : null}
     </Stack>
-  );
-};
+  )
+}
 
 TabLabel.defaultProps = {
   canClose: true,
-};
+}

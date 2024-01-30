@@ -1,17 +1,15 @@
-import { GoStringType } from "./string";
-import { AbstractTypeSpec } from "../spec";
-import { AttributeDescriptor, StructTypeSpec, ArrayTypeSpec } from "../complex";
-import { Bool, Int, Int32, Int64, Uint, Uint32, Uint64, UintPtr } from "../basic";
+import { GoStringType } from './string'
+import { type AbstractTypeSpec } from '../spec'
+import { type AttributeDescriptor, StructTypeSpec, ArrayTypeSpec } from '../complex'
+import { Bool, Int, Int32, Int64, Uint, Uint32, Uint64, UintPtr } from '../basic'
 
 const sliceHeaderAttrs: AttributeDescriptor[] = [
   { key: 'data', type: UintPtr },
   { key: 'len', type: Int },
-  { key: 'cap', type: Int }
-];
+  { key: 'cap', type: Int },
+]
 
-export const SliceHeaderType = new StructTypeSpec(
-  'reflect.SliceHeader', sliceHeaderAttrs
-);
+export const SliceHeaderType = new StructTypeSpec('reflect.SliceHeader', sliceHeaderAttrs)
 
 /**
  * SliceHeader represents a `reflect.SliceHeader` Go structure.
@@ -38,20 +36,20 @@ export interface SliceHeader {
  *
  * Returns an array of items during decode.
  */
-class SliceTypeSpec<T=number> extends StructTypeSpec<SliceHeader> {
-  constructor(private elemType: AbstractTypeSpec) {
+class SliceTypeSpec<T = number> extends StructTypeSpec<SliceHeader> {
+  constructor(private readonly elemType: AbstractTypeSpec) {
     super(`[]${elemType.name}`, sliceHeaderAttrs)
   }
 
   protected valueFromStruct(buff: ArrayBufferLike, header: SliceHeader): T[] {
-    let { data, len } = header;
+    const { data, len } = header
     if (!data || !len) {
-      return [] as T[];
+      return [] as T[]
     }
 
-    let t = new ArrayTypeSpec(this.elemType, len);
-    const { value } = t.read(new DataView(buff), data, buff);
-    return value as T[];
+    const t = new ArrayTypeSpec(this.elemType, len)
+    const { value } = t.read(new DataView(buff), data, buff)
+    return value as T[]
   }
 }
 
@@ -60,16 +58,14 @@ class SliceTypeSpec<T=number> extends StructTypeSpec<SliceHeader> {
  * @param itemType Slice item type
  * @constructor
  */
-export const SliceOf = <T=number>(itemType: AbstractTypeSpec) => (
-  new SliceTypeSpec<T>(itemType)
-);
+export const SliceOf = <T = number>(itemType: AbstractTypeSpec) => new SliceTypeSpec<T>(itemType)
 
-export const StringSlice = SliceOf<string>(GoStringType);
-export const IntSlice = SliceOf<number>(Int);
-export const Int32Slice = SliceOf<number>(Int32);
-export const Int64Slice = SliceOf<number>(Int64);
-export const UintSlice = SliceOf<number>(Uint);
-export const Uint32Slice = SliceOf<number>(Uint32);
-export const Uint64Slice = SliceOf<number>(Uint64);
-export const UintPtrSlice = SliceOf<number>(UintPtr);
-export const BoolSlice = SliceOf<boolean>(Bool);
+export const StringSlice = SliceOf<string>(GoStringType)
+export const IntSlice = SliceOf<number>(Int)
+export const Int32Slice = SliceOf<number>(Int32)
+export const Int64Slice = SliceOf<number>(Int64)
+export const UintSlice = SliceOf<number>(Uint)
+export const Uint32Slice = SliceOf<number>(Uint32)
+export const Uint64Slice = SliceOf<number>(Uint64)
+export const UintPtrSlice = SliceOf<number>(UintPtr)
+export const BoolSlice = SliceOf<boolean>(Bool)

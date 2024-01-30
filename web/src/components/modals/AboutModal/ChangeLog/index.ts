@@ -1,1 +1,1 @@
-export * from './ChangeLog';
+export * from './ChangeLog'

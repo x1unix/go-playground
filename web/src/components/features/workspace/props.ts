@@ -1,8 +1,8 @@
-import * as monaco from 'monaco-editor';
-import { MonacoSettings } from '~/services/config';
-import { getFontFamily, getDefaultFontFamily } from '~/services/fonts';
+import type * as monaco from 'monaco-editor'
+import { type MonacoSettings } from '~/services/config'
+import { getFontFamily, getDefaultFontFamily } from '~/services/fonts'
 
-export const LANGUAGE_GOLANG = 'go';
+export const LANGUAGE_GOLANG = 'go'
 
 export const DEMO_CODE = [
   'package main\n',
@@ -11,8 +11,8 @@ export const DEMO_CODE = [
   ')\n',
   'func main() {',
   '\tfmt.Println("Hello World")',
-  '}\n'
-].join('\n');
+  '}\n',
+].join('\n')
 
 // stateToOptions converts MonacoState to IEditorOptions
 export const stateToOptions = (state: MonacoSettings): monaco.editor.IEditorOptions => {
@@ -23,14 +23,19 @@ export const stateToOptions = (state: MonacoSettings): monaco.editor.IEditorOpti
     cursorBlinking,
     fontLigatures,
     cursorStyle,
-    contextMenu
-  } = state;
+    contextMenu,
+  } = state
   return {
-    selectOnLineNumbers, mouseWheelZoom, smoothScrolling, cursorBlinking, cursorStyle, fontLigatures,
+    selectOnLineNumbers,
+    mouseWheelZoom,
+    smoothScrolling,
+    cursorBlinking,
+    cursorStyle,
+    fontLigatures,
     fontFamily: state.fontFamily ? getFontFamily(state.fontFamily) : getDefaultFontFamily(),
     showUnused: true,
     automaticLayout: true,
     minimap: { enabled: state.minimap },
     contextmenu: contextMenu,
-  };
-};
+  }
+}

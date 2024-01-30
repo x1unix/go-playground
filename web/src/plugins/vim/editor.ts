@@ -1,36 +1,36 @@
-import {editor, IKeyboardEvent, KeyCode} from 'monaco-editor';
-import { VimMode } from 'monaco-vim';
-import VimModeKeymap from 'monaco-vim/lib/cm/keymap_vim';
-import type {Nullable} from '~/utils/types';
+import { type editor, type IKeyboardEvent, KeyCode } from 'monaco-editor'
+import { VimMode } from 'monaco-vim'
+import VimModeKeymap from 'monaco-vim/lib/cm/keymap_vim'
+import type { Nullable } from '~/utils/types'
 
-import { runFileDispatcher } from '~/store';
-import { dispatchShareSnippet } from '~/store/workspace';
-import {Dispatch} from '~/store/vim/state';
+import { runFileDispatcher } from '~/store'
+import { dispatchShareSnippet } from '~/store/workspace'
+import { type Dispatch } from '~/store/vim/state'
 import {
   newVimCommandDoneAction,
   newVimCommandStartAction,
   newVimConfirmAction,
   newVimDisposeAction,
-  newVimInitAction, newVimKeyDeleteAction,
+  newVimInitAction,
+  newVimKeyDeleteAction,
   newVimKeyPressAction,
   newVimModeChangeAction,
-  VimModeChangeArgs
-} from '~/store/vim/actions';
-
+  type VimModeChangeArgs,
+} from '~/store/vim/actions'
 
 // This implementation is quite hacky, but still better than
 // having a huge list of all possible keys except printable.
-const regularKeyRegex = /^.$/;
-const isPrintableKey = (key: string) => regularKeyRegex.test(key);
+const regularKeyRegex = /^.$/
+const isPrintableKey = (key: string) => regularKeyRegex.test(key)
 
-const registryOutputPrefix = '----------Registers----------';
+const registryOutputPrefix = '----------Registers----------'
 
 interface CommandInputOpts {
-  bottom?: boolean,
-  selectValueOnOpen?: boolean,
-  closeOnEnter?: boolean,
+  bottom?: boolean
+  selectValueOnOpen?: boolean
+  closeOnEnter?: boolean
   onKeyDown?: (e: KeyboardEvent, input: HTMLInputElement, closeFn: Function) => void
-  onKeyUp?: (e: KeyboardEvent, input: HTMLInputElement, closeFn: Function) => void,
+  onKeyUp?: (e: KeyboardEvent, input: HTMLInputElement, closeFn: Function) => void
   value: string
 }
 
@@ -45,52 +45,52 @@ const customCommands = [
   {
     name: 'share',
     action: dispatchShareSnippet,
-  }
+  },
 ]
 
 class VimModeKeymapAdapter extends VimModeKeymap {
-  private commandsAttached = false;
+  private commandsAttached = false
 
   constructor(
     // "dispatch" is reserved method in inner class.
-    private dispatchFunc: Dispatch,
-    editorInstance: editor.IStandaloneCodeEditor
+    private readonly dispatchFunc: Dispatch,
+    editorInstance: editor.IStandaloneCodeEditor,
   ) {
-    super(editorInstance);
+    super(editorInstance)
   }
 
   attach() {
     if (!this.commandsAttached) {
-      this.attachCommands();
-      this.commandsAttached = true;
+      this.attachCommands()
+      this.commandsAttached = true
     }
 
-    this.dispatchFunc(newVimInitAction());
-    super.attach();
+    this.dispatchFunc(newVimInitAction())
+    super.attach()
   }
 
   private attachCommands() {
-    customCommands.forEach(({name, short, action}) => {
+    customCommands.forEach(({ name, short, action }) => {
       VimMode.Vim.defineEx(name, short, () => {
-        this.dispatchFunc(action);
+        this.dispatchFunc(action)
       })
-    });
+    })
   }
 }
 
-export { VimModeKeymap };
+export { VimModeKeymap }
 
 /**
  * StatusBarAdapter is monaco-vim command handler and report status bar
  * adapter which maps it to application state.
  */
 export class StatusBarAdapter {
-  private commandResultCallback?: Nullable<((val: string) => void)>;
-  private currentOpts?: Nullable<CommandInputOpts>;
+  private commandResultCallback?: Nullable<(val: string) => void>
+  private currentOpts?: Nullable<CommandInputOpts>
 
   constructor(
-    private dispatchFn: Dispatch,
-    private editor: editor.IStandaloneCodeEditor
+    private readonly dispatchFn: Dispatch,
+    private readonly editor: editor.IStandaloneCodeEditor,
   ) {}
 
   /**
@@ -105,22 +105,29 @@ export class StatusBarAdapter {
     // as a result, registry prompt is unreadable and displayed as error.
     //
     // This dirty hack tries to resolve this issue at least partially.
-    this.commandResultCallback = null;
-    const message = result.textContent!;
+    this.commandResultCallback = null
+    const message = result.textContent!
     if (message.startsWith(registryOutputPrefix)) {
       // TODO: implement proper registries display
-      this.dispatchFn(newVimConfirmAction({
-        type: 'default',
-        message: message.split('\n').map(v => v.trim()).join(' ')
-      }));
-      return;
+      this.dispatchFn(
+        newVimConfirmAction({
+          type: 'default',
+          message: message
+            .split('\n')
+            .map((v) => v.trim())
+            .join(' '),
+        }),
+      )
+      return
     }
 
-    const isError = result.style.color === 'red';
-    this.dispatchFn(newVimConfirmAction({
-      type: isError ? 'error' : 'default',
-      message: result.textContent!
-    }));
+    const isError = result.style.color === 'red'
+    this.dispatchFn(
+      newVimConfirmAction({
+        type: isError ? 'error' : 'default',
+        message: result.textContent!,
+      }),
+    )
   }
 
   /**
@@ -130,18 +137,18 @@ export class StatusBarAdapter {
    * @param options Command handle arguments (unused)
    */
   setSec(text: DocumentFragment, callback: (val: string) => void, options: CommandInputOpts) {
-    this.currentOpts = options;
-    this.commandResultCallback = callback;
+    this.currentOpts = options
+    this.commandResultCallback = callback
 
     // Initial character is hidden inside an array of 2 spans as content of 1 span.
     // Idk who thought that this is a good idea, but we have to deal with it.
-    const commandChar = text.firstChild?.textContent;
-    this.dispatchFn(newVimCommandStartAction(commandChar));
+    const commandChar = text.firstChild?.textContent
+    this.dispatchFn(newVimCommandStartAction(commandChar))
   }
 
   onPromptClose(value: string) {
-    this.commandResultCallback?.(value.substring(1));
-    this.commandResultCallback = null;
+    this.commandResultCallback?.(value.substring(1))
+    this.commandResultCallback = null
   }
 
   /**
@@ -150,32 +157,32 @@ export class StatusBarAdapter {
    * @param currentData
    */
   handleKeyDownEvent(e: IKeyboardEvent, currentData: string) {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault()
+    e.stopPropagation()
 
     switch (e.keyCode) {
       case KeyCode.Enter:
-        this.dispatchFn(newVimCommandDoneAction());
-        this.onPromptClose(currentData);
-        return;
+        this.dispatchFn(newVimCommandDoneAction())
+        this.onPromptClose(currentData)
+        return
       case KeyCode.Escape:
-        this.dispatchFn(newVimCommandDoneAction());
-        break;
+        this.dispatchFn(newVimCommandDoneAction())
+        break
       case KeyCode.Backspace:
-        this.dispatchFn(newVimKeyDeleteAction());
-        return;
+        this.dispatchFn(newVimKeyDeleteAction())
+        return
       default:
-        break;
+        break
     }
 
     if (isPrintableKey(e.browserEvent.key)) {
-      this.dispatchFn(newVimKeyPressAction(e.browserEvent.key));
+      this.dispatchFn(newVimKeyPressAction(e.browserEvent.key))
     }
   }
 
   private closeInput() {
-    this?.editor?.focus();
-    this.currentOpts = null;
+    this?.editor?.focus()
+    this.currentOpts = null
   }
 }
 
@@ -186,27 +193,27 @@ export class StatusBarAdapter {
  */
 export const createVimModeAdapter = (
   dispatch: Dispatch,
-  editorInstance: editor.IStandaloneCodeEditor
+  editorInstance: editor.IStandaloneCodeEditor,
 ): [VimModeKeymap, StatusBarAdapter] => {
-  const vimAdapter: VimModeKeymap = new VimModeKeymapAdapter(dispatch, editorInstance);
-  const statusAdapter = new StatusBarAdapter(dispatch, editorInstance);
+  const vimAdapter: VimModeKeymap = new VimModeKeymapAdapter(dispatch, editorInstance)
+  const statusAdapter = new StatusBarAdapter(dispatch, editorInstance)
 
-  vimAdapter.setStatusBar(statusAdapter);
+  vimAdapter.setStatusBar(statusAdapter)
   vimAdapter.on('vim-mode-change', (mode: VimModeChangeArgs) => {
-    dispatch(newVimModeChangeAction(mode));
-  });
+    dispatch(newVimModeChangeAction(mode))
+  })
 
   vimAdapter.on('vim-keypress', (key: string) => {
-    dispatch(newVimKeyPressAction(key));
-  });
+    dispatch(newVimKeyPressAction(key))
+  })
 
   vimAdapter.on('vim-command-done', () => {
-    dispatch(newVimCommandDoneAction());
-  });
+    dispatch(newVimCommandDoneAction())
+  })
 
   vimAdapter.on('dispose', () => {
-    dispatch(newVimDisposeAction());
-  });
+    dispatch(newVimDisposeAction())
+  })
 
-  return [vimAdapter, statusAdapter];
-};
+  return [vimAdapter, statusAdapter]
+}

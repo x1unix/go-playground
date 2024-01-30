@@ -1,2 +1,2 @@
-export * from './binding';
-export * from './types';
+export * from './binding'
+export * from './types'

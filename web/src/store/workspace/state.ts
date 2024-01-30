@@ -1,4 +1,4 @@
-export const defaultFileName = 'main.go';
+export const defaultFileName = 'main.go'
 const defaultFile = `
 package main
 
@@ -9,7 +9,7 @@ import (
 func main() {
 \tfmt.Println("Hello, World!")
 }
-`.trimStart();
+`.trimStart()
 
 export interface SnippetState {
   /**
@@ -47,15 +47,15 @@ export interface WorkspaceState {
   /**
    * Key-value pair of file names and their content.
    */
-  files?: {[filename: string]: string}
+  files?: Record<string, string>
 }
 
 export const initialWorkspaceState: WorkspaceState = {
   snippet: {
     loading: true,
-  }
-};
+  },
+}
 
 export const defaultFiles = {
   [defaultFileName]: defaultFile,
-};
+}

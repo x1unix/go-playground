@@ -1,13 +1,13 @@
-import {AbstractTypeSpec} from '../spec';
+import { AbstractTypeSpec } from '../spec'
 
 export interface AttributeDescriptor {
   key: string
   type: AbstractTypeSpec
 }
 
-export class StructTypeSpec<T=object> extends AbstractTypeSpec {
-  private readonly _attributes: AttributeDescriptor[];
-  private readonly _firstAttr: AbstractTypeSpec;
+export class StructTypeSpec<T = object> extends AbstractTypeSpec {
+  private readonly _attributes: AttributeDescriptor[]
+  private readonly _firstAttr: AbstractTypeSpec
 
   /**
    *
@@ -15,82 +15,82 @@ export class StructTypeSpec<T=object> extends AbstractTypeSpec {
    * @param {AttributeDescriptor[]} attrs attribute descriptors
    */
   constructor(name: string, attrs: AttributeDescriptor[]) {
-    super(name, 0, 0, 0);
+    super(name, 0, 0, 0)
 
-    if (!attrs.length) {
-      throw new ReferenceError(`${this.constructor.name}: missing struct attributes`);
+    if (attrs.length === 0) {
+      throw new ReferenceError(`${this.constructor.name}: missing struct attributes`)
     }
 
-    const [ firstElem ] = attrs;
-    const totalSize = attrs
-      .map(({type}) => type.size + type.padding)
-      .reduce((total, size) => total + size, 0);
+    const [firstElem] = attrs
+    const totalSize = attrs.map(({ type }) => type.size + type.padding).reduce((total, size) => total + size, 0)
 
     this.setTypeDescriptor({
       size: totalSize,
       alignment: firstElem.type.alignment,
-      padding: 0
-    });
+      padding: 0,
+    })
 
-    this._attributes = attrs;
-    this._firstAttr = firstElem.type;
+    this._attributes = attrs
+    this._firstAttr = firstElem.type
   }
 
   get alignment() {
-    return this._firstAttr.alignment;
+    return this._firstAttr.alignment
   }
 
   alignAddress(addr) {
-    return this._firstAttr.alignAddress(addr);
+    return this._firstAttr.alignAddress(addr)
   }
 
   read(view, addr, buff: ArrayBufferLike) {
-    const address = this._firstAttr.alignAddress(addr);
-    let offset = address;
+    const address = this._firstAttr.alignAddress(addr)
+    let offset = address
 
-    const entries: [string, any][] = [];
-    for (let attr of this._attributes) {
-      const {key, type} = attr;
-      const fieldAddr = type.alignAddress(offset);
-      const {value, endOffset} = type.read(view, fieldAddr, buff);
-      entries.push([key, value]);
-      offset = endOffset;
+    const entries: Array<[string, any]> = []
+    for (const attr of this._attributes) {
+      const { key, type } = attr
+      const fieldAddr = type.alignAddress(offset)
+      const { value, endOffset } = type.read(view, fieldAddr, buff)
+      entries.push([key, value])
+      offset = endOffset
     }
 
-    const structObj = Object.fromEntries(entries) as T;
+    const structObj = Object.fromEntries(entries) as T
     return {
       address,
       endOffset: offset,
-      value: this.valueFromStruct(buff, structObj)
-    };
+      value: this.valueFromStruct(buff, structObj),
+    }
   }
 
   write(view, addr, val, buff: ArrayBufferLike) {
-    const address = this._firstAttr.alignAddress(addr);
-    let offset = address;
+    const address = this._firstAttr.alignAddress(addr)
+    let offset = address
     if (typeof val !== 'object') {
       throw new ReferenceError(
         `${this.constructor.name}.write: invalid value passed (${typeof val} ${val}). ` +
-        `Value should be an object with attributes (${this._attributes.map(a => a.key).join(', ')}) ` +
-        `(struct ${this.name})`
-      );
+          `Value should be an object with attributes (${this._attributes.map((a) => a.key).join(', ')}) ` +
+          `(struct ${this.name})`,
+      )
     }
 
-    for (let attr of this._attributes) {
-      const {key, type} = attr;
+    for (const attr of this._attributes) {
+      const { key, type } = attr
       if (!(key in val)) {
-        throw new ReferenceError(`${this.constructor.name}.write: missing object property "${key}" (struct ${this.name})`)
+        throw new ReferenceError(
+          `${this.constructor.name}.write: missing object property "${key}" (struct ${this.name})`,
+        )
       }
 
       const fieldAddr = type.alignAddress(offset)
-      const { endOffset } = type.write(view, fieldAddr, val[key], buff);
-      offset = endOffset;
+      const { endOffset } = type.write(view, fieldAddr, val[key], buff)
+      offset = endOffset
     }
 
     return {
       address,
-      endOffset: offset
-    };
+      endOffset: offset,
+    }
   }
 
   /**
@@ -107,17 +107,16 @@ export class StructTypeSpec<T=object> extends AbstractTypeSpec {
    * @protected
    */
   protected valueFromStruct(buff: ArrayBufferLike, structVal: T): any {
-    return structVal;
+    return structVal
   }
 
   encode(view, addr, val) {
-    throw new Error(`${this.constructor.name}.encode: not supported, use write() instead`);
+    throw new Error(`${this.constructor.name}.encode: not supported, use write() instead`)
   }
 
   decode(view, addr) {
-    throw new Error(`${this.constructor.name}.decode: not supported, use read() instead`);
+    throw new Error(`${this.constructor.name}.decode: not supported, use read() instead`)
   }
-
 }
 
 /**
@@ -126,6 +125,4 @@ export class StructTypeSpec<T=object> extends AbstractTypeSpec {
  * @param fields Array of field definitions
  * @constructor
  */
-export const Struct = <T=object>(name: string, fields: AttributeDescriptor[]) => (
-  new StructTypeSpec<T>(name, fields)
-);
+export const Struct = <T = object>(name: string, fields: AttributeDescriptor[]) => new StructTypeSpec<T>(name, fields)

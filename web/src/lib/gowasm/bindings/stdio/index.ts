@@ -1,2 +1,2 @@
-export * from './binding';
-export * from './console';
+export * from './binding'
+export * from './console'

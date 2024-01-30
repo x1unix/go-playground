@@ -80,12 +80,12 @@ jobs:
         working-directory: ./web
         env:
           NODE_ENV: "production"
-          REACT_APP_VERSION: "${{ env.RELEASE_VERSION }}"
-          REACT_APP_GITHUB_URL: "${{ github.server_url }}/${{ github.repository }}"
-          REACT_APP_GO_VERSION: "${{ env.GO_VERSION }}"
-          REACT_APP_PREV_GO_VERSION: "${{ env.PREV_GO_VERSION }}"
-          REACT_APP_WASM_API_VER: "${{ env.WASM_API_VER }}"
-          REACT_APP_WASM_BASE_URL: "/wasm"
+          VITE_VERSION: "${{ env.RELEASE_VERSION }}"
+          VITE_GITHUB_URL: "${{ github.server_url }}/${{ github.repository }}"
+          VITE_GO_VERSION: "${{ env.GO_VERSION }}"
+          VITE_PREV_GO_VERSION: "${{ env.PREV_GO_VERSION }}"
+          VITE_WASM_API_VER: "${{ env.WASM_API_VER }}"
+          VITE_WASM_BASE_URL: "/wasm"
 
       - name: Build and push image
         uses: docker/build-push-action@v5

@@ -1,0 +1,15 @@
+{
+  "bracketSpacing": true,
+  "singleQuote": true,
+  "jsxSingleQuote": false,
+  "printWidth": 120,
+  "proseWrap": "always",
+  "semi": false,
+  "tabWidth": 2,
+  "arrowParens": "always",
+  "trailingComma": "all",
+  "bracketSameLine": false,
+  "options": {
+    "editorconfig": true
+  }
+}

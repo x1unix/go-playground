@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   useTheme,
   mergeStyles,
@@ -11,15 +11,15 @@ import {
   type ITextProps,
   type IStackStyles,
   type ITheme,
-} from '@fluentui/react';
+} from '@fluentui/react'
 
-type PosterType = 'error'|'warning'|'info'|'default';
+type PosterType = 'error' | 'warning' | 'info' | 'default'
 
 interface Props {
   label: string
   message?: string
   icon?: string
-  type?: 'error'|'warning'|'info'|'default'
+  type?: 'error' | 'warning' | 'info' | 'default'
   textProps?: ITextProps
   horizontalContent?: boolean
 }
@@ -29,23 +29,26 @@ const iconClass = mergeStyles({
   height: FontSizes.mega,
   width: FontSizes.mega,
   marginBottom: DefaultSpacing.s2,
-});
+})
 
 const stackStyles: IStackStyles = {
   root: {
     flex: 1,
     padding: `${DefaultSpacing.s1} ${DefaultSpacing.l2}`,
-  }
-};
+  },
+}
 
-const defaultIcons: {[K in PosterType]: string} = {
+const defaultIcons: { [K in PosterType]: string } = {
   error: 'StatusErrorFull',
   warning: 'WarningSolid',
   info: 'InfoSolid',
   default: 'AlertSolid',
-};
+}
 
-const mapChildren = (children: React.ReactNode|undefined, fn: (elem: React.ReactNode, i: number) => React.ReactNode) => {
+const mapChildren = (
+  children: React.ReactNode | undefined,
+  fn: (elem: React.ReactNode, i: number) => React.ReactNode,
+) => {
   if (!children) {
     return null
   }
@@ -58,65 +61,51 @@ const mapChildren = (children: React.ReactNode|undefined, fn: (elem: React.React
 }
 
 const getIconColor = (type: PosterType, theme: ITheme) => {
-  const { semanticColors, palette} = theme;
+  const { semanticColors, palette } = theme
   switch (type) {
     case 'error':
-      return semanticColors.errorText;
+      return semanticColors.errorText
     case 'warning':
-      return palette.yellowDark;
+      return palette.yellowDark
     case 'info':
-      return semanticColors.inputIcon;
+      return semanticColors.inputIcon
     default:
-      return semanticColors.disabledText;
+      return semanticColors.disabledText
   }
 }
 
-export const Poster: React.FC<Props> = (
-  {
-    textProps,
-    label,
-    message,
-    icon,
-    type = 'default',
-    horizontalContent,
-    children
-  }
-) => {
-  const theme = useTheme();
-  const { semanticColors } = theme;
-  const iconColor = getIconColor(type, theme);
+export const Poster: React.FC<Props> = ({
+  textProps,
+  label,
+  message,
+  icon,
+  type = 'default',
+  horizontalContent,
+  children,
+}) => {
+  const theme = useTheme()
+  const { semanticColors } = theme
+  const iconColor = getIconColor(type, theme)
   const headerStyles = mergeStyles({
     fontSize: FontSizes.xLarge,
     fontWeight: FontWeights.semibold,
     textTransform: 'capitalize',
     color: semanticColors.bodyText,
     margin: DefaultSpacing.m,
-  });
+  })
 
   return (
-    <Stack
-      grow
-      verticalFill
-      horizontalAlign='center'
-      verticalAlign='center'
-      styles={stackStyles}
-    >
+    <Stack grow verticalFill horizontalAlign="center" verticalAlign="center" styles={stackStyles}>
       <Stack.Item>
-        <Icon
-          className={iconClass}
-          iconName={icon || defaultIcons[type]}
-          style={{color: iconColor}}
-        />
+        <Icon className={iconClass} iconName={icon || defaultIcons[type]} style={{ color: iconColor }} />
       </Stack.Item>
       <Stack.Item>
-        <h1 className={headerStyles}>
-          {label}
-        </h1>
+        <h1 className={headerStyles}>{label}</h1>
       </Stack.Item>
-      { message && (
+      {message && (
         <Stack.Item>
           <Text
-            variant='medium'
+            variant="medium"
             style={{
               color: semanticColors.bodySubtext,
             }}
@@ -126,25 +115,23 @@ export const Poster: React.FC<Props> = (
           </Text>
         </Stack.Item>
       )}
-      { children && (
+      {children && (
         <Stack.Item>
           <Stack
             grow
             wrap
             horizontal={horizontalContent}
-            horizontalAlign='center'
-            verticalAlign='center'
+            horizontalAlign="center"
+            verticalAlign="center"
             tokens={{
-              childrenGap: DefaultSpacing.m
+              childrenGap: DefaultSpacing.m,
             }}
             style={{
-              marginTop: DefaultSpacing.l2
+              marginTop: DefaultSpacing.l2,
             }}
           >
-            { mapChildren(children, (child, i) => (
-              <Stack.Item key={i}>
-                {child}
-              </Stack.Item>
+            {mapChildren(children, (child, i) => (
+              <Stack.Item key={i}>{child}</Stack.Item>
             ))}
           </Stack>
         </Stack.Item>

@@ -1,4 +1,4 @@
-import {Backend} from "~/services/api";
+import { type Backend } from '~/services/api'
 
 /**
  * Go program run configuration
@@ -29,19 +29,19 @@ export enum TargetType {
   /**
    * Run program on server
    */
-  Server          = 'SERVER',
+  Server = 'SERVER',
 
   /**
    * Build WASM file and execute it in browser
    */
-  WebAssembly     = 'WASM',
+  WebAssembly = 'WASM',
 
   /**
    * Execute code inside Go interpreted in browser
    */
-  Interpreter     = 'INTERPRETER',
+  Interpreter = 'INTERPRETER',
 }
 
 export const defaultRunTarget: RunTargetConfig = {
-  target: TargetType.Server
+  target: TargetType.Server,
 }

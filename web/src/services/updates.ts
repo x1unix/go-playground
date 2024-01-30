@@ -1,5 +1,5 @@
-import client from '~/services/api';
-import environment from "~/environment";
+import client from '~/services/api'
+import environment from '~/environment'
 
 export interface UpdateInfo {
   newVersion: string
@@ -10,22 +10,22 @@ export interface UpdateInfo {
  *
  * Returns null if no updates available.
  */
-export const checkUpdates = async (): Promise<UpdateInfo|null> => {
+export const checkUpdates = async (): Promise<UpdateInfo | null> => {
   if (!window.navigator.onLine) {
-    console.log('updater: application is offline, skip.');
-    return null;
+    console.log('updater: application is offline, skip.')
+    return null
   }
 
-  const { version: newVersion } = await client.getVersion();
-  const { appVersion } = environment;
+  const { version: newVersion } = await client.getVersion()
+  const { appVersion } = environment
   if (newVersion === appVersion) {
-    console.log('updater: app is up to date:', newVersion);
-    return null;
+    console.log('updater: app is up to date:', newVersion)
+    return null
   }
 
-  console.log(`updater: new update is available - ${newVersion}`);
+  console.log(`updater: new update is available - ${newVersion}`)
   return {
-    newVersion: newVersion
+    newVersion,
   }
 
   // if (!('serviceWorker' in navigator)) {
@@ -38,7 +38,6 @@ export const checkUpdates = async (): Promise<UpdateInfo|null> => {
   //   console.warn('updater: no SW registrations found, skip');
   //   return;
   // }
-
 
   // await truncateCachesAndRegister(registrations);
 }

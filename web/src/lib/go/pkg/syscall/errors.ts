@@ -1,19 +1,18 @@
-import {Errno, errorMessages} from './tables';
+import { Errno, errorMessages } from './tables'
 
 /**
  * Key-value mapping to DOM exception name and syscall error code.
  */
-const codeSyscallMap: {[k: string]: Errno} = {
-  'QuotaExceededError': Errno.ENOSPC,
-  'SecurityError': Errno.EPERM,
-  'NetworkError': Errno.ENETRESET,
-  'TimeoutError': Errno.ETIMEDOUT,
-  'DataCloneError': Errno.EPIPE
+const codeSyscallMap: Record<string, Errno> = {
+  QuotaExceededError: Errno.ENOSPC,
+  SecurityError: Errno.EPERM,
+  NetworkError: Errno.ENETRESET,
+  TimeoutError: Errno.ETIMEDOUT,
+  DataCloneError: Errno.EPIPE,
 }
 
-const unwrapError = (err: Error): Error => (
-  err['inner'] ?? err
-);
+// eslint-disable-next-line @typescript-eslint/dot-notation
+const unwrapError = (err: Error): Error => err['inner'] ?? err
 
 /**
  * SyscallError is syscall execution error which contains error code.
@@ -22,7 +21,7 @@ const unwrapError = (err: Error): Error => (
  */
 export class SyscallError extends Error {
   constructor(public errno: Errno) {
-    super(`Syscall error: ${errorMessages.get(errno) ?? Errno[errno]}`);
+    super(`Syscall error: ${errorMessages.get(errno) ?? Errno[errno]}`)
   }
 
   /**
@@ -33,10 +32,10 @@ export class SyscallError extends Error {
    */
   static is(err: Error, errno: Errno): boolean {
     if (!(err instanceof SyscallError)) {
-      return false;
+      return false
     }
 
-    return err.errno === errno;
+    return err.errno === errno
   }
 
   /**
@@ -49,15 +48,15 @@ export class SyscallError extends Error {
    */
   static fromError(err: Error | Errno): SyscallError {
     if (typeof err === 'number') {
-      return new SyscallError(err);
+      return new SyscallError(err)
     }
 
     if (err instanceof SyscallError) {
-      return err;
+      return err
     }
 
-    const unwrapped = unwrapError(err);
-    const errCode = codeSyscallMap[unwrapped.name] ?? Errno.EIO;
-    return new SyscallError(errCode);
+    const unwrapped = unwrapError(err)
+    const errCode = codeSyscallMap[unwrapped.name] ?? Errno.EIO
+    return new SyscallError(errCode)
   }
 }

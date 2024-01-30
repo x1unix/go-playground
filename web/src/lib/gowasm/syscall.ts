@@ -1,11 +1,9 @@
-import { WasmExport, Package, PackageBinding } from '~/lib/gowasm/binder';
-import { GoWrapper, js, StackReader } from '~/lib/go';
-import { Errno, SyscallError } from '~/lib/go/pkg/syscall';
+import { WasmExport, Package, PackageBinding } from '~/lib/gowasm/binder'
+import { type GoWrapper, js, type StackReader } from '~/lib/go'
+import { Errno, SyscallError } from '~/lib/go/pkg/syscall'
 
 // list of syscall errors which should not be logged.
-const suppressedErrors = new Set([
-  Errno.ENOENT
-]);
+const suppressedErrors = new Set([Errno.ENOENT])
 
 /**
  * SyscallHelper contains extensions required for "gowasm" package.
@@ -16,16 +14,19 @@ const suppressedErrors = new Set([
 export default class SyscallHelper extends PackageBinding {
   private callbackFunc?: js.Func
 
-  constructor(private go: GoWrapper, private debug = false) {
-    super();
+  constructor(
+    private readonly go: GoWrapper,
+    private readonly debug = false,
+  ) {
+    super()
   }
 
   @WasmExport('registerCallbackHandler')
   private registerCallbackHandler(sp: number, reader: StackReader) {
-    reader.skipHeader();
-    const callbackFunc = reader.next<js.Func>(js.FuncType);
-    console.log('js: registered callback handler', callbackFunc);
-    this.callbackFunc = callbackFunc;
+    reader.skipHeader()
+    const callbackFunc = reader.next<js.Func>(js.FuncType)
+    console.log('js: registered callback handler', callbackFunc)
+    this.callbackFunc = callbackFunc
   }
 
   /**
@@ -35,14 +36,14 @@ export default class SyscallHelper extends PackageBinding {
    */
   sendCallbackResult(callbackId: number, result: number) {
     if (!this.callbackFunc) {
-      throw new Error('SyscallHelper: callback handler not registered.');
+      throw new Error('SyscallHelper: callback handler not registered.')
     }
 
     if (this.debug) {
-      console.log('SyscallHelper: sendCallbackResult', { callbackId, result });
+      console.log('SyscallHelper: sendCallbackResult', { callbackId, result })
     }
 
-    this.go.callFunc(this.callbackFunc, [callbackId, result]);
+    this.go.callFunc(this.callbackFunc, [callbackId, result])
   }
 
   /**
@@ -53,13 +54,12 @@ export default class SyscallHelper extends PackageBinding {
    * @param err
    */
   sendErrorResult(callbackId: number, err: Error | DOMException | Errno) {
-    const sysErr = SyscallError.fromError(err);
+    const sysErr = SyscallError.fromError(err)
     if (!suppressedErrors.has(sysErr.errno)) {
-      console.error(
-        `gowasm: async callback thrown an error: ${err} (errno: ${sysErr.errno}, id: ${callbackId})`
-      );
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
+      console.error(`gowasm: async callback thrown an error: ${err} (errno: ${sysErr.errno}, id: ${callbackId})`)
     }
-    this.sendCallbackResult(callbackId, sysErr.errno);
+    this.sendCallbackResult(callbackId, sysErr.errno)
   }
 
   /**
@@ -74,13 +74,13 @@ export default class SyscallHelper extends PackageBinding {
     try {
       fn()
         .then(() => {
-          this.sendCallbackResult(callbackId, 0);
+          this.sendCallbackResult(callbackId, 0)
         })
         .catch((err: Error) => {
-          this.sendErrorResult(callbackId, err);
-        });
+          this.sendErrorResult(callbackId, err)
+        })
     } catch (err) {
-      this.sendErrorResult(callbackId, err as Error);
+      this.sendErrorResult(callbackId, err as Error)
     }
   }
 }

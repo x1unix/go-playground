@@ -1,10 +1,11 @@
-import {editor, MarkerSeverity, Uri} from 'monaco-editor';
-import environment from "~/environment";
+import { type editor, MarkerSeverity, Uri } from 'monaco-editor'
+import environment from '~/environment'
 
-const segmentLength = 'time.Now()'.length;
-const issueUrl = Uri.parse(`${environment.urls.github}/issues/104`);
-const timeNowUsageWarning = 'Warning: `time.Now()` will always return fake time. ' +
-    'Change current environment to WebAssembly in settings to use real date and time.';
+const segmentLength = 'time.Now()'.length
+const issueUrl = Uri.parse(`${environment.urls.github}/issues/104`)
+const timeNowUsageWarning =
+  'Warning: `time.Now()` will always return fake time. ' +
+  'Change current environment to WebAssembly in settings to use real date and time.'
 
 /**
  * Checks if passed source code contains `time.Now()` calls and returns
@@ -14,26 +15,29 @@ const timeNowUsageWarning = 'Warning: `time.Now()` will always return fake time.
  * @param code
  * @param editorInstance
  */
-export const getTimeNowUsageMarkers = (code: string, editorInstance: editor.IStandaloneCodeEditor): editor.IMarkerData[]  => {
-  const regex = /\W(time\.Now\(\))/gm;
-  const matches: number[] = [];
-  let match: RegExpExecArray | null;
+export const getTimeNowUsageMarkers = (
+  code: string,
+  editorInstance: editor.IStandaloneCodeEditor,
+): editor.IMarkerData[] => {
+  const regex = /\W(time\.Now\(\))/gm
+  const matches: number[] = []
+  let match: RegExpExecArray | null
   while ((match = regex.exec(code))) {
-    matches.push(match.index);
+    matches.push(match.index)
   }
 
-  if (!matches.length) {
-    return [];
+  if (matches.length === 0) {
+    return []
   }
 
-  const model = editorInstance.getModel() as editor.ITextModel;
-  return matches.map(index => {
+  const model = editorInstance.getModel()!
+  return matches.map((index) => {
     // Skip extra character or white-space before expression
-    const {lineNumber, column} = model.getPositionAt(index + 1);
+    const { lineNumber, column } = model.getPositionAt(index + 1)
     return {
       code: {
         value: 'More information',
-        target: issueUrl
+        target: issueUrl,
       },
       severity: MarkerSeverity.Warning,
       message: timeNowUsageWarning,
@@ -41,8 +45,8 @@ export const getTimeNowUsageMarkers = (code: string, editorInstance: editor.ISta
       endLineNumber: lineNumber,
       startColumn: column,
       endColumn: column + segmentLength,
-    };
-  });
+    }
+  })
 }
 
 /**
@@ -52,19 +56,19 @@ export const getTimeNowUsageMarkers = (code: string, editorInstance: editor.ISta
  * @param delay Debounce time
  */
 export const wrapAsyncWithDebounce = <T>(fn: (...args) => Promise<T>, delay: number) => {
-  let lastTimeoutId: NodeJS.Timeout|null = null;
+  let lastTimeoutId: NodeJS.Timeout | null = null
 
-  return (...args) => {
+  return async (...args) => {
     if (lastTimeoutId) {
-      clearTimeout(lastTimeoutId);
+      clearTimeout(lastTimeoutId)
     }
 
-    return new Promise<T>((res, rej) => {
+    return await new Promise<T>((resolve, reject) => {
       lastTimeoutId = setTimeout(() => {
         fn(...args)
-          .then(res)
-          .catch(rej);
-      }, delay);
+          .then(resolve)
+          .catch(reject)
+      }, delay)
     })
   }
 }

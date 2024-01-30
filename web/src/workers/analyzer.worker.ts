@@ -1,85 +1,89 @@
-import { instantiateStreaming } from "~/lib/go/common";
-import { getWasmUrl, wasmExecUrl } from "~/services/api/resources";
+import '~/lib/go/wasm_exec.js'
+import { instantiateStreaming } from '~/lib/go/common'
+import { getWasmUrl } from '~/services/api/resources'
 
-declare const self: DedicatedWorkerGlobalScope;
-export default {} as typeof Worker & { new (): Worker };
+declare const self: DedicatedWorkerGlobalScope
 
+const FN_EXIT = 'exit'
+const TYPE_ANALYZE = 'ANALYZE'
+const TYPE_EXIT = 'EXIT'
 
-const FN_EXIT = 'exit';
-const TYPE_ANALYZE = 'ANALYZE';
-const TYPE_EXIT = 'EXIT';
-
-self.importScripts(wasmExecUrl);
-
-function wrapModule(module) {
+function wrapModule(mod) {
   const wrapped = {
-    exit: () => module.exit.call(module),
-  };
-  Object.keys(module)
-    .filter(k => k !== FN_EXIT)
-    .forEach(fnName => {
-      wrapped[fnName] = (...args) => (new Promise((res, rej) => {
-        const cb = (rawResp) => {
-          try {
-            const resp = JSON.parse(rawResp);
-            if (resp.error) {
-              rej(new Error(`${fnName}: ${resp.error}`));
-              return;
+    // eslint-disable-next-line no-useless-call
+    exit: () => mod.exit.call(mod),
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  Object.keys(mod)
+    .filter((k) => k !== FN_EXIT)
+    .forEach((fnName) => {
+      wrapped[fnName] = async (...args) =>
+        await new Promise((resolve, reject) => {
+          const cb = (rawResp) => {
+            try {
+              const resp = JSON.parse(rawResp)
+              if (resp.error) {
+                reject(new Error(`${fnName}: ${resp.error}`))
+                return
+              }
+
+              resolve(resp.result)
+            } catch (ex) {
+              console.error(`analyzer: "${fnName}" returned and error`, ex)
+              reject(new Error(`${fnName}: ${ex}`))
             }
-
-            res(resp.result);
-          } catch (ex) {
-            console.error(`analyzer: "${fnName}" returned and error`, ex);
-            rej(new Error(`${fnName}: ${ex}`));
           }
-        };
 
-        const newArgs = args.concat(cb);
-        module[fnName].apply(self, newArgs);
-      }))
-  });
-  return wrapped;
+          const newArgs = args.concat(cb)
+          mod[fnName].apply(self, newArgs)
+        })
+    })
+  return wrapped
 }
 
 /**
  * WASM module load handler. Called by Go worker.
  */
 function onModuleInit(module) {
-  console.log('analyzer: started');
-  module = wrapModule(module);
+  console.log('analyzer: started')
+  module = wrapModule(module)
   onmessage = (msg) => {
-    const {id, type, data} = msg.data;
+    const { id, type, data } = msg.data
     switch (type) {
       case TYPE_ANALYZE:
-        module.analyzeCode(data)
-          .then(result => postMessage({id, type, result}))
-          .catch(error => postMessage({id, type, error}));
-        break;
+        module
+          .analyzeCode(data)
+          .then((result) => {
+            postMessage({ id, type, result })
+          })
+          .catch((error) => {
+            postMessage({ id, type, error })
+          })
+        break
       case TYPE_EXIT:
-        console.log('analyzer: exit');
-        module.exit();
-        break;
+        console.log('analyzer: exit')
+        module.exit()
+        break
       default:
-        console.error('analyzer: unknown message type "%s"', type);
-        return;
+        console.error('analyzer: unknown message type "%s"', type)
     }
-  };
+  }
 }
 
-function main() {
-  const workerUrl = getWasmUrl('analyzer');
-  const go = new globalThis.Go();
+export const main = () => {
+  const workerUrl = getWasmUrl('analyzer')
+  const go = new globalThis.Go()
 
   // Pass the entrypoint via argv.
-  globalThis.onModuleInit = onModuleInit;
-  go.argv = ['js', 'onModuleInit'];
+  globalThis.onModuleInit = onModuleInit
+  go.argv = ['js', 'onModuleInit']
 
   fetch(workerUrl)
-    .then(rsp => instantiateStreaming(rsp, go.importObject))
-    .then(({instance}) =>
-      go.run(instance)
-    )
-    .catch(err => console.error('analyzer: Go error ', err));
+    .then(async (rsp) => await instantiateStreaming(rsp, go.importObject))
+    .then(({ instance }) => go.run(instance))
+    .catch((err) => {
+      console.error('analyzer: Go error ', err)
+    })
 }
 
-main();
+main()

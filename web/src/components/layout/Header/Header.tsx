@@ -1,24 +1,21 @@
-import React from 'react';
-import {
-  CommandBar,
-  ICommandBarItemProps, Stack,
-} from '@fluentui/react';
+import React from 'react'
+import { CommandBar, type ICommandBarItemProps, Stack } from '@fluentui/react'
 
-import apiClient, { type VersionsInfo } from "~/services/api";
-import { newAddNotificationAction, NotificationType } from "~/store/notifications";
-import { SettingsModal, type SettingsChanges } from '~/components/features/settings/SettingsModal';
-import { ThemeableComponent } from '~/components/utils/ThemeableComponent';
-import { AboutModal } from '~/components/modals/AboutModal';
-import { RunTargetSelector } from '~/components/elements/inputs/RunTargetSelector';
-import { SharePopup } from '~/components/utils/SharePopup';
+import apiClient, { type VersionsInfo } from '~/services/api'
+import { newAddNotificationAction, NotificationType } from '~/store/notifications'
+import { SettingsModal, type SettingsChanges } from '~/components/features/settings/SettingsModal'
+import { ThemeableComponent } from '~/components/utils/ThemeableComponent'
+import { AboutModal } from '~/components/modals/AboutModal'
+import { RunTargetSelector } from '~/components/elements/inputs/RunTargetSelector'
+import { SharePopup } from '~/components/utils/SharePopup'
 
-import { dispatchTerminalSettingsChange } from '~/store/terminal';
+import { dispatchTerminalSettingsChange } from '~/store/terminal'
 import {
   dispatchImportSource,
   dispatchLoadSnippet,
   dispatchFormatFile,
   dispatchShareSnippet,
-} from '~/store/workspace/dispatchers';
+} from '~/store/workspace/dispatchers'
 import {
   Connect,
   type Dispatcher,
@@ -26,16 +23,16 @@ import {
   newMonacoParamsChangeDispatcher,
   newSettingsChangeDispatcher,
   runFileDispatcher,
-} from '~/store';
+} from '~/store'
 
-import { getSnippetsMenuItems, SnippetMenuItem } from './utils';
+import { getSnippetsMenuItems, type SnippetMenuItem } from './utils'
 
-import './Header.css';
+import './Header.css'
 
 /**
  * Unique class name for share button to use as popover target.
  */
-const BTN_SHARE_CLASSNAME = 'Header__btn--share';
+const BTN_SHARE_CLASSNAME = 'Header__btn--share'
 
 interface HeaderState {
   showSettings?: boolean
@@ -50,65 +47,65 @@ interface Props {
   loading: boolean
   running: boolean
   snippetName?: string
-  hideThemeToggle?: boolean,
+  hideThemeToggle?: boolean
   dispatch: (d: Dispatcher) => void
 }
 
 // FIXME: rewrite to function component and refactor all that re-render mess.
-@Connect((
-  {
-    settings, status, ui
-  }
-) => ({
+@Connect(({ settings, status, ui }) => ({
   darkMode: settings.darkMode,
   loading: status?.loading,
   running: status?.running,
   hideThemeToggle: settings.useSystemTheme,
-  snippetName: ui?.shareCreated && ui?.snippetId
+  snippetName: ui?.shareCreated && ui?.snippetId,
 }))
 export class Header extends ThemeableComponent<any, HeaderState> {
-  private snippetMenuItems = getSnippetsMenuItems(i => this.onSnippetMenuItemClick(i));
+  private readonly snippetMenuItems = getSnippetsMenuItems((i) => {
+    this.onSnippetMenuItemClick(i)
+  })
 
   constructor(props: Props) {
-    super(props);
+    super(props)
     this.state = {
       showSettings: false,
       showAbout: false,
       loading: false,
-      showShareMessage: false
-    };
+      showShareMessage: false,
+    }
   }
 
   componentDidMount(): void {
-    apiClient.getBackendVersions().then(rsp => {
-      this.setState({
-        goVersions: rsp
-      });
-    }).catch(err => this.props.dispatch(
-      newAddNotificationAction({
-        id: 'VERSIONS_FETCH_ERROR',
-        type: NotificationType.Error,
-        title: 'Failed to fetch Go version info',
-        description: err.toString(),
-        canDismiss: true,
+    apiClient
+      .getBackendVersions()
+      .then((rsp) => {
+        this.setState({
+          goVersions: rsp,
+        })
       })
-    ));
+      .catch((err) =>
+        this.props.dispatch(
+          newAddNotificationAction({
+            id: 'VERSIONS_FETCH_ERROR',
+            type: NotificationType.Error,
+            title: 'Failed to fetch Go version info',
+            description: err.toString(),
+            canDismiss: true,
+          }),
+        ),
+      )
   }
 
   onSnippetMenuItemClick(item: SnippetMenuItem) {
-    const dispatcher = item.snippet ?
-      dispatchLoadSnippet(item.snippet) :
-      dispatchImportSource(item.files!);
-    this.props.dispatch(dispatcher);
+    const dispatcher = item.snippet ? dispatchLoadSnippet(item.snippet) : dispatchImportSource(item.files ?? {})
+    this.props.dispatch(dispatcher)
   }
 
   get isDisabled() {
-    return this.props.loading || this.props.running;
+    return this.props.loading || this.props.running
   }
 
   get menuItems(): ICommandBarItemProps[] {
     return [
-
       {
         key: 'run',
         text: 'Run',
@@ -117,8 +114,8 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         iconProps: { iconName: 'Play' },
         disabled: this.isDisabled,
         onClick: () => {
-          this.props.dispatch(runFileDispatcher);
-        }
+          this.props.dispatch(runFileDispatcher)
+        },
       },
       {
         key: 'share',
@@ -127,15 +124,15 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         iconProps: { iconName: 'Share' },
         disabled: this.isDisabled,
         onClick: () => {
-          this.setState({ showShareMessage: true });
-          this.props.dispatch(dispatchShareSnippet());
-        }
+          this.setState({ showShareMessage: true })
+          this.props.dispatch(dispatchShareSnippet())
+        },
       },
       {
         key: 'explore',
         text: 'Examples',
         iconProps: {
-          iconName: 'TestExploreSolid'
+          iconName: 'TestExploreSolid',
         },
         disabled: this.isDisabled,
         subMenuProps: {
@@ -149,8 +146,8 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         iconProps: { iconName: 'Settings' },
         disabled: this.isDisabled,
         onClick: () => {
-          this.setState({ showSettings: true });
-        }
+          this.setState({ showSettings: true })
+        },
       },
       {
         key: 'about',
@@ -158,10 +155,10 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         ariaLabel: 'About',
         iconProps: { iconName: 'Info' },
         onClick: () => {
-          this.setState({ showAbout: true });
-        }
-      }
-    ];
+          this.setState({ showAbout: true })
+        },
+      },
+    ]
   }
 
   get asideItems(): ICommandBarItemProps[] {
@@ -174,17 +171,13 @@ export class Header extends ThemeableComponent<any, HeaderState> {
               horizontal
               verticalAlign="center"
               style={{
-                marginRight: ".5rem"
+                marginRight: '.5rem',
               }}
             >
-              <RunTargetSelector
-                responsive
-                disabled={this.isDisabled}
-                goVersions={this.state.goVersions}
-              />
+              <RunTargetSelector responsive disabled={this.isDisabled} goVersions={this.state.goVersions} />
             </Stack>
           )
-        }
+        },
       },
       {
         key: 'format',
@@ -194,8 +187,8 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         disabled: this.isDisabled,
         iconProps: { iconName: 'Code' },
         onClick: () => {
-          this.props.dispatch(dispatchFormatFile());
-        }
+          this.props.dispatch(dispatchFormatFile())
+        },
       },
       {
         key: 'toggleTheme',
@@ -207,61 +200,60 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         onClick: () => {
           this.props.dispatch(dispatchToggleTheme)
         },
-      }
-    ];
+      },
+    ]
   }
 
   private onSettingsClose(changes: SettingsChanges) {
     if (changes.monaco) {
       // Update monaco state if some of its settings were changed
-      this.props.dispatch(newMonacoParamsChangeDispatcher(changes.monaco));
+      this.props.dispatch(newMonacoParamsChangeDispatcher(changes.monaco))
     }
 
     if (changes.settings) {
-      this.props.dispatch(newSettingsChangeDispatcher(changes.settings));
+      this.props.dispatch(newSettingsChangeDispatcher(changes.settings))
     }
 
     if (changes.terminal) {
-      this.props.dispatch(dispatchTerminalSettingsChange(changes.terminal));
+      this.props.dispatch(dispatchTerminalSettingsChange(changes.terminal))
     }
 
-    this.setState({ showSettings: false });
+    this.setState({ showSettings: false })
   }
 
   render() {
-    const { showShareMessage } = this.state;
-    const { snippetName } = this.props;
+    const { showShareMessage } = this.state
+    const { snippetName } = this.props
     return (
-      <header
-        className='header'
-        style={{ backgroundColor: this.theme.palette.white }}
-      >
-        <img
-          src='/go-logo-blue.svg'
-          className='header__logo'
-          alt='Golang Logo'
-        />
+      <header className="header" style={{ backgroundColor: this.theme.palette.white }}>
+        <img src="/go-logo-blue.svg" className="header__logo" alt="Golang Logo" />
         <CommandBar
-          className='header__commandBar'
+          className="header__commandBar"
           items={this.menuItems}
           farItems={this.asideItems.filter(({ hidden }) => !hidden)}
-          ariaLabel='CodeEditor menu'
+          ariaLabel="CodeEditor menu"
         />
         <SharePopup
           visible={!!(showShareMessage && snippetName)}
           target={`.${BTN_SHARE_CLASSNAME}`}
           snippetId={snippetName}
-          onDismiss={() => this.setState({ showShareMessage: false })}
+          onDismiss={() => {
+            this.setState({ showShareMessage: false })
+          }}
         />
         <SettingsModal
-          onClose={(args) => this.onSettingsClose(args)}
+          onClose={(args) => {
+            this.onSettingsClose(args)
+          }}
           isOpen={this.state.showSettings}
         />
         <AboutModal
-          onClose={() => this.setState({ showAbout: false })}
+          onClose={() => {
+            this.setState({ showAbout: false })
+          }}
           isOpen={this.state.showAbout}
         />
       </header>
-    );
+    )
   }
 }

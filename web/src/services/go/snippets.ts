@@ -1,8 +1,8 @@
-import snippets from './snippets.json';
+import snippets from './snippets.json'
 
 export enum SnippetType {
   Test = 'test',
-  Experimental = 'experimental'
+  Experimental = 'experimental',
 }
 
 export interface Snippet {
@@ -36,4 +36,4 @@ export interface Snippet {
   files?: Record<string, string>
 }
 
-export default snippets as { [sectionName: string]: Snippet[] }
+export default snippets as Record<string, Snippet[]>

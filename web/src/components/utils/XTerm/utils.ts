@@ -1,5 +1,5 @@
-import type { Theme } from '@fluentui/theme';
-import type { ITheme } from '@xterm/xterm';
+import type { Theme } from '@fluentui/theme'
+import type { ITheme } from '@xterm/xterm'
 
 /**
  * Constructs XTerm theme from FluentUI theme

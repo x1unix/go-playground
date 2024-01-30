@@ -59,7 +59,7 @@ build-ui:
 
 .PHONY: wasm_exec.js
 wasm_exec.js:
-	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(PUBLIC_DIR)/wasm/wasm_exec@$(WASM_API_VER).js
+	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(UI)/src/lib/go/wasm_exec.js
 
 .PHONY:build-webworker
 analyzer.wasm:

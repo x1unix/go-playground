@@ -1,1 +1,1 @@
-export * from './PanelAction';
+export * from './PanelAction'

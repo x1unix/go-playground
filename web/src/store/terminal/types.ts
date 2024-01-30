@@ -1,7 +1,7 @@
 export enum RenderingBackend {
   DOM = 'dom',
   WebGL = 'webgl',
-  Canvas = 'canvas'
+  Canvas = 'canvas',
 }
 
 export interface TerminalSettings {

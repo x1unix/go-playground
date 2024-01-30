@@ -1,22 +1,22 @@
-import { hex, DebugOptions } from '../common';
-import { AbstractTypeSpec } from "../types/spec";
-import { JSValuesTable } from "../wrapper/interface";
-import { StackWriter } from "./writer";
-import { Ref, RefType, RefSlice } from "../pkg/syscall/js";
+import { hex, type DebugOptions } from '../common'
+import { type AbstractTypeSpec } from '../types/spec'
+import { type JSValuesTable } from '../wrapper/interface'
+import { StackWriter } from './writer'
+import { type Ref, RefType, RefSlice } from '../pkg/syscall/js'
 
-const STACK_SKIP_COUNT = 8;
+const STACK_SKIP_COUNT = 8
 
 /**
  * Provides functionality for reading data from Go stack frame.
  */
 export class StackReader {
-  private _offset = 0;
-  private _initialOffset = 0;
-  private _popCount = 0;
-  private _debug = false;
-  private _finished = false;
-  private _mem: DataView;
-  private _values: JSValuesTable;
+  private _offset = 0
+  private _initialOffset = 0
+  private _popCount = 0
+  private readonly _debug = false
+  private _finished = false
+  private readonly _mem: DataView
+  private readonly _values: JSValuesTable
 
   /**
    *
@@ -30,19 +30,19 @@ export class StackReader {
      * @type DataView
      * @private
      */
-    this._mem = mem;
-    this._offset = sp;
-    this._values = values;
-    this._initialOffset = sp;
-    this._debug = opts.debug ?? false;
+    this._mem = mem
+    this._offset = sp
+    this._values = values
+    this._initialOffset = sp
+    this._debug = opts.debug ?? false
   }
 
   get dataView() {
-    return this._mem;
+    return this._mem
   }
 
   get addr() {
-    return this._offset;
+    return this._offset
   }
 
   /**
@@ -53,22 +53,24 @@ export class StackReader {
    */
   updateStackPointer(newSp: number) {
     if (newSp === this._initialOffset) {
-      return;
+      return
     }
 
-    const delta = this._offset - this._initialOffset;
-    const newOffset = newSp + delta;
+    const delta = this._offset - this._initialOffset
+    const newOffset = newSp + delta
 
     if (this._debug) {
-      console.log([
-        'Set SP:',
-        `${hex(this._initialOffset)} -> ${hex(newSp)}`,
-        `\t(offset: ${hex(this._offset)} -> ${hex(newOffset)}) (+${delta})`
-      ].join(' '))
+      console.log(
+        [
+          'Set SP:',
+          `${hex(this._initialOffset)} -> ${hex(newSp)}`,
+          `\t(offset: ${hex(this._offset)} -> ${hex(newOffset)}) (+${delta})`,
+        ].join(' '),
+      )
     }
 
-    this._initialOffset = newSp;
-    this._offset = newOffset;
+    this._initialOffset = newSp
+    this._offset = newOffset
   }
 
   /**
@@ -76,7 +78,7 @@ export class StackReader {
    * @param {number} count
    */
   skip(count) {
-    this._offset += count;
+    this._offset += count
   }
 
   /**
@@ -85,10 +87,10 @@ export class StackReader {
    */
   skipHeader() {
     if (this._popCount > 0) {
-      throw new Error('StackReader.skipHeader: should be called once');
+      throw new Error('StackReader.skipHeader: should be called once')
     }
 
-    this._offset += STACK_SKIP_COUNT;
+    this._offset += STACK_SKIP_COUNT
   }
 
   /**
@@ -97,12 +99,12 @@ export class StackReader {
    * @param count number of times to repeat
    */
   nextN<T = any>(typeSpec: AbstractTypeSpec, count: number): T[] {
-    const results: any[] = [];
+    const results: any[] = []
     for (let i = 0; i < count; i++) {
-      results.push(this.next(typeSpec));
+      results.push(this.next(typeSpec))
     }
 
-    return results;
+    return results
   }
 
   /**
@@ -113,23 +115,21 @@ export class StackReader {
    */
   next<T = any>(typeSpec: AbstractTypeSpec): T {
     if (!typeSpec) {
-      throw new ReferenceError('StackReader.pop: missing type reader');
+      throw new ReferenceError('StackReader.pop: missing type reader')
     }
 
     if (this._finished) {
-      throw new Error('StackReader.pop: cannot be called after writer()');
+      throw new Error('StackReader.pop: cannot be called after writer()')
     }
 
-    const { value, address, endOffset } = typeSpec.read(
-      this._mem, this._offset, this._mem.buffer
-    );
-    this._offset = endOffset;
+    const { value, address, endOffset } = typeSpec.read(this._mem, this._offset, this._mem.buffer)
+    this._offset = endOffset
     if (this._debug) {
-      console.log(`Pop: $${this._popCount} (*${typeSpec.name})(${hex(address)})`, value);
+      console.log(`Pop: $${this._popCount} (*${typeSpec.name})(${hex(address)})`, value)
     }
 
-    this._popCount++;
-    return value as T;
+    this._popCount++
+    return value as T
   }
 
   /**
@@ -137,8 +137,8 @@ export class StackReader {
    * JS value referenced by it.
    */
   nextRef<T = any>(): T {
-    const ref = this.next<Ref>(RefType);
-    return ref.toValue(this._values) as T;
+    const ref = this.next<Ref>(RefType)
+    return ref.toValue(this._values) as T
   }
 
   /**
@@ -146,8 +146,8 @@ export class StackReader {
    * returns array of JS values.
    */
   nextRefSlice<T = any>(): T[] {
-    const refsSlice = this.next<Ref[]>(RefSlice);
-    return refsSlice.map(ref => ref.toValue(this._values)) as T[];
+    const refsSlice = this.next<Ref[]>(RefSlice)
+    return refsSlice.map((ref) => ref.toValue(this._values)) as T[]
   }
 
   /**
@@ -159,9 +159,9 @@ export class StackReader {
    */
   writer() {
     if (this._finished) {
-      throw new Error('StackReader.writer: method can be called only once');
+      throw new Error('StackReader.writer: method can be called only once')
     }
-    this._finished = true;
-    return new StackWriter(this._mem, this._offset, this._debug);
+    this._finished = true
+    return new StackWriter(this._mem, this._offset, this._debug)
   }
 }

@@ -1,13 +1,13 @@
-import { connect } from 'react-redux';
-import type { editor } from 'monaco-editor';
-import type { EvalEvent } from '~/services/api';
-import type {MonacoSettings, RunTargetConfig} from '~/services/config';
-import type {LayoutType} from '~/styles/layout';
+import { connect } from 'react-redux'
+import type { editor } from 'monaco-editor'
+import type { EvalEvent } from '~/services/api'
+import type { MonacoSettings, RunTargetConfig } from '~/services/config'
+import type { LayoutType } from '~/styles/layout'
 
-import type { VimState } from './vim/state';
-import { NotificationsState } from './notifications/state';
-import type { TerminalState } from './terminal/state';
-import type { WorkspaceState } from './workspace/state';
+import type { VimState } from './vim/state'
+import { type NotificationsState } from './notifications/state'
+import type { TerminalState } from './terminal/state'
+import type { WorkspaceState } from './workspace/state'
 
 export interface UIState {
   shareCreated?: boolean
@@ -15,31 +15,31 @@ export interface UIState {
 }
 
 export interface StatusState {
-  loading: boolean,
-  running?: boolean,
-  dirty?: boolean,
-  lastError?: string | null,
-  events?: EvalEvent[],
+  loading: boolean
+  running?: boolean
+  dirty?: boolean
+  lastError?: string | null
+  events?: EvalEvent[]
   markers?: Record<string, editor.IMarkerData[] | null>
 }
 
 export interface SettingsState {
   darkMode: boolean
   useSystemTheme: boolean
-  autoFormat: boolean,
+  autoFormat: boolean
   enableVimMode: boolean
   goProxyUrl: string
 }
 
 export interface PanelState {
-  height ?: string|number
-  width ?: string|number
-  collapsed ?: boolean
+  height?: string | number
+  width?: string | number
+  collapsed?: boolean
   layout?: LayoutType
 }
 
 export interface State {
-  status?: StatusState,
+  status?: StatusState
   settings: SettingsState
   runTarget: RunTargetConfig
   monaco: MonacoSettings
@@ -53,6 +53,6 @@ export interface State {
 
 export function Connect(fn: (state: State) => any) {
   return function (constructor: Function) {
-    return connect(fn)(constructor as any) as any;
+    return connect(fn)(constructor as any) as any
   }
 }
