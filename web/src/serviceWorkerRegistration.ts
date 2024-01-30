@@ -10,6 +10,9 @@
 
 // To learn more about the benefits of this model and instructions on how to
 // opt-in, read https://cra.link/PWA
+import { trimSuffix } from './utils/path'
+
+const BASE_URL = trimSuffix(import.meta.env.BASE_URL, '/')
 
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
@@ -27,7 +30,7 @@ interface Config {
 export function register(config?: Config) {
   if (import.meta.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
-    const publicUrl = new URL(import.meta.env.BASE_URL, window.location.href)
+    const publicUrl = new URL(BASE_URL, window.location.href)
     if (publicUrl.origin !== window.location.origin) {
       // Our service worker won't work if BASE_URL is on a different origin
       // from what our page is served on. This might happen if a CDN is used to
@@ -36,7 +39,7 @@ export function register(config?: Config) {
     }
 
     window.addEventListener('load', () => {
-      const swUrl = `${import.meta.env.BASE_URL}/service-worker.js`
+      const swUrl = `${BASE_URL}/service-worker.js`
 
       if (isLocalhost) {
         // This is running on localhost. Let's check if a service worker still exists or not.
@@ -75,12 +78,12 @@ export function manualRegister(config?: Config) {
     return
   }
 
-  const publicUrl = new URL(import.meta.env.BASE_URL, window.location.href)
+  const publicUrl = new URL(BASE_URL, window.location.href)
   if (publicUrl.origin !== window.location.origin) {
     return
   }
 
-  const swUrl = `${import.meta.env.BASE_URL}/service-worker.js`
+  const swUrl = `${BASE_URL}/service-worker.js`
   if (isLocalhost) {
     checkValidServiceWorker(swUrl, config)
     return

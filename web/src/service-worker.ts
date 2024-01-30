@@ -13,8 +13,11 @@ import { ExpirationPlugin } from 'workbox-expiration'
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching'
 import { registerRoute } from 'workbox-routing'
 import { NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies'
+import { trimSuffix } from './utils/path'
 
 declare const self: ServiceWorkerGlobalScope
+
+const BASE_URL = trimSuffix(import.meta.env.BASE_URL, '/')
 
 clientsClaim()
 
@@ -51,7 +54,7 @@ registerRoute(
     // Return true to signal that we want to use the handler.
     return true
   },
-  createHandlerBoundToURL(import.meta.env.BASE_URL + '/index.html'),
+  createHandlerBoundToURL(BASE_URL + '/index.html'),
 )
 
 // An example runtime caching route for requests that aren't handled by the
