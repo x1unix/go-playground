@@ -4,7 +4,9 @@ import { defineConfig } from 'vite'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import svgr from 'vite-plugin-svgr'
 import tsConfigPaths from 'vite-tsconfig-paths'
-import htmlTemplate from 'vite-plugin-html-template'
+import htmlTemplateLib from 'vite-plugin-html-template'
+
+const htmlTemplate = htmlTemplateLib['default']
 
 const {
   NODE_ENV = 'dev',
@@ -22,6 +24,7 @@ export default defineConfig({
     },
   },
   server: {
+    port: 3000,
     proxy: {
       '/api': PROXY_HOST,
     }

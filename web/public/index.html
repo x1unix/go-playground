@@ -3,13 +3,13 @@
 
 <head>
   <meta charset="utf-8" />
-  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+  <link rel="icon" href="<%- BASE_URL %>/favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
   <meta name="description" content="Better Go Playground with syntax highlight support" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-  <link rel="manifest" href="<%- BASE_URL -%>/manifest.json" />
+  <link rel="apple-touch-icon" href="<%-BASE_URL%>/logo192.png" />
+  <link rel="manifest" href="<%- BASE_URL %>/manifest.json" />
   <title>Better Go Playground</title>
   <style>
     .app-preloader {
@@ -125,7 +125,7 @@
   </div>
   <script src="%VITE_WASM_BASE_URL%/wasm_exec@%VITE_WASM_API_VER%.js"></script>
   <script type="module" src="/src/index.tsx"></script>
-  <%- if (PROD) { -%>
+  <%- if (PROD) { %>
   {{ if .GoogleTagID }}
   <script async src="https://www.googletagmanager.com/gtag/js?id={{.GoogleTagID}}"></script>
   <script>
@@ -135,7 +135,7 @@
       gtag('config', '{{.GoogleTagID}}');
   </script>
   {{ end }}
-  <%- } -%>
+  <%- } %>
 </body>
 
 </html>
