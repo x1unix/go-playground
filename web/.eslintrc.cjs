@@ -65,6 +65,8 @@ module.exports = {
     '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/triple-slash-reference': 'off',
     '@typescript-eslint/prefer-nullish-coalescing': 'off',
+    '@typescript-eslint/no-confusing-void-expression': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
     'import/no-named-as-default-member': 'off',
     '@typescript-eslint/ban-types': [
       "error",

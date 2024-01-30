@@ -85,7 +85,6 @@ export class PackageFileStore implements FileStore {
       if (parentNode.fileType !== FileType.Directory) {
         throw new SyscallError(Errno.ENOTDIR)
       }
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       parentId = parentNode.id!
     }
 

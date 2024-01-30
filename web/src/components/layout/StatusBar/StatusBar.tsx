@@ -134,7 +134,6 @@ const StatusBar: React.FC<Props> = ({ loading, running, lastError, markers }) =>
 }
 
 export const ConnectedStatusBar = connect<StateProps, {}>(({ status }) => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const { loading, lastError, running, markers } = status!
   return { loading, lastError, running, markers }
 })(StatusBar)

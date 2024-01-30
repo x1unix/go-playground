@@ -63,7 +63,6 @@ const getPercentComplete = (progress: NotificationProps['progress']): number | u
   }
 
   const { current, total } = progress
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const percentage = (current! * 100) / total!
   return percentage / 100
 }

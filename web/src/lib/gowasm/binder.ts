@@ -56,7 +56,6 @@ export const Package =
 export const WasmExport =
   (funcName: string): MethodDecorator =>
   (target, propertyKey, descriptor) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const func = descriptor.value! as unknown as CallImportHandler
     const meta = getGoExportMetadata(target)
 

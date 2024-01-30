@@ -30,7 +30,6 @@ export const getTimeNowUsageMarkers = (
     return []
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const model = editorInstance.getModel()!
   return matches.map((index) => {
     // Skip extra character or white-space before expression

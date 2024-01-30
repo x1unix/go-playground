@@ -58,7 +58,6 @@ class BootTimeoutGuard {
 
   cancel(isStarted = true) {
     this.started = isStarted
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     clearTimeout(this.timeout!)
   }
 }

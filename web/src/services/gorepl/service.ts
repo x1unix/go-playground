@@ -203,7 +203,6 @@ const handleProgramStateEvent = (dispatcher: DispatchFn, { state, message }: Pro
       dispatcher(
         newProgramWriteAction({
           Kind: EvalEventKind.Stderr,
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           Message: message!,
           Delay: 0,
         }),
