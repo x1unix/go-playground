@@ -4,7 +4,6 @@ import {
   type WorkspaceState,
   dispatchCreateFile,
   dispatchRemoveFile,
-  dispatchUpdateFile,
   dispatchImportFile,
   newFileSelectAction,
 } from '~/store/workspace';
