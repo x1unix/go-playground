@@ -2,7 +2,7 @@ export enum NotificationType {
   None = '',
   Info = 'info',
   Warning = 'warning',
-  Error = 'error'
+  Error = 'error',
 }
 
 export interface Notification {
@@ -15,13 +15,13 @@ export interface Notification {
     indeterminate?: boolean
     total?: number
     current?: number
-  },
-  actions?: {
-    label: string,
-    key: string,
-    primary?: boolean,
-    onClick?: () => void,
-  }[]
+  }
+  actions?: Array<{
+    label: string
+    key: string
+    primary?: boolean
+    onClick?: () => void
+  }>
 }
 
-export type NotificationsState = {[k: string]: Notification};
+export type NotificationsState = Record<string, Notification>

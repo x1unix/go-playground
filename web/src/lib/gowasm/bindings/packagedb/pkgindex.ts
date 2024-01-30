@@ -8,7 +8,7 @@ export interface PackageIndex {
    *
    * @param name Package name
    */
-  lookupPackage(name: string): Promise<string|null>
+  lookupPackage: (name: string) => Promise<string | null>
 
   /**
    * Registers or updates an existing package information in index.
@@ -16,7 +16,7 @@ export interface PackageIndex {
    * @param pkgName Package name
    * @param version Version
    */
-  registerPackage(pkgName: string, version: string): Promise<void>
+  registerPackage: (pkgName: string, version: string) => Promise<void>
 
   /**
    * Removes package from index.
@@ -24,5 +24,5 @@ export interface PackageIndex {
    *
    * @param pkgName Package name
    */
-  removePackage(pkgName: string): Promise<boolean>
+  removePackage: (pkgName: string) => Promise<boolean>
 }

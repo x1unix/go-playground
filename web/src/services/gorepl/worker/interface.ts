@@ -1,4 +1,4 @@
-import {ConsoleStreamType} from "~/lib/gowasm/bindings/stdio";
+import { type ConsoleStreamType } from '~/lib/gowasm/bindings/stdio'
 
 export enum GoWorkerBootEventType {
   None,
@@ -12,16 +12,16 @@ export enum GoWorkerBootEventType {
  * Default Worker config
  */
 export const defaultWorkerConfig: WorkerConfig = {
-  startTimeout: 30 * 1000 // 30s
-};
+  startTimeout: 30 * 1000, // 30s
+}
 
 /**
  * WebWorker RPC interface that should be implemented by client and server.
  */
 export interface WorkerInterface {
-  runProgram(code: string): Promise<void>
-  terminateProgram(): Promise<void>
-  updateGoProxyAddress(newAddress: string): Promise<void>
+  runProgram: (code: string) => Promise<void>
+  terminateProgram: () => Promise<void>
+  updateGoProxyAddress: (newAddress: string) => Promise<void>
 }
 
 /**
@@ -46,9 +46,8 @@ export interface WorkerConfig {
   /**
    * Custom environment variables
    */
-  env?: {[k: string]: string}
+  env?: Record<string, string>
 }
-
 
 /**
  * WebWorker events list
@@ -77,7 +76,7 @@ export enum WorkerEvent {
   /**
    * Event fired during Go worker load progress
    */
-  GoWorkerBoot = 'goWorkerBoot'
+  GoWorkerBoot = 'goWorkerBoot',
 }
 
 /**
@@ -97,7 +96,7 @@ export interface GoWorkerExitEvent {
  */
 export interface GoWorkerBootEvent {
   eventType: GoWorkerBootEventType
-  code?: number,
+  code?: number
   progress?: {
     totalBytes: number
     currentBytes: number

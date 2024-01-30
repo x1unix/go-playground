@@ -1,1 +1,1 @@
-export * from './TabActionBar';
+export * from './TabActionBar'

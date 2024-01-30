@@ -20,7 +20,7 @@ export enum Backend {
 
 export enum EvalEventKind {
   Stdout = 'stdout',
-  Stderr = 'stderr'
+  Stderr = 'stderr',
 }
 
 export interface ShareResponse {

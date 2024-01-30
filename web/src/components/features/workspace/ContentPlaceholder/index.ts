@@ -1,1 +1,1 @@
-export * from './ContentPlaceholder';
+export * from './ContentPlaceholder'

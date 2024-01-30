@@ -1,16 +1,10 @@
-import {
-  UInt8ArrayTypeSpec,
-  Int64,
-  Struct,
-  Uint8,
-  UintPtr
-} from '~/lib/go';
-import { newPackageSymbolFunc } from '../../utils';
+import { UInt8ArrayTypeSpec, Int64, Struct, Uint8, UintPtr } from '~/lib/go'
+import { newPackageSymbolFunc } from '../../utils'
 
-export const MAX_FILE_NAME_LEN = 128;
-export const PKG_NAME = 'github.com/x1unix/go-playground/internal/gowasm/browserfs';
+export const MAX_FILE_NAME_LEN = 128
+export const PKG_NAME = 'github.com/x1unix/go-playground/internal/gowasm/browserfs'
 
-export const sym = newPackageSymbolFunc(PKG_NAME);
+export const sym = newPackageSymbolFunc(PKG_NAME)
 
 export interface SizedFileName {
   len: number
@@ -29,14 +23,14 @@ export interface Inode {
   parentId: number
   fileType: FileType
   size: number
-  createdAt: number,
+  createdAt: number
   name: SizedFileName
 }
 
 export const TSizedFileName = Struct<SizedFileName>(sym('sizedFileName'), [
   { key: 'len', type: Uint8 },
-  { key: 'data', type: new UInt8ArrayTypeSpec(MAX_FILE_NAME_LEN) }
-]);
+  { key: 'data', type: new UInt8ArrayTypeSpec(MAX_FILE_NAME_LEN) },
+])
 
 export const TInode = Struct<Inode>(sym('inode'), [
   { key: 'id', type: UintPtr },
@@ -45,6 +39,4 @@ export const TInode = Struct<Inode>(sym('inode'), [
   { key: 'size', type: Int64 },
   { key: 'createdAt', type: Int64 },
   { key: 'name', type: TSizedFileName },
-]);
-
-
+])

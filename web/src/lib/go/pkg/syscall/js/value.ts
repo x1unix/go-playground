@@ -1,13 +1,13 @@
-import { SliceOf, Struct, Uint32, UintPtr } from "../../../types";
+import { SliceOf, Struct, Uint32, UintPtr } from '../../../types'
 
 export interface Value {
-  ref: number;
-  gcPtr: number;
+  ref: number
+  gcPtr: number
 }
 
 export interface Func {
-  value: Value;
-  id: number;
+  value: Value
+  id: number
 }
 
 /**
@@ -16,7 +16,7 @@ export interface Func {
 export const ValueType = Struct('syscall/js.Value', [
   { key: 'ref', type: UintPtr },
   { key: 'gcPtr', type: UintPtr },
-]);
+])
 
 /**
  * `syscall/js.Func` type.
@@ -24,6 +24,6 @@ export const ValueType = Struct('syscall/js.Value', [
 export const FuncType = Struct('syscall/js.Func', [
   { key: 'value', type: ValueType },
   { key: 'id', type: Uint32 },
-]);
+])
 
-export const ValueSlice = SliceOf<Value>(ValueType);
+export const ValueSlice = SliceOf<Value>(ValueType)

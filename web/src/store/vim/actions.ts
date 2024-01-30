@@ -1,5 +1,5 @@
-import {ConfirmMessage, VimState} from '~/store/vim/state';
-import {Nullable} from "~/utils/types";
+import { type ConfirmMessage, type VimState } from '~/store/vim/state'
+import { type Nullable } from '~/utils/types'
 
 export enum ActionType {
   VIM_INIT = 'VIM_INIT',
@@ -9,7 +9,7 @@ export enum ActionType {
   VIM_KEYDEL = 'VIM_KEYDEL',
   VIM_COMMAND_START = 'VIM_COMMAND_START',
   VIM_COMMAND_DONE = 'VIM_COMMAND_DONE',
-  VIM_SHOW_CONFIRM = 'VIM_SHOW_CONFIRM'
+  VIM_SHOW_CONFIRM = 'VIM_SHOW_CONFIRM',
 }
 
 /**
@@ -17,7 +17,7 @@ export enum ActionType {
  *
  * @see monaco-vim/lib/statusbar.js
  */
-export type VimModeChangeArgs = Pick<VimState, 'mode' | 'subMode'>;
+export type VimModeChangeArgs = Pick<VimState, 'mode' | 'subMode'>
 
 export interface VimKeyPressArgs {
   key: string
@@ -25,37 +25,37 @@ export interface VimKeyPressArgs {
 }
 
 export const newVimInitAction = () => ({
-  type: ActionType.VIM_INIT
-});
+  type: ActionType.VIM_INIT,
+})
 
 export const newVimDisposeAction = () => ({
-  type: ActionType.VIM_DISPOSE
-});
+  type: ActionType.VIM_DISPOSE,
+})
 
 export const newVimModeChangeAction = (payload: VimModeChangeArgs) => ({
   type: ActionType.VIM_MODE_CHANGE,
-  payload
-});
+  payload,
+})
 
 export const newVimKeyPressAction = (key: string, replaceContents = false) => ({
   type: ActionType.VIM_KEYPRESS,
-  payload: {key, replaceContents}
-});
+  payload: { key, replaceContents },
+})
 
 export const newVimKeyDeleteAction = () => ({
-  type: ActionType.VIM_KEYDEL
-});
+  type: ActionType.VIM_KEYDEL,
+})
 
 export const newVimCommandStartAction = (commandSuffix?: Nullable<string>) => ({
   type: ActionType.VIM_COMMAND_START,
-  payload: commandSuffix ?? ''
+  payload: commandSuffix ?? '',
 })
 
 export const newVimCommandDoneAction = () => ({
-  type: ActionType.VIM_COMMAND_DONE
-});
+  type: ActionType.VIM_COMMAND_DONE,
+})
 
 export const newVimConfirmAction = (payload: ConfirmMessage) => ({
   type: ActionType.VIM_SHOW_CONFIRM,
-  payload: payload
-});
+  payload,
+})

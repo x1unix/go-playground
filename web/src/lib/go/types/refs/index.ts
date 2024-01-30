@@ -1,2 +1,2 @@
-export * from './slice';
-export * from './string';
+export * from './slice'
+export * from './string'

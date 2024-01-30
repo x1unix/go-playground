@@ -5,5 +5,5 @@ export enum TerminalAction {
   /**
    * Terminal settings change action.
    */
-  SETTINGS_CHANGE = 'TERMINAL_SETTINGS_CHANGE'
+  SETTINGS_CHANGE = 'TERMINAL_SETTINGS_CHANGE',
 }

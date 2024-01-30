@@ -1,34 +1,35 @@
-import type {FileUpdatePayload} from '../actions';
+import type { FileUpdatePayload } from '../actions'
 
-const MAX_FILE_SIZE = 1024 * 1024 * 10; // 5MB
-const MAX_DEDUP_ATTEMPTS = 255;
+const MAX_FILE_SIZE = 1024 * 1024 * 10 // 5MB
+const MAX_DEDUP_ATTEMPTS = 255
 
-export const readFile = (file: File) => new Promise<FileUpdatePayload>((resolve, reject) => {
-  if (file.size > MAX_FILE_SIZE) {
-    reject(`File is too large. Max file size is ${MAX_FILE_SIZE}`);
-    return;
-  }
+export const readFile = async (file: File) =>
+  await new Promise<FileUpdatePayload>((resolve, reject) => {
+    if (file.size > MAX_FILE_SIZE) {
+      reject(`File is too large. Max file size is ${MAX_FILE_SIZE}`)
+      return
+    }
 
-  const reader = new FileReader();
-  reader.onload = e => {
-    const data = e.target?.result as string;
-    resolve({ filename: file.name, content: data });
-  };
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const data = e.target?.result as string
+      resolve({ filename: file.name, content: data })
+    }
 
-  reader.onerror = e => {
-    reject(`Failed to read file: ${e}`);
-  };
+    reader.onerror = (e) => {
+      reject(`Failed to read file: ${e}`)
+    }
 
-  reader.readAsText(file, 'UTF-8');
-});
+    reader.readAsText(file, 'UTF-8')
+  })
 
 const splitExt = (filename: string): [string, string] => {
-  const idx = filename.lastIndexOf('.');
+  const idx = filename.lastIndexOf('.')
   if (idx === -1) {
-    return [filename, ''];
+    return [filename, '']
   }
 
-  return [filename.slice(0, idx), filename.slice(idx)];
+  return [filename.slice(0, idx), filename.slice(idx)]
 }
 
 /**
@@ -39,22 +40,22 @@ const splitExt = (filename: string): [string, string] => {
  * @param filename
  * @param files
  */
-const dedupFileName = (filename: string, files: Set<string>): string|null => {
+const dedupFileName = (filename: string, files: Set<string>): string | null => {
   if (!files.has(filename)) {
-    return filename;
+    return filename
   }
 
-  const [basename, ext] = splitExt(filename);
+  const [basename, ext] = splitExt(filename)
   for (let i = 0; i < MAX_DEDUP_ATTEMPTS; i++) {
-    let newName = `${basename} (${i + 1})${ext}`;
+    const newName = `${basename} (${i + 1})${ext}`
     if (files.has(newName)) {
-      continue;
+      continue
     }
 
-    return newName;
+    return newName
   }
 
-  return null;
+  return null
 }
 
 /**
@@ -67,22 +68,21 @@ const dedupFileName = (filename: string, files: Set<string>): string|null => {
  */
 export function* dedupFiles(files: FileList, currentValues: Set<string>, onError?: () => void): Generator<File> {
   for (const f of files) {
-    const uniqName = dedupFileName(f.name, currentValues);
+    const uniqName = dedupFileName(f.name, currentValues)
     if (!uniqName) {
-      console.warn('Cannot dedup filename:', f.name);
-      onError?.();
-      continue;
+      console.warn('Cannot dedup filename:', f.name)
+      onError?.()
+      continue
     }
 
-    currentValues.add(uniqName);
+    currentValues.add(uniqName)
     if (uniqName === f.name) {
-      yield f;
-      continue;
+      yield f
+      continue
     }
 
-    const { type, lastModified } = f;
-    const newFile = new File([f], uniqName, { type, lastModified });
-    yield newFile;
+    const { type, lastModified } = f
+    const newFile = new File([f], uniqName, { type, lastModified })
+    yield newFile
   }
 }
-

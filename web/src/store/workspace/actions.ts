@@ -1,4 +1,4 @@
-import type { WorkspaceState } from './state';
+import type { WorkspaceState } from './state'
 
 export enum WorkspaceAction {
   /**

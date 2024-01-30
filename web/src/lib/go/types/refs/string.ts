@@ -1,35 +1,33 @@
-import { UintPtr, Int } from '../basic';
-import { StructTypeSpec } from '../complex';
+import { UintPtr, Int } from '../basic'
+import { StructTypeSpec } from '../complex'
 
-export const stringEncoder = new TextEncoder();
-export const stringDecoder = new TextDecoder('utf-8');
+export const stringEncoder = new TextEncoder()
+export const stringDecoder = new TextDecoder('utf-8')
 
 const stringStructDescriptor = [
   { key: 'data', type: UintPtr },
-  { key: 'len', type: Int}
-];
+  { key: 'len', type: Int },
+]
 
 export interface StringHeader {
-  data: number,
+  data: number
   len: number
 }
 
 class GoStringTypeSpec extends StructTypeSpec<StringHeader> {
   constructor() {
-    super('string', stringStructDescriptor);
+    super('string', stringStructDescriptor)
   }
 
   protected valueFromStruct(mem: ArrayBufferLike, structVal: StringHeader) {
-    const { data, len } = structVal;
+    const { data, len } = structVal
     if (!len) {
-      return '';
+      return ''
     }
 
-    return stringDecoder.decode(new DataView(mem, data, len));
+    return stringDecoder.decode(new DataView(mem, data, len))
   }
 }
 
-export const GoStringType = new GoStringTypeSpec();
-export const StringHeaderType = new StructTypeSpec(
-  'reflect.StringHeader', stringStructDescriptor
-);
+export const GoStringType = new GoStringTypeSpec()
+export const StringHeaderType = new StructTypeSpec('reflect.StringHeader', stringStructDescriptor)

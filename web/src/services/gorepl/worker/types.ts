@@ -7,7 +7,7 @@ export enum PMEventType {
   DependencyResolveStart = 2,
   PackageSearchStart = 3,
   PackageDownload = 4,
-  PackageExtract = 5
+  PackageExtract = 5,
 }
 
 /**
@@ -46,6 +46,6 @@ export interface ProgramStateChangeEvent {
  * EvalEventHandler handles Go program compilation and package manager events.
  */
 export interface EvalEventHandler {
-  onPackageManagerEvent(e: PackageManagerEvent)
-  onProgramEvalStateChange(e: ProgramStateChangeEvent)
+  onPackageManagerEvent: (e: PackageManagerEvent) => any
+  onProgramEvalStateChange: (e: ProgramStateChangeEvent) => any
 }

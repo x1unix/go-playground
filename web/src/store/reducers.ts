@@ -1,38 +1,29 @@
-import { connectRouter } from 'connected-react-router';
-import { combineReducers } from 'redux';
+import { connectRouter } from 'connected-react-router'
+import { combineReducers } from 'redux'
 
-import { EvalEvent } from '~/services/api';
-import config, {
-  MonacoSettings,
-  RunTargetConfig
-} from '~/services/config';
+import { type EvalEvent } from '~/services/api'
+import config, { type MonacoSettings, type RunTargetConfig } from '~/services/config'
 
-import vimReducers from './vim/reducers';
-import notificationReducers from './notifications/reducers';
+import vimReducers from './vim/reducers'
+import notificationReducers from './notifications/reducers'
 
-import { initialTerminalState } from './terminal/state';
-import { reducers as terminalReducers } from './terminal/reducers';
+import { initialTerminalState } from './terminal/state'
+import { reducers as terminalReducers } from './terminal/reducers'
 
-import { type FilePayload, WorkspaceAction } from '~/store/workspace/actions';
-import { initialWorkspaceState } from '~/store/workspace/state';
-import { reducers as workspaceReducers } from '~/store/workspace/reducers';
+import { type FilePayload, WorkspaceAction } from '~/store/workspace/actions'
+import { initialWorkspaceState } from '~/store/workspace/state'
+import { reducers as workspaceReducers } from '~/store/workspace/reducers'
 
 import {
-  Action,
+  type Action,
   ActionType,
   type LoadingStateChanges,
   type MonacoParamsChanges,
   type MarkerChangePayload,
-} from './actions';
-import { mapByAction } from './helpers';
+} from './actions'
+import { mapByAction } from './helpers'
 
-import {
-  SettingsState,
-  State,
-  StatusState,
-  PanelState,
-  UIState,
-} from './state';
+import { type SettingsState, type State, type StatusState, type PanelState, type UIState } from './state'
 
 // TODO: move settings reducers and state to store/settings
 const initialSettingsState: SettingsState = {
@@ -41,166 +32,158 @@ const initialSettingsState: SettingsState = {
   useSystemTheme: config.useSystemTheme,
   enableVimMode: config.enableVimMode,
   goProxyUrl: config.goProxyUrl,
-};
+}
 
 const reducers = {
-  runTarget: mapByAction<RunTargetConfig>({
-    [ActionType.RUN_TARGET_CHANGE]: (_, {payload}: Action<RunTargetConfig>) => (
-      payload
-    ),
-  }, config.runTargetConfig),
-  status: mapByAction<StatusState>({
-    [WorkspaceAction.WORKSPACE_IMPORT]: (_: StatusState) => (
-      {
-          loading: false,
-          running: false,
-          dirty: false,
-          lastError: null,
-      }
-    ),
-    [WorkspaceAction.SNIPPET_LOAD_FINISH]: (_: StatusState) => (
-      {
+  runTarget: mapByAction<RunTargetConfig>(
+    {
+      [ActionType.RUN_TARGET_CHANGE]: (_, { payload }: Action<RunTargetConfig>) => payload,
+    },
+    config.runTargetConfig,
+  ),
+  status: mapByAction<StatusState>(
+    {
+      [WorkspaceAction.WORKSPACE_IMPORT]: (_: StatusState) => ({
         loading: false,
         running: false,
         dirty: false,
         lastError: null,
-      }
-    ),
-    [WorkspaceAction.SNIPPET_LOAD_START]: (_: StatusState) => (
-      {
+      }),
+      [WorkspaceAction.SNIPPET_LOAD_FINISH]: (_: StatusState) => ({
+        loading: false,
+        running: false,
+        dirty: false,
+        lastError: null,
+      }),
+      [WorkspaceAction.SNIPPET_LOAD_START]: (_: StatusState) => ({
         loading: true,
         running: false,
         dirty: false,
         lastError: null,
-      }
-    ),
-    [WorkspaceAction.REMOVE_FILE]: ({markers, ...state}: StatusState, { payload: {filename}}: Action<FilePayload>) => {
-      const { [filename]: _, ...newMarkers } = markers || {};
-      return {
-        ...state,
-        markers: newMarkers,
-      };
-    },
-    [ActionType.ERROR]: (s: StatusState, a: Action<string>) => (
-      {
+      }),
+      [WorkspaceAction.REMOVE_FILE]: (
+        { markers, ...state }: StatusState,
+        { payload: { filename } }: Action<FilePayload>,
+      ) => {
+        const { [filename]: _, ...newMarkers } = markers || {}
+        return {
+          ...state,
+          markers: newMarkers,
+        }
+      },
+      [ActionType.ERROR]: (s: StatusState, a: Action<string>) => ({
         ...s,
         loading: false,
         running: false,
         dirty: true,
-        lastError: a.payload
-      }
-    ),
-    [ActionType.LOADING_STATE_CHANGE]: (s: StatusState, { payload: { loading } }: Action<LoadingStateChanges>) => (
-      {
+        lastError: a.payload,
+      }),
+      [ActionType.LOADING_STATE_CHANGE]: (s: StatusState, { payload: { loading } }: Action<LoadingStateChanges>) => ({
         ...s,
         loading,
         running: false,
-      }
-    ),
-    [ActionType.EVAL_START]: (s: StatusState, _: Action) => (
-      {
+      }),
+      [ActionType.EVAL_START]: (s: StatusState, _: Action) => ({
         lastError: null,
         loading: false,
         running: true,
         dirty: true,
-        events: []
-      }
-    ),
-    [ActionType.EVAL_EVENT]: (s: StatusState, a: Action<EvalEvent>) => (
-      {
+        events: [],
+      }),
+      [ActionType.EVAL_EVENT]: (s: StatusState, a: Action<EvalEvent>) => ({
         lastError: null,
         loading: false,
         running: true,
         dirty: true,
-        events: s.events ?
-            s.events.concat(a.payload) : [a.payload],
-      }
-    ),
-    [ActionType.EVAL_FINISH]: (s: StatusState, _: Action) => (
-      {
+        events: s.events ? s.events.concat(a.payload) : [a.payload],
+      }),
+      [ActionType.EVAL_FINISH]: (s: StatusState, _: Action) => ({
         ...s,
         loading: false,
         running: false,
-        dirty: true
-      }
-    ),
-    [ActionType.RUN_TARGET_CHANGE]: (s: StatusState, {payload}: Action<RunTargetConfig>) => {
-      // if (payload.target) {
-      //   // Reset build output if build runtime was changed
-      //   return { ...s, loading: false, lastError: null }
-      // }
+        dirty: true,
+      }),
+      [ActionType.RUN_TARGET_CHANGE]: (s: StatusState, { payload }: Action<RunTargetConfig>) => {
+        // if (payload.target) {
+        //   // Reset build output if build runtime was changed
+        //   return { ...s, loading: false, lastError: null }
+        // }
 
-      return s;
-    },
-    [ActionType.MARKER_CHANGE]: (s: StatusState, { payload }: Action<MarkerChangePayload>) => (
-      {
+        return s
+      },
+      [ActionType.MARKER_CHANGE]: (s: StatusState, { payload }: Action<MarkerChangePayload>) => ({
         ...s,
         markers: {
           ...s.markers,
           [payload.fileName]: payload.markers || null,
         },
-      }
-    )
-  }, { loading: false }),
-  settings: mapByAction<SettingsState>({
-    [ActionType.TOGGLE_THEME]: (s: SettingsState, a: Action) => {
-      s.darkMode = !s.darkMode;
-      config.darkThemeEnabled = s.darkMode;
-      return s;
+      }),
     },
-    [ActionType.SETTINGS_CHANGE]: (s: SettingsState, {payload}: Action<Partial<SettingsState>>) => (
-      {
-        ...s,
-        ...payload
-      }
-    )
-  },
-   initialSettingsState,
+    { loading: false },
   ),
-  monaco: mapByAction<MonacoSettings>({
-    [ActionType.MONACO_SETTINGS_CHANGE]: (s: MonacoSettings, {payload}: Action<MonacoParamsChanges>) => (
-      {
+  settings: mapByAction<SettingsState>(
+    {
+      [ActionType.TOGGLE_THEME]: (s: SettingsState, a: Action) => {
+        s.darkMode = !s.darkMode
+        config.darkThemeEnabled = s.darkMode
+        return s
+      },
+      [ActionType.SETTINGS_CHANGE]: (s: SettingsState, { payload }: Action<Partial<SettingsState>>) => ({
         ...s,
-        ...payload
-      }
-    )
-  }, config.monacoSettings),
-  panel: mapByAction<PanelState>({
-    [ActionType.PANEL_STATE_CHANGE]: (s: PanelState, {payload}: Action<PanelState>) => (
-      {
-        ...s,
-        ...payload
-      }
-    )
-  }, config.panelLayout),
-  ui: mapByAction<UIState>({
-    [ActionType.LOADING_STATE_CHANGE]: (s: UIState, {payload: { loading } }: Action<LoadingStateChanges>) => {
-      if (!s) {
-        return { loading, shareCreated: false, snippetId: null };
-      }
-
-      return {
-        ...s,
-        loading,
-      };
+        ...payload,
+      }),
     },
-    [ActionType.UI_STATE_CHANGE]: (s: UIState, { payload }: Action<Partial<UIState>>) => {
-      if (!s) {
-        return payload as UIState;
-      }
+    initialSettingsState,
+  ),
+  monaco: mapByAction<MonacoSettings>(
+    {
+      [ActionType.MONACO_SETTINGS_CHANGE]: (s: MonacoSettings, { payload }: Action<MonacoParamsChanges>) => ({
+        ...s,
+        ...payload,
+      }),
+    },
+    config.monacoSettings,
+  ),
+  panel: mapByAction<PanelState>(
+    {
+      [ActionType.PANEL_STATE_CHANGE]: (s: PanelState, { payload }: Action<PanelState>) => ({
+        ...s,
+        ...payload,
+      }),
+    },
+    config.panelLayout,
+  ),
+  ui: mapByAction<UIState>(
+    {
+      [ActionType.LOADING_STATE_CHANGE]: (s: UIState, { payload: { loading } }: Action<LoadingStateChanges>) => {
+        if (!s) {
+          return { loading, shareCreated: false, snippetId: null }
+        }
 
-      return { ...s, ...payload };
-    }
-  }, {}),
+        return {
+          ...s,
+          loading,
+        }
+      },
+      [ActionType.UI_STATE_CHANGE]: (s: UIState, { payload }: Action<Partial<UIState>>) => {
+        if (!s) {
+          return payload as UIState
+        }
+
+        return { ...s, ...payload }
+      },
+    },
+    {},
+  ),
   vim: vimReducers,
   notifications: notificationReducers,
   terminal: terminalReducers,
   workspace: workspaceReducers,
-};
+}
 
 export const getInitialState = (): State => ({
   status: {
-    loading: true
+    loading: true,
   },
   settings: initialSettingsState,
   runTarget: config.runTargetConfig,
@@ -210,9 +193,10 @@ export const getInitialState = (): State => ({
   vim: null,
   terminal: initialTerminalState,
   workspace: initialWorkspaceState,
-});
+})
 
-export const createRootReducer = history => combineReducers({
-  router: connectRouter(history),
-  ...reducers,
-});
+export const createRootReducer = (history) =>
+  combineReducers({
+    router: connectRouter(history),
+    ...reducers,
+  })

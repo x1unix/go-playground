@@ -1,8 +1,8 @@
-import { IPartialTheme, DefaultPalette } from '@fluentui/react';
+import { type IPartialTheme, DefaultPalette } from '@fluentui/react'
 
 export const LightTheme: IPartialTheme = {
   palette: DefaultPalette,
-};
+}
 
 export const DarkTheme: IPartialTheme = {
   palette: {
@@ -28,6 +28,6 @@ export const DarkTheme: IPartialTheme = {
     themeDarkAlt: '#4ba0e1',
     themeDark: '#65aee6',
     themeDarker: '#8ac2ec',
-    accent: '#3a96dd'
-  }
-};
+    accent: '#3a96dd',
+  },
+}

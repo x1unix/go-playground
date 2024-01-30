@@ -4,7 +4,6 @@
  * See: /go/src/syscall/tables_js.go
  */
 export enum Errno {
-
   /**
    * Operation not permitted
    */
@@ -617,456 +616,117 @@ export enum Errno {
 }
 
 export const errorMessages = new Map<Errno, string>([
-  [
-    Errno.EPERM,
-    "Operation not permitted"
-  ],
-  [
-    Errno.ENOENT,
-    "No such file or directory"
-  ],
-  [
-    Errno.ESRCH,
-    "No such process"
-  ],
-  [
-    Errno.EINTR,
-    "Interrupted system call"
-  ],
-  [
-    Errno.EIO,
-    "I/O error"
-  ],
-  [
-    Errno.ENXIO,
-    "No such device or address"
-  ],
-  [
-    Errno.E2BIG,
-    "Argument list too long"
-  ],
-  [
-    Errno.ENOEXEC,
-    "Exec format error"
-  ],
-  [
-    Errno.EBADF,
-    "Bad file number"
-  ],
-  [
-    Errno.ECHILD,
-    "No child processes"
-  ],
-  [
-    Errno.EAGAIN,
-    "Try again"
-  ],
-  [
-    Errno.ENOMEM,
-    "Out of memory"
-  ],
-  [
-    Errno.EACCES,
-    "Permission denied"
-  ],
-  [
-    Errno.EFAULT,
-    "Bad address"
-  ],
-  [
-    Errno.EBUSY,
-    "Device or resource busy"
-  ],
-  [
-    Errno.EEXIST,
-    "File exists"
-  ],
-  [
-    Errno.EXDEV,
-    "Cross-device link"
-  ],
-  [
-    Errno.ENODEV,
-    "No such device"
-  ],
-  [
-    Errno.ENOTDIR,
-    "Not a directory"
-  ],
-  [
-    Errno.EISDIR,
-    "Is a directory"
-  ],
-  [
-    Errno.EINVAL,
-    "Invalid argument"
-  ],
-  [
-    Errno.ENFILE,
-    "File table overflow"
-  ],
-  [
-    Errno.EMFILE,
-    "Too many open files"
-  ],
-  [
-    Errno.ENOTTY,
-    "Not a typewriter"
-  ],
-  [
-    Errno.EFBIG,
-    "File too large"
-  ],
-  [
-    Errno.ENOSPC,
-    "No space left on device"
-  ],
-  [
-    Errno.ESPIPE,
-    "Illegal seek"
-  ],
-  [
-    Errno.EROFS,
-    "Read-only file system"
-  ],
-  [
-    Errno.EMLINK,
-    "Too many links"
-  ],
-  [
-    Errno.EPIPE,
-    "Broken pipe"
-  ],
-  [
-    Errno.ENAMETOOLONG,
-    "File name too long"
-  ],
-  [
-    Errno.ENOSYS,
-    "not implemented on js"
-  ],
-  [
-    Errno.EDQUOT,
-    "Quota exceeded"
-  ],
-  [
-    Errno.EDOM,
-    "Math arg out of domain of func"
-  ],
-  [
-    Errno.ERANGE,
-    "Math result not representable"
-  ],
-  [
-    Errno.EDEADLK,
-    "Deadlock condition"
-  ],
-  [
-    Errno.ENOLCK,
-    "No record locks available"
-  ],
-  [
-    Errno.ENOTEMPTY,
-    "Directory not empty"
-  ],
-  [
-    Errno.ELOOP,
-    "Too many symbolic links"
-  ],
-  [
-    Errno.ENOMSG,
-    "No message of desired type"
-  ],
-  [
-    Errno.EIDRM,
-    "Identifier removed"
-  ],
-  [
-    Errno.ECHRNG,
-    "Channel number out of range"
-  ],
-  [
-    Errno.EL2NSYNC,
-    "Level 2 not synchronized"
-  ],
-  [
-    Errno.EL3HLT,
-    "Level 3 halted"
-  ],
-  [
-    Errno.EL3RST,
-    "Level 3 reset"
-  ],
-  [
-    Errno.ELNRNG,
-    "Link number out of range"
-  ],
-  [
-    Errno.EUNATCH,
-    "Protocol driver not attached"
-  ],
-  [
-    Errno.ENOCSI,
-    "No CSI structure available"
-  ],
-  [
-    Errno.EL2HLT,
-    "Level 2 halted"
-  ],
-  [
-    Errno.EBADE,
-    "Invalid exchange"
-  ],
-  [
-    Errno.EBADR,
-    "Invalid request descriptor"
-  ],
-  [
-    Errno.EXFULL,
-    "Exchange full"
-  ],
-  [
-    Errno.ENOANO,
-    "No anode"
-  ],
-  [
-    Errno.EBADRQC,
-    "Invalid request code"
-  ],
-  [
-    Errno.EBADSLT,
-    "Invalid slot"
-  ],
-  [
-    Errno.EBFONT,
-    "Bad font file fmt"
-  ],
-  [
-    Errno.ENOSTR,
-    "Device not a stream"
-  ],
-  [
-    Errno.ENODATA,
-    "No data (for no delay io)"
-  ],
-  [
-    Errno.ETIME,
-    "Timer expired"
-  ],
-  [
-    Errno.ENOSR,
-    "Out of streams resources"
-  ],
-  [
-    Errno.ENONET,
-    "Machine is not on the network"
-  ],
-  [
-    Errno.ENOPKG,
-    "Package not installed"
-  ],
-  [
-    Errno.EREMOTE,
-    "The object is remote"
-  ],
-  [
-    Errno.ENOLINK,
-    "The link has been severed"
-  ],
-  [
-    Errno.EADV,
-    "Advertise error"
-  ],
-  [
-    Errno.ESRMNT,
-    "Srmount error"
-  ],
-  [
-    Errno.ECOMM,
-    "Communication error on send"
-  ],
-  [
-    Errno.EPROTO,
-    "Protocol error"
-  ],
-  [
-    Errno.EMULTIHOP,
-    "Multihop attempted"
-  ],
-  [
-    Errno.EDOTDOT,
-    "Cross mount point (not really error)"
-  ],
-  [
-    Errno.EBADMSG,
-    "Trying to read unreadable message"
-  ],
-  [
-    Errno.EOVERFLOW,
-    "Value too large for defined data type"
-  ],
-  [
-    Errno.ENOTUNIQ,
-    "Given log. name not unique"
-  ],
-  [
-    Errno.EBADFD,
-    "f.d. invalid for this operation"
-  ],
-  [
-    Errno.EREMCHG,
-    "Remote address changed"
-  ],
-  [
-    Errno.ELIBACC,
-    "Can't access a needed shared lib"
-  ],
-  [
-    Errno.ELIBBAD,
-    "Accessing a corrupted shared lib"
-  ],
-  [
-    Errno.ELIBSCN,
-    ".lib section in a.out corrupted"
-  ],
-  [
-    Errno.ELIBMAX,
-    "Attempting to link in too many libs"
-  ],
-  [
-    Errno.ELIBEXEC,
-    "Attempting to exec a shared library"
-  ],
-  [
-    Errno.ENOTSOCK,
-    "Socket operation on non-socket"
-  ],
-  [
-    Errno.EDESTADDRREQ,
-    "Destination address required"
-  ],
-  [
-    Errno.EMSGSIZE,
-    "Message too long"
-  ],
-  [
-    Errno.EPROTOTYPE,
-    "Protocol wrong type for socket"
-  ],
-  [
-    Errno.ENOPROTOOPT,
-    "Protocol not available"
-  ],
-  [
-    Errno.EPROTONOSUPPORT,
-    "Unknown protocol"
-  ],
-  [
-    Errno.ESOCKTNOSUPPORT,
-    "Socket type not supported"
-  ],
-  [
-    Errno.EOPNOTSUPP,
-    "Operation not supported on transport endpoint"
-  ],
-  [
-    Errno.EPFNOSUPPORT,
-    "Protocol family not supported"
-  ],
-  [
-    Errno.EAFNOSUPPORT,
-    "Address family not supported by protocol family"
-  ],
-  [
-    Errno.EADDRINUSE,
-    "Address already in use"
-  ],
-  [
-    Errno.EADDRNOTAVAIL,
-    "Address not available"
-  ],
-  [
-    Errno.ENETDOWN,
-    "Network interface is not configured"
-  ],
-  [
-    Errno.ENETUNREACH,
-    "Network is unreachable"
-  ],
-  [
-    Errno.ECONNABORTED,
-    "Connection aborted"
-  ],
-  [
-    Errno.ECONNRESET,
-    "Connection reset by peer"
-  ],
-  [
-    Errno.ENOBUFS,
-    "No buffer space available"
-  ],
-  [
-    Errno.EISCONN,
-    "Socket is already connected"
-  ],
-  [
-    Errno.ENOTCONN,
-    "Socket is not connected"
-  ],
-  [
-    Errno.ESHUTDOWN,
-    "Can't send after socket shutdown"
-  ],
-  [
-    Errno.ETIMEDOUT,
-    "Connection timed out"
-  ],
-  [
-    Errno.ECONNREFUSED,
-    "Connection refused"
-  ],
-  [
-    Errno.EHOSTDOWN,
-    "Host is down"
-  ],
-  [
-    Errno.EHOSTUNREACH,
-    "Host is unreachable"
-  ],
-  [
-    Errno.EALREADY,
-    "Socket already connected"
-  ],
-  [
-    Errno.EINPROGRESS,
-    "Connection already in progress"
-  ],
-  [
-    Errno.ENOMEDIUM,
-    "No medium (in tape drive)"
-  ],
-  [
-    Errno.ECANCELED,
-    "Operation canceled."
-  ],
-  [
-    Errno.ELBIN,
-    "Inode is remote (not really error)"
-  ],
-  [
-    Errno.EFTYPE,
-    "Inappropriate file type or format"
-  ],
-  [
-    Errno.ENMFILE,
-    "No more files"
-  ],
-  [
-    Errno.ENOSHARE,
-    "No such host or network path"
-  ],
-  [
-    Errno.ECASECLASH,
-    "Filename exists with different case"
-  ]
-]);
+  [Errno.EPERM, 'Operation not permitted'],
+  [Errno.ENOENT, 'No such file or directory'],
+  [Errno.ESRCH, 'No such process'],
+  [Errno.EINTR, 'Interrupted system call'],
+  [Errno.EIO, 'I/O error'],
+  [Errno.ENXIO, 'No such device or address'],
+  [Errno.E2BIG, 'Argument list too long'],
+  [Errno.ENOEXEC, 'Exec format error'],
+  [Errno.EBADF, 'Bad file number'],
+  [Errno.ECHILD, 'No child processes'],
+  [Errno.EAGAIN, 'Try again'],
+  [Errno.ENOMEM, 'Out of memory'],
+  [Errno.EACCES, 'Permission denied'],
+  [Errno.EFAULT, 'Bad address'],
+  [Errno.EBUSY, 'Device or resource busy'],
+  [Errno.EEXIST, 'File exists'],
+  [Errno.EXDEV, 'Cross-device link'],
+  [Errno.ENODEV, 'No such device'],
+  [Errno.ENOTDIR, 'Not a directory'],
+  [Errno.EISDIR, 'Is a directory'],
+  [Errno.EINVAL, 'Invalid argument'],
+  [Errno.ENFILE, 'File table overflow'],
+  [Errno.EMFILE, 'Too many open files'],
+  [Errno.ENOTTY, 'Not a typewriter'],
+  [Errno.EFBIG, 'File too large'],
+  [Errno.ENOSPC, 'No space left on device'],
+  [Errno.ESPIPE, 'Illegal seek'],
+  [Errno.EROFS, 'Read-only file system'],
+  [Errno.EMLINK, 'Too many links'],
+  [Errno.EPIPE, 'Broken pipe'],
+  [Errno.ENAMETOOLONG, 'File name too long'],
+  [Errno.ENOSYS, 'not implemented on js'],
+  [Errno.EDQUOT, 'Quota exceeded'],
+  [Errno.EDOM, 'Math arg out of domain of func'],
+  [Errno.ERANGE, 'Math result not representable'],
+  [Errno.EDEADLK, 'Deadlock condition'],
+  [Errno.ENOLCK, 'No record locks available'],
+  [Errno.ENOTEMPTY, 'Directory not empty'],
+  [Errno.ELOOP, 'Too many symbolic links'],
+  [Errno.ENOMSG, 'No message of desired type'],
+  [Errno.EIDRM, 'Identifier removed'],
+  [Errno.ECHRNG, 'Channel number out of range'],
+  [Errno.EL2NSYNC, 'Level 2 not synchronized'],
+  [Errno.EL3HLT, 'Level 3 halted'],
+  [Errno.EL3RST, 'Level 3 reset'],
+  [Errno.ELNRNG, 'Link number out of range'],
+  [Errno.EUNATCH, 'Protocol driver not attached'],
+  [Errno.ENOCSI, 'No CSI structure available'],
+  [Errno.EL2HLT, 'Level 2 halted'],
+  [Errno.EBADE, 'Invalid exchange'],
+  [Errno.EBADR, 'Invalid request descriptor'],
+  [Errno.EXFULL, 'Exchange full'],
+  [Errno.ENOANO, 'No anode'],
+  [Errno.EBADRQC, 'Invalid request code'],
+  [Errno.EBADSLT, 'Invalid slot'],
+  [Errno.EBFONT, 'Bad font file fmt'],
+  [Errno.ENOSTR, 'Device not a stream'],
+  [Errno.ENODATA, 'No data (for no delay io)'],
+  [Errno.ETIME, 'Timer expired'],
+  [Errno.ENOSR, 'Out of streams resources'],
+  [Errno.ENONET, 'Machine is not on the network'],
+  [Errno.ENOPKG, 'Package not installed'],
+  [Errno.EREMOTE, 'The object is remote'],
+  [Errno.ENOLINK, 'The link has been severed'],
+  [Errno.EADV, 'Advertise error'],
+  [Errno.ESRMNT, 'Srmount error'],
+  [Errno.ECOMM, 'Communication error on send'],
+  [Errno.EPROTO, 'Protocol error'],
+  [Errno.EMULTIHOP, 'Multihop attempted'],
+  [Errno.EDOTDOT, 'Cross mount point (not really error)'],
+  [Errno.EBADMSG, 'Trying to read unreadable message'],
+  [Errno.EOVERFLOW, 'Value too large for defined data type'],
+  [Errno.ENOTUNIQ, 'Given log. name not unique'],
+  [Errno.EBADFD, 'f.d. invalid for this operation'],
+  [Errno.EREMCHG, 'Remote address changed'],
+  [Errno.ELIBACC, "Can't access a needed shared lib"],
+  [Errno.ELIBBAD, 'Accessing a corrupted shared lib'],
+  [Errno.ELIBSCN, '.lib section in a.out corrupted'],
+  [Errno.ELIBMAX, 'Attempting to link in too many libs'],
+  [Errno.ELIBEXEC, 'Attempting to exec a shared library'],
+  [Errno.ENOTSOCK, 'Socket operation on non-socket'],
+  [Errno.EDESTADDRREQ, 'Destination address required'],
+  [Errno.EMSGSIZE, 'Message too long'],
+  [Errno.EPROTOTYPE, 'Protocol wrong type for socket'],
+  [Errno.ENOPROTOOPT, 'Protocol not available'],
+  [Errno.EPROTONOSUPPORT, 'Unknown protocol'],
+  [Errno.ESOCKTNOSUPPORT, 'Socket type not supported'],
+  [Errno.EOPNOTSUPP, 'Operation not supported on transport endpoint'],
+  [Errno.EPFNOSUPPORT, 'Protocol family not supported'],
+  [Errno.EAFNOSUPPORT, 'Address family not supported by protocol family'],
+  [Errno.EADDRINUSE, 'Address already in use'],
+  [Errno.EADDRNOTAVAIL, 'Address not available'],
+  [Errno.ENETDOWN, 'Network interface is not configured'],
+  [Errno.ENETUNREACH, 'Network is unreachable'],
+  [Errno.ECONNABORTED, 'Connection aborted'],
+  [Errno.ECONNRESET, 'Connection reset by peer'],
+  [Errno.ENOBUFS, 'No buffer space available'],
+  [Errno.EISCONN, 'Socket is already connected'],
+  [Errno.ENOTCONN, 'Socket is not connected'],
+  [Errno.ESHUTDOWN, "Can't send after socket shutdown"],
+  [Errno.ETIMEDOUT, 'Connection timed out'],
+  [Errno.ECONNREFUSED, 'Connection refused'],
+  [Errno.EHOSTDOWN, 'Host is down'],
+  [Errno.EHOSTUNREACH, 'Host is unreachable'],
+  [Errno.EALREADY, 'Socket already connected'],
+  [Errno.EINPROGRESS, 'Connection already in progress'],
+  [Errno.ENOMEDIUM, 'No medium (in tape drive)'],
+  [Errno.ECANCELED, 'Operation canceled.'],
+  [Errno.ELBIN, 'Inode is remote (not really error)'],
+  [Errno.EFTYPE, 'Inappropriate file type or format'],
+  [Errno.ENMFILE, 'No more files'],
+  [Errno.ENOSHARE, 'No such host or network path'],
+  [Errno.ECASECLASH, 'Filename exists with different case'],
+])

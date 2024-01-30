@@ -1,5 +1,5 @@
-import { editor } from 'monaco-editor';
-import * as monaco from "monaco-editor";
+import { type editor } from 'monaco-editor'
+import * as monaco from 'monaco-editor'
 
 /**
  * MonacoDIContainer is undocumented DI service container of monaco editor.
@@ -9,7 +9,7 @@ interface MonacoDIContainer {
 }
 
 interface HotkeyAction {
-  keybinding: number,
+  keybinding: number
   callback: (editorInstance: editor.IStandaloneCodeEditor, di?: MonacoDIContainer) => void
 }
 
@@ -19,20 +19,21 @@ interface HotkeyAction {
  * @param action Action name
  */
 const createActionAlias = (keybinding: number, action: string): HotkeyAction => ({
-  keybinding, callback: (ed) => ed.getAction(action)?.run()
+  keybinding,
+  callback: async (ed) => await ed.getAction(action)?.run(),
 })
 
 /**
  * Builtin custom actions
  */
 const commands: HotkeyAction[] = [
-  createActionAlias(
-    monaco.KeyMod.Shift | monaco.KeyCode.Enter,
-    'editor.action.insertLineAfter'
-  ),
-];
+  createActionAlias(monaco.KeyMod.Shift | monaco.KeyCode.Enter, 'editor.action.insertLineAfter'),
+]
 
 export const attachCustomCommands = (editorInstance: editor.IStandaloneCodeEditor) => {
-  commands.forEach(({keybinding, callback}) =>
-    editorInstance.addCommand(keybinding, (di) => callback(editorInstance, di)))
+  commands.forEach(({ keybinding, callback }) =>
+    editorInstance.addCommand(keybinding, (di) => {
+      callback(editorInstance, di)
+    }),
+  )
 }

@@ -1,15 +1,15 @@
-import {DEFAULT_FONT} from "../fonts";
+import { DEFAULT_FONT } from '../fonts'
 
 export interface MonacoSettings {
-  fontFamily: string,
-  fontLigatures: boolean,
-  cursorBlinking: 'blink' | 'smooth' | 'phase' | 'expand' | 'solid',
-  cursorStyle: 'line' | 'block' | 'underline' | 'line-thin' | 'block-outline' | 'underline-thin',
-  selectOnLineNumbers: boolean,
-  minimap: boolean,
-  contextMenu: boolean,
-  smoothScrolling: boolean,
-  mouseWheelZoom: boolean,
+  fontFamily: string
+  fontLigatures: boolean
+  cursorBlinking: 'blink' | 'smooth' | 'phase' | 'expand' | 'solid'
+  cursorStyle: 'line' | 'block' | 'underline' | 'line-thin' | 'block-outline' | 'underline-thin'
+  selectOnLineNumbers: boolean
+  minimap: boolean
+  contextMenu: boolean
+  smoothScrolling: boolean
+  mouseWheelZoom: boolean
 }
 
 export const defaultMonacoSettings: MonacoSettings = {
@@ -22,4 +22,4 @@ export const defaultMonacoSettings: MonacoSettings = {
   contextMenu: true,
   smoothScrolling: true,
   mouseWheelZoom: true,
-};
+}

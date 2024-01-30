@@ -1,22 +1,22 @@
-import React from "react";
+import React from 'react'
 import {
   Stack,
   IconButton,
-  ISemanticColors,
+  type ISemanticColors,
   ProgressIndicator,
   DefaultButton,
   PrimaryButton,
   useTheme,
-} from "@fluentui/react";
-import { FontIcon } from "@fluentui/react/lib/Icon";
+} from '@fluentui/react'
+import { FontIcon } from '@fluentui/react/lib/Icon'
 
-import "./Notification.css"
+import './Notification.css'
 
 export enum NotificationType {
   None = '',
   Info = 'info',
   Warning = 'warning',
-  Error = 'error'
+  Error = 'error',
 }
 
 interface ProgressState {
@@ -33,7 +33,7 @@ interface NotificationAction {
 }
 
 export interface NotificationProps {
-  id: number|string
+  id: number | string
   type?: NotificationType
   title: string
   description?: string
@@ -43,41 +43,33 @@ export interface NotificationProps {
   actions?: NotificationAction[]
 }
 
-const iconColorPaletteMap: {[k in NotificationType]: keyof ISemanticColors} = {
+const iconColorPaletteMap: { [k in NotificationType]: keyof ISemanticColors } = {
   [NotificationType.Warning]: 'warningHighlight',
   [NotificationType.Error]: 'severeWarningIcon',
   [NotificationType.Info]: 'link',
   [NotificationType.None]: 'inputText',
-};
+}
 
-const statusIconMapping: {[k in NotificationType]: string} = {
+const statusIconMapping: { [k in NotificationType]: string } = {
   [NotificationType.Warning]: 'warning',
   [NotificationType.Error]: 'ErrorBadge',
   [NotificationType.Info]: 'info',
   [NotificationType.None]: 'info',
-};
-
-const getPercentComplete = (progress: NotificationProps['progress']): (number|undefined) => {
-  if (!progress || progress?.indeterminate) {
-    return;
-  }
-
-  const { current, total } = progress;
-  const percentage = (current! * 100) / total!;
-  return percentage / 100;
 }
 
-const NotificationActionButton: React.FC<Omit<NotificationAction, 'key'>> = (
-  {label, primary, onClick}
-) => {
-  const ButtonComponent = primary ? PrimaryButton : DefaultButton;
-  return (
-    <ButtonComponent
-      primary={primary}
-      onClick={onClick}
-      text={label}
-    />
-  );
+const getPercentComplete = (progress: NotificationProps['progress']): number | undefined => {
+  if (!progress || progress?.indeterminate) {
+    return
+  }
+
+  const { current, total } = progress
+  const percentage = (current! * 100) / total!
+  return percentage / 100
+}
+
+const NotificationActionButton: React.FC<Omit<NotificationAction, 'key'>> = ({ label, primary, onClick }) => {
+  const ButtonComponent = primary ? PrimaryButton : DefaultButton
+  return <ButtonComponent primary={primary} onClick={onClick} text={label} />
 }
 
 export const Notification: React.FunctionComponent<NotificationProps> = ({
@@ -88,9 +80,9 @@ export const Notification: React.FunctionComponent<NotificationProps> = ({
   canDismiss = true,
   type = NotificationType.Info,
   onClose,
-  actions
+  actions,
 }) => {
-  const {semanticColors, fonts, ...theme} = useTheme();
+  const { semanticColors, fonts, ...theme } = useTheme()
   return (
     <div
       className="Notification"
@@ -110,11 +102,9 @@ export const Notification: React.FunctionComponent<NotificationProps> = ({
             fontSize: fonts.medium.fontSize,
           }}
         />
-        <span className="Notification__Title">
-          {title}
-        </span>
+        <span className="Notification__Title">{title}</span>
         <div className="Notification__Controls">
-          { canDismiss && (
+          {canDismiss && (
             <IconButton
               title="Close"
               ariaLabel="Close notification"
@@ -126,48 +116,32 @@ export const Notification: React.FunctionComponent<NotificationProps> = ({
                 padding: 0,
               }}
               iconProps={{
-                iconName: "ChromeClose",
+                iconName: 'ChromeClose',
                 style: {
                   fontSize: fonts.xSmall.fontSize,
-                }
+                },
               }}
             />
           )}
         </div>
       </div>
-      { (description || progress ) && (
+      {(description || progress) && (
         <div className="Notification__Container">
-          { description && (
-            <div className="Notification__Content">
-              {description}
-            </div>
-          )}
-          { progress && (
+          {description && <div className="Notification__Content">{description}</div>}
+          {progress && (
             <div className="Notification__Progress">
-              <ProgressIndicator
-                percentComplete={getPercentComplete(progress)}
-              />
+              <ProgressIndicator percentComplete={getPercentComplete(progress)} />
             </div>
           )}
         </div>
       )}
-      { actions?.length && (
-        <Stack
-          horizontal
-          className="Notification__Actions"
-          horizontalAlign="end"
-          tokens={
-            { childrenGap: 10 }
-          }
-        >
-          {
-            actions.map(({key, ...props}, i) => (
-              <NotificationActionButton key={key} {...props} />
-            ))
-          }
+      {actions?.length && (
+        <Stack horizontal className="Notification__Actions" horizontalAlign="end" tokens={{ childrenGap: 10 }}>
+          {actions.map(({ key, ...props }, i) => (
+            <NotificationActionButton key={key} {...props} />
+          ))}
         </Stack>
       )}
-
     </div>
-  );
+  )
 }

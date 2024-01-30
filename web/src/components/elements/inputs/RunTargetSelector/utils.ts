@@ -1,4 +1,4 @@
-const majorVersionRegex = /^(\d+\.\d+)(.*)$/;
+const majorVersionRegex = /^(\d+\.\d+)(.*)$/
 
 /**
  * Returns a new string which contains only major and minor version
@@ -8,8 +8,5 @@ const majorVersionRegex = /^(\d+\.\d+)(.*)$/;
  *
  * @param str Semver string
  */
-export const removePatchVersion = (str: string): string => (
-  str.replace(majorVersionRegex, (match, ...groups) => (
-    groups?.length ? groups[0] : match
-  ))
-);
+export const removePatchVersion = (str: string): string =>
+  str.replace(majorVersionRegex, (match, ...groups) => (groups?.length ? groups[0] : match))

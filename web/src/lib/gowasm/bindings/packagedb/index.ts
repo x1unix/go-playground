@@ -1,2 +1,2 @@
-export * from './binding';
-export * from './pkgindex';
+export * from './binding'
+export * from './pkgindex'

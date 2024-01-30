@@ -1,2 +1,2 @@
-export * from './errors';
-export { Errno } from './tables';
+export * from './errors'
+export { Errno } from './tables'

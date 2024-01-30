@@ -1,69 +1,64 @@
-import {
-  GoWebAssemblyInstance,
-  GoWrapper,
-  instantiateStreaming,
-  wrapGlobal,
-} from "~/lib/go";
-import { Client } from "~/lib/wrpc";
-import { registerExportObject } from "~/lib/gowasm";
-import SyscallHelper from "~/lib/gowasm/syscall";
-import { LoggerBinding } from "~/lib/gowasm/bindings/wlog";
-import { ConsoleBinding, ConsoleStreamType } from "~/lib/gowasm/bindings/stdio";
-import { BrowserFSBinding } from "~/lib/gowasm/bindings/browserfs";
-import { PackageDBBinding } from "~/lib/gowasm/bindings/packagedb";
-import { Worker, WorkerBinding } from "~/lib/gowasm/bindings/worker";
+import { type GoWebAssemblyInstance, GoWrapper, instantiateStreaming, wrapGlobal } from '~/lib/go'
+import { type Client } from '~/lib/wrpc'
+import { registerExportObject } from '~/lib/gowasm'
+import SyscallHelper from '~/lib/gowasm/syscall'
+import { LoggerBinding } from '~/lib/gowasm/bindings/wlog'
+import { ConsoleBinding, type ConsoleStreamType } from '~/lib/gowasm/bindings/stdio'
+import { BrowserFSBinding } from '~/lib/gowasm/bindings/browserfs'
+import { PackageDBBinding } from '~/lib/gowasm/bindings/packagedb'
+import { type Worker, WorkerBinding } from '~/lib/gowasm/bindings/worker'
 
-import { getWasmUrl } from "~/services/api/resources";
-import { wrapResponseWithProgress } from "~/utils/http";
-import { FileSystemWrapper } from "~/services/go/fs";
-import ProcessStub from "~/services/go/process";
+import { getWasmUrl } from '~/services/api/resources'
+import { wrapResponseWithProgress } from '~/utils/http'
+import { FileSystemWrapper } from '~/services/go/fs'
+import ProcessStub from '~/services/go/process'
 
-import { PackageManagerEvent, ProgramStateChangeEvent } from "./types";
-import { PackageCacheDB, PackageFileStore, PackageIndex } from "../pkgcache";
+import { type PackageManagerEvent, type ProgramStateChangeEvent } from './types'
+import { PackageCacheDB, PackageFileStore, PackageIndex } from '../pkgcache'
 import {
   defaultWorkerConfig,
-  GoWorkerBootEvent,
+  type GoWorkerBootEvent,
   GoWorkerBootEventType,
-  GoWorkerExitEvent,
-  StdoutWriteEvent,
-  WorkerConfig,
-  WorkerEvent
-} from "./interface";
-import { UIHostBinding } from "./binding";
-import { StdioWrapper } from "./console";
+  type GoWorkerExitEvent,
+  type StdoutWriteEvent,
+  type WorkerConfig,
+  WorkerEvent,
+} from './interface'
+import { UIHostBinding } from './binding'
+import { StdioWrapper } from './console'
 
 /**
  * Go WASM executable URL
  */
-const wasmWorkerUrl = getWasmUrl('go-repl');
+const wasmWorkerUrl = getWasmUrl('go-repl')
 
 export interface GoReplWorker extends Worker {
-  runProgram(strSize: number, data: Uint8Array)
-  updateGoProxyAddress(newAddress: string)
-  terminateProgram()
+  runProgram: (strSize: number, data: Uint8Array) => any
+  updateGoProxyAddress: (newAddress: string) => any
+  terminateProgram: () => any
 }
 
 class BootTimeoutGuard {
-  private timeout?: NodeJS.Timeout;
-  private started = false;
+  private timeout?: NodeJS.Timeout
+  private started = false
 
   startBootTimeout(rejector: Function, ms?: number) {
     if (!ms) {
-      return;
+      return
     }
 
     this.timeout = setTimeout(() => {
       if (this.started) {
-        return;
+        return
       }
 
-      rejector(new Error('Go WebAssembly worker start timeout exceeded'));
-    });
+      rejector(new Error('Go WebAssembly worker start timeout exceeded'))
+    })
   }
 
   cancel(isStarted = true) {
-    this.started = isStarted;
-    clearTimeout(this.timeout!);
+    this.started = isStarted
+    clearTimeout(this.timeout!)
   }
 }
 
@@ -75,11 +70,11 @@ class BootTimeoutGuard {
  * @param rpcClient WRPC client instance.
  * @param cfg Custom startup config
  */
-export const startGoWorker = (globalScope: any, rpcClient: Client, cfg: WorkerConfig = defaultWorkerConfig) => new Promise<GoReplWorker>(
-  (res, rej) => {
-    const timeout = new BootTimeoutGuard();
+export const startGoWorker = async (globalScope: any, rpcClient: Client, cfg: WorkerConfig = defaultWorkerConfig) =>
+  await new Promise<GoReplWorker>((res, rej) => {
+    const timeout = new BootTimeoutGuard()
 
-    const ioWrapper = new StdioWrapper(rpcClient);
+    const ioWrapper = new StdioWrapper(rpcClient)
     const globalMocks = {
       fs: new FileSystemWrapper(ioWrapper.stdoutPipe, ioWrapper.stderrPipe),
       process: ProcessStub,
@@ -88,83 +83,92 @@ export const startGoWorker = (globalScope: any, rpcClient: Client, cfg: WorkerCo
     // Wrap Go from wasm_exec.js with overlay.
     const go = new GoWrapper(new globalScope.Go(), {
       debug: cfg.debugRuntime,
-      globalValue: wrapGlobal(globalMocks, globalScope)
-    });
+      globalValue: wrapGlobal(globalMocks, globalScope),
+    })
 
-    const helper = new SyscallHelper(go, false);
-    const pkgDb = new PackageCacheDB();
+    const helper = new SyscallHelper(go, false)
+    const pkgDb = new PackageCacheDB()
     const pkgIndex = new PackageIndex(pkgDb)
-    const fs = new PackageFileStore(pkgDb);
+    const fs = new PackageFileStore(pkgDb)
 
-    go.setEnv('GOPATH', '/go');
-    go.setEnv('WASM_DEBUG', cfg.debugWasm ? '1' : '0');
+    go.setEnv('GOPATH', '/go')
+    go.setEnv('WASM_DEBUG', cfg.debugWasm ? '1' : '0')
     if (cfg.env) {
-      Object.entries(cfg.env)
-        .forEach(([k, v]) => go.setEnv(k, v));
+      Object.entries(cfg.env).forEach(([k, v]) => {
+        go.setEnv(k, v)
+      })
     }
 
     // Core imports (logger, fs, package manager)
-    registerExportObject(go, helper);
-    registerExportObject(go, new LoggerBinding());
-    registerExportObject(go, new BrowserFSBinding(helper, fs));
-    registerExportObject(go, new PackageDBBinding(helper, pkgIndex));
+    registerExportObject(go, helper)
+    registerExportObject(go, new LoggerBinding())
+    registerExportObject(go, new BrowserFSBinding(helper, fs))
+    registerExportObject(go, new PackageDBBinding(helper, pkgIndex))
 
     // Attach stdout to client
-    registerExportObject(go, new ConsoleBinding({
-      write(fd: ConsoleStreamType, msg: string) {
-        rpcClient.publish<StdoutWriteEvent>(WorkerEvent.StdoutWrite, {
-          msgType: fd,
-          message: msg
-        });
-      }
-    }));
+    registerExportObject(
+      go,
+      new ConsoleBinding({
+        write(fd: ConsoleStreamType, msg: string) {
+          rpcClient.publish<StdoutWriteEvent>(WorkerEvent.StdoutWrite, {
+            msgType: fd,
+            message: msg,
+          })
+        },
+      }),
+    )
 
     // Intercept Go runtime start
-    registerExportObject(go, new WorkerBinding<GoReplWorker>(go, {
-      onWorkerRegister: (worker) => {
-        timeout.cancel(true);
-        rpcClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
-          eventType: GoWorkerBootEventType.Complete,
-        });
-        res(worker);
-      }
-    }));
+    registerExportObject(
+      go,
+      new WorkerBinding<GoReplWorker>(go, {
+        onWorkerRegister: (worker) => {
+          timeout.cancel(true)
+          rpcClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
+            eventType: GoWorkerBootEventType.Complete,
+          })
+          res(worker)
+        },
+      }),
+    )
 
     // Register Go interpreter event handlers
-    registerExportObject(go, new UIHostBinding({
-      onPackageManagerEvent: e => {
-        rpcClient.publish<PackageManagerEvent>(WorkerEvent.PackageManagerEvent, e);
-      },
-      onProgramEvalStateChange: e => {
-        rpcClient.publish<ProgramStateChangeEvent>(WorkerEvent.ProgramEvalStateChange, e);
-      }
-    }));
+    registerExportObject(
+      go,
+      new UIHostBinding({
+        onPackageManagerEvent: (e) => {
+          rpcClient.publish<PackageManagerEvent>(WorkerEvent.PackageManagerEvent, e)
+        },
+        onProgramEvalStateChange: (e) => {
+          rpcClient.publish<ProgramStateChangeEvent>(WorkerEvent.ProgramEvalStateChange, e)
+        },
+      }),
+    )
 
     // Capture worker crash event
     go.onExit = (code: number) => {
       rpcClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
         eventType: GoWorkerBootEventType.Crash,
-        code: code,
-      });
-    };
+        code,
+      })
+    }
 
     instantiateStreaming(fetchWithProgress(rpcClient, wasmWorkerUrl), go.importObject)
-      .then(({ instance }) => {
+      .then(async ({ instance }) => {
         rpcClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
           eventType: GoWorkerBootEventType.Starting,
-        });
-        timeout.startBootTimeout(rej, cfg.startTimeout);
-        return go.run(instance as GoWebAssemblyInstance);
+        })
+        timeout.startBootTimeout(rej, cfg.startTimeout)
+        await go.run(instance as GoWebAssemblyInstance)
       })
       .then(() => {
-        rpcClient.publish<GoWorkerExitEvent>(WorkerEvent.GoWorkerExit, {});
+        rpcClient.publish<GoWorkerExitEvent>(WorkerEvent.GoWorkerExit, {})
       })
-      .catch(err => {
-        timeout.cancel();
-        rej(err);
-      });
-  }
-);
+      .catch((err) => {
+        timeout.cancel()
+        rej(err)
+      })
+  })
 
 /**
  * Fetches WebAssembly binary with progress reported to the event queue.
@@ -173,15 +177,15 @@ export const startGoWorker = (globalScope: any, rpcClient: Client, cfg: WorkerCo
  * @param req Fetch request args
  */
 const fetchWithProgress = async (rspClient: Client, req: RequestInfo): Promise<Response> => {
-  const rsp = await fetch(req);
+  const rsp = await fetch(req)
   if (rsp.status !== 200) {
-    throw new Error(`Cannot fetch WebAssembly worker: GET ${rsp.url} - ${rsp.status} ${rsp.statusText}`);
+    throw new Error(`Cannot fetch WebAssembly worker: GET ${rsp.url} - ${rsp.status} ${rsp.statusText}`)
   }
 
   return wrapResponseWithProgress(rsp, (progress) => {
     rspClient.publish<GoWorkerBootEvent>(WorkerEvent.GoWorkerBoot, {
       eventType: GoWorkerBootEventType.Downloading,
-      progress
-    });
-  });
+      progress,
+    })
+  })
 }

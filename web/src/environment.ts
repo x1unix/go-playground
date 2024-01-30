@@ -13,8 +13,8 @@ const environment = {
   urls: {
     github: import.meta.env.VITE_GITHUB_URL ?? 'https://github.com/x1unix/go-playground',
     issue: import.meta.env.VITE_GITHUB_URL ?? 'https://github.com/x1unix/go-playground/issues/new',
-    donate: import.meta.env.VITE_DONATE_URL ?? 'https://opencollective.com/bttr-go-playground'
-  }
-};
+    donate: import.meta.env.VITE_DONATE_URL ?? 'https://opencollective.com/bttr-go-playground',
+  },
+}
 
-export default environment;
+export default environment

@@ -1,9 +1,5 @@
-import type {
-  ITheme,
-  IStackStyles,
-  IButtonStyles,
-} from '@fluentui/react';
-import {FontSizes} from "@fluentui/react";
+import type { ITheme, IStackStyles, IButtonStyles } from '@fluentui/react'
+import { FontSizes } from '@fluentui/react'
 
 export const commandCellStyles: IStackStyles = {
   root: {
@@ -13,10 +9,10 @@ export const commandCellStyles: IStackStyles = {
     flexDirection: 'column',
     alignContent: 'stretch',
     justifyContent: 'stretch',
-  }
-};
+  },
+}
 
-export const getActionBtnStyle = ({semanticColors}: ITheme): IButtonStyles => ({
+export const getActionBtnStyle = ({ semanticColors }: ITheme): IButtonStyles => ({
   icon: {
     fontSize: FontSizes.smallPlus,
     height: FontSizes.smallPlus,
@@ -39,6 +35,6 @@ export const getActionBtnStyle = ({semanticColors}: ITheme): IButtonStyles => ({
     color: 'inherit',
   },
   rootPressed: {
-    color: 'inherit'
-  }
-});
+    color: 'inherit',
+  },
+})

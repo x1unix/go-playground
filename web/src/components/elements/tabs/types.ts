@@ -1,4 +1,4 @@
-import type {IIconProps} from '@fluentui/react';
+import type { IIconProps } from '@fluentui/react'
 
 export interface TabBarAction {
   key?: string
@@ -7,7 +7,7 @@ export interface TabBarAction {
   onClick?: () => void
 }
 
-export type TabKey = string;
+export type TabKey = string
 export interface TabInfo {
   key: TabKey
   label: string

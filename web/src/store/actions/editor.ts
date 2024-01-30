@@ -1,18 +1,16 @@
-import type { editor } from 'monaco-editor';
+import type { editor } from 'monaco-editor'
 
-import { ActionType } from "./actions";
+import { ActionType } from './actions'
 
-export const newMarkerAction = (fileName: string, markers?: editor.IMarkerData[]) => (
-  {
-    type: ActionType.MARKER_CHANGE,
-    payload: {
-        fileName,
-        markers
-    },
-  }
-);
+export const newMarkerAction = (fileName: string, markers?: editor.IMarkerData[]) => ({
+  type: ActionType.MARKER_CHANGE,
+  payload: {
+    fileName,
+    markers,
+  },
+})
 
 export interface MarkerChangePayload {
-    fileName: string,
-    markers?: editor.IMarkerData[] | null
+  fileName: string
+  markers?: editor.IMarkerData[] | null
 }

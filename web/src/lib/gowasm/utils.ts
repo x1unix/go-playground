@@ -3,4 +3,4 @@
  *
  * @param pkgName Go Package name
  */
-export const newPackageSymbolFunc = pkgName => fnName => `${pkgName}.${fnName}`;
+export const newPackageSymbolFunc = (pkgName) => (fnName) => `${pkgName}.${fnName}`

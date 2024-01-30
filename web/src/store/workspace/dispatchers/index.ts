@@ -1,2 +1,2 @@
-export * from './files';
-export * from './snippet';
+export * from './files'
+export * from './snippet'

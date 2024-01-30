@@ -1,3 +1,3 @@
-export * from './struct';
-export * from './array';
-export * from './u8array';
+export * from './struct'
+export * from './array'
+export * from './u8array'

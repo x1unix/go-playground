@@ -1,1 +1,1 @@
-export * from './NewFileModal';
+export * from './NewFileModal'

@@ -1,5 +1,5 @@
 import { settingsPropStyles } from './styles'
-import React from 'react';
+import React from 'react'
 
 interface SettingsSectionProps {
   title: string
@@ -13,9 +13,7 @@ export function SettingsProperty(props: SettingsSectionProps) {
       <div className={settingsPropStyles.block}>
         <div className={settingsPropStyles.title}>{props.title}</div>
         <div className={settingsPropStyles.description}>{props.description}</div>
-        <div className={settingsPropStyles.container}>
-          {props.control}
-        </div>
+        <div className={settingsPropStyles.container}>{props.control}</div>
       </div>
     )
   }
@@ -23,9 +21,7 @@ export function SettingsProperty(props: SettingsSectionProps) {
   return (
     <div className={settingsPropStyles.block}>
       <div className={settingsPropStyles.title}>{props.title}</div>
-      <div className={settingsPropStyles.container}>
-        {props.control}
-      </div>
+      <div className={settingsPropStyles.container}>{props.control}</div>
     </div>
   )
 }

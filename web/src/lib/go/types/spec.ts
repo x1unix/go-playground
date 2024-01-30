@@ -1,17 +1,17 @@
-import { alignAddr } from "~/lib/go/types/common";
+import { alignAddr } from '~/lib/go/types/common'
 
 export interface WriteResult {
-  address: number;
-  endOffset: number;
+  address: number
+  endOffset: number
 }
 
-export interface ReadResult<T=any> extends WriteResult{
+export interface ReadResult<T = any> extends WriteResult {
   value: T
 }
 
 export interface TypeDescriptor {
-  size: number,
-  alignment: number,
+  size: number
+  alignment: number
   padding: number
 }
 
@@ -20,11 +20,11 @@ export interface TypeDescriptor {
  *
  * @abstract
  */
-export abstract class AbstractTypeSpec<T=any> {
-  private _size = 0;
-  private _align = 1;
-  private _skip = 0;
-  private _name = '';
+export abstract class AbstractTypeSpec<T = any> {
+  private _size = 0
+  private _align = 1
+  private _skip = 0
+  private readonly _name = ''
 
   /**
    * @param name Original type name.
@@ -32,19 +32,17 @@ export abstract class AbstractTypeSpec<T=any> {
    * @param align Type alignment.
    * @param skip Number of bytes to skip.
    */
-  protected constructor(
-    name: string, size: number, align = 1, skip = 0
-  ) {
-    this._size = size;
-    this._align = align;
-    this._skip = skip;
-    this._name = name;
+  protected constructor(name: string, size: number, align = 1, skip = 0) {
+    this._size = size
+    this._align = align
+    this._skip = skip
+    this._name = name
   }
 
-  protected setTypeDescriptor({size, alignment, padding}: TypeDescriptor) {
-    this._size = size;
-    this._align = alignment;
-    this._skip = padding;
+  protected setTypeDescriptor({ size, alignment, padding }: TypeDescriptor) {
+    this._size = size
+    this._align = alignment
+    this._skip = padding
   }
 
   /**
@@ -52,7 +50,7 @@ export abstract class AbstractTypeSpec<T=any> {
    * @returns {number}
    */
   get padding() {
-    return this._skip;
+    return this._skip
   }
 
   /**
@@ -60,14 +58,14 @@ export abstract class AbstractTypeSpec<T=any> {
    * @returns {number}
    */
   get size() {
-    return this._size;
+    return this._size
   }
 
   /**
    * @type {string}
    */
   get name() {
-    return this._name;
+    return this._name
   }
 
   /**
@@ -75,7 +73,7 @@ export abstract class AbstractTypeSpec<T=any> {
    * @returns {number}
    */
   get alignment() {
-    return this._align;
+    return this._align
   }
 
   /**
@@ -86,10 +84,10 @@ export abstract class AbstractTypeSpec<T=any> {
   alignAddress(addr: number): number {
     if (addr % this._align === 0) {
       // Address is aligned
-      return addr;
+      return addr
     }
 
-    return alignAddr(addr, this._align);
+    return alignAddr(addr, this._align)
   }
 
   /**
@@ -104,7 +102,7 @@ export abstract class AbstractTypeSpec<T=any> {
    * @returns {*}
    */
   decode(view: DataView, addr: number): T {
-    throw new Error(`${this.constructor.name}.decode: not implemented`);
+    throw new Error(`${this.constructor.name}.decode: not implemented`)
   }
 
   /**
@@ -119,7 +117,7 @@ export abstract class AbstractTypeSpec<T=any> {
    * @param {*} val
    */
   encode(view: DataView, addr: number, val: T) {
-    throw new Error(`${this.constructor.name}.encode: not implemented`);
+    throw new Error(`${this.constructor.name}.encode: not implemented`)
   }
 
   /**
@@ -134,13 +132,13 @@ export abstract class AbstractTypeSpec<T=any> {
    * @returns {ReadResult}
    */
   read(view: DataView, addr: number, buff: ArrayBufferLike): ReadResult<T> {
-    let address = this.alignAddress(addr);
-    const value = this.decode(view, address);
+    const address = this.alignAddress(addr)
+    const value = this.decode(view, address)
     return {
       value,
       address,
       endOffset: address + this.size + this.padding,
-    };
+    }
   }
 
   /**
@@ -154,11 +152,11 @@ export abstract class AbstractTypeSpec<T=any> {
    * @returns {WriteResult}
    */
   write(view: DataView, addr: number, val: T, buff: ArrayBufferLike): WriteResult {
-    const address = this.alignAddress(addr);
-    this.encode(view, address, val);
+    const address = this.alignAddress(addr)
+    this.encode(view, address, val)
     return {
       address,
-      endOffset: address + this.size + this.padding
-    };
+      endOffset: address + this.size + this.padding,
+    }
   }
 }

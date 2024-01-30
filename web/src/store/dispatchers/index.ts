@@ -1,3 +1,3 @@
-export * from './settings';
-export * from './build';
-export * from './utils';
+export * from './settings'
+export * from './build'
+export * from './utils'
