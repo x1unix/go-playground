@@ -1,4 +1,3 @@
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const CracoAlias = require("craco-alias");
 
@@ -10,7 +9,6 @@ module.exports = {
     },
     plugins: {
       add: [
-        new MonacoWebpackPlugin(),
         new CircularDependencyPlugin({
           // exclude detection of files based on a RegExp
           exclude: /a\.js|node_modules/,

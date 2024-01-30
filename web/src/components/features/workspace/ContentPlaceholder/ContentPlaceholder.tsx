@@ -32,7 +32,7 @@ export const ContentPlaceholder: React.FC<Props> = ({isLoading, error, onUploadC
         { isLoading ? (
           <Spinner
             key='spinner'
-            label='Loading editor...'
+            label='Loading snippet...'
             labelPosition='right'
           />
         ) : error?.length ? (

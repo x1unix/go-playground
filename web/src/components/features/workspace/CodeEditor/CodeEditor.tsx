@@ -1,7 +1,12 @@
 import React from 'react';
-import MonacoEditor from 'react-monaco-editor';
-import * as monaco from 'monaco-editor';
-import {editor, IKeyboardEvent} from 'monaco-editor';
+import { Spinner } from '@fluentui/react';
+import MonacoEditor, { type Monaco } from '@monaco-editor/react';
+import {
+  KeyMod,
+  KeyCode,
+  type editor,
+  type IKeyboardEvent,
+} from 'monaco-editor';
 
 import {
   createVimModeAdapter,
@@ -57,17 +62,19 @@ const mapWorkspaceProps = ({files, selectedFile}: WorkspaceState) => {
 }))
 export class CodeEditor extends React.Component<any, CodeEditorState> {
   private analyzer?: Analyzer;
-  private _previousTimeout: any;
   private editorInstance?: editor.IStandaloneCodeEditor;
   private vimAdapter?: VimModeKeymap;
   private vimCommandAdapter?: StatusBarAdapter;
+  private monaco?: Monaco;
 
   private debouncedAnalyzeFunc = wrapAsyncWithDebounce((fileName: string, code: string) => (
     this.doAnalyze(fileName, code)
   ), ANALYZE_DEBOUNCE_TIME);
 
-  editorDidMount(editorInstance: editor.IStandaloneCodeEditor, _: monaco.editor.IEditorConstructionOptions) {
+  editorDidMount(editorInstance: editor.IStandaloneCodeEditor, monacoInstance: Monaco) {
     this.editorInstance = editorInstance;
+    this.monaco = monacoInstance;
+
     editorInstance.onKeyDown(e => this.onKeyDown(e));
     const [ vimAdapter, statusAdapter ] = createVimModeAdapter(
       this.props.dispatch,
@@ -101,7 +108,7 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
         label: 'Build And Run Code',
         contextMenuGroupId: 'navigation',
         keybindings: [
-          monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter
+          KeyMod.CtrlCmd | KeyCode.Enter
         ],
         run: (ed, ...args) => {
           this.props.dispatch(runFileDispatcher);
@@ -112,7 +119,7 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
         label: 'Format Code (goimports)',
         contextMenuGroupId: 'navigation',
         keybindings: [
-          monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF
+          KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KeyF
         ],
         run: (ed, ...args) => {
           this.props.dispatch(dispatchFormatFile());
@@ -124,6 +131,9 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
     actions.forEach(action => editorInstance.addAction(action));
     attachCustomCommands(editorInstance);
     editorInstance.focus();
+
+    const { fileName, code } = this.props;
+    this.debouncedAnalyzeFunc(fileName, code);
   }
 
   private isFileOrEnvironmentChanged(prevProps) {
@@ -149,7 +159,7 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
   componentDidUpdate(prevProps) {
     if (this.isFileOrEnvironmentChanged(prevProps)) {
       // Update editor markers on file or environment changes;
-      this.debouncedAnalyzeFunc(this.props.code);
+      this.debouncedAnalyzeFunc(this.props.fileName, this.props.code);
     }
 
     this.applyVimModeChanges(prevProps);
@@ -158,9 +168,19 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
   componentWillUnmount() {
     this.analyzer?.dispose();
     this.vimAdapter?.dispose();
+
+    // Shutdown instance to avoid dangling markers.
+    this.monaco?.editor.removeAllMarkers(
+      this.editorInstance?.getId() as string
+    );
+    this.editorInstance?.dispose();
   }
 
-  onChange(newValue: string, _: editor.IModelContentChangedEvent) {
+  onChange(newValue: string|undefined, _: editor.IModelContentChangedEvent) {
+    if (!newValue) {
+      return;
+    }
+
     this.props.dispatch(dispatchUpdateFile(this.props.fileName, newValue));
     const { fileName, code } = this.props;
     this.debouncedAnalyzeFunc(fileName, code);
@@ -188,7 +208,7 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
       return r.value ?? [];
     });
 
-    editor.setModelMarkers(
+    this.monaco?.editor.setModelMarkers(
       this.editorInstance?.getModel() as editor.ITextModel,
       this.editorInstance?.getId() as string,
       markers
@@ -212,10 +232,18 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
         language={LANGUAGE_GOLANG}
         theme={this.props.darkMode ? 'vs-dark' : 'vs-light'}
         value={this.props.code}
-        // path={this.props.fileName}
+        defaultValue={this.props.code}
+        path={this.props.fileName}
         options={options}
         onChange={(newVal, e) => this.onChange(newVal, e)}
-        editorDidMount={(e, m: any) => this.editorDidMount(e, m)}
+        onMount={(e, m) => this.editorDidMount(e, m)}
+        loading={(
+          <Spinner
+            key='spinner'
+            label='Loading editor...'
+            labelPosition='right'
+          />
+        )}
       />
     );
   }
