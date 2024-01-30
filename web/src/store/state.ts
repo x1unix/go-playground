@@ -14,18 +14,13 @@ export interface UIState {
   snippetId?: string | null
 }
 
-export interface EditorState {
-  fileName: string,
-  code: string
-}
-
 export interface StatusState {
   loading: boolean,
   running?: boolean,
   dirty?: boolean,
   lastError?: string | null,
   events?: EvalEvent[],
-  markers?: editor.IMarkerData[]
+  markers?: Record<string, editor.IMarkerData[] | null>
 }
 
 export interface SettingsState {
@@ -44,7 +39,6 @@ export interface PanelState {
 }
 
 export interface State {
-  editor: EditorState
   status?: StatusState,
   settings: SettingsState
   runTarget: RunTargetConfig

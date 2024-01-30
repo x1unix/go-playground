@@ -4,8 +4,8 @@ import { connect } from 'react-redux';
 
 import {
   dispatchPanelLayoutChange,
-  newSnippetLoadDispatcher,
 } from '~/store';
+import { dispatchLoadSnippet } from '~/store/workspace';
 import { Header } from '~/components/layout/Header';
 import { Workspace } from '~/components/features/workspace/Workspace';
 import { InspectorPanel } from '~/components/features/inspector/InspectorPanel/InspectorPanel';
@@ -22,7 +22,7 @@ interface PageParams {
 export const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }))(({ panelProps, dispatch }: any) => {
   const { snippetID } = useParams<PageParams>();
   useEffect(() => {
-    dispatch(newSnippetLoadDispatcher(snippetID));
+    dispatch(dispatchLoadSnippet(snippetID));
   }, [snippetID, dispatch]);
 
   return (

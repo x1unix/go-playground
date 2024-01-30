@@ -14,17 +14,18 @@ import { SharePopup } from '~/components/utils/SharePopup';
 
 import { dispatchTerminalSettingsChange } from '~/store/terminal';
 import {
+  dispatchImportSource,
+  dispatchLoadSnippet,
+  dispatchFormatFile,
+  dispatchShareSnippet,
+} from '~/store/workspace/dispatchers';
+import {
   Connect,
   type Dispatcher,
   dispatchToggleTheme,
-  formatFileDispatcher,
-  newCodeImportDispatcher,
-  newImportFileDispatcher,
   newMonacoParamsChangeDispatcher,
-  newSnippetLoadDispatcher,
   newSettingsChangeDispatcher,
   runFileDispatcher,
-  shareSnippetDispatcher
 } from '~/store';
 
 import { getSnippetsMenuItems, SnippetMenuItem } from './utils';
@@ -32,7 +33,7 @@ import { getSnippetsMenuItems, SnippetMenuItem } from './utils';
 import './Header.css';
 
 /**
- * Uniquie class name for share button to use as popover target.
+ * Unique class name for share button to use as popover target.
  */
 const BTN_SHARE_CLASSNAME = 'Header__btn--share';
 
@@ -96,8 +97,8 @@ export class Header extends ThemeableComponent<any, HeaderState> {
 
   onSnippetMenuItemClick(item: SnippetMenuItem) {
     const dispatcher = item.snippet ?
-      newSnippetLoadDispatcher(item.snippet) :
-      newCodeImportDispatcher(item.label, item.text as string);
+      dispatchLoadSnippet(item.snippet) :
+      dispatchImportSource(item.files!);
     this.props.dispatch(dispatcher);
   }
 
@@ -127,7 +128,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         disabled: this.isDisabled,
         onClick: () => {
           this.setState({ showShareMessage: true });
-          this.props.dispatch(shareSnippetDispatcher);
+          this.props.dispatch(dispatchShareSnippet());
         }
       },
       {
@@ -193,7 +194,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         disabled: this.isDisabled,
         iconProps: { iconName: 'Code' },
         onClick: () => {
-          this.props.dispatch(formatFileDispatcher);
+          this.props.dispatch(dispatchFormatFile());
         }
       },
       {

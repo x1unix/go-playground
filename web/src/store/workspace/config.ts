@@ -1,25 +1,11 @@
 import config from '~/services/config';
-import type { WorkspaceState } from './types';
+import { type WorkspaceState, defaultFiles, defaultFileName } from './state';
 
 const CONFIG_KEY = 'workspace.state';
 
-const defaultFile = `
-package main
-
-import (
-\t"fmt"
-)
-
-func main() {
-\tfmt.Println("Hello, World!")
-}
-`.trimStart()
-
 const defaultWorkspace: WorkspaceState = {
-  selectedFile: 'main.go',
-  files: {
-    'main.go': defaultFile,
-  }
+  selectedFile: defaultFileName,
+  files: defaultFiles,
 }
 
 export const saveWorkspaceState = (state: WorkspaceState) => {

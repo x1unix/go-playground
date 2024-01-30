@@ -33,7 +33,7 @@ export interface Snippet {
    *
    * Not empty when shipped field is empty
    */
-  text?: string
+  files?: Record<string, string>
 }
 
 export default snippets as { [sectionName: string]: Snippet[] }

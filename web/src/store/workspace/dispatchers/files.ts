@@ -10,6 +10,7 @@ import {
 import { saveWorkspaceState } from '../config';
 import { WorkspaceAction, type FileUpdatePayload } from '../actions';
 import { readFile, dedupFiles } from './utils';
+import { type WorkspaceState, defaultFiles } from '../state';
 
 const AUTOSAVE_INTERVAL = 1000;
 
@@ -131,4 +132,19 @@ export const dispatchUpdateFile = (filename: string, content: string) => (
     scheduleAutosave(getState);
   }
 );
+
+export const dispatchImportSource = (files: Record<string,string>) => (
+  (dispatch: DispatchFn, _: StateProvider) => {
+    const selectedFile = Object.keys(files)[0];
+    dispatch<WorkspaceState>({
+      type: WorkspaceAction.WORKSPACE_IMPORT,
+      payload: {
+        selectedFile,
+        files,
+      }
+    })
+  }
+);
+
+export const dispatchResetWorkspace = dispatchImportSource(defaultFiles);
 

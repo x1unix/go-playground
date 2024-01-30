@@ -1,6 +1,6 @@
 import React from "react";
 import clsx from "clsx";
-import {editor, MarkerSeverity} from "monaco-editor";
+import {type editor, MarkerSeverity} from "monaco-editor";
 import {VscDebugAlt} from "react-icons/vsc";
 import environment from "~/environment";
 import {StateDispatch, connect} from "~/store";
@@ -18,7 +18,7 @@ interface StateProps {
   loading?: boolean
   running?: boolean
   lastError?: string|null
-  markers?: editor.IMarkerData[]
+  markers?: Record<string, editor.IMarkerData[] | null>
 }
 
 interface Props extends OwnProps, StateProps {
@@ -33,7 +33,24 @@ const pluralize = (count: number, label: string) => (
   )
 )
 
-const getMarkerCounters = (markers?: editor.IMarkerData[]) => {
+const countMarkers = (markers?: StateProps['markers']) => {
+  if (!markers) {
+    return {
+      errors: 0,
+      warnings: 0,
+    };
+  }
+
+  return Object.values(markers)
+    .filter(v => v?.length)
+    .map(getMarkerCounters!)
+    .reduce((acc, {errors, warnings}) => ({
+      errors: acc.errors + errors,
+      warnings: acc.warnings + warnings,
+    }), {errors: 0, warnings: 0});
+}
+
+const getMarkerCounters = (markers?: editor.IMarkerData[] | null) => {
   let errors = 0;
   let warnings = 0;
   if (!markers?.length) {
@@ -101,7 +118,7 @@ const StatusBar: React.FC<Props> = ({
   const {
     warnings,
     errors
-  } = getMarkerCounters(markers);
+  } = countMarkers(markers);
   return (
     <>
       <div

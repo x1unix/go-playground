@@ -1,3 +1,16 @@
+export const defaultFileName = 'main.go';
+const defaultFile = `
+package main
+
+import (
+\t"fmt"
+)
+
+func main() {
+\tfmt.Println("Hello, World!")
+}
+`.trimStart();
+
 export interface SnippetState {
   /**
    * Current snippet ID.
@@ -41,4 +54,8 @@ export const initialWorkspaceState: WorkspaceState = {
   snippet: {
     loading: true,
   }
+};
+
+export const defaultFiles = {
+  [defaultFileName]: defaultFile,
 };

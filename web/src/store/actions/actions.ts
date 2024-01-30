@@ -1,6 +1,4 @@
 export enum ActionType {
-  IMPORT_FILE             = 'IMPORT_FILE',
-  FILE_CHANGE             = 'FILE_CHANGE',
   LOADING_STATE_CHANGE    = 'LOADING_STATE_CHANGE',
   ERROR                   = 'ERROR',
   FORMAT_CODE             = 'FORMAT_CODE',
