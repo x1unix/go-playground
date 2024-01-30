@@ -1,9 +1,9 @@
 {
   "name": "ui",
+  "type": "module",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@craco/craco": "^6.4.3",
     "@fluentui/react": "^8.52.3",
     "@monaco-editor/loader": "^1.4.0",
     "@monaco-editor/react": "^4.6.0",
@@ -25,7 +25,6 @@
     "connected-react-router": "^6.9.2",
     "copy-to-clipboard": "^3.3.1",
     "core-js": "^3.35.1",
-    "craco-alias": "^3.0.1",
     "dexie": "^3.2.3",
     "file-saver": "^2.0.5",
     "monaco-editor": "^0.45.0",
@@ -92,7 +91,6 @@
     "eslint-plugin-react": "^7.27.1",
     "eslint-plugin-react-hooks": "^4.3.0",
     "eslint-plugin-testing-library": "^5.0.1",
-    "http-proxy-middleware": "^2.0.6",
     "vite": "^5.0.12",
     "vite-plugin-html-template": "^1.2.2",
     "vite-plugin-node-polyfills": "^0.19.0",
