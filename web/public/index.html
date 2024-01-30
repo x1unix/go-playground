@@ -124,6 +124,7 @@
     </div>
   </div>
   <script src="%VITE_WASM_BASE_URL%/wasm_exec@%VITE_WASM_API_VER%.js"></script>
+  <script type="module" src="/src/index.tsx"></script>
   <%- if (PROD) { -%>
   {{ if .GoogleTagID }}
   <script async src="https://www.googletagmanager.com/gtag/js?id={{.GoogleTagID}}"></script>
