@@ -22,6 +22,7 @@ interface Props {
 const tabContainerStyles: IStackStyles = {
   root: {
     flex: 1,
+    minWidth: 0,
   },
 }
 
@@ -62,12 +63,13 @@ export const TabHeader: React.FC<Props> = ({
     <FocusZone style={{ flex: 1 }}>
       <Stack
         grow
-        wrap={!compact}
+        // wrap={!compact}
         horizontal
         verticalFill
         horizontalAlign="stretch"
         verticalAlign="stretch"
         styles={headerStyles}
+        data-component="TabHeader"
       >
         {compact ? (
           <TabSelector

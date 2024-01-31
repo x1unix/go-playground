@@ -1,10 +1,11 @@
 import React, { useMemo, useCallback } from 'react'
-import { Stack, FontSizes, IconButton, useTheme, type IStackStyles, type IButtonStyles } from '@fluentui/react'
+import { Stack, Text, FontSizes, IconButton, useTheme, type IStackStyles, type IButtonStyles } from '@fluentui/react'
 
 const labelCellStyles: IStackStyles = {
   root: {
     flex: 1,
     fontSize: FontSizes.smallPlus,
+    minWidth: 0,
   },
 }
 
@@ -101,7 +102,11 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
       aria-label={`Switch to tab ${label}`}
       data-is-focusable
     >
-      <Stack.Item styles={labelCellStyles}>{label}</Stack.Item>
+      <Stack.Item styles={labelCellStyles}>
+        <Text block nowrap variant="smallPlus">
+          {label}
+        </Text>
+      </Stack.Item>
       {canClose ? (
         <Stack.Item>
           <IconButton
