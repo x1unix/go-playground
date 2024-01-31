@@ -26,5 +26,6 @@ export const containerStyles: IStackStyles = {
     height: '100%',
     overflow: 'hidden',
     flex: 1,
+    minWidth: 160,
   },
 }

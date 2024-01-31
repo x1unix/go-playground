@@ -5,7 +5,7 @@ const segmentLength = 'time.Now()'.length
 const issueUrl = Uri.parse(`${environment.urls.github}/issues/104`)
 const timeNowUsageWarning =
   'Warning: `time.Now()` will always return fake time. ' +
-  'Change current environment to WebAssembly in settings to use real date and time.'
+  'Change current environment to WebAssembly to use real date and time.'
 
 /**
  * Checks if passed source code contains `time.Now()` calls and returns

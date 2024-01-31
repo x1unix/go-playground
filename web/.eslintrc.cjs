@@ -68,6 +68,7 @@ module.exports = {
     '@typescript-eslint/no-confusing-void-expression': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
     'import/no-named-as-default-member': 'off',
+    '@typescript-eslint/array-type': 'off',
     '@typescript-eslint/ban-types': [
       "error",
       {

@@ -1,15 +1,27 @@
 import React, { useMemo, useCallback } from 'react'
-import { Stack, FontSizes, IconButton, useTheme, type IStackStyles, type IButtonStyles } from '@fluentui/react'
+import {
+  Stack,
+  FontIcon,
+  Text,
+  FontSizes,
+  IconButton,
+  useTheme,
+  type IStackStyles,
+  type IButtonStyles,
+} from '@fluentui/react'
+import type { TabIconStyles } from '../types.ts'
 
 const labelCellStyles: IStackStyles = {
   root: {
     flex: 1,
     fontSize: FontSizes.smallPlus,
+    minWidth: 0,
   },
 }
 
 interface Props {
   label: string
+  icon?: TabIconStyles
   active?: boolean
   canClose?: boolean
   disabled?: boolean
@@ -17,7 +29,7 @@ interface Props {
   onClose?: () => void
 }
 
-export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, onClose, canClose }) => {
+export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, onClose, canClose, icon }) => {
   const theme = useTheme()
 
   const containerStyles: IStackStyles = useMemo(() => {
@@ -80,6 +92,8 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
     }
   }, [active])
 
+  const iconStyle = active ? icon?.active : icon?.inactive
+
   const handleClose = useCallback(
     (e) => {
       e.stopPropagation()
@@ -97,10 +111,24 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
       verticalAlign="center"
       styles={containerStyles}
       onClick={onClick}
-      aria-label={`Switch to tab ${label}`}
+      title={label}
+      aria-label={label}
       data-is-focusable
     >
-      <Stack.Item styles={labelCellStyles}>{label}</Stack.Item>
+      {iconStyle && (
+        <Stack.Item>
+          <FontIcon
+            aria-hidden
+            iconName={iconStyle.icon}
+            style={{ color: iconStyle.color, paddingRight: '.3rem', fontSize: '.8em' }}
+          />
+        </Stack.Item>
+      )}
+      <Stack.Item styles={labelCellStyles}>
+        <Text block nowrap variant="smallPlus">
+          {label}
+        </Text>
+      </Stack.Item>
       {canClose ? (
         <Stack.Item>
           <IconButton

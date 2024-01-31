@@ -22,9 +22,19 @@
   padding: 10px 15px 0 15px;
 }
 
+.InspectorPanel--horizontal {
+  max-width: 80%;
+}
+
+.InspectorPanel--vertical {
+  max-height: 80%;
+}
+
 /** Collapsed state **/
 .InspectorPanel.InspectorPanel--collapsed {
   height: auto !important;
+  max-width: none !important;
+  max-height: none !important;
 }
 
 .InspectorPanel.InspectorPanel--collapsed:before {

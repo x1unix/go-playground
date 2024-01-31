@@ -56,7 +56,7 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "GENERATE_SOURCEMAP=false vite build",
+    "build": "vite build",
     "serve": "vite preview",
     "lint": "npx eslint .",
     "gen:suggestions": "node ./src/editor/internal/genpkgcache.js"
