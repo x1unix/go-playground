@@ -23,7 +23,7 @@ interface Props extends WorkspaceState {
 }
 
 const Workspace: React.FC<Props> = ({ dispatch, files, selectedFile, snippet }) => {
-  const { palette, semanticColors  } = useTheme()
+  const { palette, semanticColors } = useTheme()
   const uploadRef = useRef<HTMLInputElement>(null)
   const [modalOpen, setModalOpen] = useState(false)
 
