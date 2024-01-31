@@ -17,7 +17,6 @@ import { FlexContainer } from '../FlexContainer'
 import { NewFileModal } from '../NewFileModal'
 import { ContentPlaceholder } from '../ContentPlaceholder'
 import { newEmptyFileContent } from './utils'
-import {tab} from "@testing-library/user-event/dist/tab";
 
 interface Props extends WorkspaceState {
   dispatch: StateDispatch
@@ -31,11 +30,11 @@ const Workspace: React.FC<Props> = ({ dispatch, files, selectedFile, snippet }) 
   const tabIconStyles: TabIconStyles = {
     active: {
       icon: 'FileCode',
-      color: palette.blueLight,
+      color: palette.themePrimary,
     },
     inactive: {
       icon: 'FileCode',
-      color: semanticColors.bodyText,
+      color: semanticColors.disabledText,
     },
   }
 
