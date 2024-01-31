@@ -6,6 +6,8 @@ import {
   FontSizes,
   IconButton,
   useTheme,
+  MotionAnimations,
+  MotionDurations,
   type IStackStyles,
   type IButtonStyles,
 } from '@fluentui/react'
@@ -49,6 +51,8 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
         borderBottomColor: active ? background : semanticColors.variantBorder,
         padding: '.3rem .3rem .3rem .5rem',
         fontSize: FontSizes.smallPlus,
+        animation: MotionAnimations.slideUpIn,
+        animationDuration: MotionDurations.duration3,
         color: active ? semanticColors.bodyText : palette.neutralSecondary,
         ':hover button': {
           opacity: '1',
