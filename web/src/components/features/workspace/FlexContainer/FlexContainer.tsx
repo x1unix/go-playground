@@ -1,12 +1,21 @@
-import React, { type FC, type PropsWithChildren } from 'react'
+import React from 'react'
 
-export const FlexContainer: FC<PropsWithChildren<{}>> = ({ children }) => (
-  <div
-    style={{
-      flex: '1 1',
-      overflow: 'hidden',
-    }}
-  >
-    {children}
-  </div>
-)
+type Props = Omit<React.HTMLAttributes<HTMLDivElement>, 'style'>
+
+export const FlexContainer = React.forwardRef<HTMLDivElement, Props>(function FlexContainer(
+  { children, ...props },
+  ref,
+) {
+  return (
+    <div
+      ref={ref}
+      style={{
+        flex: '1 1',
+        overflow: 'hidden',
+      }}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+})
