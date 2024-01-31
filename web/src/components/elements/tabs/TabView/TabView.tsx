@@ -12,6 +12,7 @@ interface Props {
   selectedTab?: string | null
   allowEmpty?: boolean
   responsive?: boolean
+  placeholder?: string
   onSelected?: (key: string, i: number) => void
   onClosed?: (key: string, i: number) => void
 }

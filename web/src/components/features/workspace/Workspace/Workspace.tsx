@@ -88,6 +88,7 @@ const Workspace: React.FC<Props> = ({ dispatch, files, selectedFile, snippet }) 
       selectedTab={selectedFile}
       onClosed={onTabClose}
       onSelected={onTabChange}
+      placeholder="No files"
       disabled={(snippet?.loading ?? false) || !!snippet?.error}
     >
       {tabs?.length ? (

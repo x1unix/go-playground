@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { useTheme, Stack, Dropdown, type IStackStyles, type IDropdownStyles } from '@fluentui/react';
+import { useTheme, Stack, Dropdown, type IStackStyles, type IDropdownStyles } from '@fluentui/react'
 import type { TabInfo, TabKey } from '../types'
 import { TabActionBar } from '../TabActionBar'
 

@@ -13,6 +13,7 @@ interface Props {
   actions?: TabBarAction[]
   selectedTab?: TabKey | null
   allowEmpty?: boolean
+  placeholder?: string
   onSelected?: (key: TabKey, i: number) => void
   onClosed?: (key: TabKey, i: number) => void
 }
@@ -30,6 +31,7 @@ export const TabHeader: React.FC<Props> = ({
   selectedTab,
   onSelected,
   onClosed,
+  placeholder,
   compact,
   disabled,
 }) => {
@@ -61,7 +63,7 @@ export const TabHeader: React.FC<Props> = ({
             tabs={tabs}
             disabled={disabled}
             selectedTab={selectedTab}
-            placeholder="No files available"
+            placeholder={placeholder}
             onSelected={onSelected}
             onClosed={onClosed}
           />
