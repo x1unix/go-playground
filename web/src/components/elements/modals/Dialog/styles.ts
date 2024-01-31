@@ -1,4 +1,4 @@
-import { FontWeights, FontSizes, mergeStyleSets, type ITheme } from '@fluentui/react'
+import { MotionAnimations, MotionDurations, FontWeights, FontSizes, mergeStyleSets, type ITheme } from '@fluentui/react'
 
 export const getIconButtonStyles = (theme?: ITheme) =>
   mergeStyleSets({
@@ -21,6 +21,8 @@ export const getContentStyles = (theme: ITheme) =>
       alignItems: 'stretch',
       width: '95%',
       maxWidth: '480px',
+      animation: MotionAnimations.slideDownIn,
+      animationDuration: MotionDurations.duration3,
     },
     header: [
       theme.fonts.xLargePlus,

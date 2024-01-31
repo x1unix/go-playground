@@ -1,5 +1,15 @@
 import React, { useMemo } from 'react'
-import { IconButton, FontWeights, FontSizes, mergeStyleSets, useTheme, Stack, DefaultButton } from '@fluentui/react'
+import {
+  MotionAnimations,
+  MotionDurations,
+  IconButton,
+  FontWeights,
+  FontSizes,
+  mergeStyleSets,
+  useTheme,
+  Stack,
+  DefaultButton,
+} from '@fluentui/react'
 import { Modal } from '@fluentui/react/lib/Modal'
 import { Link } from '@fluentui/react/lib/Link'
 
@@ -23,6 +33,10 @@ export const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) =>
   const modalStyles = useMemo(
     () =>
       mergeStyleSets({
+        container: {
+          animation: MotionAnimations.slideDownIn,
+          animationDuration: MotionDurations.duration3,
+        },
         main: {
           maxWidth: '640px',
         },
@@ -55,6 +69,7 @@ export const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) =>
       isOpen={props.isOpen}
       onDismiss={props.onClose}
       styles={modalStyles}
+      containerClassName={modalStyles.container}
     >
       <div className={contentStyles.header}>
         <span id={TITLE_ID}>About</span>
