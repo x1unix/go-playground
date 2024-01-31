@@ -13,26 +13,30 @@ export const getIconButtonStyles = (theme?: ITheme) =>
     },
   })
 
-export const getContentStyles = (theme?: ITheme) =>
+export const getContentStyles = (theme: ITheme) =>
   mergeStyleSets({
     container: {
       display: 'flex',
       flexFlow: 'column nowrap',
       alignItems: 'stretch',
-      width: '80%',
+      width: '95%',
       maxWidth: '480px',
     },
     header: [
-      theme?.fonts.xLargePlus,
+      theme.fonts.xLargePlus,
       {
         flex: '1 1 auto',
-        borderTop: `4px solid ${theme?.palette.themePrimary}`,
-        color: theme?.palette.neutralPrimary,
+        borderTop: `4px solid ${theme.palette.themePrimary}`,
+        background: theme?.semanticColors.bodyBackground,
+        color: theme.palette.neutralPrimary,
         display: 'flex',
         fontSize: FontSizes.xLarge,
         alignItems: 'center',
         fontWeight: FontWeights.semibold,
         padding: '12px 12px 14px 24px',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1,
       },
     ],
     body: {
