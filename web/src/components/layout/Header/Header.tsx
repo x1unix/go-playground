@@ -6,16 +6,12 @@ import { newAddNotificationAction, NotificationType } from '~/store/notification
 import { SettingsModal, type SettingsChanges } from '~/components/features/settings/SettingsModal'
 import { ThemeableComponent } from '~/components/utils/ThemeableComponent'
 import { AboutModal } from '~/components/modals/AboutModal'
+import { ExamplesModal } from '~/components/features/examples/ExamplesModal'
 import { RunTargetSelector } from '~/components/elements/inputs/RunTargetSelector'
 import { SharePopup } from '~/components/utils/SharePopup'
 
 import { dispatchTerminalSettingsChange } from '~/store/terminal'
-import {
-  dispatchImportSource,
-  dispatchLoadSnippet,
-  dispatchFormatFile,
-  dispatchShareSnippet,
-} from '~/store/workspace/dispatchers'
+import { dispatchFormatFile, dispatchShareSnippet } from '~/store/workspace/dispatchers'
 import {
   Connect,
   type Dispatcher,
@@ -24,8 +20,6 @@ import {
   newSettingsChangeDispatcher,
   runFileDispatcher,
 } from '~/store'
-
-import { getSnippetsMenuItems, type SnippetMenuItem } from './utils'
 
 import './Header.css'
 
@@ -37,6 +31,7 @@ const BTN_SHARE_CLASSNAME = 'Header__btn--share'
 interface HeaderState {
   showSettings?: boolean
   showAbout?: boolean
+  showExamples?: boolean
   loading?: boolean
   showShareMessage?: boolean
   goVersions?: VersionsInfo
@@ -60,10 +55,6 @@ interface Props {
   snippetName: ui?.shareCreated && ui?.snippetId,
 }))
 export class Header extends ThemeableComponent<any, HeaderState> {
-  private readonly snippetMenuItems = getSnippetsMenuItems((i) => {
-    this.onSnippetMenuItemClick(i)
-  })
-
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -93,11 +84,6 @@ export class Header extends ThemeableComponent<any, HeaderState> {
           }),
         ),
       )
-  }
-
-  onSnippetMenuItemClick(item: SnippetMenuItem) {
-    const dispatcher = item.snippet ? dispatchLoadSnippet(item.snippet) : dispatchImportSource(item.files ?? {})
-    this.props.dispatch(dispatcher)
   }
 
   get isDisabled() {
@@ -135,8 +121,8 @@ export class Header extends ThemeableComponent<any, HeaderState> {
           iconName: 'TestExploreSolid',
         },
         disabled: this.isDisabled,
-        subMenuProps: {
-          items: this.snippetMenuItems,
+        onClick: () => {
+          this.setState({ showExamples: true })
         },
       },
       {
@@ -222,7 +208,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
   }
 
   render() {
-    const { showShareMessage } = this.state
+    const { showShareMessage, showAbout, showSettings, showExamples } = this.state
     const { snippetName } = this.props
     return (
       <header className="header" style={{ backgroundColor: this.theme.palette.white }}>
@@ -245,14 +231,15 @@ export class Header extends ThemeableComponent<any, HeaderState> {
           onClose={(args) => {
             this.onSettingsClose(args)
           }}
-          isOpen={this.state.showSettings}
+          isOpen={showSettings}
         />
         <AboutModal
           onClose={() => {
             this.setState({ showAbout: false })
           }}
-          isOpen={this.state.showAbout}
+          isOpen={showAbout}
         />
+        <ExamplesModal isOpen={showExamples} onDismiss={() => this.setState({ showExamples: false })} />
       </header>
     )
   }

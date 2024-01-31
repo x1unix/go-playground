@@ -1,6 +1,7 @@
 import { replace } from 'connected-react-router'
 import type { DispatchFn, StateProvider } from '~/store/helpers'
 import client from '~/services/api'
+import { getSnippetFromSource, type SnippetSource } from '~/services/examples'
 import {
   newAddNotificationAction,
   newNotificationId,
@@ -11,6 +12,43 @@ import { newLoadingAction, newErrorAction, newUIStateChangeAction } from '~/stor
 import { type SnippetLoadPayload, type FileUpdatePayload, WorkspaceAction } from '../actions'
 import { loadWorkspaceState } from '../config'
 
+/**
+ * Dispatch snippet load from a predefined source.
+ * Used to load examples hosted as static files.
+ * @param source
+ */
+export const dispatchLoadSnippetFromSource = (source: SnippetSource) => async (dispatch: DispatchFn) => {
+  dispatch({
+    type: WorkspaceAction.SNIPPET_LOAD_START,
+    payload: source.basePath,
+  })
+
+  try {
+    const files = await getSnippetFromSource(source)
+    dispatch<SnippetLoadPayload>({
+      type: WorkspaceAction.SNIPPET_LOAD_FINISH,
+      payload: {
+        id: source.basePath,
+        error: null,
+        files,
+      },
+    })
+  } catch (err: any) {
+    dispatch<SnippetLoadPayload>({
+      type: WorkspaceAction.SNIPPET_LOAD_FINISH,
+      payload: {
+        id: source.basePath,
+        error: `${err.message}`,
+      },
+    })
+  }
+}
+
+/**
+ * Dispatch snippet load from a snippet ID.
+ * Loads shared snippets from Go Playground API.
+ * @param snippetId
+ */
 export const dispatchLoadSnippet = (snippetId: string | null) => async (dispatch: DispatchFn, _: StateProvider) => {
   if (!snippetId) {
     dispatch({

@@ -2,189 +2,194 @@
   "Templates": [
     {
       "label": "New Empty Test",
-      "type": "test",
-      "files": {
-        "main_test.go": "package main\n\nimport \"testing\"\n\nfunc TestExample(t *testing.T) {\n\tt.Log(\"this is unit test sample\")\n}\n"
+      "icon": "TestPlan",
+      "iconColor": "#00cc6a",
+      "source": {
+        "basePath": "example-test",
+        "files": [
+          "main_test.go"
+        ]
       }
     },
     {
       "label": "Example Test",
-      "type": "test",
-      "snippet": "GFuPdlBlyMU"
-    },
-    {
-      "label": "Hello World",
-      "snippet": "NeviD0awXjt"
-    }
-  ],
-  "Basic Examples": [
-    {
-      "label": "Hello World",
-      "snippet": "NeviD0awXjt"
-    },
-    {
-      "label": "Maps",
-      "snippet": "agK2Ro2i-Lu"
-    },
-    {
-      "label": "Sorting",
-      "snippet": "_gY0tANzJ4l"
-    },
-    {
-      "label": "Custom sort",
-      "snippet": "h4g4vaLBtkw"
-    },
-    {
-      "label": "Recursion",
-      "snippet": "smWim1q9ofu"
-    },
-    {
-      "label": "Structs & methods",
-      "snippet": "4wmDCAydC1e"
-    },
-    {
-      "label": "Interfaces",
-      "snippet": "XJASG4MxBQr"
-    },
-    {
-      "label": "Generics",
-      "snippet": "-HOv2JpMQih"
-    },
-    {
-      "label": "Errors",
-      "snippet": "NiJOpCPO3L0"
-    },
-    {
-      "label": "Defer",
-      "snippet": "5SDVfc_jxbg"
-    },
-    {
-      "label": "Panic & recover",
-      "snippet": "Sk-SVdofEIZ"
+      "icon": "TestPlan",
+      "iconColor": "#00cc6a",
+      "id": "GFuPdlBlyMU"
     }
   ],
   "Playground features": [
     {
       "label": "Display image",
-      "snippet": "XN6x3L23Vok",
-      "icon": "FileImage"
+      "id": "XN6x3L23Vok",
+      "icon": "FileImage",
+      "iconColor": "#00bcf2"
     },
     {
       "label": "WebAssembly",
-      "snippet": "CmRxNZQXvqB",
-      "icon": "JS"
+      "id": "CmRxNZQXvqB",
+      "icon": "JS",
+      "iconColor": "#654ff0"
+    }
+  ],
+  "Language Basics": [
+    {
+      "label": "Hello World",
+      "id": "NeviD0awXjt",
+      "icon": "Emoji2",
+      "iconColor": "#ff8c00"
+    },
+    {
+      "label": "Maps",
+      "id": "agK2Ro2i-Lu"
+    },
+    {
+      "label": "Sorting",
+      "id": "_gY0tANzJ4l"
+    },
+    {
+      "label": "Custom sort",
+      "id": "h4g4vaLBtkw"
+    },
+    {
+      "label": "Recursion",
+      "id": "smWim1q9ofu"
+    },
+    {
+      "label": "Structs & methods",
+      "id": "4wmDCAydC1e"
+    },
+    {
+      "label": "Interfaces",
+      "id": "XJASG4MxBQr"
+    },
+    {
+      "label": "Generics",
+      "id": "-HOv2JpMQih"
+    },
+    {
+      "label": "Errors",
+      "id": "NiJOpCPO3L0"
+    },
+    {
+      "label": "Defer",
+      "id": "5SDVfc_jxbg"
+    },
+    {
+      "label": "Panic & recover",
+      "id": "Sk-SVdofEIZ"
     }
   ],
   "Concurrency": [
       {
         "label": "Goroutines",
-        "snippet": "I7scqRijEJt"
+        "id": "I7scqRijEJt"
       },
       {
         "label": "Channels",
-        "snippet": "MaLY7AiAkHM"
+        "id": "MaLY7AiAkHM"
       },
       {
         "label": "Buffered channels",
-        "snippet": "3BRCdRnRszb"
+        "id": "3BRCdRnRszb"
       },
       {
         "label": "Select",
-        "snippet": "FzONhs4-tae"
+        "id": "FzONhs4-tae"
       },
       {
         "label": "Timeouts",
-        "snippet": "4oOz0j29MJ6"
+        "id": "4oOz0j29MJ6"
       },
       {
         "label": "Non-blocking channel operations",
-        "snippet": "TFv6-7OVNVq"
+        "id": "TFv6-7OVNVq"
       },
       {
         "label": "Closing channels",
-        "snippet": "yQMclmwOYs9"
+        "id": "yQMclmwOYs9"
       },
       {
         "label": "Timers",
-        "snippet": "gF7VLRz3URM"
+        "id": "gF7VLRz3URM"
       },
       {
         "label": "Tickers",
-        "snippet": "gs6zoJP-Pl9"
+        "id": "gs6zoJP-Pl9"
       },
       {
         "label": "Worker pools",
-        "snippet": "hiSJJsYZJKL"
+        "id": "hiSJJsYZJKL"
       },
       {
         "label": "Rate limit",
-        "snippet": "20c_m1AtOEI"
+        "id": "20c_m1AtOEI"
       },
       {
         "label": "Atomics",
-        "snippet": "j-14agntvEO"
+        "id": "j-14agntvEO"
       },
       {
         "label": "Mutexes",
-        "snippet": "0WEmOOjoCjp"
+        "id": "0WEmOOjoCjp"
       },
       {
         "label": "Stateful goroutines",
-        "snippet": "5mf_P9xqBzk"
+        "id": "5mf_P9xqBzk"
       },
       {
         "label": "Context",
-        "snippet": "0_bu1o8rIBO"
+        "id": "0_bu1o8rIBO"
       }
   ],
   "Other examples": [
     {
       "label": "Random number",
-      "snippet": "PGklfJzErTN"
+      "id": "PGklfJzErTN"
     },
     {
       "label": "Number parsing",
-      "snippet": "ZAMEid6Fpmu"
+      "id": "ZAMEid6Fpmu"
     },
     {
       "label": "Regular expressions",
-      "snippet": "LEKGY_d3Nu_P"
+      "id": "LEKGY_d3Nu_P"
     },
     {
       "label": "JSON",
-      "snippet": "JOQpRGJWAxR"
+      "id": "JOQpRGJWAxR"
     },
     {
       "label": "HTTP Client",
-      "snippet": "kHCcVLoz7nd"
+      "id": "kHCcVLoz7nd"
     },
     {
       "label": "Time",
-      "snippet": "YAM3s1KPc8c"
+      "id": "YAM3s1KPc8c"
     },
     {
       "label": "Time formatting",
-      "snippet": "BoZYtr_2j66"
+      "id": "BoZYtr_2j66"
     },
     {
       "label": "SHA1 hash",
-      "snippet": "XLftf8Gvj4y"
+      "id": "XLftf8Gvj4y"
     },
     {
       "label": "Base64 encoding",
-      "snippet": "S7ff3UgzNlG"
+      "id": "S7ff3UgzNlG"
     },
     {
       "label": "Writing files",
-      "snippet": "fQ7sd4gXv0F"
+      "id": "fQ7sd4gXv0F"
     },
     {
       "label": "Reading files",
-      "snippet": "kF0cDC0drsX"
+      "id": "kF0cDC0drsX"
     },
     {
       "label": "Signals",
-      "snippet": "YRV64KEXJW1"
+      "id": "YRV64KEXJW1"
     }
   ]
 
