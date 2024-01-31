@@ -1,24 +1,55 @@
-import React, { useMemo } from 'react'
-import { useTheme, Stack, Dropdown, type IStackStyles, type IDropdownStyles } from '@fluentui/react'
+import React, { useMemo, useCallback } from 'react'
+import {
+  useTheme,
+  Text,
+  Stack,
+  FontIcon,
+  Dropdown,
+  mergeStyles,
+  DefaultSpacing,
+  type IStackStyles,
+  type IDropdownStyles,
+  type IDropdownOption,
+} from '@fluentui/react'
 import type { TabInfo, TabKey } from '../types'
 import { TabActionBar } from '../TabActionBar'
 
 interface Props {
   tabs?: TabInfo[] | null
   disabled?: boolean
+  icon?: string
   placeholder?: string
   selectedTab?: TabKey | null
   onSelected?: (key: TabKey, i: number) => void
   onClosed?: (key: TabKey, i: number) => void
 }
 
+const tabLabelStyles = mergeStyles({
+  flex: 1,
+  alignSelf: 'baseline',
+  paddingLeft: DefaultSpacing.s1,
+  // Prevent overflow
+  minWidth: 0,
+})
+
 const containerStyles: IStackStyles = {
   root: {
     flex: 1,
+
+    // Prevent children width overflow
+    minWidth: 0,
   },
 }
 
-export const TabSelector: React.FC<Props> = ({ tabs, disabled, selectedTab, placeholder, onClosed, onSelected }) => {
+export const TabSelector: React.FC<Props> = ({
+  tabs,
+  disabled,
+  icon,
+  selectedTab,
+  placeholder,
+  onClosed,
+  onSelected,
+}) => {
   const theme = useTheme()
   const dropdownStyles: Partial<IDropdownStyles> = useMemo(() => {
     const { semanticColors, palette } = theme
@@ -27,6 +58,9 @@ export const TabSelector: React.FC<Props> = ({ tabs, disabled, selectedTab, plac
         borderColor: semanticColors.variantBorder,
         borderRightColor: palette.white,
         borderRadius: 0,
+      },
+      label: {
+        display: 'flex',
       },
       dropdown: {
         '&:hover .ms-Dropdown-title': {
@@ -42,6 +76,33 @@ export const TabSelector: React.FC<Props> = ({ tabs, disabled, selectedTab, plac
       },
     }
   }, [theme])
+
+  const onRenderTitle = useCallback(
+    (opts?: IDropdownOption<any>[]) => {
+      const label = opts?.[0].text
+      if (!label) {
+        return null
+      }
+
+      if (!icon) {
+        return <span>{label}</span>
+      }
+
+      return (
+        <Stack grow horizontal verticalAlign="center" horizontalAlign="stretch">
+          <Stack.Item>
+            <FontIcon aria-hidden iconName={icon} style={{ color: '#00bcf2' }} />
+          </Stack.Item>
+          <Stack.Item className={tabLabelStyles}>
+            <Text block nowrap>
+              {label}
+            </Text>
+          </Stack.Item>
+        </Stack>
+      )
+    },
+    [icon],
+  )
 
   const options = useMemo(() => {
     return (
@@ -63,17 +124,26 @@ export const TabSelector: React.FC<Props> = ({ tabs, disabled, selectedTab, plac
   ]
 
   return (
-    <Stack grow wrap horizontal verticalFill horizontalAlign="stretch" verticalAlign="stretch" styles={containerStyles}>
+    <Stack
+      grow
+      horizontal
+      verticalFill
+      horizontalAlign="stretch"
+      verticalAlign="stretch"
+      styles={containerStyles}
+      data-component="TabSelector"
+    >
       <Stack.Item>
         <TabActionBar disabled={disabled || !selectedTab} actions={actions} />
       </Stack.Item>
-      <Stack.Item style={{ flex: '1' }}>
+      <Stack.Item style={{ flex: '1', minWidth: 0 }}>
         <Dropdown
           options={options}
           disabled={disabled || !selectedTab}
           selectedKey={selectedTab}
           placeholder={placeholder}
           styles={dropdownStyles}
+          onRenderTitle={onRenderTitle}
           onChange={(_, opt) => {
             opt && onSelected?.(opt.key as TabKey, 0)
           }}

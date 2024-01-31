@@ -9,6 +9,7 @@ import type { TabBarAction, TabInfo, TabKey } from '../types'
 interface Props {
   compact?: boolean
   disabled?: boolean
+  icon?: string
   tabs?: TabInfo[] | null
   actions?: TabBarAction[]
   selectedTab?: TabKey | null
@@ -26,6 +27,7 @@ const tabContainerStyles: IStackStyles = {
 
 export const TabHeader: React.FC<Props> = ({
   tabs,
+  icon,
   actions,
   allowEmpty,
   selectedTab,
@@ -42,6 +44,7 @@ export const TabHeader: React.FC<Props> = ({
         flex: '1 0',
         flexShrink: 0,
         background: semanticColors.bodyStandoutBackground,
+        minWidth: 160,
       },
       inner: {
         justifyContent: 'flex-end',
@@ -57,10 +60,19 @@ export const TabHeader: React.FC<Props> = ({
 
   return (
     <FocusZone style={{ flex: 1 }}>
-      <Stack grow wrap horizontal verticalFill horizontalAlign="stretch" verticalAlign="stretch" styles={headerStyles}>
+      <Stack
+        grow
+        wrap={!compact}
+        horizontal
+        verticalFill
+        horizontalAlign="stretch"
+        verticalAlign="stretch"
+        styles={headerStyles}
+      >
         {compact ? (
           <TabSelector
             tabs={tabs}
+            icon={icon}
             disabled={disabled}
             selectedTab={selectedTab}
             placeholder={placeholder}
@@ -72,6 +84,7 @@ export const TabHeader: React.FC<Props> = ({
             <Stack.Item key={key} styles={tabContainerStyles}>
               <TabLabel
                 label={label}
+                icon={icon}
                 active={key === selectedTab}
                 canClose={allowEmpty || tabs?.length > 1}
                 disabled={disabled}

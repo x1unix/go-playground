@@ -13,6 +13,7 @@ interface Props {
   tabs?: TabInfo[] | null
   disabled?: boolean
   selectedTab?: string | null
+  icon?: string
   allowEmpty?: boolean
   responsive?: boolean
   placeholder?: string

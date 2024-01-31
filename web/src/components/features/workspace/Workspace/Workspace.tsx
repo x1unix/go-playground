@@ -85,6 +85,7 @@ const Workspace: React.FC<Props> = ({ dispatch, files, selectedFile, snippet }) 
       responsive
       actions={actions}
       tabs={tabs}
+      icon="FileCode"
       selectedTab={selectedFile}
       onClosed={onTabClose}
       onSelected={onTabChange}

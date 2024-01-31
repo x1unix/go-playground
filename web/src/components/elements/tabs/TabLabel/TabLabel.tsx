@@ -10,6 +10,7 @@ const labelCellStyles: IStackStyles = {
 
 interface Props {
   label: string
+  icon?: string
   active?: boolean
   canClose?: boolean
   disabled?: boolean
