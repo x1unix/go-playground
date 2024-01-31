@@ -3,7 +3,7 @@ import { Stack, useTheme } from '@fluentui/react'
 import { FlexContainer } from '~/components/features/workspace/FlexContainer'
 
 import { TabHeader } from '../TabHeader'
-import { type TabBarAction, type TabInfo } from '../types'
+import type { TabBarAction, TabInfo, TabIconStyles } from '../types'
 
 import { containerStyles, tabHeaderStyles, getTabContentStyles } from './styles'
 import { debounce } from './debounce.ts'
@@ -13,7 +13,7 @@ interface Props {
   tabs?: TabInfo[] | null
   disabled?: boolean
   selectedTab?: string | null
-  icon?: string
+  icon?: TabIconStyles
   allowEmpty?: boolean
   responsive?: boolean
   placeholder?: string

@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react'
+import { useTheme } from '@fluentui/react'
 import { type StateDispatch, connect } from '~/store'
 import {
   type WorkspaceState,
@@ -9,21 +10,34 @@ import {
 } from '~/store/workspace'
 
 import { TabView } from '~/components/elements/tabs/TabView'
-import type { TabBarAction } from '~/components/elements/tabs/types'
+import type { TabBarAction, TabIconStyles } from '~/components/elements/tabs/types'
 
 import { CodeEditor } from '../CodeEditor'
 import { FlexContainer } from '../FlexContainer'
 import { NewFileModal } from '../NewFileModal'
 import { ContentPlaceholder } from '../ContentPlaceholder'
 import { newEmptyFileContent } from './utils'
+import {tab} from "@testing-library/user-event/dist/tab";
 
 interface Props extends WorkspaceState {
   dispatch: StateDispatch
 }
 
 const Workspace: React.FC<Props> = ({ dispatch, files, selectedFile, snippet }) => {
+  const { palette, semanticColors  } = useTheme()
   const uploadRef = useRef<HTMLInputElement>(null)
   const [modalOpen, setModalOpen] = useState(false)
+
+  const tabIconStyles: TabIconStyles = {
+    active: {
+      icon: 'FileCode',
+      color: palette.blueLight,
+    },
+    inactive: {
+      icon: 'FileCode',
+      color: semanticColors.bodyText,
+    },
+  }
 
   const tabs = useMemo(
     () =>
@@ -85,7 +99,7 @@ const Workspace: React.FC<Props> = ({ dispatch, files, selectedFile, snippet }) 
       responsive
       actions={actions}
       tabs={tabs}
-      icon="FileCode"
+      icon={tabIconStyles}
       selectedTab={selectedFile}
       onClosed={onTabClose}
       onSelected={onTabChange}

@@ -12,3 +12,13 @@ export interface TabInfo {
   key: TabKey
   label: string
 }
+
+export interface TabIconStyle {
+  icon: string
+  color: string
+}
+
+export interface TabIconStyles {
+  active: TabIconStyle
+  inactive: TabIconStyle
+}

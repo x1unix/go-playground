@@ -11,13 +11,13 @@ import {
   type IDropdownStyles,
   type IDropdownOption,
 } from '@fluentui/react'
-import type { TabInfo, TabKey } from '../types'
+import type { TabInfo, TabKey, TabIconStyles } from '../types'
 import { TabActionBar } from '../TabActionBar'
 
 interface Props {
   tabs?: TabInfo[] | null
   disabled?: boolean
-  icon?: string
+  icon?: TabIconStyles
   placeholder?: string
   selectedTab?: TabKey | null
   onSelected?: (key: TabKey, i: number) => void
@@ -88,10 +88,13 @@ export const TabSelector: React.FC<Props> = ({
         return <span>{label}</span>
       }
 
+      const {
+        active: { icon: iconName, color },
+      } = icon
       return (
         <Stack grow horizontal verticalAlign="center" horizontalAlign="stretch">
           <Stack.Item>
-            <FontIcon aria-hidden iconName={icon} style={{ color: '#00bcf2' }} />
+            <FontIcon aria-hidden iconName={iconName} style={{ color }} />
           </Stack.Item>
           <Stack.Item className={tabLabelStyles}>
             <Text block nowrap>

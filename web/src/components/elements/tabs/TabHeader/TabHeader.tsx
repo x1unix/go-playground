@@ -4,12 +4,12 @@ import { useTheme, Stack, FocusZone, type IStackStyles } from '@fluentui/react'
 import { TabLabel } from '../TabLabel'
 import { TabActionBar } from '../TabActionBar'
 import { TabSelector } from '../TabSelector'
-import type { TabBarAction, TabInfo, TabKey } from '../types'
+import type { TabBarAction, TabIconStyles, TabInfo, TabKey } from '../types'
 
 interface Props {
   compact?: boolean
   disabled?: boolean
-  icon?: string
+  icon?: TabIconStyles
   tabs?: TabInfo[] | null
   actions?: TabBarAction[]
   selectedTab?: TabKey | null

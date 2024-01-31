@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 import { Stack, Text, FontSizes, IconButton, useTheme, type IStackStyles, type IButtonStyles } from '@fluentui/react'
+import type { TabIconStyles } from '../types.ts'
 
 const labelCellStyles: IStackStyles = {
   root: {
@@ -11,7 +12,7 @@ const labelCellStyles: IStackStyles = {
 
 interface Props {
   label: string
-  icon?: string
+  icon?: TabIconStyles
   active?: boolean
   canClose?: boolean
   disabled?: boolean
