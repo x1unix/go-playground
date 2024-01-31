@@ -27,7 +27,6 @@ interface Props {
 const tabLabelStyles = mergeStyles({
   flex: 1,
   alignSelf: 'baseline',
-  paddingLeft: DefaultSpacing.s1,
   // Prevent overflow
   minWidth: 0,
 })
@@ -94,7 +93,7 @@ export const TabSelector: React.FC<Props> = ({
       return (
         <Stack grow horizontal verticalAlign="center" horizontalAlign="stretch">
           <Stack.Item>
-            <FontIcon aria-hidden iconName={iconName} style={{ color }} />
+            <FontIcon aria-hidden iconName={iconName} style={{ color, paddingRight: DefaultSpacing.s1 }} />
           </Stack.Item>
           <Stack.Item className={tabLabelStyles}>
             <Text block nowrap>
