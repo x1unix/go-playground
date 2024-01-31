@@ -4,6 +4,7 @@ import { useTheme, Stack, FocusZone, type IStackStyles } from '@fluentui/react'
 import { TabLabel } from '../TabLabel'
 import { TabActionBar } from '../TabActionBar'
 import { TabSelector } from '../TabSelector'
+import { TabPanelPlaceholder } from '../TabPanelPlaceholder'
 import type { TabBarAction, TabIconStyles, TabInfo, TabKey } from '../types'
 
 interface Props {
@@ -63,7 +64,6 @@ export const TabHeader: React.FC<Props> = ({
     <FocusZone style={{ flex: 1 }}>
       <Stack
         grow
-        // wrap={!compact}
         horizontal
         verticalFill
         horizontalAlign="stretch"
@@ -81,7 +81,7 @@ export const TabHeader: React.FC<Props> = ({
             onSelected={onSelected}
             onClosed={onClosed}
           />
-        ) : (
+        ) : tabs?.length ? (
           tabs?.map(({ key, label }, i) => (
             <Stack.Item key={key} styles={tabContainerStyles}>
               <TabLabel
@@ -95,6 +95,8 @@ export const TabHeader: React.FC<Props> = ({
               />
             </Stack.Item>
           ))
+        ) : (
+          <TabPanelPlaceholder key="empty-state-placeholder$" />
         )}
         <Stack.Item styles={cmdToolbarStyles}>
           <TabActionBar actions={actions} disabled={disabled} />
