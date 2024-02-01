@@ -1,5 +1,15 @@
 import React, { useCallback } from 'react'
-import { useTheme, Text, DefaultSpacing, Stack, DefaultButton, type IButtonProps } from '@fluentui/react'
+import {
+  useTheme,
+  mergeStyles,
+  getScreenSelector,
+  Text,
+  DefaultSpacing,
+  Stack,
+  DefaultButton,
+  type IButtonProps,
+  type IStackItemProps,
+} from '@fluentui/react'
 
 import type { Snippet } from '~/services/examples'
 
@@ -18,13 +28,18 @@ const stackStyles = {
   },
 }
 
-const stackItemStyles = {
-  root: {
+const stackItemStyles: IStackItemProps['styles'] = {
+  root: mergeStyles({
     flexGrow: 1,
-    flexBasis: '50%',
     display: 'flex',
     boxSizing: 'border-box',
-  },
+    [getScreenSelector(0, 500)]: {
+      flexBasis: '100%',
+    },
+    [getScreenSelector(500, undefined)]: {
+      flexBasis: '50%',
+    },
+  }),
 }
 
 const renderButtonText = (props?: IButtonProps) => {
