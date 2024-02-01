@@ -5,7 +5,7 @@
       "icon": "TestPlan",
       "iconColor": "#00cc6a",
       "source": {
-        "basePath": "example-test",
+        "basePath": "empty-test",
         "files": [
           "main_test.go"
         ]
@@ -15,21 +15,36 @@
       "label": "Example Test",
       "icon": "TestPlan",
       "iconColor": "#00cc6a",
-      "id": "GFuPdlBlyMU"
+      "source": {
+        "basePath": "example-test",
+        "files": [
+          "example_test.go"
+        ]
+      }
     }
   ],
   "Playground features": [
     {
       "label": "Display image",
-      "id": "XN6x3L23Vok",
       "icon": "PhotoCollection",
-      "iconColor": "#00bcf2"
+      "iconColor": "#00bcf2",
+      "source": {
+        "basePath": "image",
+        "files": [
+          "main.go"
+        ]
+      }
     },
     {
       "label": "WebAssembly",
-      "id": "CmRxNZQXvqB",
       "icon": "SiWebassembly",
-      "iconColor": "#654ff0"
+      "iconColor": "#654ff0",
+      "source": {
+        "basePath": "wasm",
+        "files": [
+          "main.go"
+        ]
+      }
     }
   ],
   "Language Basics": [
