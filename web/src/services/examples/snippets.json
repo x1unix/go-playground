@@ -45,6 +45,17 @@
           "main.go"
         ]
       }
+    },
+    {
+      "label": "Colored output",
+      "icon": "CommandPrompt",
+      "iconColor": "#b4a0ff",
+      "source": {
+        "basePath": "colors",
+        "files": [
+          "main.go"
+        ]
+      }
     }
   ],
   "Language Basics": [
