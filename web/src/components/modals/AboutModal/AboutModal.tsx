@@ -18,7 +18,6 @@ import { getContentStyles, getIconButtonStyles } from '~/styles/modal'
 import environment from '~/environment'
 
 const TITLE_ID = 'AboutTitle'
-const SUB_TITLE_ID = 'AboutSubtitle'
 
 interface AboutModalProps {
   isOpen?: boolean
@@ -41,9 +40,12 @@ export const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) =>
           maxWidth: '640px',
         },
         title: {
-          fontWeight: FontWeights.light,
+          fontWeight: FontWeights.semibold,
           fontSize: FontSizes.xxLargePlus,
-          padding: '1em 2em 2em 2em',
+          padding: '1em 0 2em',
+          color: 'transparent',
+          background:
+            'linear-gradient(to right, rgb(10,97,244) 0%, rgb(16, 187, 187) 100%) repeat scroll 0% 0% / auto padding-box text',
           textAlign: 'center',
         },
         info: {
@@ -65,14 +67,12 @@ export const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) =>
   return (
     <Modal
       titleAriaId={TITLE_ID}
-      subtitleAriaId={SUB_TITLE_ID}
       isOpen={props.isOpen}
       onDismiss={props.onClose}
       styles={modalStyles}
       containerClassName={modalStyles.container}
     >
       <div className={contentStyles.header}>
-        <span id={TITLE_ID}>About</span>
         <IconButton
           iconProps={{ iconName: 'Cancel' }}
           styles={iconButtonStyles}
@@ -80,8 +80,10 @@ export const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) =>
           onClick={props.onClose as any}
         />
       </div>
-      <div id={SUB_TITLE_ID} className={contentStyles.body}>
-        <div className={modalStyles.title}>Better Go Playground</div>
+      <div className={contentStyles.body}>
+        <div id={TITLE_ID} className={modalStyles.title}>
+          Better Go Playground
+        </div>
         <div className={modalStyles.info}>
           <Link href={environment.urls.github} target="_blank">
             <b>GitHub</b>
