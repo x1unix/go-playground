@@ -22,13 +22,13 @@
     {
       "label": "Display image",
       "id": "XN6x3L23Vok",
-      "icon": "FileImage",
+      "icon": "PhotoCollection",
       "iconColor": "#00bcf2"
     },
     {
       "label": "WebAssembly",
       "id": "CmRxNZQXvqB",
-      "icon": "JS",
+      "icon": "SiWebassembly",
       "iconColor": "#654ff0"
     }
   ],
@@ -41,155 +41,229 @@
     },
     {
       "label": "Maps",
-      "id": "agK2Ro2i-Lu"
+      "id": "agK2Ro2i-Lu",
+      "icon": "Table",
+      "iconColor": "#00bcf2"
     },
     {
       "label": "Sorting",
-      "id": "_gY0tANzJ4l"
+      "id": "_gY0tANzJ4l",
+      "icon": "Sort",
+      "iconColor": "#107c10"
     },
     {
       "label": "Custom sort",
-      "id": "h4g4vaLBtkw"
-    },
-    {
-      "label": "Recursion",
-      "id": "smWim1q9ofu"
+      "id": "h4g4vaLBtkw",
+      "icon": "SortLines",
+      "iconColor": "#107c10"
     },
     {
       "label": "Structs & methods",
-      "id": "4wmDCAydC1e"
+      "id": "4wmDCAydC1e",
+      "iconColor": "#b4a0ff",
+      "icon": "VscSymbolClass"
     },
     {
       "label": "Interfaces",
+      "icon": "VscSymbolClass",
+      "iconColor": "#b4a0ff",
       "id": "XJASG4MxBQr"
     },
     {
       "label": "Generics",
-      "id": "-HOv2JpMQih"
+      "id": "-HOv2JpMQih",
+      "icon": "VscSymbolParameter",
+      "iconColor": "#ff6347"
+    },
+    {
+      "label": "Recursion",
+      "id": "smWim1q9ofu",
+      "icon": "RepeatAll",
+      "iconColor": "#008272"
     },
     {
       "label": "Errors",
-      "id": "NiJOpCPO3L0"
+      "id": "NiJOpCPO3L0",
+      "icon": "VscBracketError",
+      "iconColor": "#D83B01"
     },
     {
       "label": "Defer",
-      "id": "5SDVfc_jxbg"
+      "id": "5SDVfc_jxbg",
+      "icon": "SiAzurefunctions",
+      "iconColor": "#ffb900"
     },
     {
       "label": "Panic & recover",
-      "id": "Sk-SVdofEIZ"
+      "id": "Sk-SVdofEIZ",
+      "icon": "Error",
+      "iconColor": "#D83B01"
     }
   ],
   "Concurrency": [
       {
         "label": "Goroutines",
-        "id": "I7scqRijEJt"
+        "id": "I7scqRijEJt",
+        "icon": "SiAzurefunctions",
+        "iconColor": "#00bcf2"
       },
       {
         "label": "Channels",
-        "id": "MaLY7AiAkHM"
+        "id": "MaLY7AiAkHM",
+        "icon": "BranchCompare",
+        "iconColor": "#b4a0ff"
       },
       {
         "label": "Buffered channels",
-        "id": "3BRCdRnRszb"
+        "id": "3BRCdRnRszb",
+        "icon": "BranchCompare",
+        "iconColor": "#b4a0ff"
       },
       {
         "label": "Select",
-        "id": "FzONhs4-tae"
+        "id": "FzONhs4-tae",
+        "icon": "BranchCompare",
+        "iconColor": "#b4a0ff"
       },
       {
         "label": "Timeouts",
-        "id": "4oOz0j29MJ6"
+        "id": "4oOz0j29MJ6",
+        "icon": "BranchCompare",
+        "iconColor": "#b4a0ff"
       },
       {
-        "label": "Non-blocking channel operations",
-        "id": "TFv6-7OVNVq"
+        "label": "Non-blocking read",
+        "id": "TFv6-7OVNVq",
+        "icon": "BranchCompare",
+        "iconColor": "#b4a0ff"
       },
       {
         "label": "Closing channels",
-        "id": "yQMclmwOYs9"
+        "id": "yQMclmwOYs9",
+        "icon": "BranchCompare",
+        "iconColor": "#b4a0ff"
       },
       {
         "label": "Timers",
-        "id": "gF7VLRz3URM"
+        "id": "gF7VLRz3URM",
+        "icon": "BranchCompare",
+        "iconColor": "#b4a0ff"
       },
       {
         "label": "Tickers",
-        "id": "gs6zoJP-Pl9"
+        "id": "gs6zoJP-Pl9",
+        "icon": "BranchCompare",
+        "iconColor": "#b4a0ff"
       },
       {
         "label": "Worker pools",
-        "id": "hiSJJsYZJKL"
+        "id": "hiSJJsYZJKL",
+        "icon": "BranchCompare",
+        "iconColor": "#b4a0ff"
       },
       {
         "label": "Rate limit",
-        "id": "20c_m1AtOEI"
+        "id": "20c_m1AtOEI",
+        "icon": "BranchCompare",
+        "iconColor": "#b4a0ff"
       },
       {
         "label": "Atomics",
-        "id": "j-14agntvEO"
+        "id": "j-14agntvEO",
+        "icon": "BranchLocked",
+        "iconColor": "#ffb900"
       },
       {
         "label": "Mutexes",
-        "id": "0WEmOOjoCjp"
+        "id": "0WEmOOjoCjp",
+        "icon": "BranchLocked",
+        "iconColor": "#ffb900"
       },
       {
         "label": "Stateful goroutines",
-        "id": "5mf_P9xqBzk"
+        "id": "5mf_P9xqBzk",
+        "icon": "Dataflows",
+        "iconColor": "#106ebe"
       },
       {
         "label": "Context",
-        "id": "0_bu1o8rIBO"
+        "id": "0_bu1o8rIBO",
+        "icon": "Dataflows",
+        "iconColor": "#106ebe"
       }
   ],
-  "Other examples": [
+  "Standard Library": [
     {
       "label": "Random number",
-      "id": "PGklfJzErTN"
+      "id": "PGklfJzErTN",
+      "icon": "BsFillDice3Fill",
+      "iconColor": "#a4262c"
     },
     {
       "label": "Number parsing",
-      "id": "ZAMEid6Fpmu"
+      "id": "ZAMEid6Fpmu",
+      "icon": "NumberField",
+      "iconColor": "#d83b01"
     },
     {
       "label": "Regular expressions",
-      "id": "LEKGY_d3Nu_P"
+      "id": "LEKGY_d3Nu_P",
+      "icon": "VscRegex",
+      "iconColor": "#ff8c00"
     },
     {
       "label": "JSON",
-      "id": "JOQpRGJWAxR"
+      "id": "JOQpRGJWAxR",
+      "icon": "Code",
+      "iconColor": "#ffb900"
     },
     {
       "label": "HTTP Client",
-      "id": "kHCcVLoz7nd"
+      "id": "kHCcVLoz7nd",
+      "icon": "Globe",
+      "iconColor": "#00bcf2"
     },
     {
       "label": "Time",
-      "id": "YAM3s1KPc8c"
+      "id": "YAM3s1KPc8c",
+      "icon": "DateTime",
+      "iconColor": "#106ebe"
     },
     {
       "label": "Time formatting",
-      "id": "BoZYtr_2j66"
+      "id": "BoZYtr_2j66",
+      "icon": "DateTime",
+      "iconColor": "#106ebe"
     },
     {
       "label": "SHA1 hash",
-      "id": "XLftf8Gvj4y"
+      "id": "XLftf8Gvj4y",
+      "icon": "NumberSymbol",
+      "iconColor": "#008272"
     },
     {
       "label": "Base64 encoding",
-      "id": "S7ff3UgzNlG"
+      "id": "S7ff3UgzNlG",
+      "icon": "NumberSymbol",
+      "iconColor": "#008272"
     },
     {
       "label": "Writing files",
-      "id": "fQ7sd4gXv0F"
+      "id": "fQ7sd4gXv0F",
+      "icon": "FabricFolderFill",
+      "iconColor": "#ffb900"
     },
     {
       "label": "Reading files",
-      "id": "kF0cDC0drsX"
+      "id": "kF0cDC0drsX",
+      "icon": "FabricFolderFill",
+      "iconColor": "#ffb900"
     },
     {
       "label": "Signals",
-      "id": "YRV64KEXJW1"
+      "id": "YRV64KEXJW1",
+      "icon": "TriggerApproval",
+      "iconColor": "#ff8c00"
     }
   ]
 
