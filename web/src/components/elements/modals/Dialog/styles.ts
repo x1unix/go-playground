@@ -20,7 +20,6 @@ export const getContentStyles = (theme: ITheme) =>
       flexFlow: 'column nowrap',
       alignItems: 'stretch',
       width: '95%',
-      maxWidth: '480px',
       animation: MotionAnimations.slideDownIn,
       animationDuration: MotionDurations.duration3,
     },

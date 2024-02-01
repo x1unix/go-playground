@@ -1,12 +1,12 @@
 import React from 'react'
-import { Checkbox, TextField, Dropdown, Pivot, PivotItem } from '@fluentui/react'
+import { Checkbox, Dropdown, Pivot, PivotItem, TextField } from '@fluentui/react'
 
 import { ThemeableComponent } from '~/components/utils/ThemeableComponent'
 import { Dialog } from '~/components/elements/modals/Dialog'
 import { SettingsProperty } from './SettingsProperty'
 import { DEFAULT_FONT } from '~/services/fonts'
 import type { MonacoSettings } from '~/services/config'
-import type { TerminalSettings, RenderingBackend } from '~/store/terminal'
+import type { RenderingBackend, TerminalSettings } from '~/store/terminal'
 import { Connect, type MonacoParamsChanges, type SettingsState } from '~/store'
 
 import { cursorBlinkOptions, cursorLineOptions, fontOptions, terminalBackendOptions } from './options'
@@ -28,6 +28,12 @@ export interface SettingsProps {
 
 interface SettingsModalState {
   isOpen?: boolean
+}
+
+const modalStyles = {
+  main: {
+    maxWidth: 480,
+  },
 }
 
 @Connect((state) => ({
@@ -85,7 +91,7 @@ export class SettingsModal extends ThemeableComponent<SettingsProps, SettingsMod
   render() {
     const { isOpen } = this.props
     return (
-      <Dialog label="Settings" onDismiss={() => this.onClose()} isOpen={isOpen}>
+      <Dialog label="Settings" onDismiss={() => this.onClose()} isOpen={isOpen} styles={modalStyles}>
         <Pivot aria-label="Settings">
           <PivotItem headerText="General">
             <SettingsProperty

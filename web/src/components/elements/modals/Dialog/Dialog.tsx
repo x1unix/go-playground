@@ -4,7 +4,7 @@ import { Modal, IconButton, useTheme, type IModalProps } from '@fluentui/react'
 
 import { getContentStyles, getIconButtonStyles } from './styles'
 
-interface Props extends Pick<IModalProps, 'isOpen' | 'onDismiss' | 'isBlocking'> {
+interface Props extends IModalProps {
   label: string
   disabled?: boolean
   canClose?: boolean

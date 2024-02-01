@@ -36,8 +36,14 @@ const stackItemStyles: IStackItemProps['styles'] = {
     [getScreenSelector(0, 500)]: {
       flexBasis: '100%',
     },
-    [getScreenSelector(500, undefined)]: {
+    [getScreenSelector(500, 640)]: {
       flexBasis: '50%',
+    },
+    [getScreenSelector(640, 840)]: {
+      flexBasis: '33.3%',
+    },
+    [getScreenSelector(840, undefined)]: {
+      flexBasis: '25%',
     },
   }),
 }

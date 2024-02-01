@@ -1,5 +1,4 @@
 import React from 'react'
-
 import { Dialog } from '~/components/elements/modals/Dialog'
 import { getSnippetsList } from '~/services/examples'
 
@@ -12,9 +11,15 @@ interface Props {
 
 const examples = getSnippetsList()
 
+const modalStyles = {
+  main: {
+    maxWidth: 840,
+  },
+}
+
 export const ExamplesModal: React.FC<Props> = ({ isOpen, onDismiss }) => {
   return (
-    <Dialog label="Examples" isOpen={isOpen} onDismiss={onDismiss}>
+    <Dialog label="Examples" styles={modalStyles} isOpen={isOpen} onDismiss={onDismiss}>
       {Object.entries(examples).map(([label, snippets]) => (
         <ExamplesSection key={label} label={label} snippets={snippets} />
       ))}
