@@ -1,6 +1,7 @@
 import React from 'react'
 import { CommandBar, type ICommandBarItemProps, Stack } from '@fluentui/react'
 
+import type { Snippet } from '~/services/examples'
 import apiClient, { type VersionsInfo } from '~/services/api'
 import { newAddNotificationAction, NotificationType } from '~/store/notifications'
 import { SettingsModal, type SettingsChanges } from '~/components/features/settings/SettingsModal'
@@ -11,7 +12,12 @@ import { RunTargetSelector } from '~/components/elements/inputs/RunTargetSelecto
 import { SharePopup } from '~/components/utils/SharePopup'
 
 import { dispatchTerminalSettingsChange } from '~/store/terminal'
-import { dispatchFormatFile, dispatchShareSnippet } from '~/store/workspace/dispatchers'
+import {
+  dispatchFormatFile,
+  dispatchLoadSnippet,
+  dispatchLoadSnippetFromSource,
+  dispatchShareSnippet,
+} from '~/store/workspace/dispatchers'
 import {
   Connect,
   type Dispatcher,
@@ -207,6 +213,16 @@ export class Header extends ThemeableComponent<any, HeaderState> {
     this.setState({ showSettings: false })
   }
 
+  private onSnippetSelected(snippet: Snippet) {
+    this.setState({ showExamples: false })
+    if (snippet.source) {
+      this.props.dispatch(dispatchLoadSnippetFromSource(snippet.source))
+      return
+    }
+
+    this.props.dispatch(dispatchLoadSnippet(snippet.id))
+  }
+
   render() {
     const { showShareMessage, showAbout, showSettings, showExamples } = this.state
     const { snippetName } = this.props
@@ -239,7 +255,11 @@ export class Header extends ThemeableComponent<any, HeaderState> {
           }}
           isOpen={showAbout}
         />
-        <ExamplesModal isOpen={showExamples} onDismiss={() => this.setState({ showExamples: false })} />
+        <ExamplesModal
+          isOpen={showExamples}
+          onDismiss={() => this.setState({ showExamples: false })}
+          onSelect={(s) => this.onSnippetSelected(s)}
+        />
       </header>
     )
   }

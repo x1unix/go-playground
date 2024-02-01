@@ -16,6 +16,7 @@ import type { Snippet } from '~/services/examples'
 interface Props {
   label: string
   snippets: Snippet[]
+  onSelect?: (snippet: Snippet) => void
 }
 
 const fallbackIcon = 'TestExploreSolid'
@@ -56,7 +57,7 @@ const renderButtonText = (props?: IButtonProps) => {
   )
 }
 
-export const ExamplesSection: React.FC<Props> = ({ label, snippets }) => {
+export const ExamplesSection: React.FC<Props> = ({ label, snippets, onSelect }) => {
   const { semanticColors } = useTheme()
   const needPlaceholder = snippets.length % 2 !== 0
   const textStyles = {
@@ -109,13 +110,14 @@ export const ExamplesSection: React.FC<Props> = ({ label, snippets }) => {
         {label}
       </Text>
       <Stack horizontal wrap grow verticalFill styles={stackStyles}>
-        {snippets.map(({ label, ...snippet }, i) => (
+        {snippets.map((snippet, i) => (
           <Stack.Item key={i} styles={stackItemStyles}>
             <DefaultButton
               styles={btnStyles}
               iconProps={getIconProps(snippet)}
-              text={label}
+              text={snippet.label}
               onRenderText={renderButtonText}
+              onClick={() => onSelect?.(snippet)}
             />
           </Stack.Item>
         ))}
