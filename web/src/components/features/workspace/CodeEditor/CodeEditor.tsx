@@ -151,6 +151,7 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
 
     // Shutdown instance to avoid dangling markers.
     this.monaco?.editor.removeAllMarkers(this.editorInstance.getId())
+    this.monaco?.editor.getModels().forEach((m) => m.dispose())
     this.editorInstance.dispose()
   }
 
