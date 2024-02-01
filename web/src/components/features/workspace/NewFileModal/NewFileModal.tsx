@@ -32,6 +32,12 @@ const validateFileName = (value?: string, validatorFn?: Props['fileNameValidator
   return validatorFn?.(value)
 }
 
+const modalStyles = {
+  main: {
+    maxWidth: 480,
+  },
+}
+
 export const NewFileModal: React.FC<Props> = ({ isOpen, onClose, fileNameValidator }) => {
   const [fileName, setFileName] = useState<string | undefined>()
   const [isDirty, setIsDirty] = useState(false)
@@ -58,6 +64,7 @@ export const NewFileModal: React.FC<Props> = ({ isOpen, onClose, fileNameValidat
     <Dialog
       label="New file"
       isOpen={isOpen}
+      styles={modalStyles}
       onDismiss={() => {
         onClose()
       }}
