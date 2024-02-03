@@ -32,8 +32,8 @@ export interface SettingsState {
 }
 
 export interface PanelState {
-  height?: string | number
-  width?: string | number
+  heightPercent?: number
+  widthPercent?: number
   collapsed?: boolean
   layout?: LayoutType
 }

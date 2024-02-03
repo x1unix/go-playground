@@ -16,46 +16,50 @@ const handleClasses = {
   left: 'InspectorPanel__handle--left',
 }
 
-export interface ResizePanelParams {
+export type SizeChanges = { height: number } | { width: number }
+
+export interface Props {
   layout?: LayoutType
   collapsed?: boolean
-  height?: string | number
-  width?: string | number
-}
-
-interface Props extends ResizePanelParams {
-  onViewChange?: (changes: ResizePanelParams) => void
+  heightPercent?: number
+  widthPercent?: number
+  onResize?: (size: SizeChanges) => void
+  onLayoutChange?: (layout: LayoutType) => void
+  onCollapsed?: (collapsed: boolean) => void
 }
 
 export const InspectorPanel: React.FC<Props> = ({
   layout = LayoutType.Vertical,
-  height = DEFAULT_PANEL_HEIGHT,
-  width = DEFAULT_PANEL_WIDTH,
+  heightPercent = DEFAULT_PANEL_HEIGHT,
+  widthPercent = DEFAULT_PANEL_WIDTH,
   collapsed,
-  onViewChange,
+  onResize,
+  onLayoutChange,
+  onCollapsed,
 }) => {
   const {
     palette: { accent },
     semanticColors: { buttonBorder },
   } = useTheme()
-  const onResize = useCallback(
-    (e, direction, ref, size) => {
+  const handleResize = useCallback(
+    (e, direction, ref) => {
+      const { offsetHeight, offsetWidth } = ref
       switch (layout) {
         case LayoutType.Vertical:
-          onViewChange?.({ height: height + size.height })
+          onResize?.({ height: offsetHeight })
           return
         case LayoutType.Horizontal:
-          onViewChange?.({ width: width + size.width })
+          onResize?.({ width: offsetWidth })
           break
         default:
       }
     },
-    [height, width, layout, onViewChange],
+    [layout, onResize],
   )
 
   const size = {
-    height: layout === LayoutType.Vertical ? height : '100%',
-    width: layout === LayoutType.Horizontal ? width : '100%',
+    height: layout === LayoutType.Vertical ? `${heightPercent}%` : '100%',
+    width: layout === LayoutType.Horizontal ? `${widthPercent}%` : '100%',
   }
 
   const enabledCorners = {
@@ -76,7 +80,7 @@ export const InspectorPanel: React.FC<Props> = ({
       handleClasses={handleClasses}
       size={size}
       enable={enabledCorners}
-      onResizeStop={onResize}
+      onResizeStop={handleResize}
       minHeight={MIN_HEIGHT}
       minWidth={MIN_WIDTH}
       style={
@@ -93,20 +97,20 @@ export const InspectorPanel: React.FC<Props> = ({
             hidden: layout === LayoutType.Vertical,
             icon: <VscSplitVertical />,
             label: 'Use vertical layout',
-            onClick: () => onViewChange?.({ layout: LayoutType.Vertical }),
+            onClick: () => onLayoutChange?.(LayoutType.Vertical),
           },
           'horizontal-layout': {
             desktopOnly: true,
             hidden: layout === LayoutType.Horizontal,
             icon: <VscSplitHorizontal />,
             label: 'Use horizontal layout',
-            onClick: () => onViewChange?.({ layout: LayoutType.Horizontal }),
+            onClick: () => onLayoutChange?.(LayoutType.Horizontal),
           },
           collapse: {
             hidden: layout === LayoutType.Horizontal,
             icon: collapsed ? <VscChevronUp /> : <VscChevronDown />,
             label: collapsed ? 'Expand' : 'Collapse',
-            onClick: () => onViewChange?.({ collapsed: !collapsed }),
+            onClick: () => onCollapsed?.(!collapsed),
           },
         }}
       />
