@@ -1,3 +1,5 @@
+//go:build js && wasm
+
 // This tutorial introduces Go WebAssembly features.
 //
 // Go code can be compiled and ran in web browser as WebAssembly module.
