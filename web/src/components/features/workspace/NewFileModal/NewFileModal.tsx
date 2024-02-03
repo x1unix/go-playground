@@ -10,7 +10,8 @@ interface Props {
   onClose: (fileName?: string) => void
 }
 
-const fileNameRegex = /^(?!.*(\.\.|\/\.|\.\/|\/$))[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\.go$/i
+const fileNameRegex =
+  /^(?!.*(\.\.|\/\.|\.\/|\/$))([a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/)?(go\.mod|go\.sum|[a-zA-Z0-9_-]+\.go)$/i
 const maxFileNameLength = 255
 
 const verticalStackTokens: IStackTokens = {
