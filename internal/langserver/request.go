@@ -1,61 +1,103 @@
 package langserver
 
 import (
-	"encoding/json"
-	"go.uber.org/zap"
+	"bytes"
+	"fmt"
+	"io"
 	"net/http"
+	"net/url"
 	"strconv"
+	"strings"
+
+	"github.com/x1unix/go-playground/pkg/goplay"
 )
 
-// ErrorResponse is error response
-type ErrorResponse struct {
-	code int
+// RunParams is code run request parameters
+type RunParams struct {
+	// Vet enables go vet
+	Vet bool
 
-	// Error is error message
-	Error string `json:"error"`
+	// Format identifies whether to format code before run.
+	//
+	// Deprecated and used only for v1.
+	Format bool
+
+	// Backend is Go run backend.
+	Backend string
 }
 
-// NewErrorResponse is ErrorResponse constructor
-func NewErrorResponse(err error) *ErrorResponse {
-	return &ErrorResponse{Error: err.Error(), code: http.StatusInternalServerError}
-}
-
-// Write writes error to response
-func (r *ErrorResponse) Write(w http.ResponseWriter) http.ResponseWriter {
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(r.code)
-	if err := json.NewEncoder(w).Encode(r); err != nil {
-		zap.S().Error(err)
+func RunParamsFromQuery(query url.Values) (params RunParams, err error) {
+	params = RunParams{
+		Backend: goplay.BackendGoCurrent,
 	}
-	return w
-}
 
-// WriteJSON encodes object as JSON and writes it to stdout
-func WriteJSON(w http.ResponseWriter, i interface{}) {
-	data, err := json.Marshal(i)
+	params.Vet, err = parseBoolQueryParam(query, "vet", false)
 	if err != nil {
-		NewErrorResponse(err).Write(w)
-		return
+		return params, err
 	}
 
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	_, _ = w.Write(data)
+	params.Format, err = parseBoolQueryParam(query, "format", false)
+	if err != nil {
+		return params, err
+	}
+
+	params.Backend, err = backendFromQuery(query)
+	return params, err
 }
 
-func shouldFormatCode(r *http.Request) (bool, error) {
-	val := r.URL.Query().Get(formatQueryParam)
+func parseBoolQueryParam(query url.Values, key string, defaults bool) (bool, error) {
+	val := strings.TrimSpace(query.Get(key))
 	if val == "" {
-		return false, nil
+		return defaults, nil
 	}
 
 	boolVal, err := strconv.ParseBool(val)
 	if err != nil {
 		return false, Errorf(
 			http.StatusBadRequest,
-			"invalid %q query parameter value (expected boolean)", formatQueryParam,
+			"invalid %q query parameter value (expected boolean)", key,
 		)
 	}
 
 	return boolVal, nil
+}
+
+func isContentLengthError(err error) bool {
+	if httpErr, ok := goplay.IsHTTPError(err); ok {
+		if httpErr.StatusCode == http.StatusRequestEntityTooLarge {
+			return true
+		}
+	}
+
+	return false
+}
+func backendFromQuery(query url.Values) (goplay.Backend, error) {
+	backendName := query.Get("backend")
+	if backendName == "" {
+		return goplay.BackendGoCurrent, nil
+	}
+
+	if !goplay.ValidateBackend(backendName) {
+		return "", fmt.Errorf("invalid backend name %q", backendName)
+	}
+
+	return backendName, nil
+}
+
+func getPayloadFromRequest(r *http.Request) ([]byte, error) {
+	// see: https://github.com/golang/playground/blob/master/share.go#L69
+	var buff bytes.Buffer
+	buff.Grow(goplay.MaxSnippetSize)
+
+	defer r.Body.Close()
+	_, err := io.Copy(&buff, io.LimitReader(r.Body, goplay.MaxSnippetSize+1))
+	if err != nil {
+		return nil, Errorf(http.StatusBadGateway, "failed to read request: %w", err)
+	}
+
+	if buff.Len() > goplay.MaxSnippetSize {
+		return nil, ErrSnippetTooLarge
+	}
+
+	return buff.Bytes(), nil
 }

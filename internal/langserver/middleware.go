@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"syscall"
+	"time"
 )
 
 // HandlerFunc is langserver request handler
@@ -25,6 +26,16 @@ func WrapHandler(h HandlerFunc, guards ...GuardFn) http.HandlerFunc {
 		}
 
 		handleError(h(w, r), w)
+	}
+}
+
+func DeprecatedEndpoint(h HandlerFunc, sunsetDate time.Time) HandlerFunc {
+	sunsetDateStr := sunsetDate.Format(time.RFC1123)
+	return func(w http.ResponseWriter, r *http.Request) error {
+		w.Header().Set("Deprecation", "true")
+		w.Header().Set("Sunset", sunsetDateStr)
+		w.Header().Set("Warning", `299 - "Deprecated API, use /api/v2 instead"`)
+		return h(w, r)
 	}
 }
 

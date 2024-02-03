@@ -50,6 +50,9 @@ func (sr SuggestionRequest) Trim() SuggestionRequest {
 type VersionResponse struct {
 	// Version is server version
 	Version string `json:"version"`
+
+	// APIVersion is server API version
+	APIVersion string `json:"apiVersion"`
 }
 
 // Write writes data to response
@@ -68,9 +71,9 @@ func (r SuggestionsResponse) Write(w http.ResponseWriter) {
 	WriteJSON(w, r)
 }
 
-// BuildResponse is code complile response
+// BuildResponse is code compile response
 type BuildResponse struct {
-	// Formatted contains goimport'ed code
+	// Formatted contains goimport'ed code.
 	Formatted string `json:"formatted,omitempty"`
 
 	// FileName is file name
@@ -79,7 +82,9 @@ type BuildResponse struct {
 
 // RunResponse is code run response
 type RunResponse struct {
-	// Formatted contains goimport'ed code
+	// Formatted contains goimport'ed code.
+	//
+	// Deprecated and will be removed after api/v1 sunset.
 	Formatted string `json:"formatted,omitempty"`
 
 	// Events is list of code execution outputs

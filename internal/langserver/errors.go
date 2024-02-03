@@ -45,3 +45,7 @@ func NewHTTPError(code int, err error) *HTTPError {
 func Errorf(code int, format string, args ...interface{}) *HTTPError {
 	return NewHTTPError(code, fmt.Errorf(format, args...))
 }
+
+func NewBadRequestError(err error) *HTTPError {
+	return NewHTTPError(http.StatusBadRequest, err)
+}
