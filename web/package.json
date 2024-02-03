@@ -29,7 +29,7 @@
     "file-saver": "^2.0.5",
     "monaco-editor": "^0.45.0",
     "monaco-vim": "^0.3.4",
-    "re-resizable": "^6.9.1",
+    "re-resizable": "^6.9.11",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-icons": "^5.0.1",

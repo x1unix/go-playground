@@ -6,7 +6,7 @@ import { VscChevronDown, VscChevronUp, VscSplitHorizontal, VscSplitVertical } fr
 
 import { ConnectedRunOutput } from '../RunOutput'
 import { PanelHeader } from '~/components/elements/panel/PanelHeader'
-import { LayoutType, DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_WIDTH } from '~/styles/layout'
+import { LayoutType, DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_WIDTH_PERCENT } from '~/styles/layout'
 import './InspectorPanel.css'
 
 const MIN_HEIGHT = 36
@@ -16,46 +16,83 @@ const handleClasses = {
   left: 'InspectorPanel__handle--left',
 }
 
-export interface ResizePanelParams {
-  layout?: LayoutType
-  collapsed?: boolean
-  height?: string | number
-  width?: string | number
-}
+export type SizeChanges = { height: number } | { width: number }
 
-interface Props extends ResizePanelParams {
-  onViewChange?: (changes: ResizePanelParams) => void
+export interface Props {
+  /**
+   * Panel layout
+   */
+  layout?: LayoutType
+
+  /**
+   * Hide or show panel contents
+   */
+  collapsed?: boolean
+
+  /**
+   * Absolute height in pixels.
+   *
+   * Right now, resize in percent is buggy.
+   */
+  height?: number
+
+  /**
+   * Width in percents.
+   */
+  widthPercent?: number
+
+  /**
+   * Resize handler
+   * @param size
+   */
+  onResize?: (size: SizeChanges) => void
+
+  /**
+   * Panel orientation change handler.
+   * @param layout
+   */
+  onLayoutChange?: (layout: LayoutType) => void
+
+  /**
+   * Panel collapse/expand handler.
+   * @param collapsed
+   */
+  onCollapsed?: (collapsed: boolean) => void
 }
 
 export const InspectorPanel: React.FC<Props> = ({
   layout = LayoutType.Vertical,
   height = DEFAULT_PANEL_HEIGHT,
-  width = DEFAULT_PANEL_WIDTH,
+  widthPercent = DEFAULT_PANEL_WIDTH_PERCENT,
   collapsed,
-  onViewChange,
+  onResize,
+  onLayoutChange,
+  onCollapsed,
 }) => {
   const {
     palette: { accent },
     semanticColors: { buttonBorder },
   } = useTheme()
-  const onResize = useCallback(
-    (e, direction, ref, size) => {
+  const handleResize = useCallback(
+    (e, direction, ref, delta) => {
+      const { height, width } = ref.getBoundingClientRect()
       switch (layout) {
         case LayoutType.Vertical:
-          onViewChange?.({ height: height + size.height })
+          onResize?.({ height })
           return
         case LayoutType.Horizontal:
-          onViewChange?.({ width: width + size.width })
+          onResize?.({ width })
           break
         default:
       }
     },
-    [height, width, layout, onViewChange],
+    [layout, onResize],
   )
 
   const size = {
+    // FIXME: Percent height flickers during resize. Use pixels for now.
     height: layout === LayoutType.Vertical ? height : '100%',
-    width: layout === LayoutType.Horizontal ? width : '100%',
+    width: layout === LayoutType.Horizontal ? `${widthPercent}%` : '100%',
   }
 
   const enabledCorners = {
@@ -76,7 +113,7 @@ export const InspectorPanel: React.FC<Props> = ({
       handleClasses={handleClasses}
       size={size}
       enable={enabledCorners}
-      onResizeStop={onResize}
+      onResizeStop={handleResize}
       minHeight={MIN_HEIGHT}
       minWidth={MIN_WIDTH}
       style={
@@ -93,20 +130,20 @@ export const InspectorPanel: React.FC<Props> = ({
             hidden: layout === LayoutType.Vertical,
             icon: <VscSplitVertical />,
             label: 'Use vertical layout',
-            onClick: () => onViewChange?.({ layout: LayoutType.Vertical }),
+            onClick: () => onLayoutChange?.(LayoutType.Vertical),
           },
           'horizontal-layout': {
             desktopOnly: true,
             hidden: layout === LayoutType.Horizontal,
             icon: <VscSplitHorizontal />,
             label: 'Use horizontal layout',
-            onClick: () => onViewChange?.({ layout: LayoutType.Horizontal }),
+            onClick: () => onLayoutChange?.(LayoutType.Horizontal),
           },
           collapse: {
             hidden: layout === LayoutType.Horizontal,
             icon: collapsed ? <VscChevronUp /> : <VscChevronDown />,
             label: collapsed ? 'Expand' : 'Collapse',
-            onClick: () => onViewChange?.({ collapsed: !collapsed }),
+            onClick: () => onCollapsed?.(!collapsed),
           },
         }}
       />
