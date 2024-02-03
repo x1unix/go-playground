@@ -39,6 +39,11 @@ export const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }
             dispatch(dispatchPanelLayoutChange({ collapsed }))
           }}
           onResize={(changes) => {
+            if ('height' in changes) {
+              // Height percentage is buggy on resize. Use percents only for width.
+              dispatch(dispatchPanelLayoutChange(changes))
+              return
+            }
             const result = computeSizePercentage(changes, containerRef.current!)
             dispatch(dispatchPanelLayoutChange(result))
           }}

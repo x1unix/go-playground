@@ -6,7 +6,7 @@ import { VscChevronDown, VscChevronUp, VscSplitHorizontal, VscSplitVertical } fr
 
 import { ConnectedRunOutput } from '../RunOutput'
 import { PanelHeader } from '~/components/elements/panel/PanelHeader'
-import { LayoutType, DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_WIDTH } from '~/styles/layout'
+import { LayoutType, DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_WIDTH_PERCENT } from '~/styles/layout'
 import './InspectorPanel.css'
 
 const MIN_HEIGHT = 36
@@ -19,19 +19,51 @@ const handleClasses = {
 export type SizeChanges = { height: number } | { width: number }
 
 export interface Props {
+  /**
+   * Panel layout
+   */
   layout?: LayoutType
+
+  /**
+   * Hide or show panel contents
+   */
   collapsed?: boolean
-  heightPercent?: number
+
+  /**
+   * Absolute height in pixels.
+   *
+   * Right now, resize in percent is buggy.
+   */
+  height?: number
+
+  /**
+   * Width in percents.
+   */
   widthPercent?: number
+
+  /**
+   * Resize handler
+   * @param size
+   */
   onResize?: (size: SizeChanges) => void
+
+  /**
+   * Panel orientation change handler.
+   * @param layout
+   */
   onLayoutChange?: (layout: LayoutType) => void
+
+  /**
+   * Panel collapse/expand handler.
+   * @param collapsed
+   */
   onCollapsed?: (collapsed: boolean) => void
 }
 
 export const InspectorPanel: React.FC<Props> = ({
   layout = LayoutType.Vertical,
-  heightPercent = DEFAULT_PANEL_HEIGHT,
-  widthPercent = DEFAULT_PANEL_WIDTH,
+  height = DEFAULT_PANEL_HEIGHT,
+  widthPercent = DEFAULT_PANEL_WIDTH_PERCENT,
   collapsed,
   onResize,
   onLayoutChange,
@@ -42,14 +74,14 @@ export const InspectorPanel: React.FC<Props> = ({
     semanticColors: { buttonBorder },
   } = useTheme()
   const handleResize = useCallback(
-    (e, direction, ref) => {
-      const { offsetHeight, offsetWidth } = ref
+    (e, direction, ref, delta) => {
+      const { height, width } = ref.getBoundingClientRect()
       switch (layout) {
         case LayoutType.Vertical:
-          onResize?.({ height: offsetHeight })
+          onResize?.({ height })
           return
         case LayoutType.Horizontal:
-          onResize?.({ width: offsetWidth })
+          onResize?.({ width })
           break
         default:
       }
@@ -58,7 +90,8 @@ export const InspectorPanel: React.FC<Props> = ({
   )
 
   const size = {
-    height: layout === LayoutType.Vertical ? `${heightPercent}%` : '100%',
+    // FIXME: Percent height flickers during resize. Use pixels for now.
+    height: layout === LayoutType.Vertical ? height : '100%',
     width: layout === LayoutType.Horizontal ? `${widthPercent}%` : '100%',
   }
 
