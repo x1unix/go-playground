@@ -33,8 +33,8 @@ export class Client implements IAPIClient {
     return await this.get<languages.CompletionList>(`/suggest?${queryParams}`)
   }
 
-  async build(code: string, format: boolean): Promise<BuildResponse> {
-    return await this.post<BuildResponse>(`/compile?format=${Boolean(format)}`, code)
+  async build(files: Record<string, string>): Promise<BuildResponse> {
+    return await this.post<BuildResponse>(`/v2/compile`, { files })
   }
 
   async getArtifact(fileName: string): Promise<Response> {
