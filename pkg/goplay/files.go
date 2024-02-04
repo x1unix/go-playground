@@ -3,6 +3,7 @@ package goplay
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"path/filepath"
 	"strings"
 )
@@ -54,6 +55,10 @@ func (f FileSet) Add(name, src string) error {
 
 func (f FileSet) Bytes() []byte {
 	return f.buf.Bytes()
+}
+
+func (f FileSet) Reader() io.Reader {
+	return f.buf
 }
 
 func (f FileSet) hasTrailingNewline() bool {

@@ -12,22 +12,78 @@ import (
 	"go.uber.org/zap"
 )
 
-const filesFormKey = "files"
-
 var ErrEmptyRequest = errors.New("empty request")
 
 type APIv2Handler struct {
-	logger   *zap.SugaredLogger
+	logger   *zap.Logger
 	compiler compiler.BuildService
 	client   *goplay.Client
 }
 
 func NewAPIv2Handler(client *goplay.Client, builder compiler.BuildService) *APIv2Handler {
 	return &APIv2Handler{
-		logger:   zap.S().Named("api.v2"),
+		logger:   zap.L().Named("api.v2"),
 		compiler: builder,
 		client:   client,
 	}
+}
+
+func (h *APIv2Handler) HandleGetSnippet(w http.ResponseWriter, r *http.Request) error {
+	vars := mux.Vars(r)
+	snippetID := vars["id"]
+
+	snippet, err := h.client.GetSnippet(r.Context(), snippetID)
+	if err != nil {
+		if errors.Is(err, goplay.ErrSnippetNotFound) {
+			return Errorf(http.StatusNotFound, "snippet %q not found", snippetID)
+		}
+
+		h.logger.Error("failed to get snippet", zap.String("snippetID", snippetID), zap.Error(err))
+		return err
+	}
+
+	files, err := goplay.SplitFileSet(snippet.Contents, goplay.SplitFileOpts{
+		DefaultFileName: snippet.FileName,
+		CheckPaths:      false,
+	})
+	if err != nil {
+		// Serve stuff as-is
+		h.logger.Error(
+			"Cannot split snippet to files",
+			zap.Error(err),
+			zap.String("contents", snippet.Contents),
+			zap.String("snippetID", snippetID),
+		)
+		files = map[string]string{snippet.FileName: snippet.Contents}
+	}
+
+	WriteJSON(w, FilesRequest{Files: files})
+	return nil
+}
+
+func (h *APIv2Handler) HandleShare(w http.ResponseWriter, r *http.Request) error {
+	ctx := r.Context()
+
+	payload, _, err := fileSetFromRequest(r)
+	if err != nil {
+		return err
+	}
+
+	snippetID, err := h.client.Share(ctx, payload.Reader())
+	if err != nil {
+		return err
+	}
+	if err != nil {
+		if isContentLengthError(err) {
+			return ErrSnippetTooLarge
+		}
+
+		h.logger.Error("share error", zap.Error(err))
+		return err
+	}
+
+	WriteJSON(w, ShareResponse{SnippetID: snippetID})
+	return nil
 }
 
 func (h *APIv2Handler) HandleFormat(w http.ResponseWriter, r *http.Request) error {
@@ -50,7 +106,7 @@ func (h *APIv2Handler) HandleFormat(w http.ResponseWriter, r *http.Request) erro
 			return ErrSnippetTooLarge
 		}
 
-		h.logger.Error(err)
+		h.logger.Error("goimports error", zap.Error(err))
 		return err
 	}
 
@@ -58,9 +114,12 @@ func (h *APIv2Handler) HandleFormat(w http.ResponseWriter, r *http.Request) erro
 		return NewBadRequestError(err)
 	}
 
-	results, err := goplay.SplitFileSet(rsp.Body, fileNames[0])
+	results, err := goplay.SplitFileSet(rsp.Body, goplay.SplitFileOpts{
+		DefaultFileName: fileNames[0],
+		CheckPaths:      true,
+	})
 	if err != nil {
-		h.logger.Desugar().Error("failed to reconstruct files set from format response", zap.Error(err), zap.String("rsp", rsp.Body))
+		h.logger.Error("failed to reconstruct files set from format response", zap.Error(err), zap.String("rsp", rsp.Body))
 		return NewHTTPError(http.StatusInternalServerError, fmt.Errorf("failed to reconstruct files set from format response: %w", err))
 	}
 
@@ -94,7 +153,7 @@ func (h *APIv2Handler) HandleRun(w http.ResponseWriter, r *http.Request) error {
 		return NewBadRequestError(err)
 	}
 
-	h.logger.Debugw("response from compiler", "res", res)
+	h.logger.Debug("response from compiler", zap.Any("res", res))
 	WriteJSON(w, RunResponse{
 		Events: res.Events,
 	})
@@ -105,6 +164,8 @@ func (h *APIv2Handler) HandleRun(w http.ResponseWriter, r *http.Request) error {
 func (h *APIv2Handler) Mount(r *mux.Router) {
 	r.Path("/run").Methods(http.MethodPost).HandlerFunc(WrapHandler(h.HandleRun))
 	r.Path("/format").Methods(http.MethodPost).HandlerFunc(WrapHandler(h.HandleFormat))
+	r.Path("/share").Methods(http.MethodPost).HandlerFunc(WrapHandler(h.HandleShare))
+	r.Path("/share/{id}").Methods(http.MethodGet).HandlerFunc(WrapHandler(h.HandleGetSnippet))
 }
 
 func fileSetFromRequest(r *http.Request) (goplay.FileSet, []string, error) {

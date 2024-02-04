@@ -26,11 +26,16 @@ func validateFileName(name string) bool {
 	return ext == ".go"
 }
 
-func ValidateFilePath(name string) error {
+func ValidateFilePath(name string, strict bool) error {
 	name = strings.TrimSpace(name)
 	if name == "" {
 		return errors.New("file name cannot be empty")
 	}
+
+	if !strict {
+		return nil
+	}
+
 	if strings.HasPrefix(name, "/") {
 		return errors.New("file path cannot start with a slash")
 	}
@@ -57,6 +62,14 @@ func isSeparatorLine(line string) (string, bool) {
 	return matches[0][1], true
 }
 
+type SplitFileOpts struct {
+	// DefaultFileName is a file name to use of source string doesn't contain any file name.
+	DefaultFileName string
+
+	// CheckPaths enables file path format validation.
+	CheckPaths bool
+}
+
 // SplitFileSet splits string that contains source for multiple files in Go playground format.
 //
 // The official Go Playground defines a format to pass multiple files in request.
@@ -75,10 +88,14 @@ func isSeparatorLine(line string) (string, bool) {
 //	func Foo() {
 //		...
 //	}
-func SplitFileSet(src string, defaultFileName string) (map[string]string, error) {
+func SplitFileSet(src string, opts SplitFileOpts) (map[string]string, error) {
 	files := make(map[string]string)
 
-	currentFileName := defaultFileName
+	currentFileName := opts.DefaultFileName
+	if currentFileName == "" {
+		currentFileName = "main.go"
+	}
+
 	lineBuffer := strings.Builder{}
 	chunkCommitted := true
 	isFirstLine := true
@@ -96,7 +113,7 @@ func SplitFileSet(src string, defaultFileName string) (map[string]string, error)
 			continue
 		}
 
-		if err := ValidateFilePath(fileName); err != nil {
+		if err := ValidateFilePath(fileName, opts.CheckPaths); err != nil {
 			return nil, err
 		}
 

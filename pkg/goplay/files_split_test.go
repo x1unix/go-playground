@@ -77,7 +77,10 @@ func TestSplitFileSet(t *testing.T) {
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			result, err := SplitFileSet(tt.src, tt.defaultFileName)
+			result, err := SplitFileSet(tt.src, SplitFileOpts{
+				DefaultFileName: tt.defaultFileName,
+				CheckPaths:      true,
+			})
 			if tt.expectError {
 				require.Error(t, err)
 			} else {
