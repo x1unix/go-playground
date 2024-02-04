@@ -30,7 +30,7 @@ func TestFileSet(t *testing.T) {
 	}
 
 	expected := fmt.Sprintf(
-		"--- main.go ---\n%s\n--- go.mod ---\n%s\n--- foo/foo.go ---\n%s\n",
+		"-- main.go --\n%s\n-- go.mod --\n%s\n-- foo/foo.go --\n%s\n",
 		files[0].content, files[1].content, files[2].content,
 	)
 

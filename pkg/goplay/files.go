@@ -42,9 +42,9 @@ func (f FileSet) Add(name string, src io.Reader) error {
 	}
 
 	f.duplicates[name] = struct{}{}
-	f.buf.WriteString("--- ")
+	f.buf.WriteString("-- ")
 	f.buf.WriteString(name)
-	f.buf.WriteString(" ---\n")
+	f.buf.WriteString(" --\n")
 	n, err := io.Copy(f.buf, src)
 	if err != nil {
 		return fmt.Errorf("cannot read file %q: %w", name, err)
