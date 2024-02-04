@@ -168,13 +168,13 @@ func (s *APIv1Handler) HandleFormatCode(w http.ResponseWriter, r *http.Request) 
 
 	backend, err := backendFromQuery(r.URL.Query())
 	if err != nil {
-		return NewHTTPError(http.StatusBadRequest, err)
+		return NewBadRequestError(err)
 	}
 
 	formatted, _, err := s.goImportsCode(r.Context(), src, backend)
 	if err != nil {
 		if goplay.IsCompileError(err) {
-			return NewHTTPError(http.StatusBadRequest, err)
+			return NewBadRequestError(err)
 		}
 		return err
 	}

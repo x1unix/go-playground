@@ -7,6 +7,10 @@ import (
 	"go.uber.org/zap"
 )
 
+type FilesResponse struct {
+	Files map[string]string `json:"files"`
+}
+
 // ErrorResponse is error response
 type ErrorResponse struct {
 	code int
