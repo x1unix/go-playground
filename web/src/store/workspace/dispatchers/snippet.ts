@@ -49,40 +49,50 @@ export const dispatchLoadSnippetFromSource = (source: SnippetSource) => async (d
  * Loads shared snippets from Go Playground API.
  * @param snippetId
  */
-export const dispatchLoadSnippet = (snippetId: string | null) => async (dispatch: DispatchFn, _: StateProvider) => {
-  if (!snippetId) {
+export const dispatchLoadSnippet =
+  (snippetId: string | null) => async (dispatch: DispatchFn, getState: StateProvider) => {
+    if (!snippetId) {
+      dispatch({
+        type: WorkspaceAction.WORKSPACE_IMPORT,
+        payload: loadWorkspaceState(),
+      })
+      return
+    }
+
+    const {
+      workspace: { snippet },
+      ui,
+    } = getState()
+    if (ui?.shareCreated && snippet?.id === snippetId) {
+      // Prevent loading the same snippet again if it was just shared.
+      return
+    }
+
     dispatch({
-      type: WorkspaceAction.WORKSPACE_IMPORT,
-      payload: loadWorkspaceState(),
+      type: WorkspaceAction.SNIPPET_LOAD_START,
+      payload: snippetId,
     })
-    return
-  }
 
-  dispatch({
-    type: WorkspaceAction.SNIPPET_LOAD_START,
-    payload: snippetId,
-  })
-
-  try {
-    const { files } = await client.getSnippet(snippetId)
-    dispatch<SnippetLoadPayload>({
-      type: WorkspaceAction.SNIPPET_LOAD_FINISH,
-      payload: {
-        id: snippetId,
-        error: null,
-        files,
-      },
-    })
-  } catch (err: any) {
-    dispatch<SnippetLoadPayload>({
-      type: WorkspaceAction.SNIPPET_LOAD_FINISH,
-      payload: {
-        id: snippetId,
-        error: err.message,
-      },
-    })
+    try {
+      const { files } = await client.getSnippet(snippetId)
+      dispatch<SnippetLoadPayload>({
+        type: WorkspaceAction.SNIPPET_LOAD_FINISH,
+        payload: {
+          id: snippetId,
+          error: null,
+          files,
+        },
+      })
+    } catch (err: any) {
+      dispatch<SnippetLoadPayload>({
+        type: WorkspaceAction.SNIPPET_LOAD_FINISH,
+        payload: {
+          id: snippetId,
+          error: err.message,
+        },
+      })
+    }
   }
-}
 
 export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState: StateProvider) => {
   const notificationId = newNotificationId()
