@@ -1,3 +1,5 @@
+import { loader } from '@monaco-editor/react'
+import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 import * as monaco from 'monaco-editor'
 import { type IAPIClient } from '~/services/api'
 import snippets from './snippets'
@@ -36,6 +38,12 @@ const parseExpression = (expr: string) => {
     packageName: varName,
     value: propValue,
   }
+}
+
+self.MonacoEnvironment = {
+  getWorker: () => {
+    return new EditorWorker()
+  },
 }
 
 class GoCompletionItemProvider implements monaco.languages.CompletionItemProvider {
@@ -108,5 +116,6 @@ export const registerGoLanguageProvider = (client: IAPIClient) => {
   }
 
   alreadyRegistered = true
+  loader.config({ monaco })
   return monaco.languages.registerCompletionItemProvider('go', new GoCompletionItemProvider(client))
 }
