@@ -9,7 +9,7 @@ import {
   NotificationType,
 } from '~/store/notifications'
 import { newLoadingAction, newErrorAction, newUIStateChangeAction } from '~/store/actions/ui'
-import { type SnippetLoadPayload, type FileUpdatePayload, WorkspaceAction } from '../actions'
+import { type SnippetLoadPayload, WorkspaceAction, type BulkFileUpdatePayload } from '../actions'
 import { loadWorkspaceState } from '../config'
 
 /**
@@ -158,29 +158,21 @@ export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState:
 
 export const dispatchFormatFile = () => async (dispatch: DispatchFn, getState: StateProvider) => {
   const {
-    workspace: { files, selectedFile },
+    workspace: { files },
     runTarget: { backend },
   } = getState()
-  if (!files || !selectedFile) {
+  if (!files) {
     return
   }
 
   dispatch(newLoadingAction())
   try {
-    // Format code using GoTip is enabled to support
-    // any syntax changes from unstable Go specs.
-    const code = files[selectedFile]
-    const rsp = await client.formatCode(code, backend)
+    const { files: formattedFiles } = await client.format(files, backend)
 
-    if (rsp.formatted?.length) {
-      dispatch<FileUpdatePayload>({
-        type: WorkspaceAction.UPDATE_FILE,
-        payload: {
-          filename: selectedFile,
-          content: rsp.formatted,
-        },
-      })
-    }
+    dispatch<BulkFileUpdatePayload>({
+      type: WorkspaceAction.UPDATE_FILES,
+      payload: formattedFiles,
+    })
   } catch (err: any) {
     dispatch(newErrorAction(err.message))
   } finally {

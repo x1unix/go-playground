@@ -1,6 +1,7 @@
 package langserver
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -63,7 +64,7 @@ func (h *APIv2Handler) HandleFormat(w http.ResponseWriter, r *http.Request) erro
 		return NewHTTPError(http.StatusInternalServerError, fmt.Errorf("failed to reconstruct files set from format response: %w", err))
 	}
 
-	WriteJSON(w, FilesResponse{Files: results})
+	WriteJSON(w, FilesRequest{Files: results})
 	return nil
 }
 
@@ -75,11 +76,6 @@ func (h *APIv2Handler) HandleRun(w http.ResponseWriter, r *http.Request) error {
 		return NewBadRequestError(err)
 	}
 
-	if err := r.ParseMultipartForm(goplay.MaxSnippetSize); err != nil {
-		return NewBadRequestError(err)
-	}
-
-	defer r.Body.Close()
 	payload, _, err := fileSetFromRequest(r)
 	if err != nil {
 		return err
@@ -112,25 +108,28 @@ func (h *APIv2Handler) Mount(r *mux.Router) {
 }
 
 func fileSetFromRequest(r *http.Request) (goplay.FileSet, []string, error) {
-	payload := goplay.NewFileSet(int(r.ContentLength))
-	if err := r.ParseMultipartForm(goplay.MaxSnippetSize); err != nil {
-		return payload, nil, NewBadRequestError(err)
-	}
+	reader := http.MaxBytesReader(nil, r.Body, goplay.MaxSnippetSize)
+	defer reader.Close()
 
-	files := r.MultipartForm.File["files"]
-	if len(files) == 0 {
-		return payload, nil, NewBadRequestError(ErrEmptyRequest)
-	}
-
-	fileNames := make([]string, 0, len(files))
-	for _, item := range files {
-		fileNames = append(fileNames, item.Filename)
-		f, err := item.Open()
-		if err != nil {
-			return payload, nil, NewBadRequestError(fmt.Errorf("cannot read file %q: %w", item.Filename, err))
+	body := new(FilesRequest)
+	if err := json.NewDecoder(reader).Decode(body); err != nil {
+		maxBytesErr := new(http.MaxBytesError)
+		if errors.As(err, &maxBytesErr) {
+			return goplay.FileSet{}, nil, ErrSnippetTooLarge
 		}
 
-		if err := payload.Add(item.Filename, f); err != nil {
+		return goplay.FileSet{}, nil, NewBadRequestError(err)
+	}
+
+	if len(body.Files) == 0 {
+		return goplay.FileSet{}, nil, ErrEmptyRequest
+	}
+
+	payload := goplay.NewFileSet(goplay.MaxSnippetSize)
+	fileNames := make([]string, 0, len(body.Files))
+	for name, contents := range body.Files {
+		fileNames = append(fileNames, name)
+		if err := payload.Add(name, contents); err != nil {
 			return payload, fileNames, NewBadRequestError(err)
 		}
 	}

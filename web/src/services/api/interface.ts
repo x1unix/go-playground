@@ -7,6 +7,7 @@ import {
   type Snippet,
   type ShareResponse,
   type VersionsInfo,
+  type FormatResponse,
 } from './models'
 
 export interface IAPIClient {
@@ -16,9 +17,9 @@ export interface IAPIClient {
 
   getSuggestions: (query: { packageName?: string; value?: string }) => Promise<languages.CompletionList>
 
-  evaluateCode: (code: string, format: boolean) => Promise<RunResponse>
+  run: (files: Record<string, string>, vet: boolean) => Promise<RunResponse>
 
-  formatCode: (code: string) => Promise<RunResponse>
+  format: (files: Record<string, string>) => Promise<FormatResponse>
 
   build: (code: string, format: boolean) => Promise<BuildResponse>
 

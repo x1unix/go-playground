@@ -2,7 +2,6 @@ package goplay
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -26,7 +25,7 @@ func TestFileSet(t *testing.T) {
 	}
 
 	for _, entry := range files {
-		require.NoError(t, fset.Add(entry.name, strings.NewReader(entry.content)))
+		require.NoError(t, fset.Add(entry.name, entry.content))
 	}
 
 	expected := fmt.Sprintf(

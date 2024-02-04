@@ -3,7 +3,6 @@ package goplay
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"path/filepath"
 	"strings"
 )
@@ -24,9 +23,9 @@ func NewFileSet(bufSize int) FileSet {
 }
 
 // Add adds a file to the buffer.
-func (f FileSet) Add(name string, src io.Reader) error {
-	if closer, ok := src.(io.Closer); ok {
-		defer closer.Close()
+func (f FileSet) Add(name, src string) error {
+	if src == "" {
+		return fmt.Errorf("file %q is empty", name)
 	}
 
 	name = strings.TrimSpace(name)
@@ -45,13 +44,7 @@ func (f FileSet) Add(name string, src io.Reader) error {
 	f.buf.WriteString("-- ")
 	f.buf.WriteString(name)
 	f.buf.WriteString(" --\n")
-	n, err := io.Copy(f.buf, src)
-	if err != nil {
-		return fmt.Errorf("cannot read file %q: %w", name, err)
-	}
-	if n == 0 {
-		return fmt.Errorf("file %q is empty", name)
-	}
+	f.buf.WriteString(src)
 
 	if !f.hasTrailingNewline() {
 		f.buf.WriteByte('\n')

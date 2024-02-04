@@ -31,6 +31,25 @@ export const reducers = mapByAction<WorkspaceState>(
         },
       }
     },
+    [WorkspaceAction.UPDATE_FILES]: (s: WorkspaceState, { payload: newFiles }: Action<Record<string, string>>) => {
+      const { files: originalFiles, ...rest } = s
+      if (!originalFiles) {
+        return {
+          ...rest,
+          files: newFiles,
+        }
+      }
+
+      // Preserve files order.
+      return {
+        ...rest,
+        files: Object.entries(originalFiles)
+          .map(([name, originalContent]) => ({
+            [name]: newFiles[name] ?? originalContent,
+          }))
+          .reduce((obj, item) => ({ ...obj, ...item }), {}),
+      } satisfies WorkspaceState
+    },
     [WorkspaceAction.REMOVE_FILE]: (s: WorkspaceState, { payload: { filename } }: Action<FilePayload>) => {
       const { files = {}, selectedFile, ...rest } = s
 

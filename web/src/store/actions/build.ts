@@ -2,11 +2,6 @@ import { ActionType } from './actions'
 
 import { type EvalEvent } from '~/services/api'
 
-export const newFormatCodeAction = (newText?: string) => ({
-  type: ActionType.FORMAT_CODE,
-  payload: newText,
-})
-
 export const newProgramWriteAction = (event: EvalEvent) => ({
   type: ActionType.EVAL_EVENT,
   payload: event,

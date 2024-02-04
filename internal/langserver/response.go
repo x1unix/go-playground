@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type FilesResponse struct {
+type FilesRequest struct {
 	Files map[string]string `json:"files"`
 }
 

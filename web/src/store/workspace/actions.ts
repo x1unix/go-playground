@@ -32,10 +32,17 @@ export enum WorkspaceAction {
   UPDATE_FILE = 'WORKSPACE_UPDATE_FILE',
 
   /**
+   * Bulk files update.
+   */
+  UPDATE_FILES = 'WORKSPACE_UPDATE_FILES',
+
+  /**
    * Indicates that current file tab changed.
    */
   SELECT_FILE = 'WORKSPACE_SELECT_FILE',
 }
+
+export type BulkFileUpdatePayload = Record<string, string>
 
 export interface FilePayload {
   /**

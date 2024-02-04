@@ -39,8 +39,11 @@ export interface EvalEvent {
 }
 
 export interface RunResponse {
-  formatted?: string | null
   events: EvalEvent[]
+}
+
+export interface FormatResponse {
+  files: Record<string, string>
 }
 
 export interface BuildResponse {

@@ -8,6 +8,7 @@ import {
   type Snippet,
   type ShareResponse,
   type VersionsInfo,
+  type FormatResponse,
 } from './models'
 import { type IAPIClient } from './interface'
 
@@ -47,12 +48,12 @@ export class Client implements IAPIClient {
     return resp
   }
 
-  async evaluateCode(code: string, format: boolean, backend = Backend.Default): Promise<RunResponse> {
-    return await this.post<RunResponse>(`/run?format=${Boolean(format)}&backend=${backend}`, code)
+  async run(files: Record<string, string>, vet: boolean, backend = Backend.Default): Promise<RunResponse> {
+    return await this.post<RunResponse>(`/v2/run?vet=${Boolean(vet)}&backend=${backend}`, { files })
   }
 
-  async formatCode(code: string, backend = Backend.Default): Promise<RunResponse> {
-    return await this.post<RunResponse>(`/format?backend=${backend}`, code)
+  async format(files: Record<string, string>, backend = Backend.Default): Promise<FormatResponse> {
+    return await this.post<FormatResponse>(`/v2/format?backend=${backend}`, { files })
   }
 
   async getSnippet(id: string): Promise<Snippet> {
