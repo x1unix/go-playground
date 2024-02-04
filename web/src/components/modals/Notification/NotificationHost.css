@@ -27,7 +27,7 @@
   position: absolute;
   box-sizing: border-box;
   display: flex;
-
+  z-index: 9;
   padding-bottom: 10px;
 }
 
