@@ -56,6 +56,19 @@
           "main.go"
         ]
       }
+    },
+    {
+      "label": "Multiple files",
+      "icon": "ProjectCollection",
+      "iconColor": "#d29200",
+      "source": {
+        "basePath": "multiple-files",
+        "files": [
+          "main.go",
+          "foo/bar.go",
+          "go.mod"
+        ]
+      }
     }
   ],
   "Language Basics": [
