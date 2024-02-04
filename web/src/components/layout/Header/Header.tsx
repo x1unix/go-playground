@@ -24,6 +24,7 @@ import {
   dispatchToggleTheme,
   newMonacoParamsChangeDispatcher,
   newSettingsChangeDispatcher,
+  newUIStateChangeAction,
   runFileDispatcher,
 } from '~/store'
 
@@ -39,7 +40,6 @@ interface HeaderState {
   showAbout?: boolean
   showExamples?: boolean
   loading?: boolean
-  showShareMessage?: boolean
   goVersions?: VersionsInfo
 }
 
@@ -58,7 +58,7 @@ interface Props {
   loading: status?.loading,
   running: status?.running,
   hideThemeToggle: settings.useSystemTheme,
-  snippetName: ui?.shareCreated && ui?.snippetId,
+  sharedSnippetName: ui?.shareCreated && ui?.snippetId,
 }))
 export class Header extends ThemeableComponent<any, HeaderState> {
   constructor(props: Props) {
@@ -67,7 +67,6 @@ export class Header extends ThemeableComponent<any, HeaderState> {
       showSettings: false,
       showAbout: false,
       loading: false,
-      showShareMessage: false,
     }
   }
 
@@ -116,7 +115,6 @@ export class Header extends ThemeableComponent<any, HeaderState> {
         iconProps: { iconName: 'Share' },
         disabled: this.isDisabled,
         onClick: () => {
-          this.setState({ showShareMessage: true })
           this.props.dispatch(dispatchShareSnippet())
         },
       },
@@ -224,8 +222,8 @@ export class Header extends ThemeableComponent<any, HeaderState> {
   }
 
   render() {
-    const { showShareMessage, showAbout, showSettings, showExamples } = this.state
-    const { snippetName } = this.props
+    const { showAbout, showSettings, showExamples } = this.state
+    const { sharedSnippetName } = this.props
     return (
       <header className="header" style={{ backgroundColor: this.theme.palette.white }}>
         <img src="/go-logo-blue.svg" className="header__logo" alt="Golang Logo" />
@@ -236,11 +234,11 @@ export class Header extends ThemeableComponent<any, HeaderState> {
           ariaLabel="CodeEditor menu"
         />
         <SharePopup
-          visible={!!(showShareMessage && snippetName)}
+          visible={sharedSnippetName?.length}
           target={`.${BTN_SHARE_CLASSNAME}`}
-          snippetId={snippetName}
+          snippetId={sharedSnippetName}
           onDismiss={() => {
-            this.setState({ showShareMessage: false })
+            this.props.dispatch(newUIStateChangeAction({ shareCreated: false }))
           }}
         />
         <SettingsModal

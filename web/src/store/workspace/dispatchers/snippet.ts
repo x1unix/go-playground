@@ -119,7 +119,6 @@ export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState:
     const { files } = workspace
     const { snippetID } = await client.shareSnippet(files)
     dispatch(newRemoveNotificationAction(notificationId))
-    dispatch(replace(`/snippet/${snippetID}`))
     dispatch(
       newUIStateChangeAction({
         shareCreated: true,
@@ -135,6 +134,7 @@ export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState:
         },
       },
     })
+    dispatch(replace(`/snippet/${snippetID}`, getState()))
   } catch (err) {
     dispatch(
       newAddNotificationAction({
