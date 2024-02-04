@@ -79,9 +79,13 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 
 	// Initialize API endpoints
 	r := mux.NewRouter()
+	apiRouter := r.PathPrefix("/api").Subrouter()
 	svcCfg := langserver.ServiceConfig{Version: Version}
-	langserver.New(svcCfg, playgroundClient, packages, buildSvc).
-		Mount(r.PathPrefix("/api").Subrouter())
+	langserver.NewAPIv1Handler(svcCfg, playgroundClient, packages, buildSvc).
+		Mount(apiRouter)
+
+	apiv2Router := apiRouter.PathPrefix("/v2").Subrouter()
+	langserver.NewAPIv2Handler(playgroundClient, buildSvc).Mount(apiv2Router)
 
 	// Web UI routes
 	tplVars := langserver.TemplateArguments{

@@ -25,10 +25,9 @@
 
 .NotificationHost {
   position: absolute;
-  z-index: 1;
   box-sizing: border-box;
   display: flex;
-
+  z-index: 9;
   padding-bottom: 10px;
 }
 

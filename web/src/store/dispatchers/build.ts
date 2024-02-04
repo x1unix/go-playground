@@ -9,7 +9,6 @@ import { type DispatchFn, type StateProvider } from '../helpers'
 import { newAddNotificationAction, newRemoveNotificationAction, NotificationType } from '../notifications'
 import {
   newErrorAction,
-  newFormatCodeAction,
   newLoadingAction,
   newProgramFinishAction,
   newProgramStartAction,
@@ -18,6 +17,7 @@ import {
 
 import { type Dispatcher } from './utils'
 import { wrapResponseWithProgress } from '~/utils/http'
+import { type BulkFileUpdatePayload, WorkspaceAction } from '~/store/workspace/actions'
 
 const WASM_APP_DOWNLOAD_NOTIFICATION = 'WASM_APP_DOWNLOAD_NOTIFICATION'
 const WASM_APP_EXIT_ERROR = 'WASM_APP_EXIT_ERROR'
@@ -142,30 +142,35 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
       workspace,
       runTarget: { target, backend },
     } = getState()
-    // TODO: support ApiV2
-    const { selectedFile, files } = workspace
+
+    let { files, selectedFile } = workspace
     if (!files || !selectedFile) {
       dispatch(newErrorAction('No Go files'))
       return
     }
-    const source = files[selectedFile]
+
+    if (settings.autoFormat) {
+      const rsp = await client.format(files, backend)
+      files = rsp.files
+      dispatch<BulkFileUpdatePayload>({
+        type: WorkspaceAction.UPDATE_FILES,
+        payload: rsp.files,
+      })
+    }
 
     switch (target) {
       case TargetType.Server: {
-        const res = await client.evaluateCode(source, settings.autoFormat, backend)
-        if (res.formatted?.length) {
-          dispatch(newFormatCodeAction(res.formatted))
-        }
+        // TODO: vet
+        const res = await client.run(files, false, backend)
         dispatchEvalEvents(dispatch, res.events)
         break
       }
       case TargetType.WebAssembly: {
-        const resp = await client.build(source, settings.autoFormat)
-        if (resp.formatted?.length) {
-          dispatch(newFormatCodeAction(resp.formatted))
-        }
+        // TODO: support ApiV2
+        const source = files[selectedFile]
+        const { fileName } = await client.build(source, settings.autoFormat)
 
-        const instance = await fetchWasmWithProgress(dispatch, resp.fileName)
+        const instance = await fetchWasmWithProgress(dispatch, fileName)
         dispatch(newRemoveNotificationAction(WASM_APP_DOWNLOAD_NOTIFICATION))
         dispatch(newProgramStartAction())
 
@@ -187,7 +192,9 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
           .finally(() => dispatch(newProgramFinishAction()))
         break
       }
-      case TargetType.Interpreter:
+      case TargetType.Interpreter: {
+        // TODO: support ApiV2
+        const source = files[selectedFile]
         try {
           const worker = await getWorkerInstance(dispatch, getState)
           await worker.runProgram(source)
@@ -196,6 +203,7 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
         }
 
         break
+      }
       default:
         dispatch(newErrorAction(`AppError: Unknown Go runtime type "${target}"`))
     }

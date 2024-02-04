@@ -9,7 +9,7 @@ import {
   NotificationType,
 } from '~/store/notifications'
 import { newLoadingAction, newErrorAction, newUIStateChangeAction } from '~/store/actions/ui'
-import { type SnippetLoadPayload, type FileUpdatePayload, WorkspaceAction } from '../actions'
+import { type SnippetLoadPayload, WorkspaceAction, type BulkFileUpdatePayload } from '../actions'
 import { loadWorkspaceState } from '../config'
 
 /**
@@ -49,43 +49,50 @@ export const dispatchLoadSnippetFromSource = (source: SnippetSource) => async (d
  * Loads shared snippets from Go Playground API.
  * @param snippetId
  */
-export const dispatchLoadSnippet = (snippetId: string | null) => async (dispatch: DispatchFn, _: StateProvider) => {
-  if (!snippetId) {
+export const dispatchLoadSnippet =
+  (snippetId: string | null) => async (dispatch: DispatchFn, getState: StateProvider) => {
+    if (!snippetId) {
+      dispatch({
+        type: WorkspaceAction.WORKSPACE_IMPORT,
+        payload: loadWorkspaceState(),
+      })
+      return
+    }
+
+    const {
+      workspace: { snippet },
+      ui,
+    } = getState()
+    if (ui?.shareCreated && snippet?.id === snippetId) {
+      // Prevent loading the same snippet again if it was just shared.
+      return
+    }
+
     dispatch({
-      type: WorkspaceAction.WORKSPACE_IMPORT,
-      payload: loadWorkspaceState(),
+      type: WorkspaceAction.SNIPPET_LOAD_START,
+      payload: snippetId,
     })
-    return
-  }
 
-  dispatch({
-    type: WorkspaceAction.SNIPPET_LOAD_START,
-    payload: snippetId,
-  })
-
-  try {
-    // TODO: use APIv2
-    const { fileName, code } = await client.getSnippet(snippetId)
-    dispatch<SnippetLoadPayload>({
-      type: WorkspaceAction.SNIPPET_LOAD_FINISH,
-      payload: {
-        id: snippetId,
-        error: null,
-        files: {
-          [fileName]: code,
+    try {
+      const { files } = await client.getSnippet(snippetId)
+      dispatch<SnippetLoadPayload>({
+        type: WorkspaceAction.SNIPPET_LOAD_FINISH,
+        payload: {
+          id: snippetId,
+          error: null,
+          files,
         },
-      },
-    })
-  } catch (err: any) {
-    dispatch<SnippetLoadPayload>({
-      type: WorkspaceAction.SNIPPET_LOAD_FINISH,
-      payload: {
-        id: snippetId,
-        error: err.message,
-      },
-    })
+      })
+    } catch (err: any) {
+      dispatch<SnippetLoadPayload>({
+        type: WorkspaceAction.SNIPPET_LOAD_FINISH,
+        payload: {
+          id: snippetId,
+          error: err.message,
+        },
+      })
+    }
   }
-}
 
 export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState: StateProvider) => {
   const notificationId = newNotificationId()
@@ -119,13 +126,9 @@ export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState:
   )
 
   try {
-    // TODO: use APIv2
     const { files } = workspace
-    const fileName = Object.keys(files)[0]
-    const code = files[fileName]
-    const { snippetID } = await client.shareSnippet(code)
+    const { snippetID } = await client.shareSnippet(files)
     dispatch(newRemoveNotificationAction(notificationId))
-    dispatch(replace(`/snippet/${snippetID}`))
     dispatch(
       newUIStateChangeAction({
         shareCreated: true,
@@ -141,6 +144,7 @@ export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState:
         },
       },
     })
+    dispatch(replace(`/snippet/${snippetID}`, getState()))
   } catch (err) {
     dispatch(
       newAddNotificationAction({
@@ -158,29 +162,21 @@ export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState:
 
 export const dispatchFormatFile = () => async (dispatch: DispatchFn, getState: StateProvider) => {
   const {
-    workspace: { files, selectedFile },
+    workspace: { files },
     runTarget: { backend },
   } = getState()
-  if (!files || !selectedFile) {
+  if (!files) {
     return
   }
 
   dispatch(newLoadingAction())
   try {
-    // Format code using GoTip is enabled to support
-    // any syntax changes from unstable Go specs.
-    const code = files[selectedFile]
-    const rsp = await client.formatCode(code, backend)
+    const { files: formattedFiles } = await client.format(files, backend)
 
-    if (rsp.formatted?.length) {
-      dispatch<FileUpdatePayload>({
-        type: WorkspaceAction.UPDATE_FILE,
-        payload: {
-          filename: selectedFile,
-          content: rsp.formatted,
-        },
-      })
-    }
+    dispatch<BulkFileUpdatePayload>({
+      type: WorkspaceAction.UPDATE_FILES,
+      payload: formattedFiles,
+    })
   } catch (err: any) {
     dispatch(newErrorAction(err.message))
   } finally {

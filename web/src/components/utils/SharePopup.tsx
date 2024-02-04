@@ -1,7 +1,7 @@
-import React, { type FC, useMemo } from 'react'
+import React, { type FC } from 'react'
 import copy from 'copy-to-clipboard'
 import { type Target } from '@fluentui/react-hooks'
-import { TeachingBubble, Link, DirectionalHint, type IButtonProps, useTheme } from '@fluentui/react'
+import { TeachingBubble, Link, DirectionalHint, useTheme } from '@fluentui/react'
 
 interface Props {
   visible?: boolean
@@ -15,17 +15,6 @@ export const SharePopup: FC<Props> = ({ visible, snippetId, originUrl, onDismiss
   const {
     semanticColors: { bodyBackground },
   } = useTheme()
-  const primaryButtonProps: IButtonProps = useMemo(
-    () => ({
-      children: 'Copy link',
-      onClick: () => {
-        copy(`${originUrl}/snippet/${snippetId}`)
-        onDismiss?.()
-        console.log('snippet:', snippetId)
-      },
-    }),
-    [snippetId, originUrl, onDismiss],
-  )
 
   if (!visible) {
     return <></>
@@ -33,13 +22,24 @@ export const SharePopup: FC<Props> = ({ visible, snippetId, originUrl, onDismiss
 
   return (
     <TeachingBubble
-      calloutProps={{ directionalHint: DirectionalHint.bottomCenter }}
+      calloutProps={{
+        directionalHint: DirectionalHint.bottomCenter,
+        // Monaco steals focus and cause scroll event, which cause immediate bubble close.
+        preventDismissOnLostFocus: true,
+        preventDismissOnScroll: true,
+      }}
       isWide={true}
       hasCloseButton={true}
       headline="Share successful"
       onDismiss={onDismiss}
       target={target}
-      primaryButtonProps={primaryButtonProps}
+      primaryButtonProps={{
+        children: 'Copy link',
+        onClick: (e) => {
+          copy(`${originUrl}/snippet/${snippetId}`)
+          onDismiss?.()
+        },
+      }}
     >
       <span>Your snippet is available at </span>
       <Link
@@ -52,6 +52,9 @@ export const SharePopup: FC<Props> = ({ visible, snippetId, originUrl, onDismiss
               color: bodyBackground,
             },
           ],
+        }}
+        onClick={(e) => {
+          e.stopPropagation()
         }}
       >
         {`${originUrl}/snippet/${snippetId}`}

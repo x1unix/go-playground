@@ -1,7 +1,6 @@
 package langserver
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -25,18 +24,18 @@ const (
 	frameTime               = time.Second
 	maxBuildTimeDuration    = time.Second * 30
 
-	wasmMimeType           = "application/wasm"
-	formatQueryParam       = "format"
-	artifactParamVal       = "artifactId"
-	playgroundBackendParam = "backend"
+	wasmMimeType     = "application/wasm"
+	artifactParamVal = "artifactId"
 )
+
+var apiv1SunsetDate = time.Date(2025, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 type BackendVersionProvider interface {
 	GetVersions(ctx context.Context) (*VersionsInformation, error)
 }
 
-// Service is language server service
-type Service struct {
+// APIv1Handler is API v1 handler
+type APIv1Handler struct {
 	config          ServiceConfig
 	log             *zap.SugaredLogger
 	index           analyzer.PackageIndex
@@ -51,13 +50,13 @@ type ServiceConfig struct {
 	Version string
 }
 
-// New is Service constructor
-func New(cfg ServiceConfig, client *goplay.Client, packages []*analyzer.Package, builder compiler.BuildService) *Service {
-	return &Service{
+// NewAPIv1Handler is APIv1Handler constructor
+func NewAPIv1Handler(cfg ServiceConfig, client *goplay.Client, packages []*analyzer.Package, builder compiler.BuildService) *APIv1Handler {
+	return &APIv1Handler{
 		config:          cfg,
 		compiler:        builder,
 		client:          client,
-		log:             zap.S().Named("langserver"),
+		log:             zap.S().Named("api.v1"),
 		index:           analyzer.BuildPackageIndex(packages),
 		versionProvider: NewBackendVersionService(zap.L(), client, VersionCacheTTL),
 		limiter:         rate.NewLimiter(rate.Every(frameTime), compileRequestsPerFrame),
@@ -65,28 +64,30 @@ func New(cfg ServiceConfig, client *goplay.Client, packages []*analyzer.Package,
 }
 
 // Mount mounts service on route
-func (s *Service) Mount(r *mux.Router) {
+func (s *APIv1Handler) Mount(r *mux.Router) {
 	r.Path("/version").
 		HandlerFunc(WrapHandler(s.HandleGetVersion))
 	r.Path("/suggest").
 		HandlerFunc(WrapHandler(s.HandleGetSuggestion))
-	r.Path("/run").Methods(http.MethodPost).
-		HandlerFunc(WrapHandler(s.HandleRunCode))
-	r.Path("/compile").Methods(http.MethodPost).
-		HandlerFunc(WrapHandler(s.HandleCompile))
-	r.Path("/format").Methods(http.MethodPost).
-		HandlerFunc(WrapHandler(s.HandleFormatCode))
-	r.Path("/share").Methods(http.MethodPost).
-		HandlerFunc(WrapHandler(s.HandleShare))
-	r.Path("/snippet/{id}").Methods(http.MethodGet).
-		HandlerFunc(WrapHandler(s.HandleGetSnippet))
 	r.Path("/backends/info").Methods(http.MethodGet).
 		HandlerFunc(WrapHandler(s.HandleGetVersions))
 	r.Path("/artifacts/{artifactId:[a-fA-F0-9]+}.wasm").Methods(http.MethodGet).
 		HandlerFunc(WrapHandler(s.HandleArtifactRequest))
+
+	// Deprecated endpoints
+	r.Path("/run").Methods(http.MethodPost).
+		HandlerFunc(WrapHandler(DeprecatedEndpoint(s.HandleRunCode, apiv1SunsetDate)))
+	r.Path("/compile").Methods(http.MethodPost).
+		HandlerFunc(WrapHandler(DeprecatedEndpoint(s.HandleCompile, apiv1SunsetDate)))
+	r.Path("/format").Methods(http.MethodPost).
+		HandlerFunc(WrapHandler(DeprecatedEndpoint(s.HandleFormatCode, apiv1SunsetDate)))
+	r.Path("/share").Methods(http.MethodPost).
+		HandlerFunc(WrapHandler(DeprecatedEndpoint(s.HandleShare, apiv1SunsetDate)))
+	r.Path("/snippet/{id}").Methods(http.MethodGet).
+		HandlerFunc(WrapHandler(DeprecatedEndpoint(s.HandleGetSnippet, apiv1SunsetDate)))
 }
 
-func (s *Service) lookupBuiltin(val string) (*SuggestionsResponse, error) {
+func (s *APIv1Handler) lookupBuiltin(val string) (*SuggestionsResponse, error) {
 	// Package or built-in lookup
 	pkg, ok := s.index.PackageByName("builtin")
 	if !ok {
@@ -106,7 +107,7 @@ func (s *Service) lookupBuiltin(val string) (*SuggestionsResponse, error) {
 	return &resp, nil
 }
 
-func (s *Service) provideSuggestion(req SuggestionRequest) (*SuggestionsResponse, error) {
+func (s *APIv1Handler) provideSuggestion(req SuggestionRequest) (*SuggestionsResponse, error) {
 	// Provide package suggestions (if requested)
 	if req.PackageName != "" {
 		pkg, ok := s.index.PackageByName(req.PackageName)
@@ -138,13 +139,13 @@ func (s *Service) provideSuggestion(req SuggestionRequest) (*SuggestionsResponse
 }
 
 // HandleGetVersion handles /api/version
-func (s *Service) HandleGetVersion(w http.ResponseWriter, _ *http.Request) error {
-	WriteJSON(w, VersionResponse{Version: s.config.Version})
+func (s *APIv1Handler) HandleGetVersion(w http.ResponseWriter, _ *http.Request) error {
+	WriteJSON(w, VersionResponse{Version: s.config.Version, APIVersion: "2"})
 	return nil
 }
 
 // HandleGetSuggestion handles code suggestion
-func (s *Service) HandleGetSuggestion(w http.ResponseWriter, r *http.Request) error {
+func (s *APIv1Handler) HandleGetSuggestion(w http.ResponseWriter, r *http.Request) error {
 	q := r.URL.Query()
 	value := q.Get("value")
 	pkgName := q.Get("packageName")
@@ -159,21 +160,21 @@ func (s *Service) HandleGetSuggestion(w http.ResponseWriter, r *http.Request) er
 }
 
 // HandleFormatCode handles goimports action
-func (s *Service) HandleFormatCode(w http.ResponseWriter, r *http.Request) error {
-	src, err := s.getPayloadFromRequest(r)
+func (s *APIv1Handler) HandleFormatCode(w http.ResponseWriter, r *http.Request) error {
+	src, err := getPayloadFromRequest(r)
 	if err != nil {
 		return err
 	}
 
-	backend, err := backendFromRequest(r)
+	backend, err := backendFromQuery(r.URL.Query())
 	if err != nil {
-		return NewHTTPError(http.StatusBadRequest, err)
+		return NewBadRequestError(err)
 	}
 
 	formatted, _, err := s.goImportsCode(r.Context(), src, backend)
 	if err != nil {
 		if goplay.IsCompileError(err) {
-			return NewHTTPError(http.StatusBadRequest, err)
+			return NewBadRequestError(err)
 		}
 		return err
 	}
@@ -183,7 +184,7 @@ func (s *Service) HandleFormatCode(w http.ResponseWriter, r *http.Request) error
 }
 
 // HandleShare handles snippet share
-func (s *Service) HandleShare(w http.ResponseWriter, r *http.Request) error {
+func (s *APIv1Handler) HandleShare(w http.ResponseWriter, r *http.Request) error {
 	shareID, err := s.client.Share(r.Context(), r.Body)
 	defer r.Body.Close()
 	if err != nil {
@@ -200,7 +201,7 @@ func (s *Service) HandleShare(w http.ResponseWriter, r *http.Request) error {
 }
 
 // HandleGetSnippet handles snippet load
-func (s *Service) HandleGetSnippet(w http.ResponseWriter, r *http.Request) error {
+func (s *APIv1Handler) HandleGetSnippet(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	snippetID := vars["id"]
 	snippet, err := s.client.GetSnippet(r.Context(), snippetID)
@@ -224,26 +225,21 @@ func (s *Service) HandleGetSnippet(w http.ResponseWriter, r *http.Request) error
 }
 
 // HandleRunCode handles code run
-func (s *Service) HandleRunCode(w http.ResponseWriter, r *http.Request) error {
+func (s *APIv1Handler) HandleRunCode(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
-	src, err := s.getPayloadFromRequest(r)
+	src, err := getPayloadFromRequest(r)
 	if err != nil {
 		return err
 	}
 
-	shouldFormat, err := shouldFormatCode(r)
+	params, err := RunParamsFromQuery(r.URL.Query())
 	if err != nil {
-		return err
-	}
-
-	backendName, err := backendFromRequest(r)
-	if err != nil {
-		return NewHTTPError(http.StatusBadRequest, err)
+		return NewBadRequestError(err)
 	}
 
 	var changed bool
-	if shouldFormat {
-		src, changed, err = s.goImportsCode(ctx, src, backendName)
+	if params.Format {
+		src, changed, err = s.goImportsCode(ctx, src, params.Backend)
 		if err != nil {
 			if goplay.IsCompileError(err) {
 				return NewHTTPError(http.StatusBadRequest, err)
@@ -255,9 +251,9 @@ func (s *Service) HandleRunCode(w http.ResponseWriter, r *http.Request) error {
 
 	res, err := s.client.Compile(ctx, goplay.CompileRequest{
 		Version: goplay.DefaultVersion,
-		WithVet: false,
+		WithVet: params.Vet,
 		Body:    src,
-	}, backendName)
+	}, params.Backend)
 	if err != nil {
 		return err
 	}
@@ -277,7 +273,7 @@ func (s *Service) HandleRunCode(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func (s *Service) HandleGetVersions(w http.ResponseWriter, r *http.Request) error {
+func (s *APIv1Handler) HandleGetVersions(w http.ResponseWriter, r *http.Request) error {
 	versions, err := s.versionProvider.GetVersions(r.Context())
 	if err != nil {
 		return err
@@ -288,12 +284,12 @@ func (s *Service) HandleGetVersions(w http.ResponseWriter, r *http.Request) erro
 }
 
 // HandleArtifactRequest handles WASM build artifact request
-func (s *Service) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) error {
+func (s *APIv1Handler) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	artifactId := storage.ArtifactID(vars[artifactParamVal])
 	data, err := s.compiler.GetArtifact(artifactId)
 	if err != nil {
-		if err == storage.ErrNotExists {
+		if errors.Is(err, storage.ErrNotExists) {
 			return Errorf(http.StatusNotFound, "artifact not found")
 		}
 
@@ -318,7 +314,7 @@ func (s *Service) HandleArtifactRequest(w http.ResponseWriter, r *http.Request) 
 }
 
 // HandleCompile handles WASM build request
-func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) error {
+func (s *APIv1Handler) HandleCompile(w http.ResponseWriter, r *http.Request) error {
 	// Limit for request timeout
 	ctx, cancel := context.WithDeadline(r.Context(), time.Now().Add(maxBuildTimeDuration))
 	defer cancel()
@@ -328,19 +324,19 @@ func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) error {
 		return NewHTTPError(http.StatusTooManyRequests, err)
 	}
 
-	src, err := s.getPayloadFromRequest(r)
+	src, err := getPayloadFromRequest(r)
 	if err != nil {
 		return err
 	}
 
-	shouldFormat, err := shouldFormatCode(r)
+	params, err := RunParamsFromQuery(r.URL.Query())
 	if err != nil {
-		return err
+		return NewBadRequestError(err)
 	}
 
 	var changed bool
-	if shouldFormat {
-		src, changed, err = s.goImportsCode(r.Context(), src, goplay.BackendGoCurrent)
+	if params.Format {
+		src, changed, err = s.goImportsCode(r.Context(), src, params.Backend)
 		if err != nil {
 			if goplay.IsCompileError(err) {
 				return NewHTTPError(http.StatusBadRequest, err)
@@ -370,24 +366,11 @@ func (s *Service) HandleCompile(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func backendFromRequest(r *http.Request) (goplay.Backend, error) {
-	backendName := r.URL.Query().Get(playgroundBackendParam)
-	if backendName == "" {
-		return goplay.BackendGoCurrent, nil
-	}
-
-	if !goplay.ValidateBackend(backendName) {
-		return "", fmt.Errorf("invalid backend name %q", backendName)
-	}
-
-	return backendName, nil
-}
-
 // goImportsCode reads code from request and performs "goimports" on it
 // if any error occurs, it sends error response to client and closes connection
 //
 // if "format" url query param is undefined or set to "false", just returns code as is
-func (s *Service) goImportsCode(ctx context.Context, src []byte, backend goplay.Backend) ([]byte, bool, error) {
+func (s *APIv1Handler) goImportsCode(ctx context.Context, src []byte, backend goplay.Backend) ([]byte, bool, error) {
 	resp, err := s.client.GoImports(ctx, src, backend)
 	if err != nil {
 		if isContentLengthError(err) {
@@ -404,32 +387,4 @@ func (s *Service) goImportsCode(ctx context.Context, src []byte, backend goplay.
 
 	changed := resp.Body != string(src)
 	return []byte(resp.Body), changed, nil
-}
-
-func (s *Service) getPayloadFromRequest(r *http.Request) ([]byte, error) {
-	// see: https://github.com/golang/playground/blob/master/share.go#L69
-	var buff bytes.Buffer
-	buff.Grow(goplay.MaxSnippetSize)
-
-	defer r.Body.Close()
-	_, err := io.Copy(&buff, io.LimitReader(r.Body, goplay.MaxSnippetSize+1))
-	if err != nil {
-		return nil, Errorf(http.StatusBadGateway, "failed to read request: %w", err)
-	}
-
-	if buff.Len() > goplay.MaxSnippetSize {
-		return nil, ErrSnippetTooLarge
-	}
-
-	return buff.Bytes(), nil
-}
-
-func isContentLengthError(err error) bool {
-	if httpErr, ok := goplay.IsHTTPError(err); ok {
-		if httpErr.StatusCode == http.StatusRequestEntityTooLarge {
-			return true
-		}
-	}
-
-	return false
 }

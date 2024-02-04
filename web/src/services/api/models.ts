@@ -27,11 +27,6 @@ export interface ShareResponse {
   snippetID: string
 }
 
-export interface Snippet {
-  fileName: string
-  code: string
-}
-
 export interface EvalEvent {
   Message: string
   Kind: EvalEventKind
@@ -39,8 +34,11 @@ export interface EvalEvent {
 }
 
 export interface RunResponse {
-  formatted?: string | null
   events: EvalEvent[]
+}
+
+export interface FilesPayload {
+  files: Record<string, string>
 }
 
 export interface BuildResponse {

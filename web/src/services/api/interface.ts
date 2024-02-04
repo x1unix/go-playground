@@ -4,9 +4,9 @@ import {
   type VersionResponse,
   type RunResponse,
   type BuildResponse,
-  type Snippet,
   type ShareResponse,
   type VersionsInfo,
+  type FilesPayload,
 } from './models'
 
 export interface IAPIClient {
@@ -16,17 +16,17 @@ export interface IAPIClient {
 
   getSuggestions: (query: { packageName?: string; value?: string }) => Promise<languages.CompletionList>
 
-  evaluateCode: (code: string, format: boolean) => Promise<RunResponse>
+  run: (files: Record<string, string>, vet: boolean) => Promise<RunResponse>
 
-  formatCode: (code: string) => Promise<RunResponse>
+  format: (files: Record<string, string>) => Promise<FilesPayload>
 
   build: (code: string, format: boolean) => Promise<BuildResponse>
 
   getArtifact: (fileName: string) => Promise<Response>
 
-  getSnippet: (id: string) => Promise<Snippet>
+  getSnippet: (id: string) => Promise<FilesPayload>
 
-  shareSnippet: (code: string) => Promise<ShareResponse>
+  shareSnippet: (files: Record<string, string>) => Promise<ShareResponse>
 
   getBackendVersions: () => Promise<VersionsInfo>
 }

@@ -166,6 +166,11 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
   }
 
   private async doAnalyze(fileName: string, code: string) {
+    if (!fileName.endsWith('.go')) {
+      // Ignore non-go files
+      return
+    }
+
     // Code analysis contains 2 steps that run on different conditions:
     // 1. Run Go worker if it's available and check for errors
     // 2. Add warnings to `time.Now` calls if code runs on server.
