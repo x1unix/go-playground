@@ -36,5 +36,4 @@ func TestFileSet(t *testing.T) {
 
 	got := fset.Bytes()
 	require.Equal(t, expected, string(got))
-	require.Equal(t, expected, fset.String())
 }

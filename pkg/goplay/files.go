@@ -63,10 +63,6 @@ func (f FileSet) Bytes() []byte {
 	return f.buf.Bytes()
 }
 
-func (f FileSet) String() string {
-	return f.buf.String()
-}
-
 func (f FileSet) hasTrailingNewline() bool {
 	buff := f.buf.Bytes()
 	if len(buff) == 0 {
