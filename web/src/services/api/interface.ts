@@ -4,10 +4,9 @@ import {
   type VersionResponse,
   type RunResponse,
   type BuildResponse,
-  type Snippet,
   type ShareResponse,
   type VersionsInfo,
-  type FormatResponse,
+  type FilesPayload,
 } from './models'
 
 export interface IAPIClient {
@@ -19,15 +18,15 @@ export interface IAPIClient {
 
   run: (files: Record<string, string>, vet: boolean) => Promise<RunResponse>
 
-  format: (files: Record<string, string>) => Promise<FormatResponse>
+  format: (files: Record<string, string>) => Promise<FilesPayload>
 
   build: (code: string, format: boolean) => Promise<BuildResponse>
 
   getArtifact: (fileName: string) => Promise<Response>
 
-  getSnippet: (id: string) => Promise<Snippet>
+  getSnippet: (id: string) => Promise<FilesPayload>
 
-  shareSnippet: (code: string) => Promise<ShareResponse>
+  shareSnippet: (files: Record<string, string>) => Promise<ShareResponse>
 
   getBackendVersions: () => Promise<VersionsInfo>
 }

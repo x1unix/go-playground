@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type FilesRequest struct {
+type FilesPayload struct {
 	Files map[string]string `json:"files"`
 }
 

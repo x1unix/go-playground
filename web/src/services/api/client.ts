@@ -5,10 +5,9 @@ import {
   type VersionResponse,
   type RunResponse,
   type BuildResponse,
-  type Snippet,
   type ShareResponse,
   type VersionsInfo,
-  type FormatResponse,
+  type FilesPayload,
 } from './models'
 import { type IAPIClient } from './interface'
 
@@ -52,16 +51,16 @@ export class Client implements IAPIClient {
     return await this.post<RunResponse>(`/v2/run?vet=${Boolean(vet)}&backend=${backend}`, { files })
   }
 
-  async format(files: Record<string, string>, backend = Backend.Default): Promise<FormatResponse> {
-    return await this.post<FormatResponse>(`/v2/format?backend=${backend}`, { files })
+  async format(files: Record<string, string>, backend = Backend.Default): Promise<FilesPayload> {
+    return await this.post<FilesPayload>(`/v2/format?backend=${backend}`, { files })
   }
 
-  async getSnippet(id: string): Promise<Snippet> {
-    return await this.get<Snippet>(`/snippet/${id}`)
+  async getSnippet(id: string): Promise<FilesPayload> {
+    return await this.get<FilesPayload>(`/v2/share/${id}`)
   }
 
-  async shareSnippet(code: string): Promise<ShareResponse> {
-    return await this.post<ShareResponse>('/share', code)
+  async shareSnippet(files: Record<string, string>): Promise<ShareResponse> {
+    return await this.post<ShareResponse>('/v2/share', { files })
   }
 
   async getBackendVersions(): Promise<VersionsInfo> {

@@ -57,7 +57,7 @@ func (h *APIv2Handler) HandleGetSnippet(w http.ResponseWriter, r *http.Request) 
 		files = map[string]string{snippet.FileName: snippet.Contents}
 	}
 
-	WriteJSON(w, FilesRequest{Files: files})
+	WriteJSON(w, FilesPayload{Files: files})
 	return nil
 }
 
@@ -123,7 +123,7 @@ func (h *APIv2Handler) HandleFormat(w http.ResponseWriter, r *http.Request) erro
 		return NewHTTPError(http.StatusInternalServerError, fmt.Errorf("failed to reconstruct files set from format response: %w", err))
 	}
 
-	WriteJSON(w, FilesRequest{Files: results})
+	WriteJSON(w, FilesPayload{Files: results})
 	return nil
 }
 
@@ -172,7 +172,7 @@ func fileSetFromRequest(r *http.Request) (goplay.FileSet, []string, error) {
 	reader := http.MaxBytesReader(nil, r.Body, goplay.MaxSnippetSize)
 	defer reader.Close()
 
-	body := new(FilesRequest)
+	body := new(FilesPayload)
 	if err := json.NewDecoder(reader).Decode(body); err != nil {
 		maxBytesErr := new(http.MaxBytesError)
 		if errors.As(err, &maxBytesErr) {

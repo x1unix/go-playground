@@ -64,16 +64,13 @@ export const dispatchLoadSnippet = (snippetId: string | null) => async (dispatch
   })
 
   try {
-    // TODO: use APIv2
-    const { fileName, code } = await client.getSnippet(snippetId)
+    const { files } = await client.getSnippet(snippetId)
     dispatch<SnippetLoadPayload>({
       type: WorkspaceAction.SNIPPET_LOAD_FINISH,
       payload: {
         id: snippetId,
         error: null,
-        files: {
-          [fileName]: code,
-        },
+        files,
       },
     })
   } catch (err: any) {
@@ -119,11 +116,8 @@ export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState:
   )
 
   try {
-    // TODO: use APIv2
     const { files } = workspace
-    const fileName = Object.keys(files)[0]
-    const code = files[fileName]
-    const { snippetID } = await client.shareSnippet(code)
+    const { snippetID } = await client.shareSnippet(files)
     dispatch(newRemoveNotificationAction(notificationId))
     dispatch(replace(`/snippet/${snippetID}`))
     dispatch(
