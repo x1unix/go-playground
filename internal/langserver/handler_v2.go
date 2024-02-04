@@ -67,7 +67,7 @@ func (h *APIv2Handler) HandleFormat(w http.ResponseWriter, r *http.Request) erro
 	return nil
 }
 
-func (h *APIv2Handler) HandleRunCode(w http.ResponseWriter, r *http.Request) error {
+func (h *APIv2Handler) HandleRun(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 
 	params, err := RunParamsFromQuery(r.URL.Query())
@@ -107,11 +107,16 @@ func (h *APIv2Handler) HandleRunCode(w http.ResponseWriter, r *http.Request) err
 }
 
 func (h *APIv2Handler) Mount(r *mux.Router) {
-	r.Path("/run").Methods(http.MethodPost).HandlerFunc(WrapHandler(h.HandleRunCode))
+	r.Path("/run").Methods(http.MethodPost).HandlerFunc(WrapHandler(h.HandleRun))
+	r.Path("/format").Methods(http.MethodPost).HandlerFunc(WrapHandler(h.HandleFormat))
 }
 
 func fileSetFromRequest(r *http.Request) (goplay.FileSet, []string, error) {
 	payload := goplay.NewFileSet(int(r.ContentLength))
+	if err := r.ParseMultipartForm(goplay.MaxSnippetSize); err != nil {
+		return payload, nil, NewBadRequestError(err)
+	}
+
 	files := r.MultipartForm.File["files"]
 	if len(files) == 0 {
 		return payload, nil, NewBadRequestError(ErrEmptyRequest)
