@@ -89,7 +89,7 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Resu
 
 	// Go module is required to build project
 	if _, ok := files["go.mod"]; !ok {
-		files["go.mod"] = []byte("module " + aid.String())
+		files["go.mod"] = generateGoMod(aid.String())
 	}
 
 	workspace, err := s.storage.CreateWorkspace(aid, files)

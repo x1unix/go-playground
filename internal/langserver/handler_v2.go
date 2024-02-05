@@ -48,7 +48,7 @@ func (h *APIv2Handler) HandleGetSnippet(w http.ResponseWriter, r *http.Request) 
 	}
 
 	files, err := goplay.SplitFileSet(snippet.Contents, goplay.SplitFileOpts{
-		DefaultFileName: snippet.FileName,
+		DefaultFileName: "main.go",
 		CheckPaths:      false,
 	})
 	if err != nil {
