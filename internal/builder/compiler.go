@@ -102,15 +102,23 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Resu
 }
 
 func (s BuildService) buildSource(ctx context.Context, workspace *storage.Workspace) error {
-	// Simple snippets contain usually only 1 file.
-	cmd := newGoToolCommand(ctx, "build", "-o", workspace.BinaryPath, ".")
-	cmd.Dir = workspace.WorkDir
+	// Populate go.mod and go.sum files.
+	if err := s.runGoTool(ctx, workspace.WorkDir, "mod", "tidy"); err != nil {
+		return err
+	}
+
+	return s.runGoTool(ctx, workspace.WorkDir, "build", "-o", workspace.BinaryPath, ".")
+}
+
+func (s BuildService) runGoTool(ctx context.Context, workDir string, args ...string) error {
+	cmd := newGoToolCommand(ctx, args...)
+	cmd.Dir = workDir
 	cmd.Env = s.getEnvironmentVariables()
 	buff := &bytes.Buffer{}
 	cmd.Stderr = buff
 
 	s.log.Debug(
-		"starting go build", zap.Strings("command", cmd.Args), zap.Strings("env", cmd.Env),
+		"starting go command", zap.Strings("command", cmd.Args), zap.Strings("env", cmd.Env),
 	)
 	if err := cmd.Start(); err != nil {
 		return err
@@ -118,7 +126,10 @@ func (s BuildService) buildSource(ctx context.Context, workspace *storage.Worksp
 
 	if err := cmd.Wait(); err != nil {
 		errMsg := buff.String()
-		s.log.Debug("build failed", zap.Error(err), zap.String("stderr", errMsg))
+		s.log.Debug(
+			"build failed",
+			zap.Error(err), zap.Strings("cmd", cmd.Args), zap.String("stderr", errMsg),
+		)
 		return newBuildError(errMsg)
 	}
 
