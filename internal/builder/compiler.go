@@ -16,7 +16,6 @@ var predefinedBuildVars = osutil.EnvironmentVariables{
 	"CGO_ENABLED": "0",
 	"GOOS":        "js",
 	"GOARCH":      "wasm",
-	"GOCACHE":     "off",
 	"HOME":        os.Getenv("HOME"),
 }
 
