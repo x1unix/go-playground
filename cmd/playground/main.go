@@ -70,6 +70,7 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 	playgroundClient := goplay.NewClient(cfg.Playground.PlaygroundURL, goplay.DefaultUserAgent,
 		cfg.Playground.ConnectTimeout)
 	buildCfg := builder.BuildEnvironmentConfig{
+		KeepGoModCache:               cfg.Build.SkipModuleCleanup,
 		IncludedEnvironmentVariables: osutil.SelectEnvironmentVariables(cfg.Build.BypassEnvVarsList...),
 	}
 	logger.Debug("Loaded list of environment variables used by compiler",

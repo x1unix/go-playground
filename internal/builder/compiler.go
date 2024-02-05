@@ -30,6 +30,9 @@ type Result struct {
 type BuildEnvironmentConfig struct {
 	// IncludedEnvironmentVariables is a list included environment variables for build.
 	IncludedEnvironmentVariables osutil.EnvironmentVariables
+
+	// KeepGoModCache disables Go modules cache cleanup.
+	KeepGoModCache bool
 }
 
 // BuildService is WASM build service
@@ -122,6 +125,11 @@ func (s BuildService) CleanJobName() string {
 //
 // Cleans go build and modules cache.
 func (s BuildService) Clean(ctx context.Context) error {
+	if s.config.KeepGoModCache {
+		s.log.Info("go mod cache cleanup is disabled, skip")
+		return nil
+	}
+
 	cmd := newGoToolCommand(ctx, "clean", "-modcache", "-cache", "-testcache", "-fuzzcache")
 	cmd.Env = s.getEnvironmentVariables()
 	buff := &bytes.Buffer{}
