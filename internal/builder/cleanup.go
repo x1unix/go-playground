@@ -41,9 +41,7 @@ func (c *CleanupDispatchService) Start(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-t.C:
-			for _, cleaner := range c.cleaners {
-				_ = cleaner.Clean(ctx)
-			}
+			go c.dispatchCleanup(ctx)
 		}
 	}
 }
@@ -80,7 +78,7 @@ func (c *CleanupDispatchService) dispatchCleanup(ctx context.Context) {
 	}
 
 	wg.Wait()
-	duration := time.Now().Sub(startTime)
+	duration := time.Since(startTime)
 	if duration > c.interval {
 		c.logger.Warn("cleanup job took too long!", zap.Duration("duration", duration))
 		return
