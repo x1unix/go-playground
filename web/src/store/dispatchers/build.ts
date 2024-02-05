@@ -166,9 +166,7 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
         break
       }
       case TargetType.WebAssembly: {
-        // TODO: support ApiV2
-        const source = files[selectedFile]
-        const { fileName } = await client.build(source, settings.autoFormat)
+        const { fileName } = await client.build(files)
 
         const instance = await fetchWasmWithProgress(dispatch, fileName)
         dispatch(newRemoveNotificationAction(WASM_APP_DOWNLOAD_NOTIFICATION))
