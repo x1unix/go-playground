@@ -31,7 +31,8 @@ func TestLocalStorage_GetItem(t *testing.T) {
 	r.Falsef(s.dirty.IsSet(), "dirty flag is not false")
 
 	entries := map[string][]byte{
-		"test1.go": []byte("foo"),
+		"test1.go":   []byte("foo"),
+		"foo/bar.go": []byte("bar"),
 	}
 	aid, err := GetArtifactID(entries)
 	require.NoError(t, err, "failed to create a test artifact ID")
@@ -51,16 +52,16 @@ func TestLocalStorage_GetItem(t *testing.T) {
 	// Create some data
 	workspace, err := s.CreateWorkspace(aid, entries)
 	require.NoError(t, err, "Workspace create error")
-	//err = s.CreateLocationAndDo(aid, entries, func(wasmLocation, sourceLocation string) error {
 	strEndsWith(t, workspace.BinaryPath, ExtWasm)
 	require.Len(t, workspace.Files, len(entries))
-	for _, filePath := range workspace.Files {
-		baseName := filepath.Base(filePath)
-		expectData, ok := entries[baseName]
-		require.Truef(t, ok, "missing file %q in workspace", baseName)
-		gotData, err := os.ReadFile(filePath)
+
+	for fileName, expectData := range entries {
+		absPath := filepath.Join(workspace.WorkDir, fileName)
+		require.Contains(t, workspace.Files, absPath, "missing file in workspace")
+		gotData, err := os.ReadFile(absPath)
+
 		require.NoError(t, err, "can't access expected file")
-		require.Equalf(t, expectData, gotData, "file content mismatch: %q", filePath)
+		require.Equalf(t, expectData, gotData, "file content mismatch: %q", absPath)
 	}
 
 	// Check storage dirty state

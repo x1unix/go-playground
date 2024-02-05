@@ -178,6 +178,10 @@ func (s LocalStorage) CreateWorkspace(id ArtifactID, files map[string][]byte) (*
 	fileNames := make([]string, 0, len(files))
 
 	for name, data := range files {
+		if err := createParentDir(tmpSrcDir, name); err != nil {
+			return nil, err
+		}
+
 		filePath := filepath.Join(tmpSrcDir, name)
 		fileNames = append(fileNames, filePath)
 		if err := os.WriteFile(filePath, data, perm); err != nil {
@@ -234,7 +238,7 @@ func (s LocalStorage) clean() error {
 	return nil
 }
 
-// CleanJobName iemplements builder.Cleaner interface.
+// CleanJobName implements builder.Cleaner interface.
 func (s LocalStorage) CleanJobName() string {
 	return "storage"
 }
@@ -247,4 +251,18 @@ func (s LocalStorage) Clean(ctx context.Context) error {
 	}
 
 	return s.clean()
+}
+
+func createParentDir(workDir, fileName string) error {
+	dirName := filepath.Dir(fileName)
+	if dirName == "." {
+		return nil
+	}
+
+	absDirName := filepath.Join(workDir, dirName)
+	if err := os.MkdirAll(absDirName, perm); err != nil {
+		return fmt.Errorf("can't create %q: %s", absDirName, err)
+	}
+
+	return nil
 }
