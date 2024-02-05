@@ -4,9 +4,15 @@ import { getImportObject, goRun } from '~/services/go'
 import { setTimeoutNanos, SECOND } from '~/utils/duration'
 import { instantiateStreaming } from '~/lib/go'
 import client, { type EvalEvent, EvalEventKind } from '~/services/api'
+import { isProjectRequiresGoMod, goModFile, goModTemplate } from '~/services/examples'
 
 import { type DispatchFn, type StateProvider } from '../helpers'
-import { newAddNotificationAction, newRemoveNotificationAction, NotificationType } from '../notifications'
+import {
+  newAddNotificationAction,
+  newRemoveNotificationAction,
+  NotificationType,
+  NotificationIDs,
+} from '../notifications'
 import {
   newErrorAction,
   newLoadingAction,
@@ -17,10 +23,7 @@ import {
 
 import { type Dispatcher } from './utils'
 import { wrapResponseWithProgress } from '~/utils/http'
-import { type BulkFileUpdatePayload, WorkspaceAction } from '~/store/workspace/actions'
-
-const WASM_APP_DOWNLOAD_NOTIFICATION = 'WASM_APP_DOWNLOAD_NOTIFICATION'
-const WASM_APP_EXIT_ERROR = 'WASM_APP_EXIT_ERROR'
+import { type BulkFileUpdatePayload, type FileUpdatePayload, WorkspaceAction } from '~/store/workspace/actions'
 
 /**
  * Go program execution timeout in nanoseconds
@@ -99,7 +102,7 @@ const fetchWasmWithProgress = async (dispatch: DispatchFn, fileName: string) => 
   try {
     dispatch(
       newAddNotificationAction({
-        id: WASM_APP_DOWNLOAD_NOTIFICATION,
+        id: NotificationIDs.WASMAppDownload,
         type: NotificationType.Info,
         title: 'Downloading compiled program',
         canDismiss: false,
@@ -113,7 +116,7 @@ const fetchWasmWithProgress = async (dispatch: DispatchFn, fileName: string) => 
     const rspWithProgress = wrapResponseWithProgress(rsp, ({ totalBytes, currentBytes }) => {
       dispatch(
         newAddNotificationAction({
-          id: WASM_APP_DOWNLOAD_NOTIFICATION,
+          id: NotificationIDs.WASMAppDownload,
           type: NotificationType.Info,
           title: 'Downloading compiled application',
           canDismiss: false,
@@ -127,14 +130,14 @@ const fetchWasmWithProgress = async (dispatch: DispatchFn, fileName: string) => 
 
     return await instantiateStreaming(rspWithProgress, getImportObject())
   } catch (err) {
-    dispatch(newRemoveNotificationAction(WASM_APP_DOWNLOAD_NOTIFICATION))
+    dispatch(newRemoveNotificationAction(NotificationIDs.WASMAppDownload))
     throw err
   }
 }
 
 export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getState: StateProvider) => {
-  dispatch(newLoadingAction())
-  dispatch(newRemoveNotificationAction(WASM_APP_EXIT_ERROR))
+  dispatch(newRemoveNotificationAction(NotificationIDs.WASMAppExitError))
+  dispatch(newRemoveNotificationAction(NotificationIDs.GoModMissing))
 
   try {
     const {
@@ -149,6 +152,38 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
       return
     }
 
+    if (target !== TargetType.Interpreter && isProjectRequiresGoMod(files)) {
+      dispatch(
+        newAddNotificationAction({
+          id: NotificationIDs.GoModMissing,
+          type: NotificationType.Error,
+          title: 'Go.mod file is missing',
+          description: 'Go.mod file is required to import sub-packages.',
+          canDismiss: true,
+          actions: [
+            {
+              key: 'ok',
+              label: 'Create go.mod',
+              primary: true,
+              onClick: () => {
+                dispatch<FileUpdatePayload[]>({
+                  type: WorkspaceAction.ADD_FILE,
+                  payload: [
+                    {
+                      filename: goModFile,
+                      content: goModTemplate,
+                    },
+                  ],
+                })
+              },
+            },
+          ],
+        }),
+      )
+      return
+    }
+
+    dispatch(newLoadingAction())
     if (settings.autoFormat) {
       const rsp = await client.format(files, backend)
       files = rsp.files
@@ -169,7 +204,7 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
         const { fileName } = await client.build(files)
 
         const instance = await fetchWasmWithProgress(dispatch, fileName)
-        dispatch(newRemoveNotificationAction(WASM_APP_DOWNLOAD_NOTIFICATION))
+        dispatch(newRemoveNotificationAction(NotificationIDs.WASMAppDownload))
         dispatch(newProgramStartAction())
 
         goRun(instance)
@@ -179,7 +214,7 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
           .catch((err) => {
             dispatch(
               newAddNotificationAction({
-                id: WASM_APP_EXIT_ERROR,
+                id: NotificationIDs.WASMAppExitError,
                 type: NotificationType.Error,
                 title: 'Failed to run WebAssembly program',
                 description: err.toString(),
@@ -232,7 +267,7 @@ export const createGoLifecycleAdapter = (dispatch: DispatchFn) => ({
 
     dispatch(
       newAddNotificationAction({
-        id: WASM_APP_EXIT_ERROR,
+        id: NotificationIDs.WASMAppExitError,
         type: NotificationType.Warning,
         title: 'Go program finished',
         description: `Go program exited with non zero code: ${code}`,

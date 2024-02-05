@@ -6,6 +6,7 @@ import {
   newAddNotificationAction,
   newNotificationId,
   newRemoveNotificationAction,
+  NotificationIDs,
   NotificationType,
 } from '~/store/notifications'
 import { newLoadingAction, newErrorAction, newUIStateChangeAction } from '~/store/actions/ui'
@@ -18,6 +19,7 @@ import { loadWorkspaceState } from '../config'
  * @param source
  */
 export const dispatchLoadSnippetFromSource = (source: SnippetSource) => async (dispatch: DispatchFn) => {
+  dispatch(newRemoveNotificationAction(NotificationIDs.GoModMissing))
   dispatch({
     type: WorkspaceAction.SNIPPET_LOAD_START,
     payload: source.basePath,
@@ -59,6 +61,7 @@ export const dispatchLoadSnippet =
       return
     }
 
+    dispatch(newRemoveNotificationAction(NotificationIDs.GoModMissing))
     const {
       workspace: { snippet },
       ui,

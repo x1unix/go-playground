@@ -137,8 +137,15 @@ export const Notification: React.FunctionComponent<NotificationProps> = ({
       )}
       {actions?.length && (
         <Stack horizontal className="Notification__Actions" horizontalAlign="end" tokens={{ childrenGap: 10 }}>
-          {actions.map(({ key, ...props }, i) => (
-            <NotificationActionButton key={key} {...props} />
+          {actions.map(({ key, onClick, ...props }, i) => (
+            <NotificationActionButton
+              {...props}
+              key={key}
+              onClick={() => {
+                onClick?.()
+                onClose?.()
+              }}
+            />
           ))}
         </Stack>
       )}
