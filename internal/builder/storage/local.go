@@ -234,25 +234,17 @@ func (s LocalStorage) clean() error {
 	return nil
 }
 
-// StartCleaner implements storage interface
-func (s LocalStorage) StartCleaner(ctx context.Context, interval time.Duration, wg *sync.WaitGroup) {
-	s.gcRun.Set()
-	s.log.Debug("cleaner worker starter")
-	for {
-		select {
-		case <-ctx.Done():
-			s.log.Debug("context done, cleaner worker stopped")
-			s.gcRun.UnSet()
-			if wg != nil {
-				wg.Done()
-			}
-			return
-		default:
-		}
+// CleanJobName iemplements builder.Cleaner interface.
+func (s LocalStorage) CleanJobName() string {
+	return "storage"
+}
 
-		<-time.After(interval)
-		if err := s.clean(); err != nil {
-			s.log.Error("cleanup returned an error", zap.Error(err))
-		}
+// Clean implements' builder.Cleaner interface.
+func (s LocalStorage) Clean(ctx context.Context) error {
+	s.gcRun.Set()
+	if err := ctx.Err(); err != nil {
+		return err
 	}
+
+	return s.clean()
 }

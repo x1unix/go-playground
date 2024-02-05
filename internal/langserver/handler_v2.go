@@ -1,13 +1,16 @@
 package langserver
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"golang.org/x/time/rate"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/x1unix/go-playground/internal/compiler"
+	"github.com/x1unix/go-playground/internal/builder"
 	"github.com/x1unix/go-playground/pkg/goplay"
 	"go.uber.org/zap"
 )
@@ -16,15 +19,17 @@ var ErrEmptyRequest = errors.New("empty request")
 
 type APIv2Handler struct {
 	logger   *zap.Logger
-	compiler compiler.BuildService
+	compiler builder.BuildService
 	client   *goplay.Client
+	limiter  *rate.Limiter
 }
 
-func NewAPIv2Handler(client *goplay.Client, builder compiler.BuildService) *APIv2Handler {
+func NewAPIv2Handler(client *goplay.Client, builder builder.BuildService) *APIv2Handler {
 	return &APIv2Handler{
 		logger:   zap.L().Named("api.v2"),
 		compiler: builder,
 		client:   client,
+		limiter:  rate.NewLimiter(rate.Every(frameTime), compileRequestsPerFrame),
 	}
 }
 
@@ -161,14 +166,76 @@ func (h *APIv2Handler) HandleRun(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+func (h *APIv2Handler) HandleCompile(w http.ResponseWriter, r *http.Request) error {
+	// Limit for request timeout
+	ctx, cancel := context.WithDeadline(r.Context(), time.Now().Add(maxBuildTimeDuration))
+	defer cancel()
+
+	// Wait for our queue in line for compilation
+	if err := h.limiter.Wait(ctx); err != nil {
+		return NewHTTPError(http.StatusTooManyRequests, err)
+	}
+
+	files, err := buildFilesFromRequest(r)
+	if err != nil {
+		return err
+	}
+
+	result, err := h.compiler.Build(ctx, files)
+	if builder.IsBuildError(err) {
+		return NewHTTPError(http.StatusBadRequest, err)
+	}
+	if err != nil {
+		return err
+	}
+
+	WriteJSON(w, BuildResponse{
+		FileName: result.FileName,
+	})
+	return nil
+}
+
 func (h *APIv2Handler) Mount(r *mux.Router) {
 	r.Path("/run").Methods(http.MethodPost).HandlerFunc(WrapHandler(h.HandleRun))
 	r.Path("/format").Methods(http.MethodPost).HandlerFunc(WrapHandler(h.HandleFormat))
 	r.Path("/share").Methods(http.MethodPost).HandlerFunc(WrapHandler(h.HandleShare))
 	r.Path("/share/{id}").Methods(http.MethodGet).HandlerFunc(WrapHandler(h.HandleGetSnippet))
+	r.Path("/compile").Methods(http.MethodPost).HandlerFunc(WrapHandler(h.HandleCompile))
 }
 
 func fileSetFromRequest(r *http.Request) (goplay.FileSet, []string, error) {
+	body, err := filesPayloadFromRequest(r)
+	if err != nil {
+		return goplay.FileSet{}, nil, err
+	}
+
+	payload := goplay.NewFileSet(goplay.MaxSnippetSize)
+	fileNames := make([]string, 0, len(body.Files))
+	for name, contents := range body.Files {
+		fileNames = append(fileNames, name)
+		if err := payload.Add(name, []byte(contents)); err != nil {
+			return payload, fileNames, NewBadRequestError(err)
+		}
+	}
+
+	return payload, fileNames, nil
+}
+
+func buildFilesFromRequest(r *http.Request) (map[string][]byte, error) {
+	body, err := filesPayloadFromRequest(r)
+	if err != nil {
+		return nil, err
+	}
+
+	files := make(map[string][]byte, len(body.Files))
+	for name, contents := range body.Files {
+		files[name] = []byte(contents)
+	}
+
+	return files, nil
+}
+
+func filesPayloadFromRequest(r *http.Request) (*FilesPayload, error) {
 	reader := http.MaxBytesReader(nil, r.Body, goplay.MaxSnippetSize)
 	defer reader.Close()
 
@@ -176,24 +243,15 @@ func fileSetFromRequest(r *http.Request) (goplay.FileSet, []string, error) {
 	if err := json.NewDecoder(reader).Decode(body); err != nil {
 		maxBytesErr := new(http.MaxBytesError)
 		if errors.As(err, &maxBytesErr) {
-			return goplay.FileSet{}, nil, ErrSnippetTooLarge
+			return nil, ErrSnippetTooLarge
 		}
 
-		return goplay.FileSet{}, nil, NewBadRequestError(err)
+		return nil, NewBadRequestError(err)
 	}
 
 	if len(body.Files) == 0 {
-		return goplay.FileSet{}, nil, ErrEmptyRequest
+		return nil, ErrEmptyRequest
 	}
 
-	payload := goplay.NewFileSet(goplay.MaxSnippetSize)
-	fileNames := make([]string, 0, len(body.Files))
-	for name, contents := range body.Files {
-		fileNames = append(fileNames, name)
-		if err := payload.Add(name, contents); err != nil {
-			return payload, fileNames, NewBadRequestError(err)
-		}
-	}
-
-	return payload, fileNames, nil
+	return body, nil
 }

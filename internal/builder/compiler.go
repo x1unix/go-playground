@@ -1,11 +1,12 @@
-package compiler
+package builder
 
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"os"
 
-	"github.com/x1unix/go-playground/internal/compiler/storage"
+	"github.com/x1unix/go-playground/internal/builder/storage"
 	"github.com/x1unix/go-playground/pkg/util/osutil"
 	"go.uber.org/zap"
 )
@@ -107,6 +108,31 @@ func (s BuildService) buildSource(ctx context.Context, workspace *storage.Worksp
 		errMsg := buff.String()
 		s.log.Debug("build failed", zap.Error(err), zap.String("stderr", errMsg))
 		return newBuildError(errMsg)
+	}
+
+	return nil
+}
+
+// CleanJobName implements' builder.Cleaner interface.
+func (s BuildService) CleanJobName() string {
+	return "gocache"
+}
+
+// Clean implements' builder.Cleaner interface.
+//
+// Cleans go build and modules cache.
+func (s BuildService) Clean(ctx context.Context) error {
+	cmd := newGoToolCommand(ctx, "clean", "-modcache", "-cache", "-testcache", "-fuzzcache")
+	cmd.Env = s.getEnvironmentVariables()
+	buff := &bytes.Buffer{}
+	cmd.Stderr = buff
+
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("failed to start command %s: %w", cmd.Args, err)
+	}
+
+	if err := cmd.Wait(); err != nil {
+		return fmt.Errorf("process returned error: %s. Stderr: %s", err, buff.String())
 	}
 
 	return nil

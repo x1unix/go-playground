@@ -11,8 +11,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/x1unix/foundation/app"
 	"github.com/x1unix/go-playground/internal/analyzer"
-	"github.com/x1unix/go-playground/internal/compiler"
-	"github.com/x1unix/go-playground/internal/compiler/storage"
+	"github.com/x1unix/go-playground/internal/builder"
+	"github.com/x1unix/go-playground/internal/builder/storage"
 	"github.com/x1unix/go-playground/internal/config"
 	"github.com/x1unix/go-playground/internal/langserver"
 	"github.com/x1unix/go-playground/internal/langserver/webutil"
@@ -39,7 +39,7 @@ func main() {
 	analyzer.SetLogger(logger)
 	defer logger.Sync() //nolint:errcheck
 
-	goRoot, err := compiler.GOROOT()
+	goRoot, err := builder.GOROOT()
 	if err != nil {
 		logger.Fatal("Failed to find GOROOT environment variable value", zap.Error(err))
 	}
@@ -58,24 +58,27 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 		return fmt.Errorf("failed to read packages file %q: %s", cfg.Build.PackagesFile, err)
 	}
 
-	store, err := storage.NewLocalStorage(logger.Sugar(), cfg.Build.BuildDir)
+	store, err := storage.NewLocalStorage(logger, cfg.Build.BuildDir)
 	if err != nil {
 		return err
 	}
 
 	ctx, _ := app.GetApplicationContext()
 	wg := &sync.WaitGroup{}
-	go store.StartCleaner(ctx, cfg.Build.CleanupInterval, nil)
 
 	// Initialize services
 	playgroundClient := goplay.NewClient(cfg.Playground.PlaygroundURL, goplay.DefaultUserAgent,
 		cfg.Playground.ConnectTimeout)
-	buildCfg := compiler.BuildEnvironmentConfig{
+	buildCfg := builder.BuildEnvironmentConfig{
 		IncludedEnvironmentVariables: osutil.SelectEnvironmentVariables(cfg.Build.BypassEnvVarsList...),
 	}
 	logger.Debug("Loaded list of environment variables used by compiler",
 		zap.Any("vars", buildCfg.IncludedEnvironmentVariables))
-	buildSvc := compiler.NewBuildService(zap.S(), buildCfg, store)
+	buildSvc := builder.NewBuildService(zap.L(), buildCfg, store)
+
+	// Start cleanup service
+	cleanupSvc := builder.NewCleanupDispatchService(zap.L(), cfg.Build.CleanupInterval, buildSvc, store)
+	go cleanupSvc.Start(ctx)
 
 	// Initialize API endpoints
 	r := mux.NewRouter()

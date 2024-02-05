@@ -6,10 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 	"github.com/tevino/abool"
@@ -48,11 +46,7 @@ func TestLocalStorage_GetItem(t *testing.T) {
 
 	// Start trash collector in background
 	ctx, cancelFunc := context.WithCancel(context.Background())
-	cleanInterval := time.Second * 2
-	go s.StartCleaner(ctx, cleanInterval, nil)
-	defer cancelFunc()
-	runtime.Gosched() // Ask Go to switch to cleaner goroutine
-	r.True(s.gcRun.IsSet(), "gc start flag not true")
+	t.Cleanup(cancelFunc)
 
 	// Create some data
 	workspace, err := s.CreateWorkspace(aid, entries)
@@ -88,17 +82,12 @@ func TestLocalStorage_GetItem(t *testing.T) {
 	r.Equal(binData, gotBinData, "bin data mismatch")
 
 	// Trash collector should clean all our garbage after some time
-	runtime.Gosched()
-	time.Sleep(cleanInterval + time.Second)
+	require.NoError(t, s.Clean(ctx))
 	r.False(s.dirty.IsSet(), "storage is still dirty after cleanup")
 	_, err = s.GetItem(aid)
 	r.Error(err, "test item was not removed after cleanup")
 	r.EqualError(err, ErrNotExists.Error(), "should return ErrNotExists")
 	cancelFunc()
-
-	// Ensure that collector stopped after context done
-	time.Sleep(cleanInterval)
-	r.False(s.gcRun.IsSet(), "collector not stopped after context death")
 
 	require.NoError(t, os.RemoveAll(testDir), "failed to remove test dir after exit")
 }

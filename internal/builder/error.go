@@ -1,4 +1,6 @@
-package compiler
+package builder
+
+import "errors"
 
 // BuildError is build error
 type BuildError struct {
@@ -12,4 +14,13 @@ func (e *BuildError) Error() string {
 
 func newBuildError(msg string) *BuildError {
 	return &BuildError{message: msg}
+}
+
+func IsBuildError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	dst := new(BuildError)
+	return errors.As(err, &dst)
 }
