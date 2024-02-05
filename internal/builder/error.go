@@ -1,6 +1,9 @@
 package builder
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 // BuildError is build error
 type BuildError struct {
@@ -12,7 +15,11 @@ func (e *BuildError) Error() string {
 	return e.message
 }
 
-func newBuildError(msg string) *BuildError {
+func newBuildError(msg string, args ...any) *BuildError {
+	if len(args) > 0 {
+		msg = fmt.Sprintf(msg, args...)
+	}
+
 	return &BuildError{message: msg}
 }
 

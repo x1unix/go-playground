@@ -65,6 +65,10 @@ func (s BuildService) GetArtifact(id storage.ArtifactID) (storage.ReadCloseSizer
 
 // Build compiles Go source to WASM and returns result
 func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Result, error) {
+	if err := checkFileEntries(files); err != nil {
+		return nil, err
+	}
+
 	aid, err := storage.GetArtifactID(files)
 	if err != nil {
 		return nil, err

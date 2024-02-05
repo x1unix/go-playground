@@ -103,6 +103,9 @@ func TestBuildService_Build(t *testing.T) {
 	}{
 		"bad store": {
 			wantErr: "test error",
+			files: map[string][]byte{
+				"foo.go": []byte("test"),
+			},
 			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
 				return testStorage{
 					hasItem: func(id storage.ArtifactID) (bool, error) {
@@ -132,6 +135,9 @@ func TestBuildService_Build(t *testing.T) {
 		},
 		"new build": {
 			wantErr: "can't load package",
+			files: map[string][]byte{
+				"foo.go": []byte("test"),
+			},
 			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
 				s, err := storage.NewLocalStorage(zaptest.NewLogger(t), tempDir)
 				require.NoError(t, err)
@@ -146,6 +152,9 @@ func TestBuildService_Build(t *testing.T) {
 		},
 		"bad environment": {
 			wantErr: `executable file not found`,
+			files: map[string][]byte{
+				"foo.go": []byte("test"),
+			},
 			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
 				t.Setenv("PATH", ".")
 				s, err := storage.NewLocalStorage(zaptest.NewLogger(t), tempDir)
@@ -153,6 +162,69 @@ func TestBuildService_Build(t *testing.T) {
 				return s, func() error {
 					return os.RemoveAll(tempDir)
 				}
+			},
+		},
+		"empty project": {
+			wantErr: "no buildable Go source files",
+			store: func(t *testing.T, _ map[string][]byte) (storage.StoreProvider, func() error) {
+				return nil, nil
+			},
+		},
+		"too many files": {
+			wantErr: "too many files",
+			files: map[string][]byte{
+				"0":  nil,
+				"1":  nil,
+				"2":  nil,
+				"3":  nil,
+				"4":  nil,
+				"5":  nil,
+				"6":  nil,
+				"7":  nil,
+				"8":  nil,
+				"9":  nil,
+				"10": nil,
+				"11": nil,
+				"12": nil,
+			},
+			store: func(t *testing.T, _ map[string][]byte) (storage.StoreProvider, func() error) {
+				return nil, nil
+			},
+		},
+		"path too deep": {
+			wantErr: "file path is too deep",
+			files: map[string][]byte{
+				"a/b/c/d/e/f/g/h/i.go": []byte("package main"),
+			},
+			store: func(t *testing.T, _ map[string][]byte) (storage.StoreProvider, func() error) {
+				return nil, nil
+			},
+		},
+		"empty file": {
+			wantErr: "file main.go is empty",
+			files: map[string][]byte{
+				"main.go": []byte("  "),
+			},
+			store: func(t *testing.T, _ map[string][]byte) (storage.StoreProvider, func() error) {
+				return nil, nil
+			},
+		},
+		"bad path": {
+			wantErr: "invalid file name",
+			files: map[string][]byte{
+				"../main.go": []byte("a"),
+			},
+			store: func(t *testing.T, _ map[string][]byte) (storage.StoreProvider, func() error) {
+				return nil, nil
+			},
+		},
+		"non go files": {
+			wantErr: "invalid file name",
+			files: map[string][]byte{
+				"text.png": []byte("a"),
+			},
+			store: func(t *testing.T, _ map[string][]byte) (storage.StoreProvider, func() error) {
+				return nil, nil
 			},
 		},
 	}
