@@ -83,6 +83,11 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Resu
 		return result, nil
 	}
 
+	// Go module is required to build project
+	if _, ok := files["go.mod"]; !ok {
+		files["go.mod"] = []byte("module " + aid.String())
+	}
+
 	workspace, err := s.storage.CreateWorkspace(aid, files)
 	if err != nil {
 		return nil, err
@@ -93,6 +98,7 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Resu
 }
 
 func (s BuildService) buildSource(ctx context.Context, workspace *storage.Workspace) error {
+	// Simple snippets contain usually only 1 file.
 	cmd := newGoToolCommand(ctx, "build", "-o", workspace.BinaryPath, ".")
 	cmd.Dir = workspace.WorkDir
 	cmd.Env = s.getEnvironmentVariables()
