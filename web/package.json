@@ -55,9 +55,9 @@
     "workbox-streams": "^6.5.4"
   },
   "scripts": {
-    "start": "vite",
-    "build": "vite build",
-    "serve": "vite preview",
+    "start": "npx vite",
+    "build": "npx vite build",
+    "serve": "npx vite preview",
     "lint": "npx eslint .",
     "gen:suggestions": "node ./src/editor/internal/genpkgcache.js"
   },
