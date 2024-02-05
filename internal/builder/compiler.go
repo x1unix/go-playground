@@ -39,17 +39,19 @@ type BuildEnvironmentConfig struct {
 
 // BuildService is WASM build service
 type BuildService struct {
-	log     *zap.Logger
-	config  BuildEnvironmentConfig
-	storage storage.StoreProvider
+	log       *zap.Logger
+	config    BuildEnvironmentConfig
+	storage   storage.StoreProvider
+	cmdRunner CommandRunner
 }
 
 // NewBuildService is BuildService constructor
 func NewBuildService(log *zap.Logger, cfg BuildEnvironmentConfig, store storage.StoreProvider) BuildService {
 	return BuildService{
-		log:     log.Named("builder"),
-		config:  cfg,
-		storage: store,
+		log:       log.Named("builder"),
+		config:    cfg,
+		storage:   store,
+		cmdRunner: OSCommandRunner{},
 	}
 }
 
@@ -140,17 +142,14 @@ func (s BuildService) runGoTool(ctx context.Context, workDir string, args ...str
 	s.log.Debug(
 		"starting go command", zap.Strings("command", cmd.Args), zap.Strings("env", cmd.Env),
 	)
-	if err := cmd.Start(); err != nil {
-		return err
-	}
 
-	if err := cmd.Wait(); err != nil {
-		errMsg := buff.String()
+	if err := s.cmdRunner.RunCommand(cmd); err != nil {
 		s.log.Debug(
 			"build failed",
-			zap.Error(err), zap.Strings("cmd", cmd.Args), zap.String("stderr", errMsg),
+			zap.Error(err), zap.Strings("cmd", cmd.Args), zap.Stringer("stderr", buff),
 		)
-		return newBuildError(errMsg)
+
+		return newBuildErrorFromStdout(err, buff)
 	}
 
 	return nil
@@ -175,13 +174,17 @@ func (s BuildService) Clean(ctx context.Context) error {
 	buff := &bytes.Buffer{}
 	cmd.Stderr = buff
 
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("failed to start command %s: %w", cmd.Args, err)
-	}
-
-	if err := cmd.Wait(); err != nil {
+	if err := s.cmdRunner.RunCommand(cmd); err != nil {
 		return fmt.Errorf("process returned error: %s. Stderr: %s", err, buff.String())
 	}
 
 	return nil
+}
+
+func newBuildErrorFromStdout(err error, buff *bytes.Buffer) error {
+	if buff.Len() > 0 {
+		return newBuildError(buff.String())
+	}
+
+	return newBuildError("Process returned error: %s", err)
 }

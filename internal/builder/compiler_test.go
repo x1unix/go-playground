@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"strings"
 	"syscall"
 	"testing"
@@ -13,6 +14,7 @@ import (
 	"github.com/x1unix/go-playground/internal/builder/storage"
 	"github.com/x1unix/go-playground/pkg/testutil"
 	"github.com/x1unix/go-playground/pkg/util/osutil"
+	"go.uber.org/mock/gomock"
 	"go.uber.org/zap/zaptest"
 )
 
@@ -105,7 +107,7 @@ func TestBuildService_Build(t *testing.T) {
 	cases := map[string]struct {
 		skip         bool
 		files        map[string][]byte
-		env          osutil.EnvironmentVariables
+		cmdRunner    func(t *testing.T, ctrl *gomock.Controller) CommandRunner
 		wantErr      string
 		wantResult   func(files map[string][]byte) *Result
 		beforeRun    func(t *testing.T)
@@ -240,10 +242,6 @@ func TestBuildService_Build(t *testing.T) {
 		},
 		"handle no space left": {
 			wantErr: "no space left",
-			env: osutil.EnvironmentVariables{
-				"PATH":   ".",
-				"GOPATH": "/tmp",
-			},
 			files: map[string][]byte{
 				"main.go": []byte("package main"),
 			},
@@ -261,6 +259,16 @@ func TestBuildService_Build(t *testing.T) {
 					},
 				}, nil
 			},
+			cmdRunner: func(t *testing.T, ctrl *gomock.Controller) CommandRunner {
+				m := NewMockCommandRunner(ctrl)
+				m.EXPECT().RunCommand(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) error {
+					require.Equal(t, cmd.Args, []string{
+						"go", "clean", "-modcache", "-cache", "-testcache", "-fuzzcache",
+					})
+					return nil
+				}).Times(1)
+				return m
+			},
 		},
 	}
 
@@ -269,6 +277,7 @@ func TestBuildService_Build(t *testing.T) {
 			continue
 		}
 		t.Run(n, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
 			if c.beforeRun != nil {
 				c.beforeRun(t)
 			}
@@ -284,9 +293,11 @@ func TestBuildService_Build(t *testing.T) {
 				}()
 			}
 
-			bs := NewBuildService(zaptest.NewLogger(t), BuildEnvironmentConfig{
-				IncludedEnvironmentVariables: c.env,
-			}, store)
+			bs := NewBuildService(zaptest.NewLogger(t), BuildEnvironmentConfig{}, store)
+			if c.cmdRunner != nil {
+				bs.cmdRunner = c.cmdRunner(t, ctrl)
+			}
+
 			got, err := bs.Build(context.TODO(), c.files)
 			if c.wantErr != "" {
 				if c.onErrorCheck != nil {
