@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"context"
 	"errors"
 	"io"
 )
@@ -38,4 +39,7 @@ type StoreProvider interface {
 
 	// CreateWorkspace creates workspace entry in storage
 	CreateWorkspace(id ArtifactID, files map[string][]byte) (*Workspace, error)
+
+	// Clean truncates storage contents
+	Clean(ctx context.Context) error
 }

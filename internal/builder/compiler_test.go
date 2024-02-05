@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"syscall"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -27,6 +28,7 @@ type testStorage struct {
 	hasItem         func(id storage.ArtifactID) (bool, error)
 	getItem         func(id storage.ArtifactID) (storage.ReadCloseSizer, error)
 	createWorkspace func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error)
+	clean           func(ctx context.Context) error
 }
 
 func (ts testStorage) HasItem(id storage.ArtifactID) (bool, error) {
@@ -39,6 +41,14 @@ func (ts testStorage) GetItem(id storage.ArtifactID) (storage.ReadCloseSizer, er
 
 func (ts testStorage) CreateWorkspace(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error) {
 	return ts.createWorkspace(id, entries)
+}
+
+func (ts testStorage) Clean(ctx context.Context) error {
+	if ts.clean != nil {
+		return ts.clean(ctx)
+	}
+
+	return errors.New("not implemented")
 }
 
 func TestBuildService_GetArtifact(t *testing.T) {
@@ -95,6 +105,7 @@ func TestBuildService_Build(t *testing.T) {
 	cases := map[string]struct {
 		skip         bool
 		files        map[string][]byte
+		env          osutil.EnvironmentVariables
 		wantErr      string
 		wantResult   func(files map[string][]byte) *Result
 		beforeRun    func(t *testing.T)
@@ -227,6 +238,30 @@ func TestBuildService_Build(t *testing.T) {
 				return nil, nil
 			},
 		},
+		"handle no space left": {
+			wantErr: "no space left",
+			env: osutil.EnvironmentVariables{
+				"PATH":   ".",
+				"GOPATH": "/tmp",
+			},
+			files: map[string][]byte{
+				"main.go": []byte("package main"),
+			},
+			store: func(t *testing.T, _ map[string][]byte) (storage.StoreProvider, func() error) {
+				return testStorage{
+					hasItem: func(id storage.ArtifactID) (bool, error) {
+						return false, nil
+					},
+					createWorkspace: func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error) {
+						return nil, &os.PathError{Err: syscall.ENOSPC, Op: "write"}
+					},
+					clean: func(_ context.Context) error {
+						t.Log("cleanup called")
+						return nil
+					},
+				}, nil
+			},
+		},
 	}
 
 	for n, c := range cases {
@@ -249,7 +284,9 @@ func TestBuildService_Build(t *testing.T) {
 				}()
 			}
 
-			bs := NewBuildService(zaptest.NewLogger(t), BuildEnvironmentConfig{}, store)
+			bs := NewBuildService(zaptest.NewLogger(t), BuildEnvironmentConfig{
+				IncludedEnvironmentVariables: c.env,
+			}, store)
 			got, err := bs.Build(context.TODO(), c.files)
 			if c.wantErr != "" {
 				if c.onErrorCheck != nil {

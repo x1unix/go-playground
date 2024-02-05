@@ -3,8 +3,11 @@ package builder
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"os"
+	"syscall"
+	"time"
 
 	"github.com/x1unix/go-playground/internal/builder/storage"
 	"github.com/x1unix/go-playground/pkg/util/osutil"
@@ -94,6 +97,10 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Resu
 
 	workspace, err := s.storage.CreateWorkspace(aid, files)
 	if err != nil {
+		if errors.Is(err, syscall.ENOSPC) {
+			// Immediately schedule cleanup job!
+			s.handleNoSpaceLeft()
+		}
 		return nil, err
 	}
 
@@ -108,6 +115,19 @@ func (s BuildService) buildSource(ctx context.Context, workspace *storage.Worksp
 	}
 
 	return s.runGoTool(ctx, workspace.WorkDir, "build", "-o", workspace.BinaryPath, ".")
+}
+
+func (s BuildService) handleNoSpaceLeft() {
+	s.log.Warn("no space left on device, immediate clean triggered!")
+	ctx, cancelFn := context.WithTimeout(context.Background(), time.Minute)
+	defer cancelFn()
+
+	if err := s.storage.Clean(ctx); err != nil {
+		s.log.Error("failed to clear storage", zap.Error(err))
+	}
+	if err := s.Clean(ctx); err != nil {
+		s.log.Error("failed to clear Go cache", zap.Error(err))
+	}
 }
 
 func (s BuildService) runGoTool(ctx context.Context, workDir string, args ...string) error {
