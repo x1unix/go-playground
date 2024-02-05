@@ -8,8 +8,19 @@ import (
 // ErrNotExists is item not found error
 var ErrNotExists = errors.New("item not exists")
 
+type Workspace struct {
+	// WorkDir is workspace directory
+	WorkDir string
+
+	// BinaryPath is absolute path for output binary file.
+	BinaryPath string
+
+	// Files is list of files in workspace
+	Files []string
+}
+
 // Callback is location callback
-type Callback = func(wasmLocation, sourceLocation string) error
+type Callback = func(workspace Workspace) error
 
 type ReadCloseSizer interface {
 	io.ReadCloser
@@ -25,6 +36,6 @@ type StoreProvider interface {
 	// GetItem returns item by id
 	GetItem(id ArtifactID) (ReadCloseSizer, error)
 
-	// CreateLocationAndDo creates entry in storage and runs specified callback with new location
-	CreateLocationAndDo(id ArtifactID, data []byte, cb Callback) error
+	// CreateWorkspace creates workspace entry in storage
+	CreateWorkspace(id ArtifactID, files map[string][]byte) (*Workspace, error)
 }

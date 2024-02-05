@@ -15,6 +15,7 @@ var predefinedBuildVars = osutil.EnvironmentVariables{
 	"CGO_ENABLED": "0",
 	"GOOS":        "js",
 	"GOARCH":      "wasm",
+	"GOCACHE":     "off",
 	"HOME":        os.Getenv("HOME"),
 }
 
@@ -32,38 +33,18 @@ type BuildEnvironmentConfig struct {
 
 // BuildService is WASM build service
 type BuildService struct {
-	log     *zap.SugaredLogger
+	log     *zap.Logger
 	config  BuildEnvironmentConfig
 	storage storage.StoreProvider
 }
 
 // NewBuildService is BuildService constructor
-func NewBuildService(log *zap.SugaredLogger, cfg BuildEnvironmentConfig, store storage.StoreProvider) BuildService {
+func NewBuildService(log *zap.Logger, cfg BuildEnvironmentConfig, store storage.StoreProvider) BuildService {
 	return BuildService{
 		log:     log.Named("builder"),
 		config:  cfg,
 		storage: store,
 	}
-}
-
-func (s BuildService) buildSource(ctx context.Context, outputLocation, sourceLocation string) error {
-	cmd := newGoToolCommand(ctx, "build", "-o", outputLocation, sourceLocation)
-	cmd.Env = s.getEnvironmentVariables()
-	buff := &bytes.Buffer{}
-	cmd.Stderr = buff
-
-	s.log.Debugw("starting go build", "command", cmd.Args, "env", cmd.Env)
-	if err := cmd.Start(); err != nil {
-		return err
-	}
-
-	if err := cmd.Wait(); err != nil {
-		errMsg := buff.String()
-		s.log.Debugw("build failed", "err", err, "stderr", errMsg)
-		return newBuildError(errMsg)
-	}
-
-	return nil
 }
 
 func (s BuildService) getEnvironmentVariables() []string {
@@ -80,8 +61,8 @@ func (s BuildService) GetArtifact(id storage.ArtifactID) (storage.ReadCloseSizer
 }
 
 // Build compiles Go source to WASM and returns result
-func (s BuildService) Build(ctx context.Context, data []byte) (*Result, error) {
-	aid, err := storage.GetArtifactID(data)
+func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Result, error) {
+	aid, err := storage.GetArtifactID(files)
 	if err != nil {
 		return nil, err
 	}
@@ -89,19 +70,44 @@ func (s BuildService) Build(ctx context.Context, data []byte) (*Result, error) {
 	result := &Result{FileName: aid.Ext(storage.ExtWasm)}
 	isCached, err := s.storage.HasItem(aid)
 	if err != nil {
-		s.log.Errorw("failed to check cache", "artifact", aid.String(), "err", err)
+		s.log.Error("failed to check cache", zap.Stringer("artifact", aid), zap.Error(err))
 		return nil, err
 	}
 
 	if isCached {
 		// Just return precompiled result if data is cached already
-		s.log.Debugw("build cached, returning cached file", "artifact", aid.String())
+		s.log.Debug("build cached, returning cached file", zap.Stringer("artifact", aid))
 		return result, nil
 	}
 
-	err = s.storage.CreateLocationAndDo(aid, data, func(wasmLocation, sourceLocation string) error {
-		return s.buildSource(ctx, wasmLocation, sourceLocation)
-	})
+	workspace, err := s.storage.CreateWorkspace(aid, files)
+	if err != nil {
+		return nil, err
+	}
 
+	err = s.buildSource(ctx, workspace)
 	return result, err
+}
+
+func (s BuildService) buildSource(ctx context.Context, workspace *storage.Workspace) error {
+	cmd := newGoToolCommand(ctx, "build", "-o", workspace.BinaryPath, ".")
+	cmd.Dir = workspace.WorkDir
+	cmd.Env = s.getEnvironmentVariables()
+	buff := &bytes.Buffer{}
+	cmd.Stderr = buff
+
+	s.log.Debug(
+		"starting go build", zap.Strings("command", cmd.Args), zap.Strings("env", cmd.Env),
+	)
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+
+	if err := cmd.Wait(); err != nil {
+		errMsg := buff.String()
+		s.log.Debug("build failed", zap.Error(err), zap.String("stderr", errMsg))
+		return newBuildError(errMsg)
+	}
+
+	return nil
 }

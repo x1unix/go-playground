@@ -27,9 +27,20 @@ func (a ArtifactID) String() string {
 }
 
 // GetArtifactID generates new artifact ID from contents
-func GetArtifactID(data []byte) (ArtifactID, error) {
+func GetArtifactID(entries map[string][]byte) (ArtifactID, error) {
 	h := md5.New()
-	_, _ = h.Write(bytes.TrimSpace(data))
+
+	isFirst := true
+	for name, contents := range entries {
+		if !isFirst {
+			_, _ = h.Write([]byte("\n"))
+		}
+		isFirst = false
+		_, _ = h.Write([]byte("-- "))
+		_, _ = h.Write([]byte(name))
+		_, _ = h.Write([]byte(" --\n"))
+		_, _ = h.Write(bytes.TrimSpace(contents))
+	}
 	fName := hex.EncodeToString(h.Sum(nil))
 	return ArtifactID(fName), nil
 }

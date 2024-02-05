@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -39,9 +40,9 @@ func (c cachedFile) Read(p []byte) (n int, err error) {
 	return c.ReadCloser.Read(p)
 }
 
-// LocalStorage is local build artigact storage
+// LocalStorage is local build artifact storage
 type LocalStorage struct {
-	log     *zap.SugaredLogger
+	log     *zap.Logger
 	useLock *sync.Mutex
 	dirty   *abool.AtomicBool
 	gcRun   *abool.AtomicBool
@@ -51,7 +52,7 @@ type LocalStorage struct {
 }
 
 // NewLocalStorage constructs new local storage
-func NewLocalStorage(log *zap.SugaredLogger, baseDir string) (ls *LocalStorage, err error) {
+func NewLocalStorage(log *zap.Logger, baseDir string) (ls *LocalStorage, err error) {
 	var isDirty bool
 	logger := log.Named("storage")
 	workDir := filepath.Join(baseDir, workDirName)
@@ -63,7 +64,7 @@ func NewLocalStorage(log *zap.SugaredLogger, baseDir string) (ls *LocalStorage, 
 
 	isDirty, err = isDirDirty(workDir)
 	if err != nil {
-		logger.Errorw("failed to check if work dir is dirty", "err", err)
+		logger.Error("failed to check if work dir is dirty", zap.Error(err))
 	}
 
 	if isDirty {
@@ -138,40 +139,68 @@ func (s LocalStorage) GetItem(id ArtifactID) (ReadCloseSizer, error) {
 	}, err
 }
 
-// CreateLocationAndDo implements storage interface
-func (s LocalStorage) CreateLocationAndDo(id ArtifactID, data []byte, cb Callback) error {
+// CreateWorkspace implements storage interface
+func (s LocalStorage) CreateWorkspace(id ArtifactID, files map[string][]byte) (*Workspace, error) {
 	s.useLock.Lock()
 	defer s.useLock.Unlock()
 	s.dirty.Set() // mark storage as dirty
+
+	// Ensure bin dir exists
+	if err := os.MkdirAll(s.binDir, perm); err != nil {
+		if !os.IsExist(err) {
+			s.log.Error("failed to create a binary directory",
+				zap.Stringer("artifact", id),
+				zap.String("dir", s.binDir),
+				zap.Error(err),
+			)
+
+			return nil, fmt.Errorf("failed to create artifact directory: %w", err)
+		}
+	}
+
+	// Write entries
 	tmpSrcDir := filepath.Join(s.srcDir, id.String())
 	if err := os.MkdirAll(tmpSrcDir, perm); err != nil {
 		if !os.IsExist(err) {
-			s.log.Errorw("failed to create a temporary build directory",
-				"artifact", id.String(),
-				"dir", tmpSrcDir,
-				"err", err.Error(),
+			s.log.Error("failed to create a temporary build directory",
+				zap.Stringer("artifact", id),
+				zap.String("dir", tmpSrcDir),
+				zap.Error(err),
 			)
-			return errors.Wrapf(err, "failed to create temporary build directory")
+
+			return nil, fmt.Errorf("failed to create temporary build directory: %w", err)
 		}
 
-		s.log.Debugw("build directory already exists", "artifact", id.String())
+		s.log.Debug("build directory already exists", zap.Stringer("artifact", id))
 	}
 
 	wasmLocation := s.getOutputLocation(id)
-	goFileName := id.Ext(ExtGo)
-	srcFile := filepath.Join(tmpSrcDir, goFileName)
-	if err := os.WriteFile(srcFile, data, perm); err != nil {
-		s.log.Errorw(
-			"failed to save source file",
-			"artifact", id.String(),
-			"file", srcFile,
-			"err", err,
-		)
+	fileNames := make([]string, 0, len(files))
 
-		return errors.Wrapf(err, "failed to save source file %q", goFileName)
+	for name, data := range files {
+		filePath := filepath.Join(tmpSrcDir, name)
+		fileNames = append(fileNames, filePath)
+		if err := os.WriteFile(filePath, data, perm); err != nil {
+			if err := os.RemoveAll(tmpSrcDir); err != nil {
+				s.log.Warn("failed to remove workspace", zap.String("dir", tmpSrcDir), zap.Error(err))
+			}
+
+			s.log.Error(
+				"failed to save source file",
+				zap.Stringer("artifact", id),
+				zap.String("file", filePath),
+				zap.Error(err),
+			)
+
+			return nil, fmt.Errorf("failed to store file %q: %w", name, err)
+		}
 	}
 
-	return cb(wasmLocation, srcFile)
+	return &Workspace{
+		WorkDir:    tmpSrcDir,
+		BinaryPath: wasmLocation,
+		Files:      fileNames,
+	}, nil
 }
 
 func (s LocalStorage) clean() error {
@@ -182,7 +211,7 @@ func (s LocalStorage) clean() error {
 
 	s.log.Debug("cleanup start")
 	t := time.AfterFunc(maxCleanTime, func() {
-		s.log.Warnf("cleanup took more than %.0f seconds!", maxCleanTime.Seconds())
+		s.log.Warn("cleanup timeout exceeded", zap.Duration("timeout", maxCleanTime))
 	})
 	s.useLock.Lock()
 	defer s.useLock.Unlock()
@@ -197,7 +226,7 @@ func (s LocalStorage) clean() error {
 			return errors.Wrapf(err, "failed to remove %q", dir)
 		}
 
-		s.log.Debugf("cleaner: removed directory %q", dir)
+		s.log.Debug("cleaner: removed directory", zap.String("dir", dir))
 	}
 
 	s.dirty.UnSet() // remove dirty flag
@@ -223,7 +252,7 @@ func (s LocalStorage) StartCleaner(ctx context.Context, interval time.Duration, 
 
 		<-time.After(interval)
 		if err := s.clean(); err != nil {
-			s.log.Error(err)
+			s.log.Error("cleanup returned an error", zap.Error(err))
 		}
 	}
 }

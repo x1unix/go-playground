@@ -2,18 +2,15 @@ package storage
 
 import (
 	"context"
-	"errors"
-	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"sync"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tevino/abool"
 	"github.com/x1unix/go-playground/pkg/testutil"
@@ -22,7 +19,7 @@ import (
 
 func getTestDir(t *testing.T) string {
 	t.Helper()
-	d, err := ioutil.TempDir(os.TempDir(), "storage_test")
+	d, err := os.MkdirTemp(os.TempDir(), "storage_test")
 	require.NoError(t, err)
 	return d
 }
@@ -31,12 +28,15 @@ func TestLocalStorage_GetItem(t *testing.T) {
 	r := require.New(t)
 	testDir := getTestDir(t)
 	defer os.RemoveAll(testDir)
-	s, err := NewLocalStorage(zaptest.NewLogger(t).Sugar(), testDir)
+	s, err := NewLocalStorage(zaptest.NewLogger(t), testDir)
 	r.NoError(err, "failed to create test storage")
 	r.Falsef(s.dirty.IsSet(), "dirty flag is not false")
-	expectData := []byte("foo")
-	aid, err := GetArtifactID(expectData)
-	must(t, err, "failed to create a test artifact ID")
+
+	entries := map[string][]byte{
+		"test1.go": []byte("foo"),
+	}
+	aid, err := GetArtifactID(entries)
+	require.NoError(t, err, "failed to create a test artifact ID")
 
 	// check not existing item
 	ok, err := s.HasItem(aid)
@@ -55,28 +55,25 @@ func TestLocalStorage_GetItem(t *testing.T) {
 	r.True(s.gcRun.IsSet(), "gc start flag not true")
 
 	// Create some data
-	expErr := errors.New("create error")
-	err = s.CreateLocationAndDo(aid, expectData, func(wasmLocation, sourceLocation string) error {
-		strEndsWith(t, wasmLocation, ExtWasm)
-		strEndsWith(t, sourceLocation, ExtGo)
-		t.Logf("\nWASM:\t%s\nSRC:\t%s", wasmLocation, sourceLocation)
-		f, err := os.Open(sourceLocation)
-		r.NoError(err, "failed to open source file")
-		data, err := ioutil.ReadAll(f)
-		r.NoError(err, "failed to read test file")
-
-		r.Equal(data, expectData, "input and result don't match")
-		if err := os.Mkdir(filepath.Join(s.binDir), perm); !os.IsExist(err) {
-			must(t, err, "failed to create bin dir")
-		}
-		err = ioutil.WriteFile(wasmLocation, expectData, perm)
-		must(t, err, "failed to write dest file")
-		return expErr
-	})
+	workspace, err := s.CreateWorkspace(aid, entries)
+	require.NoError(t, err, "Workspace create error")
+	//err = s.CreateLocationAndDo(aid, entries, func(wasmLocation, sourceLocation string) error {
+	strEndsWith(t, workspace.BinaryPath, ExtWasm)
+	require.Len(t, workspace.Files, len(entries))
+	for _, filePath := range workspace.Files {
+		baseName := filepath.Base(filePath)
+		expectData, ok := entries[baseName]
+		require.Truef(t, ok, "missing file %q in workspace", baseName)
+		gotData, err := os.ReadFile(filePath)
+		require.NoError(t, err, "can't access expected file")
+		require.Equalf(t, expectData, gotData, "file content mismatch: %q", filePath)
+	}
 
 	// Check storage dirty state
-	r.EqualError(err, expErr.Error(), "expected and returned error mismatch")
 	r.True(s.dirty.IsSet(), "dirty flag should be true after file manipulation")
+
+	binData := []byte("TEST")
+	require.NoError(t, os.WriteFile(workspace.BinaryPath, binData, perm), "binary path not writable")
 
 	// Try to get item from storage
 	has, err := s.HasItem(aid)
@@ -84,11 +81,11 @@ func TestLocalStorage_GetItem(t *testing.T) {
 	require.True(t, has)
 	dataFile, err := s.GetItem(aid)
 	defer dataFile.Close()
-	r.NoError(err, "failed to get saved cached data")
+	r.NoError(err, "failed to get saved bin data")
 
-	contents, err := ioutil.ReadAll(dataFile)
-	must(t, err, "failed to read saved file")
-	r.Equal(expectData, contents)
+	gotBinData, err := io.ReadAll(dataFile)
+	require.NoError(t, err, "can't read back bin data")
+	r.Equal(binData, gotBinData, "bin data mismatch")
 
 	// Trash collector should clean all our garbage after some time
 	runtime.Gosched()
@@ -103,7 +100,7 @@ func TestLocalStorage_GetItem(t *testing.T) {
 	time.Sleep(cleanInterval)
 	r.False(s.gcRun.IsSet(), "collector not stopped after context death")
 
-	must(t, os.RemoveAll(testDir), "failed to remove test dir after exit")
+	require.NoError(t, os.RemoveAll(testDir), "failed to remove test dir after exit")
 }
 
 func TestLocalStorage_clean(t *testing.T) {
@@ -121,7 +118,7 @@ func TestLocalStorage_clean(t *testing.T) {
 		},
 		"clean error": {
 			store: &LocalStorage{
-				log:     testutil.GetLogger(t),
+				log:     zaptest.NewLogger(t),
 				workDir: "/a/b/c/d",
 				useLock: &sync.Mutex{},
 				dirty:   abool.NewBool(false),
@@ -135,7 +132,7 @@ func TestLocalStorage_clean(t *testing.T) {
 	for n, c := range cases {
 		t.Run(n, func(t *testing.T) {
 			if c.store == nil {
-				store, err := NewLocalStorage(testutil.GetLogger(t), c.dir)
+				store, err := NewLocalStorage(zaptest.NewLogger(t), c.dir)
 				require.NoError(t, err)
 				c.store = store
 			}
@@ -151,123 +148,8 @@ func TestLocalStorage_clean(t *testing.T) {
 	}
 }
 
-func TestLocalStorage_CreateLocationAndDo(t *testing.T) {
-	tempDir, err := ioutil.TempDir(os.TempDir(), "tempstore")
-	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
-
-	cases := map[string]struct {
-		skip     bool
-		dir      string
-		data     []byte
-		artifact ArtifactID
-		err      string
-		before   func() error
-		after    func() error
-	}{
-		"inaccessible dir": {
-			dir:      "/root/foo",
-			artifact: "testartifactid",
-			err:      "failed to create temporary build directory",
-		},
-		"no perm": {
-			dir:      "/tmp/testdir",
-			artifact: "../../../../../../../../../../../foobar",
-			err:      "failed to create temporary build directory",
-		},
-		"ok": {
-			dir:      tempDir,
-			artifact: mustArtifactID(t, "test"),
-			data:     []byte("test"),
-			after: func() error {
-				art := mustArtifactID(t, "test")
-				f := filepath.Join(tempDir, srcDirName, art.String(), art.Ext(ExtGo))
-				_, err := os.Stat(f)
-				if err != nil {
-					t.Log(f)
-					return fmt.Errorf("created file not exists - %w", err)
-				}
-				return nil
-			},
-		},
-		"unwritable": {
-			err:      "failed to save source file",
-			dir:      tempDir,
-			artifact: mustArtifactID(t, "test1"),
-			data:     []byte("test1"),
-			before: func() error {
-				art := mustArtifactID(t, "test1")
-				f := filepath.Join(tempDir, srcDirName, art.String())
-				if err := os.MkdirAll(f, perm); err != nil {
-					return err
-				}
-
-				// create broken symlink to create unwritable file
-				f = filepath.Join(f, art.Ext(ExtGo))
-				cmd := exec.Command("ln", "-s", "/dev/badpath", f)
-				out, err := cmd.CombinedOutput()
-				if err != nil {
-					t.Log(cmd.String())
-					return fmt.Errorf("%s (%w)", string(out), err)
-				}
-				return nil
-			},
-		},
-	}
-
-	for n, c := range cases {
-		t.Run(n, func(t *testing.T) {
-			if c.skip {
-				t.Skip()
-				return
-			}
-			ls := &LocalStorage{
-				log:     zaptest.NewLogger(t).Sugar(),
-				workDir: c.dir,
-				useLock: &sync.Mutex{},
-				dirty:   abool.NewBool(false),
-				gcRun:   abool.NewBool(false),
-				binDir:  filepath.Join(c.dir, binDirName),
-				srcDir:  filepath.Join(c.dir, srcDirName),
-			}
-			if c.before != nil {
-				assert.NoError(t, c.before(), "c.before() returned an error")
-			}
-			defer func() {
-				if c.after != nil {
-					assert.NoError(t, c.after(), "c.after() returned an error")
-				}
-			}()
-			err := ls.CreateLocationAndDo(c.artifact, c.data, func(wasmLocation, sourceLocation string) error {
-				t.Logf("Callback call: %q, %q", wasmLocation, sourceLocation)
-				return nil
-			})
-			if c.err != "" {
-				testutil.ContainsError(t, err, c.err)
-				return
-			}
-			require.NoError(t, err)
-		})
-	}
-}
-
-func must(t *testing.T, err error, msg string) {
-	if err == nil {
-		return
-	}
-	t.Helper()
-	t.Fatalf("test internal error:\t%s - %s", msg, err)
-}
-
 func strEndsWith(t *testing.T, str string, suffix string) {
 	t.Helper()
 	got := str[len(str)-len(suffix):]
 	require.Equal(t, suffix, got)
-}
-
-func mustArtifactID(t *testing.T, data string) ArtifactID {
-	t.Helper()
-	a, err := GetArtifactID([]byte(data))
-	require.NoError(t, err)
-	return a
 }

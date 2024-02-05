@@ -24,24 +24,21 @@ func (ts *testReadCloser) Close() error {
 }
 
 type testStorage struct {
-	hasItem             func(id storage.ArtifactID) (bool, error)
-	getItem             func(id storage.ArtifactID) (storage.ReadCloseSizer, error)
-	createLocationAndDo func(id storage.ArtifactID, data []byte, cb storage.Callback) error
+	hasItem         func(id storage.ArtifactID) (bool, error)
+	getItem         func(id storage.ArtifactID) (storage.ReadCloseSizer, error)
+	createWorkspace func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error)
 }
 
-// HasItem checks if item exists
 func (ts testStorage) HasItem(id storage.ArtifactID) (bool, error) {
 	return ts.hasItem(id)
 }
 
-// GetItem returns item by id
 func (ts testStorage) GetItem(id storage.ArtifactID) (storage.ReadCloseSizer, error) {
 	return ts.getItem(id)
 }
 
-// CreateLocationAndDo creates entry in storage and runs specified callback with new location
-func (ts testStorage) CreateLocationAndDo(id storage.ArtifactID, data []byte, cb storage.Callback) error {
-	return ts.createLocationAndDo(id, data, cb)
+func (ts testStorage) CreateWorkspace(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error) {
+	return ts.createWorkspace(id, entries)
 }
 
 func TestBuildService_GetArtifact(t *testing.T) {
@@ -78,7 +75,7 @@ func TestBuildService_GetArtifact(t *testing.T) {
 	for k, v := range cases {
 		t.Run(k, func(t *testing.T) {
 			ts := v.beforeRun(t)
-			bs := NewBuildService(zaptest.NewLogger(t).Sugar(), BuildEnvironmentConfig{}, ts)
+			bs := NewBuildService(zaptest.NewLogger(t), BuildEnvironmentConfig{}, ts)
 			got, err := bs.GetArtifact(v.artifactID)
 			if v.wantErr != "" {
 				require.Error(t, err)
@@ -97,16 +94,16 @@ func TestBuildService_Build(t *testing.T) {
 	defer os.RemoveAll(tempDir)
 	cases := map[string]struct {
 		skip         bool
-		data         []byte
+		files        map[string][]byte
 		wantErr      string
-		wantResult   *Result
+		wantResult   func(files map[string][]byte) *Result
 		beforeRun    func(t *testing.T)
 		onErrorCheck func(t *testing.T, err error)
-		store        func(t *testing.T) (storage.StoreProvider, func() error)
+		store        func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error)
 	}{
 		"bad store": {
 			wantErr: "test error",
-			store: func(t *testing.T) (storage.StoreProvider, func() error) {
+			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
 				return testStorage{
 					hasItem: func(id storage.ArtifactID) (bool, error) {
 						return false, errors.New("test error")
@@ -115,14 +112,18 @@ func TestBuildService_Build(t *testing.T) {
 			},
 		},
 		"cached build": {
-			data: []byte("test"),
-			wantResult: &Result{
-				FileName: mustArtifactID(t, []byte("test")).String() + ".wasm",
+			files: map[string][]byte{
+				"file.go": []byte("test"),
 			},
-			store: func(t *testing.T) (storage.StoreProvider, func() error) {
+			wantResult: func(files map[string][]byte) *Result {
+				return &Result{
+					FileName: mustArtifactID(t, files).String() + ".wasm",
+				}
+			},
+			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
 				return testStorage{
 					hasItem: func(id storage.ArtifactID) (bool, error) {
-						w := mustArtifactID(t, []byte("test"))
+						w := mustArtifactID(t, files)
 						require.Equal(t, w, id)
 						return true, nil
 					},
@@ -131,8 +132,8 @@ func TestBuildService_Build(t *testing.T) {
 		},
 		"new build": {
 			wantErr: "can't load package",
-			store: func(t *testing.T) (storage.StoreProvider, func() error) {
-				s, err := storage.NewLocalStorage(zaptest.NewLogger(t).Sugar(), tempDir)
+			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
+				s, err := storage.NewLocalStorage(zaptest.NewLogger(t), tempDir)
 				require.NoError(t, err)
 				return s, func() error {
 					return os.RemoveAll(tempDir)
@@ -145,9 +146,9 @@ func TestBuildService_Build(t *testing.T) {
 		},
 		"bad environment": {
 			wantErr: `executable file not found`,
-			store: func(t *testing.T) (storage.StoreProvider, func() error) {
+			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
 				t.Setenv("PATH", ".")
-				s, err := storage.NewLocalStorage(zaptest.NewLogger(t).Sugar(), tempDir)
+				s, err := storage.NewLocalStorage(zaptest.NewLogger(t), tempDir)
 				require.NoError(t, err)
 				return s, func() error {
 					return os.RemoveAll(tempDir)
@@ -165,7 +166,7 @@ func TestBuildService_Build(t *testing.T) {
 				c.beforeRun(t)
 			}
 
-			store, cancel := c.store(t)
+			store, cancel := c.store(t, c.files)
 			if cancel != nil {
 				defer func() {
 					if err := cancel(); err != nil {
@@ -176,8 +177,8 @@ func TestBuildService_Build(t *testing.T) {
 				}()
 			}
 
-			bs := NewBuildService(zaptest.NewLogger(t).Sugar(), BuildEnvironmentConfig{}, store)
-			got, err := bs.Build(context.TODO(), c.data)
+			bs := NewBuildService(zaptest.NewLogger(t), BuildEnvironmentConfig{}, store)
+			got, err := bs.Build(context.TODO(), c.files)
 			if c.wantErr != "" {
 				if c.onErrorCheck != nil {
 					c.onErrorCheck(t, err)
@@ -188,7 +189,7 @@ func TestBuildService_Build(t *testing.T) {
 			}
 			require.NoError(t, err)
 			require.NotNil(t, got)
-			require.Equal(t, c.wantResult, got)
+			require.Equal(t, c.wantResult(c.files), got)
 		})
 	}
 }
@@ -222,16 +223,16 @@ func TestBuildService_getEnvironmentVariables(t *testing.T) {
 			cfg := BuildEnvironmentConfig{
 				IncludedEnvironmentVariables: c.includedVars,
 			}
-			svc := NewBuildService(zaptest.NewLogger(t).Sugar(), cfg, nil)
+			svc := NewBuildService(zaptest.NewLogger(t), cfg, nil)
 			got := svc.getEnvironmentVariables()
 			c.check(t, c.includedVars, got)
 		})
 	}
 }
 
-func mustArtifactID(t *testing.T, data []byte) storage.ArtifactID {
+func mustArtifactID(t *testing.T, files map[string][]byte) storage.ArtifactID {
 	t.Helper()
-	a, err := storage.GetArtifactID(data)
+	a, err := storage.GetArtifactID(files)
 	require.NoError(t, err)
 	return a
 }
