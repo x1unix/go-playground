@@ -24,8 +24,8 @@ func NewFileSet(bufSize int) FileSet {
 }
 
 // Add adds a file to the buffer.
-func (f FileSet) Add(name, src string) error {
-	if src == "" {
+func (f FileSet) Add(name string, src []byte) error {
+	if len(src) == 0 {
 		return fmt.Errorf("file %q is empty", name)
 	}
 
@@ -45,7 +45,7 @@ func (f FileSet) Add(name, src string) error {
 	f.buf.WriteString("-- ")
 	f.buf.WriteString(name)
 	f.buf.WriteString(" --\n")
-	f.buf.WriteString(src)
+	f.buf.Write(src)
 
 	if !f.hasTrailingNewline() {
 		f.buf.WriteByte('\n')

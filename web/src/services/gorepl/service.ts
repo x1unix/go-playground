@@ -4,7 +4,12 @@ import { ConsoleStreamType } from '~/lib/gowasm/bindings/stdio'
 import { newErrorAction, newProgramFinishAction, newProgramStartAction, newProgramWriteAction } from '~/store/actions'
 import { type DispatchFn, type StateProvider } from '~/store/helpers'
 
-import { newAddNotificationAction, newRemoveNotificationAction, NotificationType } from '~/store/notifications'
+import {
+  newAddNotificationAction,
+  newRemoveNotificationAction,
+  NotificationType,
+  NotificationIDs,
+} from '~/store/notifications'
 import { EvalState, type PackageManagerEvent, PMEventType, type ProgramStateChangeEvent } from './worker/types'
 import {
   defaultWorkerConfig,
@@ -15,9 +20,6 @@ import {
   WorkerEvent,
   type WorkerInterface,
 } from './worker/interface'
-
-const PKG_MGR_NOTIFICATION_ID = 'packageManager'
-const WORKER_NOTIFICATION_ID = 'goWorker'
 
 /**
  * Worker client singleton
@@ -70,7 +72,7 @@ export const getWorkerInstance = async (
 
   dispatcher(
     newAddNotificationAction({
-      id: WORKER_NOTIFICATION_ID,
+      id: NotificationIDs.GoWorkerStatus,
       type: NotificationType.Info,
       title: 'Starting Go worker',
       canDismiss: false,
@@ -104,13 +106,13 @@ export const getWorkerInstance = async (
       },
     })
   } catch (err) {
-    dispatcher(newRemoveNotificationAction(WORKER_NOTIFICATION_ID))
+    dispatcher(newRemoveNotificationAction(NotificationIDs.GoWorkerStatus))
     worker.terminate()
     client.dispose()
     throw err
   }
 
-  dispatcher(newRemoveNotificationAction(WORKER_NOTIFICATION_ID))
+  dispatcher(newRemoveNotificationAction(NotificationIDs.GoWorkerStatus))
   clientInstance = new WorkerClient(client, worker)
 
   // Populate program execution events to Redux
@@ -143,7 +145,7 @@ const handleWorkerBootEvent = (dispatcher: DispatchFn, { eventType, progress, co
       dispatcher(newProgramFinishAction())
       dispatcher(
         newAddNotificationAction({
-          id: WORKER_NOTIFICATION_ID,
+          id: NotificationIDs.GoWorkerStatus,
           type: NotificationType.Error,
           title: 'Go worker crashed',
           description: `WebAssembly worker crashed with exit code ${code}.`,
@@ -156,7 +158,7 @@ const handleWorkerBootEvent = (dispatcher: DispatchFn, { eventType, progress, co
     case GoWorkerBootEventType.Downloading:
       dispatcher(
         newAddNotificationAction({
-          id: WORKER_NOTIFICATION_ID,
+          id: NotificationIDs.GoWorkerStatus,
           type: NotificationType.Info,
           title: 'Starting Go worker',
           description: 'Downloading WebAssembly worker...',
@@ -171,7 +173,7 @@ const handleWorkerBootEvent = (dispatcher: DispatchFn, { eventType, progress, co
     case GoWorkerBootEventType.Starting:
       dispatcher(
         newAddNotificationAction({
-          id: WORKER_NOTIFICATION_ID,
+          id: NotificationIDs.GoWorkerStatus,
           type: NotificationType.Info,
           title: 'Starting Go worker',
           description: 'Starting WebAssembly worker...',
@@ -183,7 +185,7 @@ const handleWorkerBootEvent = (dispatcher: DispatchFn, { eventType, progress, co
       )
       return
     case GoWorkerBootEventType.Complete:
-      dispatcher(newRemoveNotificationAction(WORKER_NOTIFICATION_ID))
+      dispatcher(newRemoveNotificationAction(NotificationIDs.GoWorkerStatus))
       break
     default:
   }
@@ -220,13 +222,13 @@ const handlePackageManagerEvent = (dispatcher: DispatchFn, event: PackageManager
   switch (event.eventType) {
     case PMEventType.DependencyCheckFinish:
       if (success) {
-        dispatcher(newRemoveNotificationAction(PKG_MGR_NOTIFICATION_ID))
+        dispatcher(newRemoveNotificationAction(NotificationIDs.PackageManager))
         return
       }
 
       dispatcher(
         newAddNotificationAction({
-          id: PKG_MGR_NOTIFICATION_ID,
+          id: NotificationIDs.PackageManager,
           type: NotificationType.Error,
           title: 'Package installation failed',
           description: context,
@@ -237,7 +239,7 @@ const handlePackageManagerEvent = (dispatcher: DispatchFn, event: PackageManager
     case PMEventType.DependencyResolveStart:
       dispatcher(
         newAddNotificationAction({
-          id: PKG_MGR_NOTIFICATION_ID,
+          id: NotificationIDs.PackageManager,
           type: NotificationType.Info,
           title: 'Installing dependencies',
           description: `Searching ${totalItems} packages...`,
@@ -251,7 +253,7 @@ const handlePackageManagerEvent = (dispatcher: DispatchFn, event: PackageManager
     case PMEventType.PackageSearchStart:
       dispatcher(
         newAddNotificationAction({
-          id: PKG_MGR_NOTIFICATION_ID,
+          id: NotificationIDs.PackageManager,
           type: NotificationType.Info,
           title: 'Installing dependencies',
           description: `Downloading ${context}`,
@@ -265,7 +267,7 @@ const handlePackageManagerEvent = (dispatcher: DispatchFn, event: PackageManager
     case PMEventType.PackageDownload:
       dispatcher(
         newAddNotificationAction({
-          id: PKG_MGR_NOTIFICATION_ID,
+          id: NotificationIDs.PackageManager,
           type: NotificationType.Info,
           title: 'Installing dependencies',
           description: `Downloading ${context}`,
@@ -280,7 +282,7 @@ const handlePackageManagerEvent = (dispatcher: DispatchFn, event: PackageManager
     case PMEventType.PackageExtract:
       dispatcher(
         newAddNotificationAction({
-          id: PKG_MGR_NOTIFICATION_ID,
+          id: NotificationIDs.PackageManager,
           type: NotificationType.Info,
           title: 'Installing dependencies',
           description: `Extracting ${context}`,

@@ -11,8 +11,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/x1unix/go-playground/internal/analyzer"
-	"github.com/x1unix/go-playground/internal/compiler"
-	"github.com/x1unix/go-playground/internal/compiler/storage"
+	"github.com/x1unix/go-playground/internal/builder"
+	"github.com/x1unix/go-playground/internal/builder/storage"
 	"github.com/x1unix/go-playground/pkg/goplay"
 	"go.uber.org/zap"
 	"golang.org/x/time/rate"
@@ -39,7 +39,7 @@ type APIv1Handler struct {
 	config          ServiceConfig
 	log             *zap.SugaredLogger
 	index           analyzer.PackageIndex
-	compiler        compiler.BuildService
+	compiler        builder.BuildService
 	versionProvider BackendVersionProvider
 
 	client  *goplay.Client
@@ -51,7 +51,7 @@ type ServiceConfig struct {
 }
 
 // NewAPIv1Handler is APIv1Handler constructor
-func NewAPIv1Handler(cfg ServiceConfig, client *goplay.Client, packages []*analyzer.Package, builder compiler.BuildService) *APIv1Handler {
+func NewAPIv1Handler(cfg ServiceConfig, client *goplay.Client, packages []*analyzer.Package, builder builder.BuildService) *APIv1Handler {
 	return &APIv1Handler{
 		config:          cfg,
 		compiler:        builder,
@@ -346,14 +346,12 @@ func (s *APIv1Handler) HandleCompile(w http.ResponseWriter, r *http.Request) err
 		}
 	}
 
-	result, err := s.compiler.Build(ctx, src)
+	result, err := s.compiler.Build(ctx, blobToFiles(src))
+	if builder.IsBuildError(err) {
+		return NewHTTPError(http.StatusBadRequest, err)
+	}
 	if err != nil {
-		switch err.(type) {
-		case *compiler.BuildError:
-			return NewHTTPError(http.StatusBadRequest, err)
-		default:
-			return err
-		}
+		return err
 	}
 
 	resp := BuildResponse{FileName: result.FileName}
@@ -387,4 +385,8 @@ func (s *APIv1Handler) goImportsCode(ctx context.Context, src []byte, backend go
 
 	changed := resp.Body != string(src)
 	return []byte(resp.Body), changed, nil
+}
+
+func blobToFiles(blob []byte) map[string][]byte {
+	return map[string][]byte{"main.go": blob}
 }

@@ -24,6 +24,7 @@ func TestFromFlags(t *testing.T) {
 			PackagesFile:      "pkgfile",
 			CleanupInterval:   1 * time.Hour,
 			BypassEnvVarsList: []string{"FOO", "BAR"},
+			SkipModuleCleanup: true,
 		},
 		Services: ServicesConfig{GoogleAnalyticsID: "GA-123456"},
 		Log: LogConfig{
@@ -52,6 +53,7 @@ func TestFromFlags(t *testing.T) {
 		"-log-format=console",
 		"-sentry-dsn=testdsn",
 		"-sentry-breadcrumbs=1",
+		"-skip-mod-clean",
 	}
 
 	fl := flag.NewFlagSet("app", flag.PanicOnError)
@@ -106,6 +108,7 @@ func TestFromEnv(t *testing.T) {
 					PackagesFile:      "pkgfile",
 					CleanupInterval:   1 * time.Hour,
 					BypassEnvVarsList: []string{"FOO", "BAR"},
+					SkipModuleCleanup: true,
 				},
 				Services: ServicesConfig{GoogleAnalyticsID: "GA-123456"},
 				Log: LogConfig{
@@ -132,6 +135,7 @@ func TestFromEnv(t *testing.T) {
 				"APP_DEBUG":               "1",
 				"APP_LOG_LEVEL":           "warn",
 				"APP_LOG_FORMAT":          "console",
+				"APP_SKIP_MOD_CLEANUP":    "true",
 				"SENTRY_DSN":              "testdsn",
 				"SENTRY_USE_BREADCRUMBS":  "1",
 				"SENTRY_BREADCRUMB_LEVEL": "debug",

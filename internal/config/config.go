@@ -53,6 +53,9 @@ type BuildConfig struct {
 	// CleanupInterval is WebAssembly build artifact cache clean interval
 	CleanupInterval time.Duration `envconfig:"APP_CLEAN_INTERVAL" json:"cleanupInterval"`
 
+	// SkipModuleCleanup disables Go module cache cleanup.
+	SkipModuleCleanup bool `envconfig:"APP_SKIP_MOD_CLEANUP" json:"skipModuleCleanup"`
+
 	// BypassEnvVarsList is allow-list of environment variables
 	// that will be passed to Go compiler.
 	//
@@ -63,6 +66,7 @@ type BuildConfig struct {
 func (cfg *BuildConfig) mountFlagSet(f *flag.FlagSet) {
 	f.StringVar(&cfg.PackagesFile, "f", "packages.json", "Path to packages index JSON file")
 	f.StringVar(&cfg.BuildDir, "wasm-build-dir", os.TempDir(), "Directory for WASM builds")
+	f.BoolVar(&cfg.SkipModuleCleanup, "skip-mod-clean", false, "Skip Go module cache cleanup")
 	f.DurationVar(&cfg.CleanupInterval, "clean-interval", 10*time.Minute, "Build directory cleanup interval")
 	f.Var(cmdutil.NewStringsListValue(&cfg.BypassEnvVarsList), "permit-env-vars", "Comma-separated allow list of environment variables passed to Go compiler tool")
 }

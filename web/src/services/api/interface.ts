@@ -20,7 +20,7 @@ export interface IAPIClient {
 
   format: (files: Record<string, string>) => Promise<FilesPayload>
 
-  build: (code: string, format: boolean) => Promise<BuildResponse>
+  build: (files: Record<string, string>) => Promise<BuildResponse>
 
   getArtifact: (fileName: string) => Promise<Response>
 

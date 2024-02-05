@@ -1,9 +1,4 @@
-const goModTemplate = `
-// Replace "example" with your actual Go module name.
-// See: https://go.dev/doc/modules/gomod-ref
-
-module example
-`.trimStart()
+import { goModTemplate } from '~/services/examples'
 
 const splitPath = (fileName: string) => {
   const parts = fileName.split('/')

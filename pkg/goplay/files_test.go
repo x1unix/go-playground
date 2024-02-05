@@ -25,7 +25,7 @@ func TestFileSet(t *testing.T) {
 	}
 
 	for _, entry := range files {
-		require.NoError(t, fset.Add(entry.name, entry.content))
+		require.NoError(t, fset.Add(entry.name, []byte(entry.content)))
 	}
 
 	expected := fmt.Sprintf(
