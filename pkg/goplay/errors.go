@@ -17,6 +17,9 @@ func (c CompileFailedError) Error() string {
 
 // IsCompileError checks if error is CompileFailedError
 func IsCompileError(err error) bool {
+	if err == nil {
+		return false
+	}
 	_, ok := err.(CompileFailedError)
 	return ok
 }
