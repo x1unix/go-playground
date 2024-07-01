@@ -1,27 +1,36 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="utf-8" />
-  <link rel="icon" href="/favicon.ico" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#000000" />
-  <meta name="description" content="Better Go Playground with syntax highlight support" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="apple-touch-icon" href="/logo192.png" />
-  <link rel="manifest" href="/manifest.json" />
-  <title>Better Go Playground</title>
-  <style>
-    .app-preloader {
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Better Go Playground with syntax highlight support" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="darkreader-lock" />
+    <link rel="apple-touch-icon" href="/logo192.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>Better Go Playground</title>
+    <style>
+      .app-preloader {
         display: block;
         position: absolute;
         inset: 0;
         background: #1f1f1f;
         color: #f4f4f4;
-        font: 11pt system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
-    }
+        font:
+          11pt system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          'Helvetica Neue',
+          Arial,
+          'Noto Sans',
+          'Liberation Sans',
+          sans-serif;
+      }
 
-    .app-preloader__container {
+      .app-preloader__container {
         height: 100%;
         width: 100%;
         max-height: 480px;
@@ -33,108 +42,107 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-    }
+      }
 
-    .app-preloader__content {
+      .app-preloader__content {
         margin-top: 32px;
-    }
+      }
 
-    .app-preloader__content p {
+      .app-preloader__content p {
         margin: 2rem;
         text-align: center;
-    }
+      }
 
-    @keyframes progress-bar-animation {
+      @keyframes progress-bar-animation {
         0% {
-            left: -2%;
-            width: 5%;
+          left: -2%;
+          width: 5%;
         }
 
         35% {
-            width: 25%;
+          width: 25%;
         }
 
         85% {
-            width: 5%;
+          width: 5%;
         }
 
         100% {
-            left: 100%;
-            width: 5%;
+          left: 100%;
+          width: 5%;
         }
-    }
+      }
 
-    .app-preloader-progress {
+      .app-preloader-progress {
         background: #333;
         height: 4px;
         position: relative;
         overflow: hidden;
-    }
+      }
 
-    .app-preloader-progress__bar {
+      .app-preloader-progress__bar {
         position: absolute;
         top: 0;
         left: 0;
         transition: all 0.2s ease-out 0s;
         background: dodgerblue;
         height: 100%;
-    }
+      }
 
-    .app-preloader-progress__bar--indeterminate {
+      .app-preloader-progress__bar--indeterminate {
         width: 32%;
         transition: all 0.5s ease-out 0s;
         animation: progress-bar-animation 2.3s infinite;
-    }
+      }
 
-    @media (prefers-color-scheme: light) {
+      @media (prefers-color-scheme: light) {
         .app-preloader {
-            background: #fff;
-            color: #323130;
+          background: #fff;
+          color: #323130;
         }
         .app-preloader-progress {
-            background: #ccc;
+          background: #ccc;
         }
-    }
-  </style>
-</head>
+      }
+    </style>
+  </head>
 
-<body>
-  <div id="root">
-    <div class="app-preloader">
-      <div class="app-preloader__container">
-        <div><img src="/go-logo-blue.svg" alt="Go Logo" /></div>
-        <div class="app-preloader__content">
-          <noscript>
-            <p>You need to enable JavaScript to run this app.</p>
-            <style>
-              .app-preloader__label {
+  <body>
+    <div id="root">
+      <div class="app-preloader">
+        <div class="app-preloader__container">
+          <div><img src="/go-logo-blue.svg" alt="Go Logo" /></div>
+          <div class="app-preloader__content">
+            <noscript>
+              <p>You need to enable JavaScript to run this app.</p>
+              <style>
+                .app-preloader__label {
                   display: none;
-              }
-              .app-preloader-progress {
-                  display: none
-              }
-            </style>
-          </noscript>
-          <p class="app-preloader__label">Loading playground...</p>
-          <div class="app-preloader-progress">
-            <div class="app-preloader-progress__bar app-preloader-progress__bar--indeterminate"></div>
+                }
+                .app-preloader-progress {
+                  display: none;
+                }
+              </style>
+            </noscript>
+            <p class="app-preloader__label">Loading playground...</p>
+            <div class="app-preloader-progress">
+              <div class="app-preloader-progress__bar app-preloader-progress__bar--indeterminate"></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <script type="module" async src="/src/index.tsx"></script>
-  <% if (PROD) { %>
-  {{ if .GoogleTagID }}
-  <script async src="https://www.googletagmanager.com/gtag/js?id={{.GoogleTagID}}"></script>
-  <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', '{{.GoogleTagID}}');
-  </script>
-  {{ end }}
-  <% } %>
-</body>
-
+    <script type="module" async src="/src/index.tsx"></script>
+    <% if (PROD) { %> {{ if .GoogleTagID }}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{.GoogleTagID}}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
+      gtag('config', '{{.GoogleTagID}}')
+    </script>
+    {{ end }} <% } %>
+  </body>
 </html>
