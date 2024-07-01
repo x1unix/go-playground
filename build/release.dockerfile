@@ -11,7 +11,7 @@ ARG GO_VERSION=1.21
 ARG APP_VERSION=1.0.0
 ARG WASM_API_VER=v2
 
-FROM golang:${GO_VERSION}-alpine as build
+FROM golang:${GO_VERSION}-alpine AS build
 ARG GO_VERSION
 ARG WASM_API_VER
 ARG APP_VERSION
@@ -38,7 +38,7 @@ RUN echo "Building server with version $APP_VERSION" && \
     cp $(go env GOROOT)/misc/wasm/wasm_exec.js ./wasm_exec@v2.js && \
     cp $(go env GOROOT)/misc/wasm/wasm_exec.js ./wasm_exec.js
 
-FROM golang:${GO_VERSION}-alpine as production
+FROM golang:${GO_VERSION}-alpine AS production
 ARG GO_VERSION
 ARG WASM_API_VER
 WORKDIR /opt/playground
