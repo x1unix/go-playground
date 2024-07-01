@@ -34,18 +34,22 @@ COPY pkg ./pkg
 COPY internal ./internal
 COPY go.mod .
 COPY go.sum .
+
+## wasm_exec.js files are left for backwards compatibility for old clients.
 RUN echo "Building server with version $APP_VERSION" && \
     go build -o server -ldflags="-X 'main.Version=$APP_VERSION'" ./cmd/playground && \
     GOOS=js GOARCH=wasm go build \
-      -buildvcs=false \
-      -ldflags "-s -w" \
-      -trimpath \
-      -o ./go-repl@$WASM_API_VER.wasm ./cmd/wasm/go-repl && \
+    -buildvcs=false \
+    -ldflags "-s -w" \
+    -trimpath \
+    -o ./go-repl@$WASM_API_VER.wasm ./cmd/wasm/go-repl && \
     GOOS=js GOARCH=wasm go build \
-      -buildvcs=false \
-      -ldflags "-s -w" \
-      -trimpath \
-      -o ./analyzer@$WASM_API_VER.wasm ./cmd/wasm/analyzer
+    -buildvcs=false \
+    -ldflags "-s -w" \
+    -trimpath \
+    -o ./analyzer@$WASM_API_VER.wasm ./cmd/wasm/analyzer && \
+    cp $(go env GOROOT)/misc/wasm/wasm_exec.js ./wasm_exec@v2.js && \
+    cp $(go env GOROOT)/misc/wasm/wasm_exec.js ./wasm_exec.js
 
 FROM golang:${GO_VERSION}-alpine as production
 ARG GO_VERSION
@@ -61,6 +65,7 @@ COPY data ./data
 COPY --from=ui-build /tmp/web/build ./public
 COPY --from=build /tmp/playground/server .
 COPY --from=build /tmp/playground/*.wasm ./public/wasm/
+COPY --from=build /tmp/playground/*.js ./public/wasm/
 EXPOSE 8000
 ENTRYPOINT /opt/playground/server \
     -f='/opt/playground/data/packages.json' \
