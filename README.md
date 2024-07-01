@@ -9,6 +9,8 @@
 
 Improved Go Playground powered by Monaco Editor and React - [https://goplay.tools/](https://goplay.tools)
 
+🎉 **Check new upcoming features in latest beta at [beta.goplay.tools](https://beta.goplay.tools)**
+
 ![alt text](docs/demo.gif)
 
 ## Features
@@ -50,8 +52,20 @@ sudo make install
 * Code for templates and tutorials provided by [gobyexample.com](https://gobyexample.com/)
 * Code completion snippets were inspired by [tj/vscode-snippets](https://github.com/tj/vscode-snippets/blob/master/go.json)
 
-
 ## Contributors
+
+Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for information on how to contribute to the project.
+
+### Sponsoring
+
+<a href="https://gno.land/?from=goplay-tools" target="_blank">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="./docs/sponsors/gnoland-dark.svg" width="480">
+        <img alt="Gno.land logo" width="480" src="./docs/sponsors/gnoland-light.svg">
+    </picture>
+</a>
+
+This project is sponsored by Gno.land providing cloud environment to host Better Go Playground.
 
 ### Code Contributors
 
