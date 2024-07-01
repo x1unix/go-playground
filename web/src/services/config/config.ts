@@ -4,7 +4,7 @@ import { type PanelState } from '~/store'
 import { defaultPanelProps } from '~/styles/layout'
 import { supportsPreferColorScheme } from '~/utils/theme'
 
-import { type RunTargetConfig, defaultRunTarget } from './target'
+import { type RunTargetConfig, TargetType, defaultRunTarget } from './target'
 import { type MonacoSettings, defaultMonacoSettings } from './monaco'
 
 const DARK_THEME_KEY = 'ui.darkTheme.enabled'
@@ -56,7 +56,13 @@ const Config = {
   },
 
   get runTargetConfig(): RunTargetConfig {
-    return this.getObject<RunTargetConfig>(RUN_TARGET_KEY, defaultRunTarget)
+    const cfg = this.getObject<RunTargetConfig>(RUN_TARGET_KEY, defaultRunTarget)
+    if (cfg.target === TargetType.Interpreter) {
+      // Yaegi is unsupported anymode, see #348
+      cfg.target = TargetType.WebAssembly
+    }
+
+    return cfg
   },
 
   set runTargetConfig(newVal: RunTargetConfig) {

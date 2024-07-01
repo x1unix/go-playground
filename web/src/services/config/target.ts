@@ -38,6 +38,8 @@ export enum TargetType {
 
   /**
    * Execute code inside Go interpreted in browser
+   *
+   * @deprecated Replaced by `TargetType.WebAssembly` and not supported anymore.
    */
   Interpreter = 'INTERPRETER',
 }
