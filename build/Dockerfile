@@ -5,7 +5,7 @@ ARG APP_VERSION=1.0.0
 ARG GITHUB_URL='https://github.com/x1unix/go-playground'
 ARG PREV_GO_VERSION=1.19
 
-FROM node:${NODE_VERSION}-alpine as ui-build
+FROM node:${NODE_VERSION}-alpine AS ui-build
 ARG APP_VERSION
 ARG GITHUB_URL
 ARG NODE_VERSION
@@ -24,7 +24,7 @@ RUN yarn install --silent && \
     VITE_WASM_BASE_URL=/wasm \
     yarn build
 
-FROM golang:${GO_VERSION}-alpine as build
+FROM golang:${GO_VERSION}-alpine AS build
 ARG GO_VERSION
 ARG APP_VERSION
 ARG WASM_API_VER
@@ -51,7 +51,7 @@ RUN echo "Building server with version $APP_VERSION" && \
     cp $(go env GOROOT)/misc/wasm/wasm_exec.js ./wasm_exec@v2.js && \
     cp $(go env GOROOT)/misc/wasm/wasm_exec.js ./wasm_exec.js
 
-FROM golang:${GO_VERSION}-alpine as production
+FROM golang:${GO_VERSION}-alpine AS production
 ARG GO_VERSION
 ARG APP_VERSION
 ARG WASM_API_VER
