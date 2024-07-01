@@ -1,5 +1,4 @@
 import { TargetType } from '~/services/config'
-import { getWorkerInstance } from '~/services/gorepl'
 import { getImportObject, goRun } from '~/services/go'
 import { setTimeoutNanos, SECOND } from '~/utils/duration'
 import { instantiateStreaming } from '~/lib/go'
@@ -152,7 +151,7 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
       return
     }
 
-    if (target !== TargetType.Interpreter && isProjectRequiresGoMod(files)) {
+    if (isProjectRequiresGoMod(files)) {
       dispatch(
         newAddNotificationAction({
           id: NotificationIDs.GoModMissing,
@@ -223,18 +222,6 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
             )
           })
           .finally(() => dispatch(newProgramFinishAction()))
-        break
-      }
-      case TargetType.Interpreter: {
-        // TODO: support ApiV2
-        const source = files[selectedFile]
-        try {
-          const worker = await getWorkerInstance(dispatch, getState)
-          await worker.runProgram(source)
-        } catch (err: any) {
-          dispatch(newErrorAction(err.message ?? err.toString()))
-        }
-
         break
       }
       default:

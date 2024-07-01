@@ -93,17 +93,6 @@ export const createDropdownOptions = (
       description: 'Run program in browser as WebAssembly module.',
     },
   },
-  {
-    key: keyFromOption(TargetType.Interpreter),
-    text: 'Go Interpreter',
-    disabled: !supportsWebAssembly,
-    data: {
-      icon: SiWebassembly,
-      iconColor: OptionColors.WebAssembly,
-      type: TargetType.Interpreter,
-      description: 'Use Yaegi Go interpreter to run code. Works offline.',
-    },
-  },
 ]
 
 export const dropdownOptionsFromResponse = ({

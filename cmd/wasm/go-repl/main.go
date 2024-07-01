@@ -2,6 +2,7 @@
 
 //
 // "go-repl" is a self-contained Go REPL with package downloader to be run in web browser as WASM binary.
+// DEPRECATED: Yaegi interpreter is removed in #348.
 //
 
 package main
