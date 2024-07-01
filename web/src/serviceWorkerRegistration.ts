@@ -170,7 +170,7 @@ export function unregister() {
         void registration.unregister()
       })
       .catch((error) => {
-        console.error(error.message)
+        console.error('failed to unregister service worker:', error.message)
       })
   }
 }
