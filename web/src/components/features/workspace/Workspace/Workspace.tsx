@@ -17,6 +17,7 @@ import { FlexContainer } from '../FlexContainer'
 import { NewFileModal } from '../NewFileModal'
 import { ContentPlaceholder } from '../ContentPlaceholder'
 import { newEmptyFileContent } from './utils'
+import { useConfirmModal } from '~/components/modals/ConfirmModal'
 
 interface Props extends WorkspaceState {
   dispatch: StateDispatch
@@ -26,6 +27,7 @@ const Workspace: React.FC<Props> = ({ dispatch, files, selectedFile, snippet }) 
   const { palette, semanticColors } = useTheme()
   const uploadRef = useRef<HTMLInputElement>(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const { showConfirm } = useConfirmModal()
 
   const tabIconStyles: TabIconStyles = {
     active: {
@@ -50,7 +52,15 @@ const Workspace: React.FC<Props> = ({ dispatch, files, selectedFile, snippet }) 
   )
 
   const onTabClose = (key: string) => {
-    dispatch(dispatchRemoveFile(key))
+    void showConfirm({
+      title: `Delete file "${key}"?`,
+      message: "This item will be deleted permanently. You can't undo this action.",
+      confirmText: 'Delete',
+    }).then((result) => {
+      if (result) {
+        dispatch(dispatchRemoveFile(key))
+      }
+    })
   }
 
   const onTabChange = (key: string) => {
