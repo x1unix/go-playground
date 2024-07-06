@@ -13,6 +13,7 @@ import { ConnectedStatusBar } from '~/components/layout/StatusBar'
 import { computeSizePercentage } from './utils'
 
 import styles from './PlaygroundPage.module.css'
+import { ConfirmProvider } from '~/components/modals/ConfirmModal'
 
 interface PageParams {
   snippetID: string
@@ -29,26 +30,28 @@ export const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }
     <div ref={containerRef} className={styles.Playground}>
       <Header />
       <Layout layout={panelProps.layout}>
-        <ConnectedWorkspace />
-        <InspectorPanel
-          {...panelProps}
-          onLayoutChange={(layout) => {
-            dispatch(dispatchPanelLayoutChange({ layout }))
-          }}
-          onCollapsed={(collapsed) => {
-            dispatch(dispatchPanelLayoutChange({ collapsed }))
-          }}
-          onResize={(changes) => {
-            if ('height' in changes) {
-              // Height percentage is buggy on resize. Use percents only for width.
-              dispatch(dispatchPanelLayoutChange(changes))
-              return
-            }
-            const result = computeSizePercentage(changes, containerRef.current!)
-            dispatch(dispatchPanelLayoutChange(result))
-          }}
-        />
-        <NotificationHost />
+        <ConfirmProvider>
+          <ConnectedWorkspace />
+          <InspectorPanel
+            {...panelProps}
+            onLayoutChange={(layout) => {
+              dispatch(dispatchPanelLayoutChange({ layout }))
+            }}
+            onCollapsed={(collapsed) => {
+              dispatch(dispatchPanelLayoutChange({ collapsed }))
+            }}
+            onResize={(changes) => {
+              if ('height' in changes) {
+                // Height percentage is buggy on resize. Use percents only for width.
+                dispatch(dispatchPanelLayoutChange(changes))
+                return
+              }
+              const result = computeSizePercentage(changes, containerRef.current!)
+              dispatch(dispatchPanelLayoutChange(result))
+            }}
+          />
+          <NotificationHost />
+        </ConfirmProvider>
       </Layout>
       <ConnectedStatusBar />
     </div>
