@@ -13,6 +13,9 @@ import {
 } from '@fluentui/react'
 import type { TabIconStyles } from '../types.ts'
 
+const BUTTON_PRIMARY = 0
+const BUTTON_WHEEL = 1
+
 const labelCellStyles: IStackStyles = {
   root: {
     flex: 1,
@@ -98,6 +101,18 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
 
   const iconStyle = active ? icon?.active : icon?.inactive
 
+  // onAuxClick doesn't work in Chrome, so only way to capture it is onMouseUp/Down.
+  const handleClick: React.MouseEventHandler = (e) => {
+    switch (e.button) {
+      case BUTTON_PRIMARY:
+        onClick?.()
+        break
+      case BUTTON_WHEEL:
+        onClose?.()
+        break
+    }
+  }
+
   const handleClose = useCallback(
     (e) => {
       e.stopPropagation()
@@ -114,7 +129,7 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
       horizontalAlign="stretch"
       verticalAlign="center"
       styles={containerStyles}
-      onClick={onClick}
+      onMouseUp={handleClick}
       title={label}
       aria-label={label}
       data-is-focusable
