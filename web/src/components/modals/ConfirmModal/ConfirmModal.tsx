@@ -39,6 +39,7 @@ export const ConfirmModal: React.FC<ConfirmProps> = ({ isOpen, title, message, o
           />
           <PrimaryButton
             text={confirmText ?? 'OK'}
+            autoFocus={true}
             onClick={() => {
               onResult?.(true)
             }}
