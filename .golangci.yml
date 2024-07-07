@@ -1,10 +1,10 @@
 run:
   tests: false
-  skip-dirs:
-    - pkg/worker
-    - cmd/webworker
-    - web
 issues:
+  exclude-dirs:
+  - pkg/worker
+  - cmd/webworker
+  - web
   exclude-rules:
     - path: 'internal/gowasm/(.+)\.go'
       linters:
