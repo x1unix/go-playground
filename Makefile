@@ -36,7 +36,7 @@ export VITE_WASM_BASE_URL=/wasm
 
 .PHONY:run
 run:
-	@GOROOT=$(GOROOT) $(GO) run $(PKG) \
+	@GOROOT=$(GOROOT) APP_CLEAN_INTERVAL=10h $(GO) run $(PKG) \
 		-f ./data/packages.json \
 		-static-dir="$(UI)/build" \
 		-gtag-id="$(GTAG)" \
