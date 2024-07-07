@@ -15,7 +15,7 @@ import (
 	"github.com/x1unix/go-playground/pkg/testutil"
 )
 
-func TestClient_Compile(t *testing.T) {
+func TestClient_Evaluate(t *testing.T) {
 	cases := map[string]struct {
 		expect     *CompileResponse
 		err        string
@@ -81,7 +81,7 @@ func TestClient_Compile(t *testing.T) {
 				Body:    c.payload,
 			}
 
-			got, err := client.Compile(context.TODO(), req, "")
+			got, err := client.Evaluate(context.TODO(), req, "")
 			if c.err != "" {
 				testutil.ContainsError(t, err, c.err)
 				return

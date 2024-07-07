@@ -145,7 +145,7 @@ func (h *APIv2Handler) HandleRun(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	res, err := h.client.Compile(ctx, goplay.CompileRequest{
+	res, err := h.client.Evaluate(ctx, goplay.CompileRequest{
 		Version: goplay.DefaultVersion,
 		WithVet: params.Vet,
 		Body:    payload.Bytes(),
