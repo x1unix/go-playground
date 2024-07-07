@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"path/filepath"
@@ -113,7 +114,7 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 	r.PathPrefix("/").
 		Handler(spaHandler)
 
-	server := &http.Server{
+	srv := &http.Server{
 		Addr:         cfg.HTTP.Addr,
 		Handler:      r,
 		ReadTimeout:  5 * time.Second,
@@ -121,7 +122,7 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 		IdleTimeout:  15 * time.Second,
 	}
 
-	if err := startHttpServer(ctx, wg, server); err != nil {
+	if err := startHttpServer(ctx, wg, srv); err != nil {
 		return err
 	}
 
@@ -139,16 +140,17 @@ func startHttpServer(ctx context.Context, wg *sync.WaitGroup, server *http.Serve
 		defer wg.Done()
 		server.SetKeepAlivesEnabled(false)
 		if err := server.Shutdown(shutdownCtx); err != nil {
-			if err == context.Canceled {
+			if errors.Is(err, context.Canceled) {
 				return
 			}
+
 			logger.Errorf("Could not gracefully shutdown the server: %v\n", err)
 		}
 	}()
 
 	wg.Add(1)
 	logger.Infof("Listening on %q", server.Addr)
-	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return fmt.Errorf("cannot start server on %q: %s", server.Addr, err)
 	}
 
