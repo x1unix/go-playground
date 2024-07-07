@@ -31,7 +31,8 @@ func evalPayloadFromRequest(r *http.Request) ([]byte, error) {
 	// See: https://github.com/golang/go/issues/68327
 	if body.HasUnitTests() {
 		return nil, errors.New(
-			"Due to Go Playground bug, unit test snippets can't have multiple files. Please remove non-test Go files. " +
+			"Due to Go Playground bug, unit test snippets can't have multiple files.\n" +
+				"Please remove other Go files or use WebAssembly environment instead.\n\n" +
 				"See: https://github.com/golang/go/issues/68327",
 		)
 	}
