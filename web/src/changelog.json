@@ -1,19 +1,33 @@
 {
-  "Interface - Terminal": [
+  "Go - General": [
     {
-      "issueId": 303,
-      "url": "/pull/303",
-      "description": "Support terminal sequences and colored output"
+      "issueId": 324,
+      "url": "issues/324",
+      "description": "Add workaround for Playground API unit tests bug"
+    }
+  ],
+  "Go - WebAssembly": [
+    {
+      "issueId": 348,
+      "url": "/issues/348",
+      "description": "Disable Yaegi Go interpreter"
+    }
+  ],
+  "Interface - General": [
+    {
+      "issueId": 354,
+      "url": "pull/354",
+      "description": "Add file deletion confirm dialog"
     },
     {
-      "issueId": 264,
-      "url": "/issues/264",
-      "description": "Cleanup output before run"
+      "issueId": 347,
+      "url": "pull/347",
+      "description": "Add DarkReader extension support"
     },
     {
-      "issueId": 267,
-      "url": "/issues/267",
-      "description": "Fix new line formatting in output"
+      "issueId": 346,
+      "url": "pull/346",
+      "description": "Disable broken service worker"
     }
   ]
 }
