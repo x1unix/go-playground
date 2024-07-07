@@ -26,6 +26,9 @@ var predefinedBuildVars = osutil.EnvironmentVariables{
 type Result struct {
 	// FileName is artifact file name
 	FileName string
+
+	// IsTest indicates whether binary is a test file
+	IsTest bool
 }
 
 // BuildEnvironmentConfig is BuildService environment configuration.
@@ -70,7 +73,8 @@ func (s BuildService) GetArtifact(id storage.ArtifactID) (storage.ReadCloseSizer
 
 // Build compiles Go source to WASM and returns result
 func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Result, error) {
-	if err := checkFileEntries(files); err != nil {
+	projInfo, err := checkFileEntries(files)
+	if err != nil {
 		return nil, err
 	}
 
@@ -79,7 +83,11 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Resu
 		return nil, err
 	}
 
-	result := &Result{FileName: aid.Ext(storage.ExtWasm)}
+	result := &Result{
+		FileName: aid.Ext(storage.ExtWasm),
+		IsTest:   projInfo.projectType == projectTypeTest,
+	}
+
 	isCached, err := s.storage.HasItem(aid)
 	if err != nil {
 		s.log.Error("failed to check cache", zap.Stringer("artifact", aid), zap.Error(err))
@@ -106,14 +114,18 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Resu
 		return nil, err
 	}
 
-	err = s.buildSource(ctx, workspace)
+	err = s.buildSource(ctx, projInfo, workspace)
 	return result, err
 }
 
-func (s BuildService) buildSource(ctx context.Context, workspace *storage.Workspace) error {
+func (s BuildService) buildSource(ctx context.Context, projInfo projectInfo, workspace *storage.Workspace) error {
 	// Populate go.mod and go.sum files.
 	if err := s.runGoTool(ctx, workspace.WorkDir, "mod", "tidy"); err != nil {
 		return err
+	}
+
+	if projInfo.projectType == projectTypeTest {
+		return s.runGoTool(ctx, workspace.WorkDir, "test", "-c", "-o", workspace.BinaryPath)
 	}
 
 	return s.runGoTool(ctx, workspace.WorkDir, "build", "-o", workspace.BinaryPath, ".")
