@@ -23,7 +23,7 @@ const highlightLinks = (str: string) =>
         {content}
       </Link>
     ) : (
-      <React.Fragment key={content}>content</React.Fragment>
+      <React.Fragment key={content}>{content}</React.Fragment>
     ),
   )
 
