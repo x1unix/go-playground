@@ -79,8 +79,10 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 	buildSvc := builder.NewBuildService(zap.L(), buildCfg, store)
 
 	// Start cleanup service
-	cleanupSvc := builder.NewCleanupDispatchService(zap.L(), cfg.Build.CleanupInterval, buildSvc, store)
-	go cleanupSvc.Start(ctx)
+	if !cfg.Build.SkipModuleCleanup {
+		cleanupSvc := builder.NewCleanupDispatchService(zap.L(), cfg.Build.CleanupInterval, buildSvc, store)
+		go cleanupSvc.Start(ctx)
+	}
 
 	// Initialize API endpoints
 	r := mux.NewRouter()
