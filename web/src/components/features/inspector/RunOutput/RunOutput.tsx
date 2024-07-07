@@ -16,10 +16,17 @@ interface StateProps {
   terminal: TerminalState
 }
 
+const linkStyle = {
+  root: {
+    // Fluent UI adds padding with :nth-child selector.
+    paddingLeft: '0 !important',
+  },
+}
+
 const highlightLinks = (str: string) =>
   splitStringUrls(str).map(({ isUrl, content }) =>
     isUrl ? (
-      <Link key={content} href={content} target="_blank" rel="noopener noreferrer nofollow">
+      <Link key={content} styles={linkStyle} href={content} target="_blank" rel="noopener noreferrer nofollow">
         {content}
       </Link>
     ) : (
