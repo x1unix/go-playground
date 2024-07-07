@@ -41,6 +41,9 @@ jobs:
       - name: Run ESLint
         run: yarn lint
         working-directory: ./web
+      - name: Run vitest
+        run: yarn test
+        working-directory: ./web
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
