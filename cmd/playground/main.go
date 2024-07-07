@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"path/filepath"
@@ -14,8 +15,8 @@ import (
 	"github.com/x1unix/go-playground/internal/builder"
 	"github.com/x1unix/go-playground/internal/builder/storage"
 	"github.com/x1unix/go-playground/internal/config"
-	"github.com/x1unix/go-playground/internal/langserver"
-	"github.com/x1unix/go-playground/internal/langserver/webutil"
+	"github.com/x1unix/go-playground/internal/server"
+	"github.com/x1unix/go-playground/internal/server/webutil"
 	"github.com/x1unix/go-playground/pkg/goplay"
 	"github.com/x1unix/go-playground/pkg/util/cmdutil"
 	"github.com/x1unix/go-playground/pkg/util/osutil"
@@ -84,15 +85,15 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 	// Initialize API endpoints
 	r := mux.NewRouter()
 	apiRouter := r.PathPrefix("/api").Subrouter()
-	svcCfg := langserver.ServiceConfig{Version: Version}
-	langserver.NewAPIv1Handler(svcCfg, playgroundClient, packages, buildSvc).
+	svcCfg := server.ServiceConfig{Version: Version}
+	server.NewAPIv1Handler(svcCfg, playgroundClient, packages, buildSvc).
 		Mount(apiRouter)
 
 	apiv2Router := apiRouter.PathPrefix("/v2").Subrouter()
-	langserver.NewAPIv2Handler(playgroundClient, buildSvc).Mount(apiv2Router)
+	server.NewAPIv2Handler(playgroundClient, buildSvc).Mount(apiv2Router)
 
 	// Web UI routes
-	tplVars := langserver.TemplateArguments{
+	tplVars := server.TemplateArguments{
 		GoogleTagID: cfg.Services.GoogleAnalyticsID,
 	}
 	if tplVars.GoogleTagID != "" {
@@ -104,8 +105,8 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 	}
 
 	assetsDir := cfg.HTTP.AssetsDir
-	indexHandler := langserver.NewTemplateFileServer(zap.L(), filepath.Join(assetsDir, langserver.IndexFileName), tplVars)
-	spaHandler := langserver.NewSpaFileServer(assetsDir, tplVars)
+	indexHandler := server.NewTemplateFileServer(zap.L(), filepath.Join(assetsDir, server.IndexFileName), tplVars)
+	spaHandler := server.NewSpaFileServer(assetsDir, tplVars)
 	r.Path("/").
 		Handler(indexHandler)
 	r.Path("/snippet/{snippetID:[A-Za-z0-9_-]+}").
@@ -113,7 +114,7 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 	r.PathPrefix("/").
 		Handler(spaHandler)
 
-	server := &http.Server{
+	srv := &http.Server{
 		Addr:         cfg.HTTP.Addr,
 		Handler:      r,
 		ReadTimeout:  5 * time.Second,
@@ -121,7 +122,7 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 		IdleTimeout:  15 * time.Second,
 	}
 
-	if err := startHttpServer(ctx, wg, server); err != nil {
+	if err := startHttpServer(ctx, wg, srv); err != nil {
 		return err
 	}
 
@@ -139,16 +140,17 @@ func startHttpServer(ctx context.Context, wg *sync.WaitGroup, server *http.Serve
 		defer wg.Done()
 		server.SetKeepAlivesEnabled(false)
 		if err := server.Shutdown(shutdownCtx); err != nil {
-			if err == context.Canceled {
+			if errors.Is(err, context.Canceled) {
 				return
 			}
+
 			logger.Errorf("Could not gracefully shutdown the server: %v\n", err)
 		}
 	}()
 
 	wg.Add(1)
 	logger.Infof("Listening on %q", server.Addr)
-	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return fmt.Errorf("cannot start server on %q: %s", server.Addr, err)
 	}
 

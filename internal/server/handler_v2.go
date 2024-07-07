@@ -1,8 +1,7 @@
-package langserver
+package server
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"golang.org/x/time/rate"
@@ -140,15 +139,15 @@ func (h *APIv2Handler) HandleRun(w http.ResponseWriter, r *http.Request) error {
 		return NewBadRequestError(err)
 	}
 
-	payload, _, err := fileSetFromRequest(r)
+	snippet, err := evalPayloadFromRequest(r)
 	if err != nil {
-		return err
+		return NewBadRequestError(err)
 	}
 
-	res, err := h.client.Compile(ctx, goplay.CompileRequest{
+	res, err := h.client.Evaluate(ctx, goplay.CompileRequest{
 		Version: goplay.DefaultVersion,
 		WithVet: params.Vet,
-		Body:    payload.Bytes(),
+		Body:    snippet,
 	}, params.Backend)
 	if err != nil {
 		return err
@@ -201,57 +200,4 @@ func (h *APIv2Handler) Mount(r *mux.Router) {
 	r.Path("/share").Methods(http.MethodPost).HandlerFunc(WrapHandler(h.HandleShare))
 	r.Path("/share/{id}").Methods(http.MethodGet).HandlerFunc(WrapHandler(h.HandleGetSnippet))
 	r.Path("/compile").Methods(http.MethodPost).HandlerFunc(WrapHandler(h.HandleCompile))
-}
-
-func fileSetFromRequest(r *http.Request) (goplay.FileSet, []string, error) {
-	body, err := filesPayloadFromRequest(r)
-	if err != nil {
-		return goplay.FileSet{}, nil, err
-	}
-
-	payload := goplay.NewFileSet(goplay.MaxSnippetSize)
-	fileNames := make([]string, 0, len(body.Files))
-	for name, contents := range body.Files {
-		fileNames = append(fileNames, name)
-		if err := payload.Add(name, []byte(contents)); err != nil {
-			return payload, fileNames, NewBadRequestError(err)
-		}
-	}
-
-	return payload, fileNames, nil
-}
-
-func buildFilesFromRequest(r *http.Request) (map[string][]byte, error) {
-	body, err := filesPayloadFromRequest(r)
-	if err != nil {
-		return nil, err
-	}
-
-	files := make(map[string][]byte, len(body.Files))
-	for name, contents := range body.Files {
-		files[name] = []byte(contents)
-	}
-
-	return files, nil
-}
-
-func filesPayloadFromRequest(r *http.Request) (*FilesPayload, error) {
-	reader := http.MaxBytesReader(nil, r.Body, goplay.MaxSnippetSize)
-	defer reader.Close()
-
-	body := new(FilesPayload)
-	if err := json.NewDecoder(reader).Decode(body); err != nil {
-		maxBytesErr := new(http.MaxBytesError)
-		if errors.As(err, &maxBytesErr) {
-			return nil, ErrSnippetTooLarge
-		}
-
-		return nil, NewBadRequestError(err)
-	}
-
-	if len(body.Files) == 0 {
-		return nil, ErrEmptyRequest
-	}
-
-	return body, nil
 }

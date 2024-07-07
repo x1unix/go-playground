@@ -1,4 +1,4 @@
-package langserver
+package server
 
 import (
 	"context"
@@ -249,7 +249,7 @@ func (s *APIv1Handler) HandleRunCode(w http.ResponseWriter, r *http.Request) err
 		}
 	}
 
-	res, err := s.client.Compile(ctx, goplay.CompileRequest{
+	res, err := s.client.Evaluate(ctx, goplay.CompileRequest{
 		Version: goplay.DefaultVersion,
 		WithVet: params.Vet,
 		Body:    src,

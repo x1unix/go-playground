@@ -58,8 +58,8 @@ func (c *Client) GoImports(ctx context.Context, src []byte, backend Backend) (*F
 	return dest, err
 }
 
-// Compile runs code in goplayground and returns response
-func (c *Client) Compile(ctx context.Context, req CompileRequest, backend string) (*CompileResponse, error) {
+// Evaluate runs code in goplayground and returns response
+func (c *Client) Evaluate(ctx context.Context, req CompileRequest, backend string) (*CompileResponse, error) {
 	dest := new(CompileResponse)
 
 	form := req.URLValues()

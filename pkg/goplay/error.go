@@ -32,7 +32,7 @@ func IsHTTPError(err error) (*HTTPError, bool) {
 		return e, true
 	}
 
-	var httpErr *HTTPError
+	httpErr := new(HTTPError)
 	if errors.As(err, httpErr) {
 		return httpErr, true
 	}

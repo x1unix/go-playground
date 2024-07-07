@@ -1,4 +1,4 @@
-package langserver
+package server
 
 import (
 	"context"
@@ -140,7 +140,7 @@ func (svc *BackendVersionService) fetchGoBackendVersionWithRetry(ctx context.Con
 func (svc *BackendVersionService) getGoBackendVersion(ctx context.Context, backend goplay.Backend) (string, error) {
 	// Dirty hack to fetch Go version for playground backend by running a simple program
 	// which returns Go version to stdout.
-	result, err := svc.client.Compile(ctx, goplay.CompileRequest{
+	result, err := svc.client.Evaluate(ctx, goplay.CompileRequest{
 		Version: goplay.DefaultVersion,
 		WithVet: false,
 		Body:    versionSnippet,
