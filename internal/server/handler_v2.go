@@ -32,6 +32,7 @@ func NewAPIv2Handler(client *goplay.Client, builder builder.BuildService) *APIv2
 	}
 }
 
+// HandleGetSnippet handles requests to get snippet by id.
 func (h *APIv2Handler) HandleGetSnippet(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	snippetID := vars["id"]
@@ -65,6 +66,7 @@ func (h *APIv2Handler) HandleGetSnippet(w http.ResponseWriter, r *http.Request) 
 	return nil
 }
 
+// HandleShare handles snippet share requests.
 func (h *APIv2Handler) HandleShare(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 
@@ -90,6 +92,7 @@ func (h *APIv2Handler) HandleShare(w http.ResponseWriter, r *http.Request) error
 	return nil
 }
 
+// HandleFormat handles gofmt requests.
 func (h *APIv2Handler) HandleFormat(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 
@@ -165,6 +168,7 @@ func (h *APIv2Handler) HandleRun(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+// HandleCompile handles WebAssembly compile requests.
 func (h *APIv2Handler) HandleCompile(w http.ResponseWriter, r *http.Request) error {
 	// Limit for request timeout
 	ctx, cancel := context.WithDeadline(r.Context(), time.Now().Add(maxBuildTimeDuration))
@@ -188,8 +192,9 @@ func (h *APIv2Handler) HandleCompile(w http.ResponseWriter, r *http.Request) err
 		return err
 	}
 
-	WriteJSON(w, BuildResponse{
+	WriteJSON(w, BuildResponseV2{
 		FileName: result.FileName,
+		IsTest:   result.IsTest,
 	})
 	return nil
 }
