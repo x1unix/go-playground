@@ -53,6 +53,11 @@ export const wrapGlobal = (overlay: object = {}, globalValue: object = window ||
 
 export type CallImportHandler = (sp: number, stack: StackReader, mem: MemoryView) => any
 
+/**
+ * Default command line arguments, extracted from wasm_exec.js
+ */
+const defaultCmdline = ['js']
+
 export interface Options {
   debug?: boolean
   debugCalls?: string[]
@@ -320,13 +325,19 @@ export class GoWrapper {
   /**
    * Start Go program
    */
-  async run(instance: GoWebAssemblyInstance) {
+  async run(instance: GoWebAssemblyInstance, args?: string[] | null) {
     // Wrap wasm instance to re-initialise import object before run.
     const wrappedInstance = wrapWebAssemblyInstance(instance, {
       run: () => {
         this.initReferences(this._globalValue)
       },
     })
+
+    let cmdline = defaultCmdline
+    if (args?.length) {
+      cmdline = cmdline.concat(args)
+    }
+    this.go.argv = cmdline
 
     // Pass raw memory reference to avoid race condition on mutation and update.
     this._inspector = MemoryInspector.fromInstance(wrappedInstance)

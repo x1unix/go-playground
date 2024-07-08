@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"strings"
 	"syscall"
 	"testing"
@@ -261,13 +260,44 @@ func TestBuildService_Build(t *testing.T) {
 			},
 			cmdRunner: func(t *testing.T, ctrl *gomock.Controller) CommandRunner {
 				m := NewMockCommandRunner(ctrl)
-				m.EXPECT().RunCommand(gomock.Any()).DoAndReturn(func(cmd *exec.Cmd) error {
-					require.Equal(t, cmd.Args, []string{
-						"go", "clean", "-modcache", "-cache", "-testcache", "-fuzzcache",
-					})
-					return nil
-				}).Times(1)
+				m.EXPECT().RunCommand(testutil.MatchCommand("go", "clean", "-modcache", "-cache", "-testcache", "-fuzzcache")).Return(nil)
 				return m
+			},
+		},
+		"unit test build": {
+			files: map[string][]byte{
+				"main_test.go": []byte("package main"),
+				"go.mod":       []byte("module foo"),
+			},
+			store: func(t *testing.T, _ map[string][]byte) (storage.StoreProvider, func() error) {
+				return testStorage{
+					hasItem: func(id storage.ArtifactID) (bool, error) {
+						return false, nil
+					},
+					createWorkspace: func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error) {
+						return &storage.Workspace{
+							WorkDir:    "/tmp",
+							BinaryPath: "test.wasm",
+							Files:      nil,
+						}, nil
+					},
+					clean: func(_ context.Context) error {
+						t.Log("cleanup called")
+						return nil
+					},
+				}, nil
+			},
+			cmdRunner: func(t *testing.T, ctrl *gomock.Controller) CommandRunner {
+				m := NewMockCommandRunner(ctrl)
+				m.EXPECT().RunCommand(testutil.MatchCommand("go", "mod", "tidy")).Return(nil)
+				m.EXPECT().RunCommand(testutil.MatchCommand("go", "test", "-c", "-o", "test.wasm")).Return(nil)
+				return m
+			},
+			wantResult: func(files map[string][]byte) *Result {
+				return &Result{
+					FileName: mustArtifactID(t, files).String() + ".wasm",
+					IsTest:   true,
+				}
 			},
 		},
 	}

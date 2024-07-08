@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
+	"sort"
 )
 
 const (
@@ -30,17 +31,25 @@ func (a ArtifactID) String() string {
 func GetArtifactID(entries map[string][]byte) (ArtifactID, error) {
 	h := md5.New()
 
-	isFirst := true
-	for name, contents := range entries {
-		if !isFirst {
+	// Keys have to be sorted for constant hashing
+	keys := make([]string, 0, len(entries))
+	for key := range entries {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	for i, key := range keys {
+		if i > 0 {
 			_, _ = h.Write([]byte("\n"))
 		}
-		isFirst = false
+
+		contents := bytes.TrimSpace(entries[key])
 		_, _ = h.Write([]byte("-- "))
-		_, _ = h.Write([]byte(name))
+		_, _ = h.Write([]byte(key))
 		_, _ = h.Write([]byte(" --\n"))
-		_, _ = h.Write(bytes.TrimSpace(contents))
+		_, _ = h.Write(contents)
 	}
+
 	fName := hex.EncodeToString(h.Sum(nil))
 	return ArtifactID(fName), nil
 }

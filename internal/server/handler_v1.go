@@ -354,7 +354,7 @@ func (s *APIv1Handler) HandleCompile(w http.ResponseWriter, r *http.Request) err
 		return err
 	}
 
-	resp := BuildResponse{FileName: result.FileName}
+	resp := BuildResponseV1{FileName: result.FileName}
 	if changed {
 		// Return formatted code if goimports had any effect
 		resp.Formatted = string(src)

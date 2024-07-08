@@ -71,13 +71,22 @@ func (r SuggestionsResponse) Write(w http.ResponseWriter) {
 	WriteJSON(w, r)
 }
 
-// BuildResponse is code compile response
-type BuildResponse struct {
+// BuildResponseV1 is build response for legacy API.
+type BuildResponseV1 struct {
 	// Formatted contains goimport'ed code.
 	Formatted string `json:"formatted,omitempty"`
 
 	// FileName is file name
 	FileName string `json:"fileName,omitempty"`
+}
+
+// BuildResponseV2 is WASM build response for v2 api.
+type BuildResponseV2 struct {
+	// FileName is file name
+	FileName string `json:"fileName,omitempty"`
+
+	// IsUnitTest indicates whether payload is a Go test.
+	IsTest bool `json:"isTest"`
 }
 
 // RunResponse is code run response

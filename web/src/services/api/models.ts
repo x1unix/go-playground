@@ -42,8 +42,8 @@ export interface FilesPayload {
 }
 
 export interface BuildResponse {
-  formatted?: string | null
   fileName: string
+  isTest: boolean
 }
 
 export interface VersionResponse {
