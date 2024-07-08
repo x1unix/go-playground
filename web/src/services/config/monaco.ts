@@ -18,7 +18,7 @@ export const defaultMonacoSettings: MonacoSettings = {
   cursorBlinking: 'blink',
   cursorStyle: 'line',
   selectOnLineNumbers: true,
-  minimap: true,
+  minimap: false,
   contextMenu: true,
   smoothScrolling: true,
   mouseWheelZoom: true,
