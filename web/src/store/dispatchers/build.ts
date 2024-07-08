@@ -1,5 +1,5 @@
 import { TargetType } from '~/services/config'
-import { getImportObject, goRun } from '~/services/go'
+import { getImportObject, goRun, goTestRun } from '~/services/go'
 import { setTimeoutNanos, SECOND } from '~/utils/duration'
 import { instantiateStreaming } from '~/lib/go'
 import client, { type EvalEvent, EvalEventKind } from '~/services/api'
@@ -200,13 +200,14 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
         break
       }
       case TargetType.WebAssembly: {
-        const { fileName } = await client.build(files)
+        const { fileName, isTest } = await client.build(files)
 
         const instance = await fetchWasmWithProgress(dispatch, fileName)
         dispatch(newRemoveNotificationAction(NotificationIDs.WASMAppDownload))
         dispatch(newProgramStartAction())
 
-        goRun(instance)
+        const runFunc = isTest ? goTestRun : goRun
+        runFunc(instance)
           .then((result) => {
             console.log('exit code: %d', result)
           })
