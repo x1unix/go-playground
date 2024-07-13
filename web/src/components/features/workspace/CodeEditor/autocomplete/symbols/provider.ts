@@ -1,6 +1,6 @@
 import type * as monaco from 'monaco-editor'
 import { type IAPIClient } from '~/services/api'
-import { wrapAsyncWithDebounce } from '../utils'
+import { wrapAsyncWithDebounce } from '../../utils'
 import snippets from './snippets'
 import { parseExpression } from './parse'
 

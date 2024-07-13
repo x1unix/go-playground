@@ -13,7 +13,7 @@ import { getTimeNowUsageMarkers, wrapAsyncWithDebounce } from './utils'
 import { attachCustomCommands } from './commands'
 import { LANGUAGE_GOLANG, stateToOptions } from './props'
 import { configureMonacoLoader } from './loader'
-import { registerGoLanguageProvider } from './autocomplete'
+import { registerGoLanguageProviders } from './autocomplete'
 import type { VimState } from '~/store/vim/state'
 
 const ANALYZE_DEBOUNCE_TIME = 500
@@ -61,11 +61,14 @@ class CodeEditor extends React.Component<Props> {
     return await this.doAnalyze(fileName, code)
   }, ANALYZE_DEBOUNCE_TIME)
 
+  constructor(props) {
+    registerGoLanguageProviders(apiClient)
+    super(props)
+  }
+
   editorDidMount(editorInstance: editor.IStandaloneCodeEditor, monacoInstance: Monaco) {
     this.editorInstance = editorInstance
     this.monaco = monacoInstance
-
-    registerGoLanguageProvider(apiClient)
 
     editorInstance.onKeyDown((e) => this.onKeyDown(e))
     const [vimAdapter, statusAdapter] = createVimModeAdapter(this.props.dispatch, editorInstance)
