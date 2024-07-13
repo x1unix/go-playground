@@ -46,7 +46,7 @@ const RunOutput: React.FC<StateProps & {}> = ({ status, monaco, terminal }) => {
     }
   }, [theme])
   const fontFamily = useMemo(() => getFontFamily(monaco?.fontFamily ?? DEFAULT_FONT), [monaco])
-  const isClean = !status || !status?.dirty
+  const isClean = !status?.dirty
 
   return (
     <div className="RunOutput" style={styles}>

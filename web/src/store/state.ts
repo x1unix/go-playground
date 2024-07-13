@@ -51,6 +51,10 @@ export interface State {
   terminal: TerminalState
 }
 
+/**
+ * Connect decorator to attach component to store.
+ * @deprecated use `connect` instead.
+ */
 export function Connect(fn: (state: State) => any) {
   return function (constructor: Function) {
     return connect(fn)(constructor as any) as any

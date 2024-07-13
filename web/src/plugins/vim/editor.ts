@@ -3,9 +3,8 @@ import { VimMode } from 'monaco-vim'
 import VimModeKeymap from 'monaco-vim/lib/cm/keymap_vim'
 import type { Nullable } from '~/utils/types'
 
-import { runFileDispatcher } from '~/store'
+import { runFileDispatcher, type StateDispatch } from '~/store'
 import { dispatchShareSnippet } from '~/store/workspace'
-import { type Dispatch } from '~/store/vim/state'
 import {
   newVimCommandDoneAction,
   newVimCommandStartAction,
@@ -53,7 +52,7 @@ class VimModeKeymapAdapter extends VimModeKeymap {
 
   constructor(
     // "dispatch" is reserved method in inner class.
-    private readonly dispatchFunc: Dispatch,
+    private readonly dispatchFunc: StateDispatch,
     editorInstance: editor.IStandaloneCodeEditor,
   ) {
     super(editorInstance)
@@ -89,7 +88,7 @@ export class StatusBarAdapter {
   private currentOpts?: Nullable<CommandInputOpts>
 
   constructor(
-    private readonly dispatchFn: Dispatch,
+    private readonly dispatchFn: StateDispatch,
     private readonly editor: editor.IStandaloneCodeEditor,
   ) {}
 
@@ -156,7 +155,7 @@ export class StatusBarAdapter {
    * @param e
    * @param currentData
    */
-  handleKeyDownEvent(e: IKeyboardEvent, currentData: string) {
+  handleKeyDownEvent(e: IKeyboardEvent, currentData: string = '') {
     e.preventDefault()
     e.stopPropagation()
 
@@ -192,7 +191,7 @@ export class StatusBarAdapter {
  * @param editorInstance Monaco editor instance
  */
 export const createVimModeAdapter = (
-  dispatch: Dispatch,
+  dispatch: StateDispatch,
   editorInstance: editor.IStandaloneCodeEditor,
 ): [VimModeKeymap, StatusBarAdapter] => {
   const vimAdapter: VimModeKeymap = new VimModeKeymapAdapter(dispatch, editorInstance)

@@ -1,4 +1,5 @@
 module.exports = {
+  root: true,
   env: {
     browser: true,
     es2021: true
@@ -21,7 +22,9 @@ module.exports = {
     "prettier",
     "unused-imports"
   ],
+  parser: "@typescript-eslint/parser",
   parserOptions: {
+    project: true,
     ecmaVersion: "latest",
     ecmaFeatures: {
       jsx: true
@@ -50,7 +53,11 @@ module.exports = {
     },
     'import/resolver': {
       typescript: {
-        alwaysTryTypes: true
+        alwaysTryTypes: true,
+        project: ["**/tsconfig.json"]
+      },
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
       }
     }
   },

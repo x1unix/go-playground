@@ -3,21 +3,23 @@ import { Spinner } from '@fluentui/react'
 import MonacoEditor, { type Monaco } from '@monaco-editor/react'
 import { KeyMod, KeyCode, type editor, type IKeyboardEvent } from 'monaco-editor'
 
+import apiClient from '~/services/api'
 import { createVimModeAdapter, type StatusBarAdapter, type VimModeKeymap } from '~/plugins/vim/editor'
 import { Analyzer } from '~/services/analyzer'
-import { TargetType } from '~/services/config'
-import { Connect, newMarkerAction, runFileDispatcher } from '~/store'
+import { type MonacoSettings, TargetType } from '~/services/config'
+import { connect, newMarkerAction, runFileDispatcher, type StateDispatch } from '~/store'
 import { type WorkspaceState, dispatchFormatFile, dispatchResetWorkspace, dispatchUpdateFile } from '~/store/workspace'
-import { getTimeNowUsageMarkers, wrapAsyncWithDebounce } from '../utils'
-import { attachCustomCommands } from '../commands'
-import { LANGUAGE_GOLANG, stateToOptions } from '../props'
+import { getTimeNowUsageMarkers, wrapAsyncWithDebounce } from './utils'
+import { attachCustomCommands } from './commands'
+import { LANGUAGE_GOLANG, stateToOptions } from './props'
+import { configureMonacoLoader } from './loader'
+import { registerGoLanguageProvider } from './autocomplete'
+import type { VimState } from '~/store/vim/state'
 
 const ANALYZE_DEBOUNCE_TIME = 500
 
-interface CodeEditorState {
-  code?: string
-  loading?: boolean
-}
+// ask monaco-editor/react to use our own Monaco instance.
+configureMonacoLoader()
 
 const mapWorkspaceProps = ({ files, selectedFile }: WorkspaceState) => {
   if (!selectedFile) {
@@ -33,16 +35,22 @@ const mapWorkspaceProps = ({ files, selectedFile }: WorkspaceState) => {
   }
 }
 
-@Connect(({ workspace, ...s }) => ({
-  ...mapWorkspaceProps(workspace),
-  darkMode: s.settings.darkMode,
-  vimModeEnabled: s.settings.enableVimMode,
-  isServerEnvironment: s.runTarget.target === TargetType.Server,
-  loading: s.status?.loading,
-  options: s.monaco,
-  vim: s.vim,
-}))
-export class CodeEditor extends React.Component<any, CodeEditorState> {
+interface CodeEditorState {
+  code?: string
+  loading?: boolean
+}
+
+interface Props extends CodeEditorState {
+  fileName: string
+  darkMode: boolean
+  vimModeEnabled: boolean
+  isServerEnvironment: boolean
+  options: MonacoSettings
+  vim?: VimState | null
+  dispatch: StateDispatch
+}
+
+class CodeEditor extends React.Component<Props> {
   private analyzer?: Analyzer
   private editorInstance?: editor.IStandaloneCodeEditor
   private vimAdapter?: VimModeKeymap
@@ -56,6 +64,8 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
   editorDidMount(editorInstance: editor.IStandaloneCodeEditor, monacoInstance: Monaco) {
     this.editorInstance = editorInstance
     this.monaco = monacoInstance
+
+    registerGoLanguageProvider(apiClient)
 
     editorInstance.onKeyDown((e) => this.onKeyDown(e))
     const [vimAdapter, statusAdapter] = createVimModeAdapter(this.props.dispatch, editorInstance)
@@ -221,3 +231,13 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
     )
   }
 }
+
+export const ConnectedCodeEditor = connect<CodeEditorState, {}>(({ workspace, ...s }) => ({
+  ...mapWorkspaceProps(workspace),
+  darkMode: s.settings.darkMode,
+  vimModeEnabled: s.settings.enableVimMode,
+  isServerEnvironment: s.runTarget.target === TargetType.Server,
+  loading: s.status?.loading,
+  options: s.monaco,
+  vim: s.vim,
+}))(CodeEditor)

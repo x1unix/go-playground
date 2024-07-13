@@ -1,52 +1,12 @@
-import { loader } from '@monaco-editor/react'
-import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
-import * as monaco from 'monaco-editor'
+import type * as monaco from 'monaco-editor'
 import { type IAPIClient } from '~/services/api'
+import { wrapAsyncWithDebounce } from '../utils'
 import snippets from './snippets'
-import { wrapAsyncWithDebounce } from './utils'
+import { parseExpression } from './parse'
 
-// Import aliases
-type CompletionList = monaco.languages.CompletionList
-type CompletionContext = monaco.languages.CompletionContext
-type ITextModel = monaco.editor.ITextModel
-type Position = monaco.Position
-type CancellationToken = monaco.CancellationToken
-
-let alreadyRegistered = false
-
-// Matches package (and method name)
-const COMPL_REGEXP = /([a-zA-Z0-9_]+)(\.([A-Za-z0-9_]+))?$/
-const R_GROUP_PKG = 1
-const R_GROUP_METHOD = 3
 const SUGGESTIONS_DEBOUNCE_DELAY = 500
 
-const parseExpression = (expr: string) => {
-  COMPL_REGEXP.lastIndex = 0 // Reset regex state
-  const m = COMPL_REGEXP.exec(expr)
-  if (!m) {
-    return null
-  }
-
-  const varName = m[R_GROUP_PKG]
-  const propValue = m[R_GROUP_METHOD]
-
-  if (!propValue) {
-    return { value: varName }
-  }
-
-  return {
-    packageName: varName,
-    value: propValue,
-  }
-}
-
-self.MonacoEnvironment = {
-  getWorker: () => {
-    return new EditorWorker()
-  },
-}
-
-class GoCompletionItemProvider implements monaco.languages.CompletionItemProvider {
+export class GoCompletionItemProvider implements monaco.languages.CompletionItemProvider {
   private readonly getSuggestionFunc: IAPIClient['getSuggestions']
 
   constructor(private readonly client: IAPIClient) {
@@ -57,11 +17,11 @@ class GoCompletionItemProvider implements monaco.languages.CompletionItemProvide
   }
 
   async provideCompletionItems(
-    model: ITextModel,
-    position: Position,
-    context: CompletionContext,
-    token: CancellationToken,
-  ): Promise<CompletionList> {
+    model: monaco.editor.ITextModel,
+    position: monaco.Position,
+    context: monaco.languages.CompletionContext,
+    token: monaco.CancellationToken,
+  ): Promise<monaco.languages.CompletionList> {
     const val = model
       .getValueInRange({
         startLineNumber: position.lineNumber,
@@ -107,15 +67,4 @@ class GoCompletionItemProvider implements monaco.languages.CompletionItemProvide
       return { suggestions: relatedSnippets }
     }
   }
-}
-
-export const registerGoLanguageProvider = (client: IAPIClient) => {
-  if (alreadyRegistered) {
-    console.warn('Go Language provider was already registered')
-    return
-  }
-
-  alreadyRegistered = true
-  loader.config({ monaco })
-  return monaco.languages.registerCompletionItemProvider('go', new GoCompletionItemProvider(client))
 }

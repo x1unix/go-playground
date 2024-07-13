@@ -12,6 +12,9 @@ export enum VimSubMode {
   Blockwise = 'blockwise',
 }
 
+/**
+ * @deprecated use `StateDispatch` instead.
+ */
 export type Dispatch = <V = any, T = string>(v: { type: T; payload?: V } | Dispatcher) => void
 export type ConfirmMessage = VimState['confirmMessage']
 

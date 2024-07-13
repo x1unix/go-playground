@@ -1,7 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { registerGoLanguageProvider } from '~/components/features/workspace/provider'
-import apiClient from '~/services/api'
 import * as serviceWorkerRegistration from './serviceWorkerRegistration'
 import { initializeIcons } from './icons'
 import { App } from './App'
@@ -12,7 +10,6 @@ import 'core-js/actual/promise/all-settled'
 import 'core-js/actual/array/flat-map'
 
 initializeIcons()
-registerGoLanguageProvider(apiClient)
 
 // eslint-disable-next-line import/no-named-as-default-member
 ReactDOM.render(<App />, document.getElementById('root'))

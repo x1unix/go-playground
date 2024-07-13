@@ -26,10 +26,12 @@ export interface VimKeyPressArgs {
 
 export const newVimInitAction = () => ({
   type: ActionType.VIM_INIT,
+  payload: null,
 })
 
 export const newVimDisposeAction = () => ({
   type: ActionType.VIM_DISPOSE,
+  payload: null,
 })
 
 export const newVimModeChangeAction = (payload: VimModeChangeArgs) => ({
@@ -44,6 +46,7 @@ export const newVimKeyPressAction = (key: string, replaceContents = false) => ({
 
 export const newVimKeyDeleteAction = () => ({
   type: ActionType.VIM_KEYDEL,
+  payload: null,
 })
 
 export const newVimCommandStartAction = (commandSuffix?: Nullable<string>) => ({
@@ -53,6 +56,7 @@ export const newVimCommandStartAction = (commandSuffix?: Nullable<string>) => ({
 
 export const newVimCommandDoneAction = () => ({
   type: ActionType.VIM_COMMAND_DONE,
+  payload: null,
 })
 
 export const newVimConfirmAction = (payload: ConfirmMessage) => ({

@@ -12,7 +12,7 @@ import {
 import { TabView } from '~/components/elements/tabs/TabView'
 import type { TabBarAction, TabIconStyles } from '~/components/elements/tabs/types'
 
-import { CodeEditor } from '../CodeEditor'
+import { ConnectedCodeEditor } from '../CodeEditor'
 import { FlexContainer } from '../FlexContainer'
 import { NewFileModal } from '../NewFileModal'
 import { ContentPlaceholder } from '../ContentPlaceholder'
@@ -117,7 +117,7 @@ const Workspace: React.FC<Props> = ({ dispatch, files, selectedFile, snippet }) 
     >
       {tabs?.length ? (
         <FlexContainer>
-          <CodeEditor />
+          <ConnectedCodeEditor />
         </FlexContainer>
       ) : (
         <ContentPlaceholder
