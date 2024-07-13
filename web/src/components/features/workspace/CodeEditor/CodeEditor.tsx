@@ -3,6 +3,7 @@ import { Spinner } from '@fluentui/react'
 import MonacoEditor, { type Monaco } from '@monaco-editor/react'
 import { KeyMod, KeyCode, type editor, type IKeyboardEvent } from 'monaco-editor'
 
+import apiClient from '~/services/api'
 import { createVimModeAdapter, type StatusBarAdapter, type VimModeKeymap } from '~/plugins/vim/editor'
 import { Analyzer } from '~/services/analyzer'
 import { TargetType } from '~/services/config'
@@ -11,8 +12,13 @@ import { type WorkspaceState, dispatchFormatFile, dispatchResetWorkspace, dispat
 import { getTimeNowUsageMarkers, wrapAsyncWithDebounce } from '../utils'
 import { attachCustomCommands } from '../commands'
 import { LANGUAGE_GOLANG, stateToOptions } from '../props'
+import { configureMonacoLoader } from './loader'
+import { registerGoLanguageProvider } from './autocomplete'
 
 const ANALYZE_DEBOUNCE_TIME = 500
+
+// ask monaco-editor/react to use our own Monaco instance.
+configureMonacoLoader()
 
 interface CodeEditorState {
   code?: string
@@ -56,6 +62,8 @@ export class CodeEditor extends React.Component<any, CodeEditorState> {
   editorDidMount(editorInstance: editor.IStandaloneCodeEditor, monacoInstance: Monaco) {
     this.editorInstance = editorInstance
     this.monaco = monacoInstance
+
+    registerGoLanguageProvider(apiClient)
 
     editorInstance.onKeyDown((e) => this.onKeyDown(e))
     const [vimAdapter, statusAdapter] = createVimModeAdapter(this.props.dispatch, editorInstance)
