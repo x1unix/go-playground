@@ -36,6 +36,7 @@ export const stateToOptions = (state: MonacoSettings): monaco.editor.IEditorOpti
     showUnused: true,
     automaticLayout: true,
     minimap: { enabled: state.minimap },
+    fixedOverflowWidgets: true,
     contextmenu: contextMenu,
   }
 }
