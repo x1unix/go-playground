@@ -32,13 +32,7 @@ type Command struct {
 }
 
 type ISingleEditOperation struct {
-	// The range to replace. This can be empty to emulate a simple insert.
-	Range IRange `json:"range"`
-
-	// The text to replace with. This can be null to emulate a simple delete.
-	Text string `json:"text,omitempty"`
-
-	// This indicates that this operation has "insert" semantics.
-	// i.e. forceMoveMarkers = true => if `range` is collapsed, all markers at the position will be moved.
-	ForceMoveMarkers bool `json:"forceMoveMarkers,omitempty"`
+	Range            IRange `json:"range"`
+	Text             string `json:"text,omitempty"`
+	ForceMoveMarkers bool   `json:"forceMoveMarkers,omitempty"`
 }
