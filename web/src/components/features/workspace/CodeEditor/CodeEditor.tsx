@@ -1,7 +1,7 @@
 import React from 'react'
 import { Spinner } from '@fluentui/react'
 import MonacoEditor, { type Monaco } from '@monaco-editor/react'
-import { KeyMod, KeyCode, type editor, type IKeyboardEvent } from 'monaco-editor'
+import { KeyMod, KeyCode, type editor, type IKeyboardEvent, type IDisposable } from 'monaco-editor'
 
 import apiClient from '~/services/api'
 import { createVimModeAdapter, type StatusBarAdapter, type VimModeKeymap } from '~/plugins/vim/editor'
@@ -56,17 +56,14 @@ class CodeEditor extends React.Component<Props> {
   private vimAdapter?: VimModeKeymap
   private vimCommandAdapter?: StatusBarAdapter
   private monaco?: Monaco
+  private disposables?: IDisposable[]
 
   private readonly debouncedAnalyzeFunc = wrapAsyncWithDebounce(async (fileName: string, code: string) => {
     return await this.doAnalyze(fileName, code)
   }, ANALYZE_DEBOUNCE_TIME)
 
-  constructor(props) {
-    registerGoLanguageProviders(apiClient, props.dispatch)
-    super(props)
-  }
-
   editorDidMount(editorInstance: editor.IStandaloneCodeEditor, monacoInstance: Monaco) {
+    this.disposables = registerGoLanguageProviders(apiClient, this.props.dispatch)
     this.editorInstance = editorInstance
     this.monaco = monacoInstance
 
@@ -155,6 +152,7 @@ class CodeEditor extends React.Component<Props> {
   }
 
   componentWillUnmount() {
+    this.disposables?.forEach((d) => d.dispose())
     this.analyzer?.dispose()
     this.vimAdapter?.dispose()
 

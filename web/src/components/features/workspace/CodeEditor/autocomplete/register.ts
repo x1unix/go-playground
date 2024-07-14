@@ -5,10 +5,6 @@ import { GoCompletionItemProvider } from './symbols'
 import { GoImportsCompletionProvider } from './imports'
 import type { StateDispatch } from '~/store'
 
-const concatDisposables = (...disposables: monaco.IDisposable[]): monaco.IDisposable => ({
-  dispose: () => disposables.forEach((d) => d.dispose()),
-})
-
 let alreadyRegistered = false
 
 /**
@@ -21,8 +17,8 @@ export const registerGoLanguageProviders = (client: IAPIClient, dispatcher: Stat
   }
 
   alreadyRegistered = true
-  return concatDisposables(
+  return [
     monaco.languages.registerCompletionItemProvider('go', new GoCompletionItemProvider(client)),
     monaco.languages.registerCompletionItemProvider('go', new GoImportsCompletionProvider(dispatcher)),
-  )
+  ]
 }
