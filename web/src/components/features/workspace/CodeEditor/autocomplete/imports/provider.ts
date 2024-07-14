@@ -1,4 +1,4 @@
-import type * as monaco from 'monaco-editor'
+import * as monaco from 'monaco-editor'
 import type { StateDispatch } from '~/store'
 import { newAddNotificationAction, NotificationType } from '~/store/notifications'
 
@@ -24,11 +24,12 @@ export class GoImportsCompletionProvider implements monaco.languages.CompletionI
       return { suggestions: [] }
     }
 
+    const { lineNumber, column } = position
     const textUntilPosition = model.getValueInRange({
-      startLineNumber: position.lineNumber,
+      startLineNumber: lineNumber,
       startColumn: 1,
-      endLineNumber: position.lineNumber,
-      endColumn: position.column,
+      endLineNumber: lineNumber,
+      endColumn: column,
     })
 
     console.log('prov', {
@@ -37,7 +38,30 @@ export class GoImportsCompletionProvider implements monaco.languages.CompletionI
       context,
     })
 
-    return { suggestions: [] }
+    const range: monaco.IRange = {
+      startLineNumber: lineNumber,
+      endLineNumber: lineNumber,
+      startColumn: column,
+      endColumn: column,
+    }
+    const suggestions: monaco.languages.CompletionItem[] = [
+      {
+        label: 'fmt',
+        kind: monaco.languages.CompletionItemKind.Module,
+        insertText: 'fmt',
+        detail: 'fmt',
+        documentation: {
+          value:
+            'Package os provides a platform-independent interface to operating system\nfunctionality. The design is Unix-like, although the error handling is\nGo-like; failing calls return values of type error rather than error numbers.\nOften, more information is available within the error. For example,\nif a call that takes a file name fails, such as Open or Stat, the error\nwill include the failing file name when printed and will be of type\n*PathError, which may be unpacked for more information.\n\nThe os interface is intended to be uniform across all operating systems.\nFeatures not generally available appear in the system-specific package syscall.\n\nHere is a simple example, opening a file and reading some of it.\n\n```\nfile, err := os.Open("file.go") // For read access.\nif err != nil {\n\tlog.Fatal(err)\n}\n\n```\nIf the open fails, the error string will be self-explanatory, like\n\n```\nopen file.go: no such file or directory\n\n```\nThe file\'s data can then be read into a slice of bytes. Read and\nWrite take their byte counts from the length of the argument slice.\n\n```\ndata := make([]byte, 100)\ncount, err := file.Read(data)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Printf("read %d bytes: %q\\n", count, data[:count])\n\n```\nNote: The maximum number of concurrent operations on a File may be limited by\nthe OS or the system. The number should be high, but exceeding it may degrade\nperformance or cause other issues.\n\n["os" on pkg.go.dev](https://pkg.go.dev/os)',
+        },
+      },
+      {
+        label: 'os',
+        kind: monaco.languages.CompletionItemKind.Module,
+        insertText: 'os',
+      },
+    ].map((v) => ({ ...v, range }))
+    return { suggestions }
   }
 
   private isImportStatementRange(pos: monaco.Position, model: monaco.editor.ITextModel) {
