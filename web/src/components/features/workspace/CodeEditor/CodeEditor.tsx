@@ -62,7 +62,7 @@ class CodeEditor extends React.Component<Props> {
   }, ANALYZE_DEBOUNCE_TIME)
 
   constructor(props) {
-    registerGoLanguageProviders(apiClient)
+    registerGoLanguageProviders(apiClient, props.dispatch)
     super(props)
   }
 
