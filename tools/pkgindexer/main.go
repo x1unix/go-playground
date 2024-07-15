@@ -36,9 +36,10 @@ func (f Flags) WithDefaults() (Flags, error) {
 func main() {
 	var flags Flags
 	cmd := &cobra.Command{
-		Use:   "pkgindexer [-r goroot] [-o output]",
-		Short: "Go standard library packages scanner",
-		Long:  "Tool to generate Go package autocomplete entries for Monaco editor from Go SDK",
+		SilenceUsage: true,
+		Use:          "pkgindexer [-r goroot] [-o output]",
+		Short:        "Go standard library packages scanner",
+		Long:         "Tool to generate Go package autocomplete entries for Monaco editor from Go SDK",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			resolvedFlags, err := flags.WithDefaults()
 			if err != nil {
@@ -53,7 +54,9 @@ func main() {
 	cmd.PersistentFlags().StringVarP(&flags.outFile, "output", "o", "", "Path to output file. When enpty, prints to stdout.")
 	cmd.PersistentFlags().BoolVarP(&flags.prettyPrint, "pretty", "P", false, "Add indents to JSON output")
 
-	cmd.Execute()
+	if err := cmd.Execute(); err != nil {
+		os.Exit(2)
+	}
 }
 
 func runErr(flags Flags) error {
