@@ -16,9 +16,14 @@ import (
 )
 
 const (
-	// 1080 is a number of sub-directories in $GOROOT/src for Go 1.22.
-	resultsPreallocSize = 1080
+	resultsPreallocSize = 300
 )
+
+type scanResult struct {
+	hasPkg   bool
+	item     monaco.CompletionItem
+	children []string
+}
 
 // GoRootScanner scans Go SDK directory and provides information about Go version and standard packages list.
 type GoRootScanner struct {
@@ -68,9 +73,6 @@ func (s *GoRootScanner) start() ([]monaco.CompletionItem, error) {
 		}
 
 		q.add(pkgName)
-		// go s.wg.Go(func() error {
-		// 	return s.visitPackage(childCtx, rootDir, pkgName)
-		// })
 	}
 
 	results := make([]monaco.CompletionItem, 0, resultsPreallocSize)
@@ -80,22 +82,24 @@ func (s *GoRootScanner) start() ([]monaco.CompletionItem, error) {
 			break
 		}
 
-		item, nextPkgs, err := s.visitPackage(rootDir, pkgName)
+		result, err := s.visitPackage(rootDir, pkgName)
 		if err != nil {
 			return nil, err
 		}
 
-		q.add(nextPkgs...)
-		results = append(results, item)
+		q.add(result.children...)
+		if result.hasPkg {
+			results = append(results, result.item)
+		}
 	}
 
 	return results, nil
 }
 
-func (s *GoRootScanner) visitPackage(rootDir string, importPath string) (monaco.CompletionItem, []string, error) {
+func (s *GoRootScanner) visitPackage(rootDir string, importPath string) (scanResult, error) {
 	entries, err := os.ReadDir(filepath.Join(rootDir, importPath))
 	if err != nil {
-		return monaco.CompletionItem{}, nil, fmt.Errorf("failed to open package directory %q: %w", importPath, err)
+		return scanResult{}, fmt.Errorf("failed to open package directory %q: %w", importPath, err)
 	}
 
 	var nextPkgs []string
@@ -118,7 +122,7 @@ func (s *GoRootScanner) visitPackage(rootDir string, importPath string) (monaco.
 	}
 
 	if len(sourceFiles) == 0 {
-		return monaco.CompletionItem{}, nextPkgs, nil
+		return scanResult{children: nextPkgs}, nil
 	}
 
 	item, err := ParseImportCompletionItem(context.Background(), PackageParseParams{
@@ -127,10 +131,14 @@ func (s *GoRootScanner) visitPackage(rootDir string, importPath string) (monaco.
 		Files:      sourceFiles,
 	})
 	if err != nil {
-		return item, nil, fmt.Errorf("failed to parse package %q: %w", importPath, err)
+		return scanResult{}, fmt.Errorf("failed to parse package %q: %w", importPath, err)
 	}
 
-	return item, nextPkgs, nil
+	return scanResult{
+		hasPkg:   true,
+		item:     item,
+		children: nextPkgs,
+	}, nil
 }
 
 func checkVersion(root string) (string, error) {
