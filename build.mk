@@ -78,7 +78,7 @@ go-repl.wasm:
 wasm: wasm_exec.js analyzer.wasm go-repl.wasm
 
 .PHONY: build
-build: check-go check-yarn clean preinstall gen collect-meta build-server wasm build-ui
+build: check-go check-yarn clean preinstall gen collect-meta build-server wasm pkg-index build-ui 
 	@echo ":: Copying assets..." && \
 	cp -rfv ./data $(TARGET)/data && \
 	mv -v $(UI)/build $(TARGET)/public && \
