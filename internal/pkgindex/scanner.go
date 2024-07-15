@@ -13,30 +13,16 @@ import (
 	"strings"
 
 	"github.com/x1unix/go-playground/pkg/monaco"
-	"golang.org/x/sync/errgroup"
 )
 
 const (
-	// How many goroutines to use for parallel index.
-	poolSize = 4
-
-	// Size of a buffered channel to consume results.
-	buffSize = 8
-
 	// 1080 is a number of sub-directories in $GOROOT/src for Go 1.22.
 	resultsPreallocSize = 1080
 )
 
-type scanResult struct {
-	pkg   string
-	entry monaco.CompletionItem
-}
-
 // GoRootScanner scans Go SDK directory and provides information about Go version and standard packages list.
 type GoRootScanner struct {
-	goRoot  string
-	results chan scanResult
-	wg      *errgroup.Group
+	goRoot string
 }
 
 func NewGoRootScanner(goRoot string) GoRootScanner {
@@ -69,11 +55,7 @@ func (s *GoRootScanner) start() ([]monaco.CompletionItem, error) {
 		return nil, fmt.Errorf("cannot open Go SDK directory: %w", err)
 	}
 
-	wg, childCtx := errgroup.WithContext(context.Background())
-	wg.SetLimit(poolSize)
-	s.wg = wg
-
-	s.results = make(chan scanResult, buffSize)
+	q := newQueue(resultsPreallocSize)
 	for _, entry := range entries {
 		if !entry.Type().IsDir() {
 			continue
@@ -85,56 +67,48 @@ func (s *GoRootScanner) start() ([]monaco.CompletionItem, error) {
 			continue
 		}
 
-		go s.wg.Go(func() error {
-			return s.visitPackage(childCtx, rootDir, pkgName)
-		})
+		q.add(pkgName)
+		// go s.wg.Go(func() error {
+		// 	return s.visitPackage(childCtx, rootDir, pkgName)
+		// })
 	}
 
-	// Extra goroutine to get finish result as error
-	finishChan := make(chan error, 1)
-	defer close(finishChan)
-	go func() {
-		finishChan <- wg.Wait()
-	}()
-
-	// Collect all results
 	results := make([]monaco.CompletionItem, 0, resultsPreallocSize)
-	for {
-		select {
-		case val := <-s.results:
-			results = append(results, val.entry)
-		case err := <-finishChan:
-			return results, err
+	for q.occupied() {
+		pkgName, ok := q.pop()
+		if !ok {
+			break
 		}
+
+		item, nextPkgs, err := s.visitPackage(rootDir, pkgName)
+		if err != nil {
+			return nil, err
+		}
+
+		q.add(nextPkgs...)
+		results = append(results, item)
 	}
+
+	return results, nil
 }
 
-func (s *GoRootScanner) visitPackage(ctx context.Context, rootDir string, importPath string) error {
-	if ctx.Err() != nil {
-		return nil
-	}
-
+func (s *GoRootScanner) visitPackage(rootDir string, importPath string) (monaco.CompletionItem, []string, error) {
 	entries, err := os.ReadDir(filepath.Join(rootDir, importPath))
 	if err != nil {
-		return fmt.Errorf("failed to open package directory %q: %w", importPath, err)
+		return monaco.CompletionItem{}, nil, fmt.Errorf("failed to open package directory %q: %w", importPath, err)
 	}
 
+	var nextPkgs []string
 	sourceFiles := make([]string, 0, len(entries))
 	for _, entry := range entries {
-		if ctx.Err() != nil {
-			return nil
-		}
-
 		name := entry.Name()
 		if shouldIgnoreFileName(name) {
 			continue
 		}
 
 		if entry.IsDir() {
-			go s.wg.Go(func() error {
-				pkgPath := path.Join(importPath, name)
-				return s.visitPackage(ctx, rootDir, pkgPath)
-			})
+			pkgPath := path.Join(importPath, name)
+			nextPkgs = append(nextPkgs, pkgPath)
 			continue
 		}
 
@@ -144,20 +118,19 @@ func (s *GoRootScanner) visitPackage(ctx context.Context, rootDir string, import
 	}
 
 	if len(sourceFiles) == 0 {
-		return nil
+		return monaco.CompletionItem{}, nextPkgs, nil
 	}
 
-	item, err := ParseImportCompletionItem(ctx, PackageParseParams{
+	item, err := ParseImportCompletionItem(context.Background(), PackageParseParams{
 		RootDir:    rootDir,
 		ImportPath: importPath,
 		Files:      sourceFiles,
 	})
 	if err != nil {
-		return fmt.Errorf("failed to parse package %q: %w", importPath, err)
+		return item, nil, fmt.Errorf("failed to parse package %q: %w", importPath, err)
 	}
 
-	s.results <- scanResult{pkg: importPath, entry: item}
-	return nil
+	return item, nextPkgs, nil
 }
 
 func checkVersion(root string) (string, error) {

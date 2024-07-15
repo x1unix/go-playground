@@ -1,6 +1,6 @@
 module github.com/x1unix/go-playground
 
-go 1.18
+go 1.21
 
 require (
 	github.com/TheZeroSlave/zapsentry v1.10.0

@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/spf13/cobra"
 	"github.com/x1unix/go-playground/internal/pkgindex"
@@ -61,6 +62,7 @@ func main() {
 }
 
 func runErr(flags Flags) error {
+	runtime.GOMAXPROCS(1)
 	scanner := pkgindex.NewGoRootScanner(flags.goRoot)
 	results, err := scanner.Scan()
 	if err != nil {
