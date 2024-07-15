@@ -1,4 +1,4 @@
-import { MemoryCacheStorage, persistentStore } from '../cache'
+import { persistentStore } from '../cache'
 import type { GoImportsList } from './types'
 
 const stdlibImportsKey = 'go.imports.stdlib'
@@ -7,7 +7,16 @@ const stdlibImportsKey = 'go.imports.stdlib'
  * Provides data sources for autocomplete services.
  */
 export class GoCompletionService {
-  private readonly storeFacade = new MemoryCacheStorage(persistentStore)
+  private cacheWarmUp = false
+
+  /**
+   * Store keeps completions in cache.
+   *
+   * Using MemoryCacheStorage doesn't make sense as Monaco mutates completions after submit.
+   * Completions with mutated position are no longer validated, so either each new copy should be done
+   * or it's much easier to just query the DB.
+   */
+  private readonly store = persistentStore
 
   /**
    * Returns list of known importable Go packages.
@@ -17,13 +26,19 @@ export class GoCompletionService {
    */
   async getImportSuggestions() {
     // TODO: provide third-party packages using go proxy index.
-    return await this.getStandardPackages()
+    const stdlib = await this.getStandardPackages()
+    return stdlib.packages
+  }
+
+  isWarmUp() {
+    return this.cacheWarmUp
   }
 
   private async getStandardPackages() {
-    const symbols = await this.storeFacade.getItem<GoImportsList>(stdlibImportsKey)
+    const symbols = await this.store.getItem<GoImportsList>(stdlibImportsKey)
     if (symbols) {
-      return symbols.packages
+      this.cacheWarmUp = true
+      return symbols
     }
 
     const rsp = await fetch('/data/imports.json')
@@ -32,7 +47,7 @@ export class GoCompletionService {
     }
 
     const data: GoImportsList = await rsp.json()
-    await this.storeFacade.setItem(stdlibImportsKey, data)
+    await this.store.setItem(stdlibImportsKey, data)
     return data
   }
 }

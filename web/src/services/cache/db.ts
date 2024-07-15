@@ -8,6 +8,8 @@ interface CacheEntry<T = any> {
 
 type CacheDB = Dexie & EntityTable<CacheEntry, 'key'>
 
+const tableName = 'entries'
+
 /**
  * IndexedDB-based cache implementation.
  */
@@ -16,26 +18,26 @@ export class DatabaseStorage implements Storage {
 
   constructor() {
     this.db.version(1).stores({
-      entries: 'key',
+      [tableName]: 'key',
     })
   }
 
   async getItem<T>(key: string): Promise<T | undefined> {
-    const entry = await this.db.get(key)
+    const entry = await this.db.table(tableName).get(key)
     return entry?.value as T | undefined
   }
 
   async deleteItem(key: string) {
-    const n = await this.db.where({ key }).delete()
+    const n = await this.db.table(tableName).where({ key }).delete()
     return n > 0
   }
 
   async setItem<T>(key: string, value: T) {
     await this.deleteItem(key)
-    await this.db.put({ key, value })
+    await this.db.table(tableName).put({ key, value })
   }
 
   async flush() {
-    await this.db.clear()
+    await this.db.table(tableName).clear()
   }
 }

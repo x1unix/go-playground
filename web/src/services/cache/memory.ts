@@ -6,7 +6,17 @@ export class MemoryCacheStorage implements Storage {
   constructor(private readonly backend?: Storage) {}
 
   async getItem<T>(key: string): Promise<T | undefined> {
-    return this.cache.get(key) ?? (await this.backend?.getItem(key))
+    let found = this.cache.get(key)
+    if (found) {
+      return found
+    }
+
+    found = await this.backend?.getItem(key)
+    if (found) {
+      this.cache.set(key, found)
+    }
+
+    return found
   }
 
   async deleteItem(key: string) {
