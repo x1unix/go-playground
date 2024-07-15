@@ -59,7 +59,3 @@ install:
 	@if [ ! -d "./target" ]; then echo "ERROR: Please build project first by calling 'make'." && exit 2; fi
 	@if [ "$(UID)" -ne "0" ]; then echo "ERROR: you cannot perform this operation unless you are root." && exit 3; fi
 	@$(SHELL) ./build/install.sh
-
-.PHONY: pkgindexer
-pkgindexer:
-	@go run ./cmd/pkgindexer -o ./data/imports.json

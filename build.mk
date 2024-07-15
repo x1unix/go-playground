@@ -32,6 +32,11 @@ check-go:
 		exit 1; \
 	fi
 
+.PHONY: pkg-index
+pkg-index:
+	@echo ":: Generating Go packages index..." && \
+	$(GO) run ./tools/pkgindexer -o $(UI)/public/data/imports.json
+
 .PHONY:check-yarn
 check-yarn:
 	$(call check_tool,$(YARN),'YARN')
