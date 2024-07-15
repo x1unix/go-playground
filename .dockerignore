@@ -4,5 +4,4 @@
 .idea
 .vscode
 web/node_modules
-tools/
 target/

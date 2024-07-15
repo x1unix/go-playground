@@ -12,8 +12,6 @@ on:
   release:
     types:
       - created
-  repository_dispatch:
-    types: manual-deploy
 
 env:
   GO_VERSION: 1.21

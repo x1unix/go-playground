@@ -19,6 +19,7 @@ WORKDIR /tmp/playground
 COPY cmd ./cmd
 COPY pkg ./pkg
 COPY internal ./internal
+COPY tools ./tools
 COPY go.mod .
 COPY go.sum .
 
@@ -36,7 +37,8 @@ RUN echo "Building server with version $APP_VERSION" && \
       -trimpath \
       -o ./analyzer@$WASM_API_VER.wasm ./cmd/wasm/analyzer && \
     cp $(go env GOROOT)/misc/wasm/wasm_exec.js ./wasm_exec@v2.js && \
-    cp $(go env GOROOT)/misc/wasm/wasm_exec.js ./wasm_exec.js
+    cp $(go env GOROOT)/misc/wasm/wasm_exec.js ./wasm_exec.js && \
+    go run ./tools/pkgindexer -o ./data/imports.json
 
 FROM golang:${GO_VERSION}-alpine AS production
 ARG GO_VERSION
@@ -52,6 +54,7 @@ COPY web/build ./public
 COPY --from=build /tmp/playground/server .
 COPY --from=build /tmp/playground/*.wasm ./public/wasm/
 COPY --from=build /tmp/playground/*.js ./public/wasm/
+COPY --from=build /tmp/playground/data ./public/data
 EXPOSE 8000
 ENTRYPOINT /opt/playground/server \
     -f='/opt/playground/data/packages.json' \

@@ -27,7 +27,8 @@ func isDocLine(line string) bool {
 	return false
 }
 
-func formatDoc(str string) MarkdownString {
+// FormatDocString parses Go comment and returns a markdown-formatted string.
+func FormatDocString(str string) MarkdownString {
 	if str == "" {
 		return MarkdownString{Value: str}
 	}
