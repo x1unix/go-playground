@@ -24,7 +24,6 @@ Improved Go Playground powered by Monaco Editor and React - [https://goplay.tool
 * ⚙ Customization (fonts, ligatures, etc)
 * 🛠 [WebAssembly](https://github.com/golang/go/wiki/WebAssembly) support
 
-
 And more !
 
 ## Installation
@@ -54,7 +53,7 @@ sudo make install
 
 ## Contributors
 
-Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for information on how to contribute to the project.
+Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) and [HACKING.md](HACKING.md) for information on how to contribute to the project.
 
 ### Sponsoring
 
