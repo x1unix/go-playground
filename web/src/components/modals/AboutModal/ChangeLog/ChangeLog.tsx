@@ -5,8 +5,6 @@ import { Link } from '@fluentui/react/lib/Link'
 import changelog from '~/changelog.json'
 import environment from '~/environment'
 
-import './ChangeLog.css'
-
 interface Props extends Pick<React.HTMLProps<HTMLDivElement>, 'className' | 'style'> {}
 
 export const ChangeLog: React.FC<Props> = ({ className, ...props }) => {
@@ -18,10 +16,10 @@ export const ChangeLog: React.FC<Props> = ({ className, ...props }) => {
           <ul>
             {items.map(({ issueId, url, description }) => (
               <li key={issueId}>
-                <Link className="ChangeLog__issue-url" href={`${environment.urls.github}/${url}`} target="_blank">
+                <Link href={`${environment.urls.github}/${url}`} target="_blank">
                   #{issueId}
                 </Link>
-                <span>{description}</span>
+                <span> - {description}</span>
               </li>
             ))}
           </ul>
