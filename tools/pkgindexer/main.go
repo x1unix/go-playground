@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -87,6 +88,7 @@ func runErr(flags Flags) error {
 		return fmt.Errorf("can't write JSON to file %q: %w", flags.outFile, err)
 	}
 
+	log.Printf("Scanned %d packages", len(results.Packages))
 	return nil
 }
 

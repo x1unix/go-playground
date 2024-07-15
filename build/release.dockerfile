@@ -38,7 +38,7 @@ RUN echo "Building server with version $APP_VERSION" && \
       -o ./analyzer@$WASM_API_VER.wasm ./cmd/wasm/analyzer && \
     cp $(go env GOROOT)/misc/wasm/wasm_exec.js ./wasm_exec@v2.js && \
     cp $(go env GOROOT)/misc/wasm/wasm_exec.js ./wasm_exec.js && \
-    go run ./tools/pkgindexer -o ./data/imports.json
+    go run ./tools/pkgindexer -o ./data/imports.json -r /usr/local/go
 
 FROM golang:${GO_VERSION}-alpine AS production
 ARG GO_VERSION
