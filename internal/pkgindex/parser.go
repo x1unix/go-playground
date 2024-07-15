@@ -24,8 +24,8 @@ func (params PackageParseParams) PackagePath() string {
 	return filepath.Join(params.RootDir, params.ImportPath)
 }
 
-func formatGoDocLink(pkgName string, importPath string) string {
-	return fmt.Sprintf("[%[2]s on %[1]s](https://%[1]s/%[3]s)", goDocDomain, pkgName, importPath)
+func formatGoDocLink(importPath string) string {
+	return fmt.Sprintf("[%[2]s on %[1]s](https://%[1]s/%[2]s)", goDocDomain, importPath)
 }
 
 // ParseImportCompletionItem parses a Go package at a given GOROOT and constructs monaco CompletionItem from it.
@@ -38,7 +38,7 @@ func ParseImportCompletionItem(ctx context.Context, params PackageParseParams) (
 		InsertText: params.ImportPath,
 	}
 
-	var docString string
+	docString := formatGoDocLink(params.ImportPath)
 
 	fset := token.NewFileSet()
 	for _, fname := range params.Files {
@@ -60,12 +60,8 @@ func ParseImportCompletionItem(ctx context.Context, params PackageParseParams) (
 		// Found a doc string, exit.
 		result.Detail = src.Name.String()
 		docComment := strings.TrimSpace(analyzer.FormatDocString(doc.Text()).Value)
-		docString = docComment + "\n\n" + formatGoDocLink(result.Detail, params.ImportPath)
+		docString = docComment + "\n\n" + docString
 		break
-	}
-
-	if docString == "" {
-		docString = formatGoDocLink(params.ImportPath, params.ImportPath)
 	}
 
 	result.Label.SetString(params.ImportPath)

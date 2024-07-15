@@ -31,7 +31,7 @@ func TestParseImportCompletionItem(t *testing.T) {
 				ret.Documentation.SetValue(&monaco.IMarkdownString{
 					IsTrusted: true,
 					Value: "Package pkgbar is a stub package for a test.\n\n" +
-						fmt.Sprintf("[%[2]s on %[1]s](https://%[1]s/%[3]s)", goDocDomain, "pkgbar", importPath),
+						fmt.Sprintf("[%[2]s on %[1]s](https://%[1]s/%[2]s)", goDocDomain, importPath),
 				})
 				return ret
 			},

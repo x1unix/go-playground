@@ -3,15 +3,18 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/x1unix/go-playground/internal/pkgindex"
 )
 
 type Flags struct {
-	goRoot  string
-	outFile string
+	goRoot      string
+	outFile     string
+	prettyPrint bool
 }
 
 func (f Flags) WithDefaults() (Flags, error) {
@@ -46,8 +49,9 @@ func main() {
 		},
 	}
 
-	cmd.PersistentFlags().StringP("root", "r", "", "Path to GOROOT. Uses $GOROOT by default.")
-	cmd.PersistentFlags().StringP("output", "o", "", "Path to output file. When enpty, prints to stdout.")
+	cmd.PersistentFlags().StringVarP(&flags.goRoot, "root", "r", "", "Path to GOROOT. Uses $GOROOT by default.")
+	cmd.PersistentFlags().StringVarP(&flags.outFile, "output", "o", "", "Path to output file. When enpty, prints to stdout.")
+	cmd.PersistentFlags().BoolVarP(&flags.prettyPrint, "pretty", "P", false, "Add indents to JSON output")
 
 	cmd.Execute()
 }
@@ -62,17 +66,37 @@ func runErr(flags Flags) error {
 	if flags.outFile == "" {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
-		return enc.Encode(results)
+		return getEncoder(os.Stdout, flags.prettyPrint).Encode(results)
 	}
 
-	f, err := os.OpenFile(flags.outFile, os.O_CREATE|os.O_TRUNC, 0644)
+	if err := os.MkdirAll(filepath.Dir(flags.outFile), 0755); err != nil {
+		return fmt.Errorf("failed to pre-create parent directories: %w", err)
+	}
+
+	f, err := os.OpenFile(flags.outFile, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
+	defer silentClose(f)
+
 	if err != nil {
 		return fmt.Errorf("can't create output file: %w", err)
 	}
 
-	if err := json.NewEncoder(f).Encode(results); err != nil {
+	if err := getEncoder(f, flags.prettyPrint).Encode(results); err != nil {
 		return fmt.Errorf("can't write JSON to file %q: %w", flags.outFile, err)
 	}
 
 	return nil
+}
+
+func getEncoder(dst io.Writer, pretty bool) *json.Encoder {
+	enc := json.NewEncoder(dst)
+	if pretty {
+		enc.SetIndent("", "  ")
+	}
+
+	return enc
+}
+
+func silentClose(c io.Closer) {
+	// I don't care
+	_ = c.Close()
 }
