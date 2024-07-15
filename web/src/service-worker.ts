@@ -6,20 +6,26 @@ export default null
 
 declare const self: ServiceWorkerGlobalScope;
 
-self.addEventListener('install', function(e) {
+// Stub to get self-destruct SW building.
+const noop = (_v: any) => {}
+
+//@ts-expect-error -- value provided externally
+noop(self.__WB_MANIFEST)
+
+self.addEventListener('install', function (e) {
   self.skipWaiting();
 });
 
-self.addEventListener('activate', function(e) {
+self.addEventListener('activate', function (e) {
   self.registration.unregister()
-    .then(function() {
+    .then(function () {
       return self.clients.matchAll();
     })
-    .then(function(clients) {
+    .then(function (clients) {
       clients.forEach(client => {
-        if ('navigate' in client && typeof client.navigate === 'function') {
+        if (client instanceof WindowClient) {
           client.navigate(client.url)
         }
-    })
+      })
     });
 });
