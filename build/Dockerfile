@@ -32,6 +32,7 @@ WORKDIR /tmp/playground
 COPY cmd ./cmd
 COPY pkg ./pkg
 COPY internal ./internal
+COPY tools ./tools
 COPY go.mod .
 COPY go.sum .
 
