@@ -28,7 +28,6 @@ const (
 )
 
 type scanResult struct {
-	// err   error
 	pkg   string
 	entry monaco.CompletionItem
 }
@@ -82,11 +81,11 @@ func (s *GoRootScanner) start() ([]monaco.CompletionItem, error) {
 
 		pkgName := entry.Name()
 		switch pkgName {
-		case "cmd", "internal", "vendor":
+		case "cmd", "internal", "vendor", "builtin":
 			continue
 		}
 
-		s.wg.Go(func() error {
+		go s.wg.Go(func() error {
 			return s.visitPackage(childCtx, rootDir, pkgName)
 		})
 	}
@@ -102,10 +101,10 @@ func (s *GoRootScanner) start() ([]monaco.CompletionItem, error) {
 	results := make([]monaco.CompletionItem, 0, resultsPreallocSize)
 	for {
 		select {
-		case err := <-finishChan:
-			return results, err
 		case val := <-s.results:
 			results = append(results, val.entry)
+		case err := <-finishChan:
+			return results, err
 		}
 	}
 }
@@ -132,7 +131,7 @@ func (s *GoRootScanner) visitPackage(ctx context.Context, rootDir string, import
 		}
 
 		if entry.IsDir() {
-			s.wg.Go(func() error {
+			go s.wg.Go(func() error {
 				pkgPath := path.Join(importPath, name)
 				return s.visitPackage(ctx, rootDir, pkgPath)
 			})
