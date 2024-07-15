@@ -8,6 +8,9 @@ const importPackageRegex = /^\s+?([\w_|.]+\s)?"\S+"$/
 const importGroupRegex = /^import\s?\(\s?$/
 const emptyLineOrCommentRegex = /^\s+$|^\s?\/\//
 
+/**
+ * Go standard and third-party packages list provider.
+ */
 export class GoImportsCompletionProvider implements monaco.languages.CompletionItemProvider {
   // private isUpdatingIndex = false
   triggerCharacters = ['"']
