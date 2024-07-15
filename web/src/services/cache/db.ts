@@ -1,9 +1,11 @@
 import Dexie, { type EntityTable } from 'dexie'
+import { isAfter } from 'date-fns'
 import type { Storage } from './types'
 
 interface CacheEntry<T = any> {
   key: string
   value: T
+  expireAt?: Date
 }
 
 type CacheDB = Dexie & EntityTable<CacheEntry, 'key'>
@@ -24,6 +26,11 @@ export class DatabaseStorage implements Storage {
 
   async getItem<T>(key: string): Promise<T | undefined> {
     const entry = await this.db.table(tableName).get(key)
+    if (entry?.expireAt && isAfter(new Date(), entry.expireAt)) {
+      void this.deleteItem(key)
+      return undefined
+    }
+
     return entry?.value as T | undefined
   }
 
@@ -32,9 +39,9 @@ export class DatabaseStorage implements Storage {
     return n > 0
   }
 
-  async setItem<T>(key: string, value: T) {
+  async setItem<T>(key: string, value: T, expireAt?: Date) {
     await this.deleteItem(key)
-    await this.db.table(tableName).put({ key, value })
+    await this.db.table(tableName).put({ key, value, expireAt })
   }
 
   async flush() {

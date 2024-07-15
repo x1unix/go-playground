@@ -25,8 +25,8 @@ export class MemoryCacheStorage implements Storage {
     return (await this.backend?.deleteItem(key)) ?? hasItem
   }
 
-  async setItem<T>(key: string, value: T) {
-    await this.backend?.setItem(key, value)
+  async setItem<T>(key: string, value: T, expireAt?: Date) {
+    await this.backend?.setItem(key, value, expireAt)
     this.cache.set(key, value)
   }
 

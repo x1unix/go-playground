@@ -1,7 +1,12 @@
+import { addDays } from 'date-fns'
 import { persistentStore } from '../cache'
 import type { GoImportsList } from './types'
 
 const stdlibImportsKey = 'go.imports.stdlib'
+
+const TTL_DAYS = 7
+
+const getExpireTime = () => addDays(new Date(), TTL_DAYS)
 
 /**
  * Provides data sources for autocomplete services.
@@ -47,7 +52,7 @@ export class GoCompletionService {
     }
 
     const data: GoImportsList = await rsp.json()
-    await this.store.setItem(stdlibImportsKey, data)
+    await this.store.setItem(stdlibImportsKey, data, getExpireTime())
     return data
   }
 }
