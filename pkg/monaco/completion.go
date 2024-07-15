@@ -13,6 +13,7 @@ type CompletionItemRanges struct {
 
 type CompletionItem struct {
 	Label               UnionString[CompletionItemLabel]   `json:"label"`
+	Documentation       UnionString[IMarkdownString]       `json:"documentation"`
 	Detail              string                             `json:"detail,omitempty"`
 	SortText            string                             `json:"sortText,omitempty"`
 	FilterText          string                             `json:"filterText,omitempty"`
