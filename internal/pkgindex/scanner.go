@@ -1,3 +1,5 @@
+// Package pkgindex implements functionality for generating Monaco code completion data
+// from documentation and symbols extracted from Go source files.
 package pkgindex
 
 import (
@@ -84,8 +86,6 @@ func (s *GoRootScanner) start() ([]monaco.CompletionItem, error) {
 			continue
 		}
 
-		// s.wg.Add(1)
-		// go s.visitPackage(rootDir, entry.Name())
 		s.wg.Go(func() error {
 			return s.visitPackage(childCtx, rootDir, pkgName)
 		})

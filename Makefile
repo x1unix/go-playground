@@ -60,6 +60,6 @@ install:
 	@if [ "$(UID)" -ne "0" ]; then echo "ERROR: you cannot perform this operation unless you are root." && exit 3; fi
 	@$(SHELL) ./build/install.sh
 
-.PHONY: pkgindex
-pkgindex:
-	@go run ./cmd/pkgindex -o ./data/imports.json
+.PHONY: pkgindexer
+pkgindexer:
+	@go run ./cmd/pkgindexer -o ./data/imports.json
