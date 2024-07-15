@@ -68,8 +68,6 @@ Project uses a set of Go programs to prepare assets necessary for a project.
 
 ## Development Environment Setup
 
-This project consists of a backend part written in Go and a front-end React app.
-
 ### Prerequisites
 
 Please ensure that you have installed:
