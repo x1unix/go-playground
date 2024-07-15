@@ -123,7 +123,7 @@ func funcToItem(fn *ast.FuncDecl) *CompletionItem {
 		Label:           fn.Name.String(),
 		Kind:            Function,
 		Detail:          funcToString(fn.Type),
-		Documentation:   formatDoc(fn.Doc.Text()),
+		Documentation:   FormatDocString(fn.Doc.Text()),
 		InsertText:      formatFuncInsertText(fn),
 		InsertTextRules: InsertAsSnippet,
 	}
