@@ -1,33 +1,16 @@
 {
-  "Go - General": [
+  "Interface - Code Editor": [
     {
-      "issueId": 324,
-      "url": "issues/324",
-      "description": "Add workaround for Playground API unit tests bug"
+      "issueId": 362,
+      "url": "pull/362",
+      "description": "Support package paths autocomplete in import section"
     }
   ],
   "Go - WebAssembly": [
     {
-      "issueId": 348,
-      "url": "/issues/348",
-      "description": "Disable Yaegi Go interpreter"
-    }
-  ],
-  "Interface - General": [
-    {
-      "issueId": 354,
-      "url": "pull/354",
-      "description": "Add file deletion confirm dialog"
-    },
-    {
-      "issueId": 347,
-      "url": "pull/347",
-      "description": "Add DarkReader extension support"
-    },
-    {
-      "issueId": 346,
-      "url": "pull/346",
-      "description": "Disable broken service worker"
+      "issueId": 359,
+      "url": "pull/359",
+      "description": "Add unit tests support in WebAssembly environment"
     }
   ]
 }
