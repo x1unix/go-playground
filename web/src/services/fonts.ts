@@ -82,6 +82,42 @@ const fontsList: Record<string, FontDeclaration> = {
       },
     ],
   },
+  Hack: {
+    label: 'Hack',
+    family: 'Hack',
+    fonts: [
+      {
+        src: [
+          { url: '/fonts/hack/hack-regular.woff', format: 'woff' },
+          { url: '/fonts/hack/hack-regular.woff2', format: 'woff2' },
+        ],
+        weight: 400,
+      },
+      {
+        src: [
+          { url: '/fonts/hack/hack-italic.woff', format: 'woff' },
+          { url: '/fonts/hack/hack-italic.woff2', format: 'woff2' },
+        ],
+        weight: 400,
+        style: 'italic',
+      },
+      {
+        src: [
+          { url: '/fonts/hack/hack-bold.woff', format: 'woff' },
+          { url: '/fonts/hack/hack-bold.woff2', format: 'woff2' },
+        ],
+        weight: 700,
+      },
+      {
+        src: [
+          { url: '/fonts/hack/hack-bolditalic.woff', format: 'woff' },
+          { url: '/fonts/hack/hack-bolditalic.woff2', format: 'woff2' },
+        ],
+        weight: 700,
+        style: 'italic',
+      },
+    ],
+  },
   'Zed-Mono': {
     label: 'Zed Mono',
     family: 'Zed Mono',
