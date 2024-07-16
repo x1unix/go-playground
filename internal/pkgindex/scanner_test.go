@@ -16,6 +16,7 @@ func TestShouldIgnoreFileName(t *testing.T) {
 		"foo_openbsd_arm64.go",
 		"foo_netbsd_riscv64.go",
 		"mmap_unix_test.go",
+		"zerrors_linux_mips64.go",
 	}
 
 	allowFiles := []string{
@@ -26,6 +27,7 @@ func TestShouldIgnoreFileName(t *testing.T) {
 		"foo_js_wasm.go",
 		"env_unix.go",
 		"exec_linux.go",
+		"zerrors_linux_amd64.go",
 	}
 
 	t.Run("ignore", func(t *testing.T) {
