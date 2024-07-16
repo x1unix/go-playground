@@ -3,9 +3,7 @@ import { type MonacoSettings, type RunTargetConfig } from '~/services/config'
 import { ActionType } from './actions'
 import { type PanelState, type SettingsState } from '../state'
 
-export type MonacoParamsChanges<T = any> = {
-  [k in keyof MonacoSettings | string]: T
-}
+export type MonacoParamsChanges = Partial<MonacoSettings>
 
 export const newToggleThemeAction = () => ({
   type: ActionType.TOGGLE_THEME,
@@ -17,7 +15,7 @@ export const newRunTargetChangeAction = (cfg: RunTargetConfig) => ({
   payload: cfg,
 })
 
-export const newMonacoParamsChangeAction = <T>(changes: MonacoParamsChanges<T>) => ({
+export const newMonacoParamsChangeAction = (changes: MonacoParamsChanges) => ({
   type: ActionType.MONACO_SETTINGS_CHANGE,
   payload: changes,
 })

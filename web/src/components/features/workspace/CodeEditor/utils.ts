@@ -72,3 +72,18 @@ export const asyncDebounce = <T>(fn: (...args) => Promise<T>, delay: number) => 
     })
   }
 }
+
+/**
+ * Wraps passed function with a debouncer
+ */
+export const debounce = <T>(fn: (...args) => T, delay: number) => {
+  let lastTimeoutId: NodeJS.Timeout | null = null
+
+  return (...args) => {
+    if (lastTimeoutId) {
+      clearTimeout(lastTimeoutId)
+    }
+
+    lastTimeoutId = setTimeout(() => fn(...args), delay)
+  }
+}
