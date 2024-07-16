@@ -1,6 +1,7 @@
 import React from 'react'
-import { Checkbox, Dropdown, type IPivotStyles, Pivot, PivotItem, TextField } from '@fluentui/react'
+import { Checkbox, Dropdown, type IPivotStyles, PivotItem, TextField } from '@fluentui/react'
 
+import { AnimatedPivot } from '~/components/elements/tabs/AnimatedPivot'
 import { ThemeableComponent } from '~/components/utils/ThemeableComponent'
 import { Dialog } from '~/components/elements/modals/Dialog'
 import { SettingsProperty } from './SettingsProperty'
@@ -97,10 +98,11 @@ export class SettingsModal extends ThemeableComponent<SettingsProps, SettingsMod
 
   render() {
     const { isOpen } = this.props
+
     return (
       <Dialog label="Settings" onDismiss={() => this.onClose()} isOpen={isOpen} styles={modalStyles}>
-        <Pivot aria-label="Settings" styles={pivotStyles}>
-          <PivotItem headerText="General">
+        <AnimatedPivot aria-label="Settings" styles={pivotStyles}>
+          <PivotItem itemKey="0" headerText="General">
             <SettingsProperty
               key="fontFamily"
               title="Font Family"
@@ -170,7 +172,7 @@ export class SettingsModal extends ThemeableComponent<SettingsProps, SettingsMod
               }
             />
           </PivotItem>
-          <PivotItem headerText="Editor">
+          <PivotItem itemKey="1" headerText="Editor">
             <SettingsProperty
               key="cursorBlinking"
               title="Cursor Blinking"
@@ -252,7 +254,7 @@ export class SettingsModal extends ThemeableComponent<SettingsProps, SettingsMod
               }
             />
           </PivotItem>
-          <PivotItem headerText="Terminal">
+          <PivotItem itemKey="2" headerText="Terminal">
             <SettingsProperty
               title="Font Size"
               description="Controls the font size in pixels of the terminal."
@@ -295,7 +297,7 @@ export class SettingsModal extends ThemeableComponent<SettingsProps, SettingsMod
               }
             />
           </PivotItem>
-        </Pivot>
+        </AnimatedPivot>
       </Dialog>
     )
   }
