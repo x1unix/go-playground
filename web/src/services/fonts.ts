@@ -64,24 +64,6 @@ const fontsList: Record<string, FontDeclaration> = {
       },
     ],
   },
-  'JetBrains-Mono': {
-    label: 'JetBrains Mono',
-    family: 'JetBrains-Mono',
-    fonts: [
-      {
-        src: [{ url: '/fonts/JetBrainsMono-Regular.ttf', format: 'truetype' }],
-        weight: 400,
-      },
-      {
-        src: [{ url: '/fonts/JetBrainsMono-Medium.ttf', format: 'truetype' }],
-        weight: 500,
-      },
-      {
-        src: [{ url: '/fonts/JetBrainsMono-Bold.ttf', format: 'truetype' }],
-        weight: 700,
-      },
-    ],
-  },
   Hack: {
     label: 'Hack',
     family: 'Hack',
@@ -118,38 +100,6 @@ const fontsList: Record<string, FontDeclaration> = {
       },
     ],
   },
-  'Zed-Mono': {
-    label: 'Zed Mono',
-    family: 'Zed Mono',
-    fonts: [
-      {
-        src: [{ url: '/fonts/zed-mono/zed-mono-extended.ttf', format: 'truetype' }],
-        weight: 400,
-      },
-      {
-        src: [{ url: '/fonts/zed-mono/zed-mono-extendeditalic.ttf', format: 'truetype' }],
-        weight: 400,
-        style: 'italic',
-      },
-      {
-        src: [{ url: '/fonts/zed-mono/zed-mono-extendedmedium.ttf', format: 'truetype' }],
-        weight: 500,
-      },
-      {
-        src: [{ url: '/fonts/zed-mono/zed-mono-extendedsemibold.ttf', format: 'truetype' }],
-        weight: 600,
-      },
-      {
-        src: [{ url: '/fonts/zed-mono/zed-mono-extendedbold.ttf', format: 'truetype' }],
-        weight: 700,
-      },
-      {
-        src: [{ url: '/fonts/zed-mono/zed-mono-extendedbolditalic.ttf', format: 'truetype' }],
-        weight: 700,
-        style: 'italic',
-      },
-    ],
-  },
   'IBM-Plex': {
     label: 'IBM Plex Mono',
     family: 'IBM Plex Mono',
@@ -178,6 +128,56 @@ const fontsList: Record<string, FontDeclaration> = {
       },
       {
         src: [{ url: '/fonts/ibm-plex-mono/IBMPlexMono-BoldItalic.woff2', format: 'woff2' }],
+        weight: 700,
+        style: 'italic',
+      },
+    ],
+  },
+  'JetBrains-Mono': {
+    label: 'JetBrains Mono',
+    family: 'JetBrains-Mono',
+    fonts: [
+      {
+        src: [{ url: '/fonts/JetBrainsMono-Regular.ttf', format: 'truetype' }],
+        weight: 400,
+      },
+      {
+        src: [{ url: '/fonts/JetBrainsMono-Medium.ttf', format: 'truetype' }],
+        weight: 500,
+      },
+      {
+        src: [{ url: '/fonts/JetBrainsMono-Bold.ttf', format: 'truetype' }],
+        weight: 700,
+      },
+    ],
+  },
+  'Zed-Mono': {
+    label: 'Zed Mono',
+    family: 'Zed Mono',
+    fonts: [
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extended.ttf', format: 'truetype' }],
+        weight: 400,
+      },
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extendeditalic.ttf', format: 'truetype' }],
+        weight: 400,
+        style: 'italic',
+      },
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extendedmedium.ttf', format: 'truetype' }],
+        weight: 500,
+      },
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extendedsemibold.ttf', format: 'truetype' }],
+        weight: 600,
+      },
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extendedbold.ttf', format: 'truetype' }],
+        weight: 700,
+      },
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extendedbolditalic.ttf', format: 'truetype' }],
         weight: 700,
         style: 'italic',
       },
