@@ -29,21 +29,6 @@ export const goRun = async (m: WebAssembly.WebAssemblyInstantiatedSource, args?:
   await instance.run(m.instance as GoWebAssemblyInstance, args)
 }
 
-/**
- * Runs Go unit test WebAssembly binary with testing arguments (`-test.v`).
- *
- * @param m WebAssembly instance.
- * @param args Additional command line arguments.
- */
-export const goTestRun = async (m: WebAssembly.WebAssemblyInstantiatedSource, args?: string[] | null) => {
-  let testArgs = ['-test.v']
-  if (args?.length) {
-    testArgs = testArgs.concat(args)
-  }
-
-  return await goRun(m, testArgs)
-}
-
 export const getImportObject = () => instance.importObject
 
 export const bootstrapGo = (logger: ConsoleLogger, listener: LifecycleListener) => {

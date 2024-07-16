@@ -1,8 +1,8 @@
 import { TargetType } from '~/services/config'
-import { getImportObject, goRun, goTestRun } from '~/services/go'
+import { getImportObject, goRun } from '~/services/go'
 import { setTimeoutNanos, SECOND } from '~/utils/duration'
 import { instantiateStreaming } from '~/lib/go'
-import client, { type EvalEvent, EvalEventKind } from '~/services/api'
+import client, { type BuildResponse, type EvalEvent, EvalEventKind } from '~/services/api'
 import { isProjectRequiresGoMod, goModFile, goModTemplate } from '~/services/examples'
 
 import { type DispatchFn, type StateProvider } from '../helpers'
@@ -134,6 +134,19 @@ const fetchWasmWithProgress = async (dispatch: DispatchFn, fileName: string) => 
   }
 }
 
+/**
+ * Returns command line args for Go test binary based on server build response.
+ */
+const buildGoTestFlags = ({ isTest, hasBenchmark, hasFuzz }: BuildResponse): string[] => {
+  const flags: Array<[string, boolean | undefined]> = [
+    ['-test.v', isTest],
+    ['-test.bench=.', hasBenchmark],
+    ['-test.fuzz=.', hasFuzz],
+  ]
+
+  return flags.filter(([, keep]) => !!keep).map(([arg]) => arg)
+}
+
 export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getState: StateProvider) => {
   dispatch(newRemoveNotificationAction(NotificationIDs.WASMAppExitError))
   dispatch(newRemoveNotificationAction(NotificationIDs.GoModMissing))
@@ -200,14 +213,14 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
         break
       }
       case TargetType.WebAssembly: {
-        const { fileName, isTest } = await client.build(files)
+        const buildResponse = await client.build(files)
 
-        const instance = await fetchWasmWithProgress(dispatch, fileName)
+        const instance = await fetchWasmWithProgress(dispatch, buildResponse.fileName)
         dispatch(newRemoveNotificationAction(NotificationIDs.WASMAppDownload))
         dispatch(newProgramStartAction())
 
-        const runFunc = isTest ? goTestRun : goRun
-        runFunc(instance)
+        const argv = buildGoTestFlags(buildResponse)
+        goRun(instance, argv)
           .then((result) => {
             console.log('exit code: %d', result)
           })
