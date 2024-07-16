@@ -5,20 +5,20 @@
       "icon": "TestPlan",
       "iconColor": "#00cc6a",
       "source": {
-        "basePath": "empty-test",
+        "basePath": "templates",
         "files": [
-          "main_test.go"
+          "unit_test.go"
         ]
       }
     },
     {
-      "label": "Example Test",
-      "icon": "TestPlan",
-      "iconColor": "#00cc6a",
+      "label": "New Benchmark",
+      "icon": "SpeedHigh",
+      "iconColor": "#ff8c00",
       "source": {
-        "basePath": "example-test",
+        "basePath": "templates",
         "files": [
-          "example_test.go"
+          "bench_test.go"
         ]
       }
     }
@@ -137,6 +137,52 @@
       "id": "Sk-SVdofEIZ",
       "icon": "Error",
       "iconColor": "#D83B01"
+    }
+  ],
+  "Testing": [
+    {
+      "label": "Unit Tests",
+      "icon": "TestPlan",
+      "iconColor": "#00cc6a",
+      "source": {
+        "basePath": "testing",
+        "files": [
+          "example_test.go"
+        ]
+      }
+    },
+    {
+      "label": "Benchmarking",
+      "icon": "SpeedHigh",
+      "iconColor": "#ff8c00",
+      "source": {
+        "basePath": "testing",
+        "files": [
+          "bench_test.go"
+        ]
+      }
+    },
+    {
+      "label": "Fuzzing",
+      "icon": "VscPulse",
+      "iconColor": "#D83B01",
+      "source": {
+        "basePath": "testing",
+        "files": [
+          "fuzz_test.go"
+        ]
+      }
+    },
+    {
+      "label": "Mocking",
+      "icon": "VscSymbolMisc",
+      "iconColor": "#b4a0ff",
+      "source": {
+        "basePath": "testing",
+        "files": [
+          "mock_test.go"
+        ]
+      }
     }
   ],
   "Concurrency": [

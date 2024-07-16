@@ -2,7 +2,7 @@ import React from 'react'
 import { initializeIcons as initFluentIcons } from '@fluentui/react/lib/Icons'
 import { registerIcons } from '@fluentui/react/lib/Styling'
 import { SiWebassembly, SiAzurefunctions } from 'react-icons/si'
-import { VscSymbolClass, VscBracketError, VscSymbolParameter, VscRegex } from 'react-icons/vsc'
+import { VscSymbolClass, VscSymbolMisc, VscBracketError, VscSymbolParameter, VscRegex, VscPulse } from 'react-icons/vsc'
 import { BsFillDice3Fill } from 'react-icons/bs'
 
 export const initializeIcons = () => {
@@ -16,6 +16,8 @@ export const initializeIcons = () => {
       VscSymbolParameter: <VscSymbolParameter />,
       BsFillDice3Fill: <BsFillDice3Fill />,
       VscRegex: <VscRegex />,
+      VscSymbolMisc: <VscSymbolMisc />,
+      VscPulse: <VscPulse />,
     },
   })
 }
