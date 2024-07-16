@@ -57,9 +57,15 @@ func ParseImportCompletionItem(ctx context.Context, params PackageParseParams) (
 			continue
 		}
 
-		// Found a doc string, exit.
 		result.Detail = src.Name.String()
-		docComment := strings.TrimSpace(analyzer.FormatDocString(doc.Text()).Value)
+
+		// Package doc should start with "Package xxx", see issue #367.
+		docComment := strings.TrimSpace(doc.Text())
+		if !validatePackageDoc(docComment) {
+			continue
+		}
+
+		docComment = strings.TrimSpace(analyzer.FormatDocString(docComment).Value)
 		docString = docComment + "\n\n" + docString
 		break
 	}
@@ -70,4 +76,9 @@ func ParseImportCompletionItem(ctx context.Context, params PackageParseParams) (
 		IsTrusted: true,
 	})
 	return result, nil
+}
+
+func validatePackageDoc(str string) bool {
+	normalizedStr := strings.ToLower(str)
+	return strings.HasPrefix(normalizedStr, "package ")
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -13,10 +14,13 @@ import (
 
 func TestParseImportCompletionItem(t *testing.T) {
 	cases := map[string]struct {
-		pkgName    string
-		expectErr  string
-		getContext func() context.Context
-		expect     func(importPath string) monaco.CompletionItem
+		pkgName          string
+		customGoRoot     string
+		expectErr        string
+		filterInputFiles bool
+		getContext       func() context.Context
+		expect           func(importPath string) monaco.CompletionItem
+		compareFunc      func(t *testing.T, got monaco.CompletionItem)
 	}{
 		"package with documentation": {
 			pkgName: "foopkg/pkgbar",
@@ -67,6 +71,15 @@ func TestParseImportCompletionItem(t *testing.T) {
 				return ctx
 			},
 		},
+		"367-syscall-invalid-description": {
+			customGoRoot:     mustGetGoRoot(t) + "/src",
+			pkgName:          "syscall",
+			filterInputFiles: true,
+			compareFunc: func(t *testing.T, got monaco.CompletionItem) {
+				expectPfx := "Package syscall contains an interface to the low-level"
+				expectStartWith(t, got.Documentation.Value.Value, expectPfx)
+			},
+		},
 	}
 
 	const rootDir = "testdata"
@@ -77,10 +90,15 @@ func TestParseImportCompletionItem(t *testing.T) {
 				ctx = c.getContext()
 			}
 
+			goRoot := rootDir
+			if c.customGoRoot != "" {
+				goRoot = c.customGoRoot
+			}
+
 			result, err := ParseImportCompletionItem(ctx, PackageParseParams{
-				RootDir:    rootDir,
+				RootDir:    goRoot,
 				ImportPath: c.pkgName,
-				Files:      findDirFiles(t, rootDir, c.pkgName),
+				Files:      findDirFiles(t, goRoot, c.pkgName, c.filterInputFiles),
 			})
 			if c.expectErr != "" {
 				require.Error(t, err)
@@ -88,14 +106,19 @@ func TestParseImportCompletionItem(t *testing.T) {
 				return
 			}
 
-			expect := c.expect(c.pkgName)
 			require.NoError(t, err)
+			if c.compareFunc != nil {
+				c.compareFunc(t, result)
+				return
+			}
+
+			expect := c.expect(c.pkgName)
 			require.Equal(t, expect, result)
 		})
 	}
 }
 
-func findDirFiles(t *testing.T, dir, pkgName string) []string {
+func findDirFiles(t *testing.T, dir, pkgName string, filterFiles bool) []string {
 	t.Helper()
 	entries, err := os.ReadDir(filepath.Join(dir, pkgName))
 	require.NoError(t, err)
@@ -106,8 +129,26 @@ func findDirFiles(t *testing.T, dir, pkgName string) []string {
 			continue
 		}
 
-		files = append(files, entry.Name())
+		name := entry.Name()
+		if filterFiles {
+			if strings.HasSuffix(name, "_test.go") || !strings.HasSuffix(name, ".go") {
+				continue
+			}
+		}
+
+		files = append(files, name)
 	}
 
 	return files
+}
+
+func mustGetGoRoot(t *testing.T) string {
+	t.Helper()
+	v, err := ResolveGoRoot()
+	require.NoError(t, err)
+	return v
+}
+
+func expectStartWith(t *testing.T, str string, pfx string) {
+	require.Truef(t, strings.HasPrefix(str, pfx), "string %q should start with %q", str, pfx)
 }
