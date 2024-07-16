@@ -51,7 +51,6 @@ WASM Go programs are located in [`cmd/wasm`](./cmd/wasm/) directory.
 | Package    | Description                                                                                                                 |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `analyzer` | Very simple Go syntax checker.                                                                                              |
-| `go-repl`  | Deprecated tool with [Yaegi](https://github.com/traefik/yaegi) Go interpreter. Used to run Go programs without compilation. |
 
 ### Tools & Scripts
 

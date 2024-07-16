@@ -70,12 +70,8 @@ wasm_exec.js:
 analyzer.wasm:
 	$(call build_wasm_worker,analyzer)
 
-.PHONY:go-repl.wasm
-go-repl.wasm:
-	$(call build_wasm_worker,go-repl)
-
 .PHONY:wasm
-wasm: wasm_exec.js analyzer.wasm go-repl.wasm
+wasm: wasm_exec.js analyzer.wasm 
 
 .PHONY: build
 build: check-go check-yarn clean preinstall gen collect-meta build-server wasm pkg-index build-ui 

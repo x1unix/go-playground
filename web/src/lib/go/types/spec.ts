@@ -24,7 +24,7 @@ export abstract class AbstractTypeSpec<T = any> {
   private _size = 0
   private _align = 1
   private _skip = 0
-  private readonly _name = ''
+  private readonly _name: string = ''
 
   /**
    * @param name Original type name.

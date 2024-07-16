@@ -43,11 +43,6 @@ RUN echo "Building server with version $APP_VERSION" && \
     -buildvcs=false \
     -ldflags "-s -w" \
     -trimpath \
-    -o ./go-repl@$WASM_API_VER.wasm ./cmd/wasm/go-repl && \
-    GOOS=js GOARCH=wasm go build \
-    -buildvcs=false \
-    -ldflags "-s -w" \
-    -trimpath \
     -o ./analyzer@$WASM_API_VER.wasm ./cmd/wasm/analyzer && \
     cp $(go env GOROOT)/misc/wasm/wasm_exec.js ./wasm_exec@v2.js && \
     cp $(go env GOROOT)/misc/wasm/wasm_exec.js ./wasm_exec.js && \
