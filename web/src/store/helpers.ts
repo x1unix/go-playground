@@ -1,10 +1,11 @@
 import { type Action, type ActionType } from './actions'
+import type { Dispatcher } from './dispatchers'
 import { type State } from './state'
 
 export type Reducer<S, T> = (s: S, a: Action<T>) => S
 export type ActionReducers<T> = { [k in keyof typeof ActionType | string]: Reducer<T, any> }
 
-export type DispatchFn = <T = any>(a: Action<T>) => any
+export type DispatchFn = <T = any>(a: Action<T> | Dispatcher) => any
 export type StateProvider = () => State
 
 /**

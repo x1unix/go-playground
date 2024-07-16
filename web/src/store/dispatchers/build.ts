@@ -2,7 +2,8 @@ import { TargetType } from '~/services/config'
 import { getImportObject, goRun } from '~/services/go'
 import { setTimeoutNanos, SECOND } from '~/utils/duration'
 import { instantiateStreaming } from '~/lib/go'
-import client, { type BuildResponse, type EvalEvent, EvalEventKind } from '~/services/api'
+import { buildGoTestFlags, requiresWasmEnvironment } from '~/lib/sourceutil'
+import client, { type EvalEvent, EvalEventKind } from '~/services/api'
 import { isProjectRequiresGoMod, goModFile, goModTemplate } from '~/services/examples'
 
 import { type DispatchFn, type StateProvider } from '../helpers'
@@ -134,19 +135,6 @@ const fetchWasmWithProgress = async (dispatch: DispatchFn, fileName: string) => 
   }
 }
 
-/**
- * Returns command line args for Go test binary based on server build response.
- */
-const buildGoTestFlags = ({ isTest, hasBenchmark, hasFuzz }: BuildResponse): string[] => {
-  const flags: Array<[string, boolean | undefined]> = [
-    ['-test.v', isTest],
-    ['-test.bench=.', hasBenchmark],
-    ['-test.fuzz=.', hasFuzz],
-  ]
-
-  return flags.filter(([, keep]) => !!keep).map(([arg]) => arg)
-}
-
 export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getState: StateProvider) => {
   dispatch(newRemoveNotificationAction(NotificationIDs.WASMAppExitError))
   dispatch(newRemoveNotificationAction(NotificationIDs.GoModMissing))
@@ -155,7 +143,7 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
     const {
       settings,
       workspace,
-      runTarget: { target, backend },
+      runTarget: { target: selectedTarget, backend },
     } = getState()
 
     let { files, selectedFile } = workspace
@@ -205,7 +193,30 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
       })
     }
 
-    switch (target) {
+    // Force use WebAssembly for execution if source code contains go:build constraints.
+    let runTarget = selectedTarget
+    if (runTarget !== TargetType.WebAssembly && requiresWasmEnvironment(files)) {
+      runTarget = TargetType.WebAssembly
+      dispatch(
+        newAddNotificationAction({
+          id: NotificationIDs.GoTargetSwitched,
+          type: NotificationType.Warning,
+          title: 'Go environment temporarily changed',
+          description: 'This program will be executed using WebAssembly as Go program contains "//go:build" tag.',
+          canDismiss: true,
+          actions: [
+            {
+              key: 'ok',
+              label: 'Ok',
+              primary: true,
+              onClick: () => dispatch(newRemoveNotificationAction(NotificationIDs.GoTargetSwitched)),
+            },
+          ],
+        }),
+      )
+    }
+
+    switch (runTarget) {
       case TargetType.Server: {
         // TODO: vet
         const res = await client.run(files, false, backend)
@@ -239,7 +250,7 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
         break
       }
       default:
-        dispatch(newErrorAction(`AppError: Unknown Go runtime type "${target}"`))
+        dispatch(newErrorAction(`AppError: Unknown Go runtime type "${runTarget}"`))
     }
   } catch (err: any) {
     dispatch(newErrorAction(err.message))

@@ -1,3 +1,5 @@
+//go:build wasm
+
 // The Go testing package contains a benchmarking facility
 // that can be used to examine the performance of your Go code.
 //
@@ -5,6 +7,9 @@
 //
 // See: https://dave.cheney.net/2013/06/30/how-to-write-benchmarks-in-go
 package main
+
+// **Important:** This benchmark will be executed using WebAssembly as original Go Playground API doesn't support benchmarks and fuzzing.
+// See: https://stackoverflow.com/questions/54574814/go-benchmark-run-from-main-go-playground
 
 import "testing"
 
