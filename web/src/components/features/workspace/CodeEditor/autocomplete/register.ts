@@ -12,7 +12,6 @@ let alreadyRegistered = false
  */
 export const registerGoLanguageProviders = (client: IAPIClient, dispatcher: StateDispatch) => {
   if (alreadyRegistered) {
-    console.warn('Go Language provider was already registered')
     return
   }
 
