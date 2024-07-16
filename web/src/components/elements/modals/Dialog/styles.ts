@@ -44,6 +44,7 @@ export const getContentStyles = (theme: ITheme) =>
       flex: '4 4 auto',
       padding: '0 24px 24px 24px',
       overflowY: 'hidden',
+      overflowX: 'hidden',
       selectors: {
         p: {
           margin: '14px 0',
