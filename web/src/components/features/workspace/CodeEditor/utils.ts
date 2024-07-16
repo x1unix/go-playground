@@ -55,7 +55,7 @@ export const getTimeNowUsageMarkers = (
  * @param fn Function
  * @param delay Debounce time
  */
-export const wrapAsyncWithDebounce = <T>(fn: (...args) => Promise<T>, delay: number) => {
+export const asyncDebounce = <T>(fn: (...args) => Promise<T>, delay: number) => {
   let lastTimeoutId: NodeJS.Timeout | null = null
 
   return async (...args) => {

@@ -1,6 +1,6 @@
 import type * as monaco from 'monaco-editor'
 import { type IAPIClient } from '~/services/api'
-import { wrapAsyncWithDebounce } from '../../utils'
+import { asyncDebounce } from '../../utils'
 import snippets from './snippets'
 import { parseExpression } from './parse'
 
@@ -10,7 +10,7 @@ export class GoCompletionItemProvider implements monaco.languages.CompletionItem
   private readonly getSuggestionFunc: IAPIClient['getSuggestions']
 
   constructor(private readonly client: IAPIClient) {
-    this.getSuggestionFunc = wrapAsyncWithDebounce(
+    this.getSuggestionFunc = asyncDebounce(
       async (query) => await client.getSuggestions(query),
       SUGGESTIONS_DEBOUNCE_DELAY,
     )
