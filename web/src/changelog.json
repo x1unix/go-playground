@@ -1,26 +1,53 @@
 {
   "Interface - General": [
     {
-      "issueId": 371,
-      "url": "issues/371",
-      "description": "Improve settings modal window appearance."
+      "issueId": 316,
+      "url": "pull/316",
+      "description": "New multi-file workspace."
+    },
+    {
+      "issueId": 372,
+      "url": "pull/372",
+      "description": "Improved examples and settings UX."
+    },
+    {
+      "issueId": 317,
+      "url": "pull/317",
+      "description": "Use relative units for output panel width."
     }
   ],
   "Interface - Code Editor": [
     {
+      "issueId":362,
+      "url": "pull/362",
+      "description": "Suggest package names in import statements."
+    },
+    {
       "issueId": 374,
       "url": "pull/374",
-      "description": "Persist editor font size changed by mouse wheel scroll."
+      "description": "Save editor font size when changed using mouse scroll."
     },
     {
       "issueId": 373,
       "url": "pull/373",
-      "description": "Add new editor fonts."
+      "description": "Added new editor fonts."
+    }
+  ],
+  "Go - WebAssembly": [
+    {
+      "issueId": 359,
+      "url": "pull/359",
+      "description": "Added WebAssembly unit tests support."
     },
     {
-      "issueId":367,
-      "url": "pull/367",
-      "description": "Fix package description in import path suggesions."
+      "issueId": 319,
+      "url": "pull/319",
+      "description": "Added third-party libraries support for WebAssembly."
+    },
+    {
+      "issueId": 349,
+      "url": "pull/349",
+      "description": "Yaegi Go interpreter was removed."
     }
   ]
 }
