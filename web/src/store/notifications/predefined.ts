@@ -7,4 +7,5 @@ export enum NotificationIDs {
   WASMAppExitError = 'WASMAppExitError',
   PackageManager = 'PackageManager',
   GoWorkerStatus = 'GoWorkerStatus',
+  GoTargetSwitched = 'GoTargetSwitched',
 }
