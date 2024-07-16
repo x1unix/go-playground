@@ -5,7 +5,3 @@ issues:
   - pkg/worker
   - cmd/webworker
   - web
-  exclude-rules:
-    - path: 'internal/gowasm/(.+)\.go'
-      linters:
-        - typecheck
