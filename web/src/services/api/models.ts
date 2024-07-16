@@ -43,7 +43,9 @@ export interface FilesPayload {
 
 export interface BuildResponse {
   fileName: string
-  isTest: boolean
+  isTest?: boolean
+  hasBenchmark?: boolean
+  hasFuzz?: boolean
 }
 
 export interface VersionResponse {
