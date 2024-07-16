@@ -5,7 +5,7 @@ import { TeachingBubble, Link, DirectionalHint, useTheme } from '@fluentui/react
 
 interface Props {
   visible?: boolean
-  snippetId?: string
+  snippetId?: string | null
   originUrl?: string
   target?: Target
   onDismiss?: () => void

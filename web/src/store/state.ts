@@ -1,4 +1,3 @@
-import { connect } from 'react-redux'
 import type { editor } from 'monaco-editor'
 import type { EvalEvent } from '~/services/api'
 import type { MonacoSettings, RunTargetConfig } from '~/services/config'
@@ -49,14 +48,4 @@ export interface State {
   workspace: WorkspaceState
   notifications: NotificationsState
   terminal: TerminalState
-}
-
-/**
- * Connect decorator to attach component to store.
- * @deprecated use `connect` instead.
- */
-export function Connect(fn: (state: State) => any) {
-  return function (constructor: Function) {
-    return connect(fn)(constructor as any) as any
-  }
 }
