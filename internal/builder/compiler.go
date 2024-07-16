@@ -29,6 +29,12 @@ type Result struct {
 
 	// IsTest indicates whether binary is a test file
 	IsTest bool
+
+	// HasBenchmark indicates whether test contains benchmarks.
+	HasBenchmark bool
+
+	// HasFuzz indicates whether test has fuzzing tests.
+	HasFuzz bool
 }
 
 // BuildEnvironmentConfig is BuildService environment configuration.
@@ -73,7 +79,7 @@ func (s BuildService) GetArtifact(id storage.ArtifactID) (storage.ReadCloseSizer
 
 // Build compiles Go source to WASM and returns result
 func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Result, error) {
-	projInfo, err := checkFileEntries(files)
+	projInfo, err := detectProjectType(files)
 	if err != nil {
 		return nil, err
 	}
@@ -84,8 +90,10 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Resu
 	}
 
 	result := &Result{
-		FileName: aid.Ext(storage.ExtWasm),
-		IsTest:   projInfo.projectType == projectTypeTest,
+		FileName:     aid.Ext(storage.ExtWasm),
+		IsTest:       projInfo.projectType == projectTypeTest,
+		HasBenchmark: projInfo.hasBenchmark,
+		HasFuzz:      projInfo.hasFuzz,
 	}
 
 	isCached, err := s.storage.HasItem(aid)
@@ -124,11 +132,20 @@ func (s BuildService) buildSource(ctx context.Context, projInfo projectInfo, wor
 		return err
 	}
 
-	if projInfo.projectType == projectTypeTest {
-		return s.runGoTool(ctx, workspace.WorkDir, "test", "-c", "-o", workspace.BinaryPath)
+	if projInfo.projectType == projectTypeProgram {
+		return s.runGoTool(ctx, workspace.WorkDir, "build", "-o", workspace.BinaryPath, ".")
 	}
 
-	return s.runGoTool(ctx, workspace.WorkDir, "build", "-o", workspace.BinaryPath, ".")
+	args := []string{"test"}
+	if projInfo.hasBenchmark {
+		args = append(args, "-bench=.")
+	}
+	if projInfo.hasFuzz {
+		args = append(args, "-fuzz=.")
+	}
+
+	args = append(args, "-c", "-o", workspace.BinaryPath)
+	return s.runGoTool(ctx, workspace.WorkDir, args...)
 }
 
 func (s BuildService) handleNoSpaceLeft() {
