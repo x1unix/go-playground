@@ -87,6 +87,12 @@ type BuildResponseV2 struct {
 
 	// IsUnitTest indicates whether payload is a Go test.
 	IsTest bool `json:"isTest"`
+
+	// HasBenchmark indicates whether program contains a benchmark.
+	HasBenchmark bool `json:"hasBenchmark"`
+
+	// HasFuzz indicates whether program contains a fuzz test inside.
+	HasFuzz bool `json:"hasFuzz`
 }
 
 // RunResponse is code run response

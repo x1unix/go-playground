@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"golang.org/x/time/rate"
 	"net/http"
 	"time"
+
+	"golang.org/x/time/rate"
 
 	"github.com/gorilla/mux"
 	"github.com/x1unix/go-playground/internal/builder"
@@ -193,8 +194,10 @@ func (h *APIv2Handler) HandleCompile(w http.ResponseWriter, r *http.Request) err
 	}
 
 	WriteJSON(w, BuildResponseV2{
-		FileName: result.FileName,
-		IsTest:   result.IsTest,
+		FileName:     result.FileName,
+		IsTest:       result.IsTest,
+		HasBenchmark: result.HasBenchmark,
+		HasFuzz:      result.HasFuzz,
 	})
 	return nil
 }
