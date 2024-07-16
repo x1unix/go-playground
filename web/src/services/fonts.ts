@@ -23,7 +23,7 @@ interface FontDeclaration {
   label: string
   family: string
   fonts: Array<{
-    src: Array<{ url: string; format?: 'opentype' | 'embedded-opentype' | 'woff' | 'truetype' | 'svg' }>
+    src: Array<{ url: string; format?: 'opentype' | 'embedded-opentype' | 'woff' | 'woff2' | 'truetype' | 'svg' }>
     weight?: 'normal' | 'bold' | 'light' | number
     style?: 'normal' | 'italic'
   }>
@@ -39,6 +39,20 @@ const fontsList: Record<string, FontDeclaration> = {
     fonts: [
       {
         src: [{ url: '/fonts/CascadiaCode.ttf', format: 'truetype' }],
+      },
+    ],
+  },
+  'Comic-Mono': {
+    label: 'Comic Mono',
+    family: 'Comic Mono',
+    fonts: [
+      {
+        src: [{ url: '/fonts/comic-mono/ComicMono.ttf', format: 'truetype' }],
+        weight: 400,
+      },
+      {
+        src: [{ url: '/fonts/comic-mono/ComicMono-Bold.ttf', format: 'truetype' }],
+        weight: 700,
       },
     ],
   },
@@ -64,6 +78,75 @@ const fontsList: Record<string, FontDeclaration> = {
       },
     ],
   },
+  Hack: {
+    label: 'Hack',
+    family: 'Hack',
+    fonts: [
+      {
+        src: [
+          { url: '/fonts/hack/hack-regular.woff', format: 'woff' },
+          { url: '/fonts/hack/hack-regular.woff2', format: 'woff2' },
+        ],
+        weight: 400,
+      },
+      {
+        src: [
+          { url: '/fonts/hack/hack-italic.woff', format: 'woff' },
+          { url: '/fonts/hack/hack-italic.woff2', format: 'woff2' },
+        ],
+        weight: 400,
+        style: 'italic',
+      },
+      {
+        src: [
+          { url: '/fonts/hack/hack-bold.woff', format: 'woff' },
+          { url: '/fonts/hack/hack-bold.woff2', format: 'woff2' },
+        ],
+        weight: 700,
+      },
+      {
+        src: [
+          { url: '/fonts/hack/hack-bolditalic.woff', format: 'woff' },
+          { url: '/fonts/hack/hack-bolditalic.woff2', format: 'woff2' },
+        ],
+        weight: 700,
+        style: 'italic',
+      },
+    ],
+  },
+  'IBM-Plex': {
+    label: 'IBM Plex Mono',
+    family: 'IBM Plex Mono',
+    fonts: [
+      {
+        src: [{ url: '/fonts/ibm-plex-mono/IBMPlexMono-Regular.woff2', format: 'woff2' }],
+        weight: 400,
+      },
+      {
+        src: [{ url: '/fonts/ibm-plex-mono/IBMPlexMono-Italic.woff2', format: 'woff2' }],
+        weight: 400,
+        style: 'italic',
+      },
+      {
+        src: [{ url: '/fonts/ibm-plex-mono/IBMPlexMono-Medium.woff2', format: 'woff2' }],
+        weight: 500,
+      },
+      {
+        src: [{ url: '/fonts/ibm-plex-mono/IBMPlexMono-MediumItalic.woff2', format: 'woff2' }],
+        weight: 500,
+        style: 'italic',
+      },
+      {
+        src: [{ url: '/fonts/ibm-plex-mono/IBMPlexMono-Bold.woff2', format: 'woff2' }],
+        weight: 700,
+      },
+      {
+        src: [{ url: '/fonts/ibm-plex-mono/IBMPlexMono-BoldItalic.woff2', format: 'woff2' }],
+        weight: 700,
+        style: 'italic',
+      },
+    ],
+  },
   'JetBrains-Mono': {
     label: 'JetBrains Mono',
     family: 'JetBrains-Mono',
@@ -79,6 +162,47 @@ const fontsList: Record<string, FontDeclaration> = {
       {
         src: [{ url: '/fonts/JetBrainsMono-Bold.ttf', format: 'truetype' }],
         weight: 700,
+      },
+    ],
+  },
+  Recursive: {
+    label: 'Recursive',
+    family: 'Recursive',
+    fonts: [
+      {
+        src: [{ url: '/fonts/Recursive_VF_1.085.woff2', format: 'woff2' }],
+      },
+    ],
+  },
+  'Zed-Mono': {
+    label: 'Zed Mono',
+    family: 'Zed Mono',
+    fonts: [
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extended.ttf', format: 'truetype' }],
+        weight: 400,
+      },
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extendeditalic.ttf', format: 'truetype' }],
+        weight: 400,
+        style: 'italic',
+      },
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extendedmedium.ttf', format: 'truetype' }],
+        weight: 500,
+      },
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extendedsemibold.ttf', format: 'truetype' }],
+        weight: 600,
+      },
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extendedbold.ttf', format: 'truetype' }],
+        weight: 700,
+      },
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extendedbolditalic.ttf', format: 'truetype' }],
+        weight: 700,
+        style: 'italic',
       },
     ],
   },
