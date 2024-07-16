@@ -8,7 +8,7 @@ import { SettingsProperty } from './SettingsProperty'
 import { DEFAULT_FONT } from '~/services/fonts'
 import type { MonacoSettings } from '~/services/config'
 import type { RenderingBackend, TerminalSettings } from '~/store/terminal'
-import { Connect, type MonacoParamsChanges, type SettingsState } from '~/store'
+import { connect, type StateDispatch, type MonacoParamsChanges, type SettingsState } from '~/store'
 
 import { cursorBlinkOptions, cursorLineOptions, fontOptions, terminalBackendOptions } from './options'
 
@@ -18,14 +18,21 @@ export interface SettingsChanges {
   terminal?: Partial<TerminalSettings>
 }
 
-export interface SettingsProps {
+interface OwnProps {
   isOpen?: boolean
   onClose: (changes: SettingsChanges) => void
+}
+
+interface StateProps {
   settings?: SettingsState
   monaco?: MonacoSettings
   terminal?: TerminalSettings
-  dispatch?: (action) => void
 }
+
+type Props = StateProps &
+  OwnProps & {
+    dispatch: StateDispatch
+  }
 
 interface SettingsModalState {
   isOpen?: boolean
@@ -44,12 +51,7 @@ const pivotStyles: Partial<IPivotStyles> = {
   },
 }
 
-@Connect((state) => ({
-  settings: state.settings,
-  monaco: state.monaco,
-  terminal: state.terminal.settings,
-}))
-export class SettingsModal extends ThemeableComponent<SettingsProps, SettingsModalState> {
+class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
   private changes: SettingsChanges = {}
 
   constructor(props) {
@@ -302,3 +304,9 @@ export class SettingsModal extends ThemeableComponent<SettingsProps, SettingsMod
     )
   }
 }
+
+export const ConnectedSettingsModal = connect<StateProps, OwnProps>((state) => ({
+  settings: state.settings,
+  monaco: state.monaco,
+  terminal: state.terminal.settings,
+}))(SettingsModal)

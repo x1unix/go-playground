@@ -4,7 +4,7 @@ import { CommandBar, type ICommandBarItemProps, Stack } from '@fluentui/react'
 import type { Snippet } from '~/services/examples'
 import apiClient, { type VersionsInfo } from '~/services/api'
 import { newAddNotificationAction, NotificationType } from '~/store/notifications'
-import { SettingsModal, type SettingsChanges } from '~/components/features/settings/SettingsModal'
+import { ConnectedSettingsModal, type SettingsChanges } from '~/components/features/settings/SettingsModal'
 import { ThemeableComponent } from '~/components/utils/ThemeableComponent'
 import { AboutModal } from '~/components/modals/AboutModal'
 import { ExamplesModal } from '~/components/features/examples/ExamplesModal'
@@ -241,7 +241,7 @@ export class Header extends ThemeableComponent<any, HeaderState> {
             this.props.dispatch(newUIStateChangeAction({ shareCreated: false }))
           }}
         />
-        <SettingsModal
+        <ConnectedSettingsModal
           onClose={(args) => {
             this.onSettingsClose(args)
           }}
