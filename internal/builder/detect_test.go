@@ -86,6 +86,17 @@ func TestCheckFileEntries(t *testing.T) {
 				projectType: projectTypeTest,
 			},
 		},
+		"detect fuzz and bench": {
+			input: map[string][]byte{
+				"bench_test.go": []byte("package main\nfunc BenchmarkFoo(b *testing.B) {\n}"),
+				"fuzz_test.go":  []byte("package main\nfunc FuzzFoo(b *testing.F) {\n}"),
+			},
+			expect: projectInfo{
+				projectType:  projectTypeTest,
+				hasBenchmark: true,
+				hasFuzz:      true,
+			},
+		},
 		"file path too deep": {
 			err: fmt.Sprintf("file path is too deep: %smain.go", strings.Repeat("dir/", maxPathDepth+1)),
 			inputFn: func() map[string][]byte {
@@ -105,7 +116,7 @@ func TestCheckFileEntries(t *testing.T) {
 				input = tc.inputFn()
 			}
 
-			result, err := checkFileEntries(input)
+			result, err := detectProjectType(input)
 			if tc.err != "" {
 				assert.Error(t, err)
 				assert.EqualError(t, err, tc.err)

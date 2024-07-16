@@ -2,6 +2,7 @@ package builder
 
 import (
 	"bytes"
+	"regexp"
 	"strings"
 
 	"github.com/x1unix/go-playground/pkg/goplay"
@@ -12,6 +13,11 @@ const (
 	maxFileCount = 12
 )
 
+var (
+	benchRegex = regexp.MustCompile(`(?m)\bfunc Benchmark[A-Z]\w+\([\w\d_]+\s\*testing\.B\)`)
+	fuzzRegex  = regexp.MustCompile(`(?m)\bfunc Fuzz[A-Z]\w+\([\w\d_]+\s\*testing\.F\)`)
+)
+
 type projectType int
 
 const (
@@ -20,13 +26,30 @@ const (
 )
 
 type projectInfo struct {
-	projectType projectType
+	projectType  projectType
+	hasBenchmark bool
+	hasFuzz      bool
 }
 
-// checkFileEntries validates project file extensions and contents.
+func (p *projectInfo) sum(other projectInfo) {
+	if other.projectType == projectTypeProgram {
+		return
+	}
+
+	p.projectType = other.projectType
+	if other.hasBenchmark {
+		p.hasBenchmark = true
+	}
+
+	if other.hasFuzz {
+		p.hasFuzz = true
+	}
+}
+
+// detectProjectType validates project file extensions and contents.
 //
 // In result returns project information such as whether this is a regular Go program or test.
-func checkFileEntries(entries map[string][]byte) (projectInfo, error) {
+func detectProjectType(entries map[string][]byte) (projectInfo, error) {
 	if len(entries) == 0 {
 		return projectInfo{}, newBuildError("no buildable Go source files")
 	}
@@ -40,7 +63,7 @@ func checkFileEntries(entries map[string][]byte) (projectInfo, error) {
 	}
 
 	for name, contents := range entries {
-		projType, err := checkFilePath(name)
+		fileInfo, err := detectGoFileType(name, contents)
 		if err != nil {
 			return info, err
 		}
@@ -49,12 +72,27 @@ func checkFileEntries(entries map[string][]byte) (projectInfo, error) {
 			return projectInfo{}, newBuildError("file %s is empty", name)
 		}
 
-		if projType == projectTypeTest {
-			info.projectType = projType
-		}
+		info.sum(fileInfo)
 	}
 
 	return info, nil
+}
+
+func detectGoFileType(fpath string, src []byte) (pInfo projectInfo, err error) {
+	pInfo.projectType, err = checkFilePath(fpath)
+	if pInfo.projectType == projectTypeProgram || err != nil {
+		return pInfo, err
+	}
+
+	if fuzzRegex.Match(src) {
+		pInfo.hasFuzz = true
+	}
+
+	if benchRegex.Match(src) {
+		pInfo.hasBenchmark = true
+	}
+
+	return pInfo, nil
 }
 
 // checkFilePath check if file extension and path are correct.
