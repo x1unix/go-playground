@@ -114,6 +114,39 @@ const fontsList: Record<string, FontDeclaration> = {
       },
     ],
   },
+  'IBM-Plex': {
+    label: 'IBM Plex Mono',
+    family: 'IBM Plex Mono',
+    fonts: [
+      {
+        src: [{ url: '/fonts/ibm-plex-mono/IBMPlexMono-Regular.woff2', format: 'woff' }],
+        weight: 400,
+      },
+      {
+        src: [{ url: '/fonts/ibm-plex-mono/IBMPlexMono-Italic.woff2', format: 'woff' }],
+        weight: 400,
+        style: 'italic',
+      },
+      {
+        src: [{ url: '/fonts/ibm-plex-mono/IBMPlexMono-Medium.woff2', format: 'woff' }],
+        weight: 500,
+      },
+      {
+        src: [{ url: '/fonts/ibm-plex-mono/IBMPlexMono-MediumItalic.woff2', format: 'woff' }],
+        weight: 500,
+        style: 'italic',
+      },
+      {
+        src: [{ url: '/fonts/ibm-plex-mono/IBMPlexMono-Bold.woff2', format: 'woff' }],
+        weight: 700,
+      },
+      {
+        src: [{ url: '/fonts/ibm-plex-mono/IBMPlexMono-BoldItalic.woff2', format: 'woff' }],
+        weight: 700,
+        style: 'italic',
+      },
+    ],
+  },
 }
 
 /**
