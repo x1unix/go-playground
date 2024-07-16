@@ -10,14 +10,20 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/x1unix/go-playground/pkg/monaco"
 )
 
 const (
-	resultsPreallocSize = 300
+	queueInitSize = 300
+
+	// resultsInitSize value based on a number of packages in Go 1.22
+	resultsInitSize = 180
 )
+
+var buildContraintRegex = regexp.MustCompile(`(?m)^([\S]+)_(freebsd|darwin|plan9|windows|netbsd|arm|386|loong64|mips|ppc|riscv|s390x)`)
 
 type scanResult struct {
 	hasPkg   bool
@@ -60,7 +66,7 @@ func (s *GoRootScanner) start() ([]monaco.CompletionItem, error) {
 		return nil, fmt.Errorf("cannot open Go SDK directory: %w", err)
 	}
 
-	q := newQueue(resultsPreallocSize)
+	q := newQueue(queueInitSize)
 	for _, entry := range entries {
 		if !entry.Type().IsDir() {
 			continue
@@ -75,7 +81,7 @@ func (s *GoRootScanner) start() ([]monaco.CompletionItem, error) {
 		q.add(pkgName)
 	}
 
-	results := make([]monaco.CompletionItem, 0, resultsPreallocSize)
+	results := make([]monaco.CompletionItem, 0, resultsInitSize)
 	for q.occupied() {
 		pkgName, ok := q.pop()
 		if !ok {
@@ -169,5 +175,19 @@ func shouldIgnoreFileName(fname string) bool {
 		return true
 	}
 
+	if isBuildConstraintFile(fname) {
+		return true
+	}
+
 	return strings.HasSuffix(fname, "_test.go")
+}
+
+// isBuildConstraintFile checks whether file name contains Go build constraint.
+//
+// Linux and "_unix.go" files are allowed to align with GoDoc behavior.
+// Wasm-target files are intentionally allowed to support `syscall/js` package.
+//
+// For example: `foo_amd64.go` or `bar_openbsd_ppc64.go`.
+func isBuildConstraintFile(fname string) bool {
+	return buildContraintRegex.MatchString(fname)
 }
