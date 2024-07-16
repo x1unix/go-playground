@@ -42,6 +42,20 @@ const fontsList: Record<string, FontDeclaration> = {
       },
     ],
   },
+  'Comic-Mono': {
+    label: 'Comic Mono',
+    family: 'Comic Mono',
+    fonts: [
+      {
+        src: [{ url: '/fonts/comic-mono/ComicMono.ttf', format: 'truetype' }],
+        weight: 400,
+      },
+      {
+        src: [{ url: '/fonts/comic-mono/ComicMono-Bold.ttf', format: 'truetype' }],
+        weight: 700,
+      },
+    ],
+  },
   FiraCode: {
     label: 'Fira Code',
     family: 'FiraCode',
@@ -148,6 +162,15 @@ const fontsList: Record<string, FontDeclaration> = {
       {
         src: [{ url: '/fonts/JetBrainsMono-Bold.ttf', format: 'truetype' }],
         weight: 700,
+      },
+    ],
+  },
+  Recursive: {
+    label: 'Recursive',
+    family: 'Recursive',
+    fonts: [
+      {
+        src: [{ url: '/fonts/Recursive_VF_1.085.woff2', format: 'woff2' }],
       },
     ],
   },
