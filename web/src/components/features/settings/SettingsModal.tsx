@@ -1,13 +1,14 @@
 import React from 'react'
-import { Checkbox, Dropdown, Pivot, PivotItem, TextField } from '@fluentui/react'
+import { Checkbox, Dropdown, type IPivotStyles, PivotItem, TextField } from '@fluentui/react'
 
+import { AnimatedPivot } from '~/components/elements/tabs/AnimatedPivot'
 import { ThemeableComponent } from '~/components/utils/ThemeableComponent'
 import { Dialog } from '~/components/elements/modals/Dialog'
 import { SettingsProperty } from './SettingsProperty'
 import { DEFAULT_FONT } from '~/services/fonts'
 import type { MonacoSettings } from '~/services/config'
 import type { RenderingBackend, TerminalSettings } from '~/store/terminal'
-import { Connect, type MonacoParamsChanges, type SettingsState } from '~/store'
+import { connect, type StateDispatch, type MonacoParamsChanges, type SettingsState } from '~/store'
 
 import { cursorBlinkOptions, cursorLineOptions, fontOptions, terminalBackendOptions } from './options'
 
@@ -17,14 +18,21 @@ export interface SettingsChanges {
   terminal?: Partial<TerminalSettings>
 }
 
-export interface SettingsProps {
+interface OwnProps {
   isOpen?: boolean
   onClose: (changes: SettingsChanges) => void
+}
+
+interface StateProps {
   settings?: SettingsState
   monaco?: MonacoSettings
   terminal?: TerminalSettings
-  dispatch?: (action) => void
 }
+
+type Props = StateProps &
+  OwnProps & {
+    dispatch: StateDispatch
+  }
 
 interface SettingsModalState {
   isOpen?: boolean
@@ -36,12 +44,14 @@ const modalStyles = {
   },
 }
 
-@Connect((state) => ({
-  settings: state.settings,
-  monaco: state.monaco,
-  terminal: state.terminal.settings,
-}))
-export class SettingsModal extends ThemeableComponent<SettingsProps, SettingsModalState> {
+const pivotStyles: Partial<IPivotStyles> = {
+  itemContainer: {
+    // Set height to highest of pivots. See: #371
+    minHeight: 490,
+  },
+}
+
+class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
   private changes: SettingsChanges = {}
 
   constructor(props) {
@@ -90,10 +100,11 @@ export class SettingsModal extends ThemeableComponent<SettingsProps, SettingsMod
 
   render() {
     const { isOpen } = this.props
+
     return (
       <Dialog label="Settings" onDismiss={() => this.onClose()} isOpen={isOpen} styles={modalStyles}>
-        <Pivot aria-label="Settings">
-          <PivotItem headerText="General">
+        <AnimatedPivot aria-label="Settings" styles={pivotStyles}>
+          <PivotItem itemKey="0" headerText="General">
             <SettingsProperty
               key="fontFamily"
               title="Font Family"
@@ -163,7 +174,7 @@ export class SettingsModal extends ThemeableComponent<SettingsProps, SettingsMod
               }
             />
           </PivotItem>
-          <PivotItem headerText="Editor">
+          <PivotItem itemKey="1" headerText="Editor">
             <SettingsProperty
               key="cursorBlinking"
               title="Cursor Blinking"
@@ -245,7 +256,7 @@ export class SettingsModal extends ThemeableComponent<SettingsProps, SettingsMod
               }
             />
           </PivotItem>
-          <PivotItem headerText="Terminal">
+          <PivotItem itemKey="2" headerText="Terminal">
             <SettingsProperty
               title="Font Size"
               description="Controls the font size in pixels of the terminal."
@@ -288,8 +299,14 @@ export class SettingsModal extends ThemeableComponent<SettingsProps, SettingsMod
               }
             />
           </PivotItem>
-        </Pivot>
+        </AnimatedPivot>
       </Dialog>
     )
   }
 }
+
+export const ConnectedSettingsModal = connect<StateProps, OwnProps>((state) => ({
+  settings: state.settings,
+  monaco: state.monaco,
+  terminal: state.terminal.settings,
+}))(SettingsModal)

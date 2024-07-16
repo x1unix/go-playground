@@ -4,7 +4,7 @@ import { CommandBar, type ICommandBarItemProps, Stack } from '@fluentui/react'
 import type { Snippet } from '~/services/examples'
 import apiClient, { type VersionsInfo } from '~/services/api'
 import { newAddNotificationAction, NotificationType } from '~/store/notifications'
-import { SettingsModal, type SettingsChanges } from '~/components/features/settings/SettingsModal'
+import { ConnectedSettingsModal, type SettingsChanges } from '~/components/features/settings/SettingsModal'
 import { ThemeableComponent } from '~/components/utils/ThemeableComponent'
 import { AboutModal } from '~/components/modals/AboutModal'
 import { ExamplesModal } from '~/components/features/examples/ExamplesModal'
@@ -19,13 +19,13 @@ import {
   dispatchShareSnippet,
 } from '~/store/workspace/dispatchers'
 import {
-  Connect,
-  type Dispatcher,
+  connect,
   dispatchToggleTheme,
   newMonacoParamsChangeDispatcher,
   newSettingsChangeDispatcher,
   newUIStateChangeAction,
   runFileDispatcher,
+  type StateDispatch,
 } from '~/store'
 
 import './Header.css'
@@ -43,24 +43,20 @@ interface HeaderState {
   goVersions?: VersionsInfo
 }
 
-interface Props {
-  darkMode: boolean
-  loading: boolean
-  running: boolean
-  snippetName?: string
+interface StateProps {
+  darkMode?: boolean
+  loading?: boolean
+  running?: boolean
+  sharedSnippetName?: string | null
   hideThemeToggle?: boolean
-  dispatch: (d: Dispatcher) => void
+}
+
+interface Props extends StateProps {
+  dispatch: StateDispatch
 }
 
 // FIXME: rewrite to function component and refactor all that re-render mess.
-@Connect(({ settings, status, ui }) => ({
-  darkMode: settings.darkMode,
-  loading: status?.loading,
-  running: status?.running,
-  hideThemeToggle: settings.useSystemTheme,
-  sharedSnippetName: ui?.shareCreated && ui?.snippetId,
-}))
-export class Header extends ThemeableComponent<any, HeaderState> {
+class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -234,14 +230,14 @@ export class Header extends ThemeableComponent<any, HeaderState> {
           ariaLabel="CodeEditor menu"
         />
         <SharePopup
-          visible={sharedSnippetName?.length}
+          visible={!!sharedSnippetName?.length}
           target={`.${BTN_SHARE_CLASSNAME}`}
           snippetId={sharedSnippetName}
           onDismiss={() => {
             this.props.dispatch(newUIStateChangeAction({ shareCreated: false }))
           }}
         />
-        <SettingsModal
+        <ConnectedSettingsModal
           onClose={(args) => {
             this.onSettingsClose(args)
           }}
@@ -262,3 +258,11 @@ export class Header extends ThemeableComponent<any, HeaderState> {
     )
   }
 }
+
+export const Header = connect<StateProps, {}>(({ settings, status, ui }) => ({
+  darkMode: settings.darkMode,
+  loading: status?.loading,
+  running: status?.running,
+  hideThemeToggle: settings.useSystemTheme,
+  sharedSnippetName: ui?.shareCreated ? ui?.snippetId : undefined,
+}))(HeaderContainer)

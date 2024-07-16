@@ -17,7 +17,10 @@ export const settingsPropStyles = mergeStyleSets({
     marginTop: '10px',
   },
   block: {
-    marginTop: '15px',
+    marginBottom: '20px',
+    '&:first-child': {
+      marginTop: '15px',
+    },
   },
   description: {
     marginTop: '5px',
