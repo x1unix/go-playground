@@ -82,6 +82,38 @@ const fontsList: Record<string, FontDeclaration> = {
       },
     ],
   },
+  'Zed-Mono': {
+    label: 'Zed Mono',
+    family: 'Zed Mono',
+    fonts: [
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extended.ttf', format: 'truetype' }],
+        weight: 400,
+      },
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extendeditalic.ttf', format: 'truetype' }],
+        weight: 400,
+        style: 'italic',
+      },
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extendedmedium.ttf', format: 'truetype' }],
+        weight: 500,
+      },
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extendedsemibold.ttf', format: 'truetype' }],
+        weight: 600,
+      },
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extendedbold.ttf', format: 'truetype' }],
+        weight: 700,
+      },
+      {
+        src: [{ url: '/fonts/zed-mono/zed-mono-extendedbolditalic.ttf', format: 'truetype' }],
+        weight: 700,
+        style: 'italic',
+      },
+    ],
+  },
 }
 
 /**
