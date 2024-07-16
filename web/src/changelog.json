@@ -1,16 +1,26 @@
 {
-  "Interface - Code Editor": [
+  "Interface - General": [
     {
-      "issueId": 362,
-      "url": "pull/362",
-      "description": "Support package paths autocomplete in import section"
+      "issueId": 371,
+      "url": "issues/371",
+      "description": "Improve settings modal window appearance."
     }
   ],
-  "Go - WebAssembly": [
+  "Interface - Code Editor": [
     {
-      "issueId": 359,
-      "url": "pull/359",
-      "description": "Add unit tests support in WebAssembly environment"
+      "issueId": 374,
+      "url": "pull/374",
+      "description": "Persist editor font size changed by mouse wheel scroll."
+    },
+    {
+      "issueId": 373,
+      "url": "pull/373",
+      "description": "Add new editor fonts."
+    },
+    {
+      "issueId":367,
+      "url": "pull/367",
+      "description": "Fix package description in import path suggesions."
     }
   ]
 }
