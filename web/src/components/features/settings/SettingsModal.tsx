@@ -1,5 +1,5 @@
 import React from 'react'
-import { Checkbox, Dropdown, Pivot, PivotItem, TextField } from '@fluentui/react'
+import { Checkbox, Dropdown, type IPivotStyles, Pivot, PivotItem, TextField } from '@fluentui/react'
 
 import { ThemeableComponent } from '~/components/utils/ThemeableComponent'
 import { Dialog } from '~/components/elements/modals/Dialog'
@@ -33,6 +33,13 @@ interface SettingsModalState {
 const modalStyles = {
   main: {
     maxWidth: 480,
+  },
+}
+
+const pivotStyles: Partial<IPivotStyles> = {
+  itemContainer: {
+    // Set height to highest of pivots. See: #371
+    minHeight: 490,
   },
 }
 
@@ -92,7 +99,7 @@ export class SettingsModal extends ThemeableComponent<SettingsProps, SettingsMod
     const { isOpen } = this.props
     return (
       <Dialog label="Settings" onDismiss={() => this.onClose()} isOpen={isOpen} styles={modalStyles}>
-        <Pivot aria-label="Settings">
+        <Pivot aria-label="Settings" styles={pivotStyles}>
           <PivotItem headerText="General">
             <SettingsProperty
               key="fontFamily"
