@@ -14,9 +14,7 @@ import (
 	"unicode/utf8"
 )
 
-// **Important:** Fuzzing can't be ran on server as original Go Playground API doesn't support benchmarks and fuzzing.
-// Please switch to WebAssembly environment using top right corner button.
-//
+// **Important:** This test will be executed using WebAssembly as original Go Playground API doesn't support benchmarks and fuzzing.
 // See: https://stackoverflow.com/questions/54574814/go-benchmark-run-from-main-go-playground
 
 // This function will accept a string, loop over it a byte at a time, and return the reversed string at the end.

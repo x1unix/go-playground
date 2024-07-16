@@ -8,9 +8,7 @@
 // See: https://dave.cheney.net/2013/06/30/how-to-write-benchmarks-in-go
 package main
 
-// **Important:** Benchmarks can't be ran on server as original Go Playground API doesn't support benchmarks and fuzzing.
-// Please switch to WebAssembly environment using a button in the top right corner.
-//
+// **Important:** This benchmark will be executed using WebAssembly as original Go Playground API doesn't support benchmarks and fuzzing.
 // See: https://stackoverflow.com/questions/54574814/go-benchmark-run-from-main-go-playground
 
 import "testing"
