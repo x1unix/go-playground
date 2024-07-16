@@ -1,15 +1,21 @@
 import React from 'react'
 import { Spinner } from '@fluentui/react'
 import MonacoEditor, { type Monaco } from '@monaco-editor/react'
-import { KeyMod, KeyCode, type editor, type IKeyboardEvent, type IDisposable } from 'monaco-editor'
+import * as monaco from 'monaco-editor'
 
 import apiClient from '~/services/api'
 import { createVimModeAdapter, type StatusBarAdapter, type VimModeKeymap } from '~/plugins/vim/editor'
 import { Analyzer } from '~/services/analyzer'
 import { type MonacoSettings, TargetType } from '~/services/config'
-import { connect, newMarkerAction, runFileDispatcher, type StateDispatch } from '~/store'
+import {
+  connect,
+  newMarkerAction,
+  newMonacoParamsChangeDispatcher,
+  runFileDispatcher,
+  type StateDispatch,
+} from '~/store'
 import { type WorkspaceState, dispatchFormatFile, dispatchResetWorkspace, dispatchUpdateFile } from '~/store/workspace'
-import { getTimeNowUsageMarkers, wrapAsyncWithDebounce } from './utils'
+import { getTimeNowUsageMarkers, asyncDebounce, debounce } from './utils'
 import { attachCustomCommands } from './commands'
 import { LANGUAGE_GOLANG, stateToOptions } from './props'
 import { configureMonacoLoader } from './loader'
@@ -52,17 +58,25 @@ interface Props extends CodeEditorState {
 
 class CodeEditor extends React.Component<Props> {
   private analyzer?: Analyzer
-  private editorInstance?: editor.IStandaloneCodeEditor
+  private editorInstance?: monaco.editor.IStandaloneCodeEditor
   private vimAdapter?: VimModeKeymap
   private vimCommandAdapter?: StatusBarAdapter
   private monaco?: Monaco
-  private disposables?: IDisposable[]
+  private disposables?: monaco.IDisposable[]
 
-  private readonly debouncedAnalyzeFunc = wrapAsyncWithDebounce(async (fileName: string, code: string) => {
+  private readonly debouncedAnalyzeFunc = asyncDebounce(async (fileName: string, code: string) => {
     return await this.doAnalyze(fileName, code)
   }, ANALYZE_DEBOUNCE_TIME)
 
-  editorDidMount(editorInstance: editor.IStandaloneCodeEditor, monacoInstance: Monaco) {
+  private readonly persistFontSize = debounce((fontSize: number) => {
+    this.props.dispatch(
+      newMonacoParamsChangeDispatcher({
+        fontSize,
+      }),
+    )
+  }, 1000)
+
+  editorDidMount(editorInstance: monaco.editor.IStandaloneCodeEditor, monacoInstance: Monaco) {
     this.disposables = registerGoLanguageProviders(apiClient, this.props.dispatch)
     this.editorInstance = editorInstance
     this.monaco = monacoInstance
@@ -71,6 +85,15 @@ class CodeEditor extends React.Component<Props> {
     const [vimAdapter, statusAdapter] = createVimModeAdapter(this.props.dispatch, editorInstance)
     this.vimAdapter = vimAdapter
     this.vimCommandAdapter = statusAdapter
+
+    // Font should be set only once during boot as when font size changes
+    // by zoom and editor config object is updated - this cause infinite
+    // font change calls with random values.
+    if (this.props.options.fontSize) {
+      editorInstance.updateOptions({
+        fontSize: this.props.options.fontSize,
+      })
+    }
 
     if (this.props.vimModeEnabled) {
       console.log('Vim mode enabled')
@@ -96,7 +119,7 @@ class CodeEditor extends React.Component<Props> {
         id: 'run-code',
         label: 'Build And Run Code',
         contextMenuGroupId: 'navigation',
-        keybindings: [KeyMod.CtrlCmd | KeyCode.Enter],
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
         run: (ed, ...args) => {
           this.props.dispatch(runFileDispatcher)
         },
@@ -105,12 +128,22 @@ class CodeEditor extends React.Component<Props> {
         id: 'format-code',
         label: 'Format Code (goimports)',
         contextMenuGroupId: 'navigation',
-        keybindings: [KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KeyF],
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF],
         run: (ed, ...args) => {
           this.props.dispatch(dispatchFormatFile())
         },
       },
     ]
+
+    // Persist font size on zoom
+    this.disposables.push(
+      editorInstance.onDidChangeConfiguration((e) => {
+        if (e.hasChanged(monaco.editor.EditorOption.fontSize)) {
+          const newFontSize = editorInstance.getOption(monaco.editor.EditorOption.fontSize)
+          this.persistFontSize(newFontSize)
+        }
+      }),
+    )
 
     // Register custom actions
     actions.forEach((action) => editorInstance.addAction(action))
@@ -166,7 +199,7 @@ class CodeEditor extends React.Component<Props> {
     this.editorInstance.dispose()
   }
 
-  onChange(newValue: string | undefined, _: editor.IModelContentChangedEvent) {
+  onChange(newValue: string | undefined, _: monaco.editor.IModelContentChangedEvent) {
     if (!newValue) {
       return
     }
@@ -206,7 +239,7 @@ class CodeEditor extends React.Component<Props> {
     this.props.dispatch(newMarkerAction(fileName, markers))
   }
 
-  private onKeyDown(e: IKeyboardEvent) {
+  private onKeyDown(e: monaco.IKeyboardEvent) {
     const { vimModeEnabled, vim } = this.props
     if (!vimModeEnabled || !vim?.commandStarted) {
       return

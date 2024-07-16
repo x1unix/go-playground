@@ -165,15 +165,6 @@ const fontsList: Record<string, FontDeclaration> = {
       },
     ],
   },
-  Recursive: {
-    label: 'Recursive',
-    family: 'Recursive',
-    fonts: [
-      {
-        src: [{ url: '/fonts/Recursive_VF_1.085.woff2', format: 'woff2' }],
-      },
-    ],
-  },
   'Zed-Mono': {
     label: 'Zed Mono',
     family: 'Zed Mono',

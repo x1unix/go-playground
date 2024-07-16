@@ -16,6 +16,10 @@ export const DEMO_CODE = [
 
 // stateToOptions converts MonacoState to IEditorOptions
 export const stateToOptions = (state: MonacoSettings): monaco.editor.IEditorOptions => {
+  // fontSize here is intentionally ignored as monaco-editor starts to infinitly change
+  // font size to random values for unknown reason.
+  //
+  // Font size apply moved to componentDidMount.
   const {
     selectOnLineNumbers,
     mouseWheelZoom,
