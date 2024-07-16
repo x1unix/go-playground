@@ -45,6 +45,11 @@
       "description": "Added third-party libraries support for WebAssembly."
     },
     {
+      "issueId": 379,
+      "url": "pull/379",
+      "description": "Use WASM automatically based on Go build tags."
+    },
+    {
       "issueId": 349,
       "url": "pull/349",
       "description": "Yaegi Go interpreter was removed."
