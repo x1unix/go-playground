@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo, useEffect, useRef } from 'react'
 import {
   Stack,
   IconButton,
@@ -7,10 +7,10 @@ import {
   DefaultButton,
   PrimaryButton,
   useTheme,
+  MotionTimings,
 } from '@fluentui/react'
 import { FontIcon } from '@fluentui/react/lib/Icon'
-
-import './Notification.css'
+import { getContentStyles } from './styles'
 
 export enum NotificationType {
   None = '',
@@ -38,8 +38,10 @@ export interface NotificationProps {
   title: string
   description?: string
   canDismiss?: boolean
+  hidden?: boolean
   progress?: ProgressState
   onClose?: () => void
+  onClosed?: () => void
   actions?: NotificationAction[]
 }
 
@@ -76,49 +78,75 @@ export const Notification: React.FunctionComponent<NotificationProps> = ({
   id,
   title,
   progress,
+  hidden,
+  actions,
   description,
   canDismiss = true,
   type = NotificationType.Info,
   onClose,
-  actions,
+  onClosed,
 }) => {
-  const { semanticColors, fonts, ...theme } = useTheme()
+  const elementRef = useRef<HTMLDivElement | null>(null)
+  const theme = useTheme()
+  const styles = useMemo(() => getContentStyles(theme), [theme])
+
+  useEffect(() => {
+    const { current: elem } = elementRef
+    if (!hidden || !elem) {
+      return
+    }
+
+    // Animate element swipe out + shrink space around.
+    // Height should be extracted from JS until "calc-size" is not available.
+    const height = elem.clientHeight
+    const animation = elem.animate(
+      [
+        {
+          opacity: '1',
+          maxHeight: `${height}px`,
+          offset: 0,
+        },
+        {
+          opacity: '0.5',
+          transform: 'translate3d(120%, 0, 0)',
+          maxHeight: `${height}px`,
+          offset: 0.5,
+        },
+        {
+          opacity: '0',
+          transform: 'translate3d(120%, 0, 0)',
+          maxHeight: '0',
+          offset: 1.0,
+        },
+      ],
+      { duration: 100, fill: 'forwards', easing: MotionTimings.standard },
+    )
+
+    animation.onfinish = () => onClosed?.()
+    animation.play()
+  }, [hidden, elementRef, onClosed])
   return (
-    <div
-      className="Notification"
-      data-notification-id={id}
-      style={{
-        background: semanticColors.bodyStandoutBackground,
-        boxShadow: theme.effects.elevation16,
-        fontSize: fonts.medium.fontSize,
-      }}
-    >
-      <div className="Notification__Header">
+    <div ref={elementRef} className={styles.root}>
+      <div className={styles.header}>
         <FontIcon
-          className="Notification__Icon"
+          className={styles.icon}
           iconName={statusIconMapping[type]}
           style={{
-            color: semanticColors[iconColorPaletteMap[type]],
-            fontSize: fonts.medium.fontSize,
+            color: theme.semanticColors[iconColorPaletteMap[type]],
           }}
         />
         <span className="Notification__Title">{title}</span>
-        <div className="Notification__Controls">
+        <div className={styles.controls}>
           {canDismiss && (
             <IconButton
               title="Close"
               ariaLabel="Close notification"
               onClick={onClose}
-              style={{
-                color: 'inherit',
-                width: 'auto',
-                height: 'auto',
-                padding: 0,
-              }}
+              className={styles.close}
               iconProps={{
                 iconName: 'ChromeClose',
                 style: {
-                  fontSize: fonts.xSmall.fontSize,
+                  fontSize: theme.fonts.xSmall.fontSize,
                 },
               }}
             />
@@ -126,10 +154,10 @@ export const Notification: React.FunctionComponent<NotificationProps> = ({
         </div>
       </div>
       {(description || progress) && (
-        <div className="Notification__Container">
+        <div className={styles.container}>
           {description && <div className="Notification__Content">{description}</div>}
           {progress && (
-            <div className="Notification__Progress">
+            <div className={styles.progress}>
               <ProgressIndicator percentComplete={getPercentComplete(progress)} />
             </div>
           )}

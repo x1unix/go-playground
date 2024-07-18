@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { type StateDispatch, type State } from '~/store'
-import { type NotificationsState, newRemoveNotificationAction } from '~/store/notifications'
+import { type NotificationsState, newDestroyNotification, newRemoveNotificationAction } from '~/store/notifications'
 import { Notification } from './Notification'
 import './NotificationHost.css'
 
@@ -21,6 +21,7 @@ const NotificationHostBase: React.FunctionComponent<Props> = ({ notifications, d
               onClose={() => {
                 dispatch?.(newRemoveNotificationAction(key))
               }}
+              onClosed={() => dispatch?.(newDestroyNotification(key))}
             />
           ))
         : null}
