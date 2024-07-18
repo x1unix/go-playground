@@ -65,8 +65,9 @@ const getPercentComplete = (progress: NotificationProps['progress']): number | u
   }
 
   const { current, total } = progress
-  const percentage = (current! * 100) / total!
-  return percentage / 100
+  const percent = current! / total!
+  console.log(percent)
+  return percent
 }
 
 const NotificationActionButton: React.FC<Omit<NotificationAction, 'key'>> = ({ label, primary, onClick }) => {
@@ -125,6 +126,7 @@ export const Notification: React.FunctionComponent<NotificationProps> = ({
     animation.onfinish = () => onClosed?.()
     animation.play()
   }, [hidden, elementRef, onClosed])
+
   return (
     <div ref={elementRef} className={styles.root}>
       <div className={styles.header}>
