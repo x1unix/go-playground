@@ -112,20 +112,27 @@ const fetchWasmWithProgress = async (dispatch: DispatchFn, fileName: string) => 
       }),
     )
 
+    let prevRafID = -1
     const rsp = await client.getArtifact(fileName)
     const rspWithProgress = wrapResponseWithProgress(rsp, ({ totalBytes, currentBytes }) => {
-      dispatch(
-        newAddNotificationAction({
-          id: NotificationIDs.WASMAppDownload,
-          type: NotificationType.Info,
-          title: 'Downloading compiled application',
-          canDismiss: false,
-          progress: {
-            total: totalBytes,
-            current: currentBytes,
-          },
-        }),
-      )
+      // We want to limit number of emitted events to avoid dozens of re-renders on React side.
+      // If renders are too frequent, most of render queries will be dropped.
+      // This results in empty progress bar.
+      cancelAnimationFrame(prevRafID)
+      prevRafID = requestAnimationFrame(() => {
+        dispatch(
+          newAddNotificationAction({
+            id: NotificationIDs.WASMAppDownload,
+            type: NotificationType.Info,
+            title: 'Downloading compiled application',
+            canDismiss: false,
+            progress: {
+              total: totalBytes,
+              current: currentBytes,
+            },
+          }),
+        )
+      })
     })
 
     return await instantiateStreaming(rspWithProgress, getImportObject())
