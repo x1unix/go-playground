@@ -11,6 +11,7 @@ export interface Notification {
   title: string
   description?: string
   canDismiss?: boolean
+  hidden?: boolean
   progress?: {
     indeterminate?: boolean
     total?: number

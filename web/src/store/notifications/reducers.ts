@@ -1,6 +1,6 @@
 import { mapByAction } from '../helpers'
-import { type Action } from '../actions'
-import { type Notification, type NotificationsState } from './state'
+import type { Action } from '../actions'
+import type { Notification, NotificationsState } from './state'
 import { ActionType } from './actions'
 
 const reducers = mapByAction<NotificationsState>(
@@ -13,9 +13,18 @@ const reducers = mapByAction<NotificationsState>(
       ...s,
       ...Object.fromEntries(payload.map((n) => [n.id, n])),
     }),
-    [ActionType.REMOVE_NOTIFICATION]: (s: NotificationsState, { payload }: Action<string>) => {
+    [ActionType.REMOVE_NOTIFICATION]: (s: NotificationsState, { payload: id }: Action<string>) => {
+      if (!s[id]) {
+        return s
+      }
+
       const newNotifications = { ...s }
-      delete newNotifications[payload]
+      newNotifications[id].hidden = true
+      return newNotifications
+    },
+    [ActionType.DESTROY_NOTIFICATION]: (s: NotificationsState, { payload: id }: Action<string>) => {
+      const newNotifications = { ...s }
+      delete newNotifications[id]
       return newNotifications
     },
   },
