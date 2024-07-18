@@ -66,7 +66,6 @@ const getPercentComplete = (progress: NotificationProps['progress']): number | u
 
   const { current, total } = progress
   const percent = current! / total!
-  console.log(percent)
   return percent
 }
 
