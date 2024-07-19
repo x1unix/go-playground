@@ -9,37 +9,15 @@ import {
   useTheme,
 } from '@fluentui/react'
 import { FontIcon } from '@fluentui/react/lib/Icon'
+import {
+  type Notification as NotificationModel,
+  type NotificationAction,
+  NotificationType,
+} from '~/store/notifications'
 
 import './Notification.css'
 
-export enum NotificationType {
-  None = '',
-  Info = 'info',
-  Warning = 'warning',
-  Error = 'error',
-}
-
-interface ProgressState {
-  indeterminate?: boolean
-  total?: number
-  current?: number
-}
-
-interface NotificationAction {
-  label: string
-  key: string
-  primary?: boolean
-  onClick?: () => void
-}
-
-export interface NotificationProps {
-  id: string
-  type?: NotificationType
-  title: string
-  description?: string
-  canDismiss?: boolean
-  progress?: ProgressState
-  actions?: NotificationAction[]
+export interface NotificationProps extends NotificationModel {
   onDismiss?: (id: string) => void
   onDismissed?: (id: string) => void
 }
@@ -58,13 +36,18 @@ const statusIconMapping: { [k in NotificationType]: string } = {
   [NotificationType.None]: 'info',
 }
 
+/**
+ * Computes current progress percentage and returns float value between 0 and 1.
+ *
+ * Returns undefined if there is no progress data available.
+ */
 const getPercentComplete = (progress: NotificationProps['progress']): number | undefined => {
   if (!progress || progress?.indeterminate) {
     return
   }
 
   const { current, total } = progress
-  return (current! * 100) / total!
+  return current! / total!
 }
 
 const NotificationActionButton: React.FC<Omit<NotificationAction, 'key'>> = ({ label, primary, onClick }) => {

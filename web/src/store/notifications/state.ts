@@ -5,6 +5,28 @@ export enum NotificationType {
   Error = 'error',
 }
 
+export interface NotificationAction {
+  /**
+   * Button label.
+   */
+  label: string
+
+  /**
+   * Button unique key.
+   */
+  key: string
+
+  /**
+   * Whether action is primary.
+   */
+  primary?: boolean
+
+  /**
+   * Click event handler.
+   */
+  onClick?: () => void
+}
+
 export interface Notification {
   /**
    * Unique notification ID.
@@ -73,27 +95,7 @@ export interface Notification {
   /**
    * List of action buttons to show in a pop-up.
    */
-  actions?: Array<{
-    /**
-     * Button label.
-     */
-    label: string
-
-    /**
-     * Button unique key.
-     */
-    key: string
-
-    /**
-     * Whether action is primary.
-     */
-    primary?: boolean
-
-    /**
-     * Click event handler.
-     */
-    onClick?: () => void
-  }>
+  actions?: NotificationAction[]
 }
 
 export type NotificationsState = Record<string, Notification>
