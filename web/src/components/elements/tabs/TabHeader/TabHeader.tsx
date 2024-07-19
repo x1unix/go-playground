@@ -54,6 +54,7 @@ export const TabHeader: React.FC<Props> = ({
     }
   }, [semanticColors])
 
+  const isTouchDevice = navigator.maxTouchPoints > 0
   const cmdToolbarStyles: IStackStyles = {
     root: {
       display: 'flex',
@@ -61,7 +62,7 @@ export const TabHeader: React.FC<Props> = ({
   }
 
   return (
-    <FocusZone style={{ flex: 1 }}>
+    <FocusZone disabled={isTouchDevice} style={{ flex: 1 }}>
       <Stack
         grow
         horizontal

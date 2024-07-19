@@ -103,7 +103,7 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
   const iconStyle = active ? icon?.active : icon?.inactive
 
   // onAuxClick doesn't work in Chrome, so only way to capture it is onMouseUp/Down.
-  const handleClick: React.MouseEventHandler = (e) => {
+  const handleClick: React.MouseEventHandler<HTMLElement> = (e) => {
     switch (e.button) {
       case BUTTON_PRIMARY:
         onClick?.()
@@ -114,11 +114,7 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
     }
   }
 
-  const handleTouch: React.TouchEventHandler = (e) => {
-    onClick?.()
-  }
-
-  const handleClose = useCallback(
+  const handleClose: React.MouseEventHandler<HTMLElement> = useCallback(
     (e) => {
       e.stopPropagation()
       onClose?.()
@@ -135,7 +131,6 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
       verticalAlign="center"
       styles={containerStyles}
       onMouseUp={handleClick}
-      onTouchEnd={handleTouch}
       title={label}
       aria-label={label}
       data-is-focusable
@@ -162,11 +157,7 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
             disabled={disabled}
             iconProps={{ iconName: 'Cancel' }}
             styles={btnStyles}
-            onClick={handleClose}
-            onTouchEnd={(e) => {
-              e.stopPropagation()
-              onClose?.()
-            }}
+            onMouseUp={handleClose}
           />
         </Stack.Item>
       ) : null}
