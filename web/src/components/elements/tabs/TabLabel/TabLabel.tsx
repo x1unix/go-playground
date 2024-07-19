@@ -36,6 +36,7 @@ interface Props {
 
 export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, onClose, canClose, icon }) => {
   const theme = useTheme()
+  const isTouchDevice = navigator.maxTouchPoints > 0
 
   const containerStyles: IStackStyles = useMemo(() => {
     const { palette, semanticColors } = theme
@@ -84,7 +85,7 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
         lineHeight: 'auto',
         fontSize: FontSizes.smallPlus,
         color: 'inherit',
-        opacity: active ? '1' : '0',
+        opacity: isTouchDevice || active ? '1' : '0',
         ':focus': {
           opacity: '1',
         },
@@ -97,12 +98,12 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
         color: 'inherit',
       },
     }
-  }, [active])
+  }, [active, isTouchDevice])
 
   const iconStyle = active ? icon?.active : icon?.inactive
 
   // onAuxClick doesn't work in Chrome, so only way to capture it is onMouseUp/Down.
-  const handleClick: React.MouseEventHandler = (e) => {
+  const handleClick: React.MouseEventHandler<HTMLElement> = (e) => {
     switch (e.button) {
       case BUTTON_PRIMARY:
         onClick?.()
@@ -113,7 +114,7 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
     }
   }
 
-  const handleClose = useCallback(
+  const handleClose: React.MouseEventHandler<HTMLElement> = useCallback(
     (e) => {
       e.stopPropagation()
       onClose?.()
@@ -156,7 +157,7 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
             disabled={disabled}
             iconProps={{ iconName: 'Cancel' }}
             styles={btnStyles}
-            onClick={handleClose}
+            onMouseUp={handleClose}
           />
         </Stack.Item>
       ) : null}
