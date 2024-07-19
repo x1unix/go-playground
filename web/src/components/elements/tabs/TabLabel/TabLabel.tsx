@@ -36,6 +36,7 @@ interface Props {
 
 export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, onClose, canClose, icon }) => {
   const theme = useTheme()
+  const isTouchDevice = navigator.maxTouchPoints > 0
 
   const containerStyles: IStackStyles = useMemo(() => {
     const { palette, semanticColors } = theme
@@ -84,7 +85,7 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
         lineHeight: 'auto',
         fontSize: FontSizes.smallPlus,
         color: 'inherit',
-        opacity: active ? '1' : '0',
+        opacity: isTouchDevice || active ? '1' : '0',
         ':focus': {
           opacity: '1',
         },
@@ -97,7 +98,7 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
         color: 'inherit',
       },
     }
-  }, [active])
+  }, [active, isTouchDevice])
 
   const iconStyle = active ? icon?.active : icon?.inactive
 
@@ -111,6 +112,10 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
         onClose?.()
         break
     }
+  }
+
+  const handleTouch: React.TouchEventHandler = (e) => {
+    onClick?.()
   }
 
   const handleClose = useCallback(
@@ -130,6 +135,7 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
       verticalAlign="center"
       styles={containerStyles}
       onMouseUp={handleClick}
+      onTouchEnd={handleTouch}
       title={label}
       aria-label={label}
       data-is-focusable
@@ -157,6 +163,10 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
             iconProps={{ iconName: 'Cancel' }}
             styles={btnStyles}
             onClick={handleClose}
+            onTouchEnd={(e) => {
+              e.stopPropagation()
+              onClose?.()
+            }}
           />
         </Stack.Item>
       ) : null}
