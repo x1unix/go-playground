@@ -226,7 +226,7 @@ export const Console: React.FC<Props> = ({ fontFamily, fontSize, status, backend
   }, [terminal?.textarea, setIsFocused])
 
   return (
-    <div className="app-Console">
+    <div className="app-Console" style={{ '--terminal-bg': theme.background } as any}>
       <CopyButton hidden={!isFocused} onClick={copySelection} />
       <XTerm
         ref={xtermRef}

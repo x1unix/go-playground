@@ -11,6 +11,11 @@
   inset: 0;
 }
 
+/** Fix white background in viewport **/
+.app-Console__xterm .xterm-screen {
+  background: var(--terminal-bg);
+}
+
 .app-Console .terminal > * {
   padding: 0 var(--terminal-padding-x);
 }
