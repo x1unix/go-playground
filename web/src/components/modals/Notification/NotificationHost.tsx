@@ -1,16 +1,28 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { type StateDispatch, type State } from '~/store'
-import { type NotificationsState, newRemoveNotificationAction } from '~/store/notifications'
+import React, { useCallback } from 'react'
+import { type StateDispatch, connect } from '~/store'
+import {
+  type NotificationsState,
+  newDeleteRemovedNotificationAction,
+  newRemoveNotificationAction,
+} from '~/store/notifications'
 import { Notification } from './Notification'
 import './NotificationHost.css'
 
-interface Props {
+interface StateProps {
   notifications?: NotificationsState
-  dispatch?: StateDispatch
 }
 
+interface Props extends StateProps {
+  dispatch: StateDispatch
+}
+
+/**
+ * Component responsible for hosting and displaying notifications from store.
+ */
 const NotificationHostBase: React.FunctionComponent<Props> = ({ notifications, dispatch }) => {
+  const dismissNotification = useCallback((id: string) => dispatch(newRemoveNotificationAction(id)), [dispatch])
+  const deleteNotification = useCallback((id: string) => dispatch(newDeleteRemovedNotificationAction(id)), [dispatch])
+
   return (
     <div className="NotificationHost">
       {notifications
@@ -18,9 +30,8 @@ const NotificationHostBase: React.FunctionComponent<Props> = ({ notifications, d
             <Notification
               {...notification}
               key={key}
-              onClose={() => {
-                dispatch?.(newRemoveNotificationAction(key))
-              }}
+              onDismiss={dismissNotification}
+              onDismissed={deleteNotification}
             />
           ))
         : null}
@@ -28,6 +39,6 @@ const NotificationHostBase: React.FunctionComponent<Props> = ({ notifications, d
   )
 }
 
-export const NotificationHost = connect<Props, any, any, State>(({ notifications }) => ({ notifications }))(
+export const NotificationHost = connect<StateProps, {}>(({ notifications }) => ({ notifications }))(
   NotificationHostBase,
 )

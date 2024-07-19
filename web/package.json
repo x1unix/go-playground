@@ -82,7 +82,7 @@
     "workbox-streams": "^6.5.4"
   },
   "scripts": {
-    "start": "npx vite",
+    "start": "npx vite --host",
     "build": "npx vite build",
     "serve": "npx vite preview",
     "lint": "npx eslint .",

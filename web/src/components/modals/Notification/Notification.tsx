@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import {
   Stack,
   IconButton,
@@ -7,40 +7,20 @@ import {
   DefaultButton,
   PrimaryButton,
   useTheme,
+  MotionTimings,
 } from '@fluentui/react'
 import { FontIcon } from '@fluentui/react/lib/Icon'
+import {
+  type Notification as NotificationModel,
+  type NotificationAction,
+  NotificationType,
+} from '~/store/notifications'
 
 import './Notification.css'
 
-export enum NotificationType {
-  None = '',
-  Info = 'info',
-  Warning = 'warning',
-  Error = 'error',
-}
-
-interface ProgressState {
-  indeterminate?: boolean
-  total?: number
-  current?: number
-}
-
-interface NotificationAction {
-  label: string
-  key: string
-  primary?: boolean
-  onClick?: () => void
-}
-
-export interface NotificationProps {
-  id: number | string
-  type?: NotificationType
-  title: string
-  description?: string
-  canDismiss?: boolean
-  progress?: ProgressState
-  onClose?: () => void
-  actions?: NotificationAction[]
+export interface NotificationProps extends NotificationModel {
+  onDismiss?: (id: string) => void
+  onDismissed?: (id: string) => void
 }
 
 const iconColorPaletteMap: { [k in NotificationType]: keyof ISemanticColors } = {
@@ -57,14 +37,18 @@ const statusIconMapping: { [k in NotificationType]: string } = {
   [NotificationType.None]: 'info',
 }
 
+/**
+ * Computes current progress percentage and returns float value between 0 and 1.
+ *
+ * Returns undefined if there is no progress data available.
+ */
 const getPercentComplete = (progress: NotificationProps['progress']): number | undefined => {
   if (!progress || progress?.indeterminate) {
     return
   }
 
   const { current, total } = progress
-  const percentage = (current! * 100) / total!
-  return percentage / 100
+  return current! / total!
 }
 
 const NotificationActionButton: React.FC<Omit<NotificationAction, 'key'>> = ({ label, primary, onClick }) => {
@@ -79,12 +63,52 @@ export const Notification: React.FunctionComponent<NotificationProps> = ({
   description,
   canDismiss = true,
   type = NotificationType.Info,
-  onClose,
   actions,
+  dismissed,
+  onDismiss,
+  onDismissed,
 }) => {
+  const elementRef = useRef<HTMLDivElement | null>(null)
   const { semanticColors, fonts, ...theme } = useTheme()
+
+  useEffect(() => {
+    const { current: elem } = elementRef
+    if (!dismissed || !elem) {
+      return
+    }
+
+    // Animate element swipe out + shrink space around.
+    // Height should be extracted from JS until "calc-size" is not available.
+    const height = elem.clientHeight
+    const animation = elem.animate(
+      [
+        {
+          opacity: '1',
+          maxHeight: `${height}px`,
+          offset: 0,
+        },
+        {
+          opacity: '0.5',
+          transform: 'translate3d(120%, 0, 0)',
+          maxHeight: `${height}px`,
+          offset: 0.5,
+        },
+        {
+          opacity: '0',
+          transform: 'translate3d(120%, 0, 0)',
+          maxHeight: '0',
+          offset: 1.0,
+        },
+      ],
+      { duration: 200, fill: 'forwards', easing: MotionTimings.standard },
+    )
+
+    animation.onfinish = () => onDismissed?.(id)
+    animation.play()
+  }, [id, dismissed, elementRef, onDismissed])
   return (
     <div
+      ref={elementRef}
       className="Notification"
       data-notification-id={id}
       style={{
@@ -108,7 +132,7 @@ export const Notification: React.FunctionComponent<NotificationProps> = ({
             <IconButton
               title="Close"
               ariaLabel="Close notification"
-              onClick={onClose}
+              onClick={() => onDismiss?.(id)}
               style={{
                 color: 'inherit',
                 width: 'auto',
@@ -143,7 +167,7 @@ export const Notification: React.FunctionComponent<NotificationProps> = ({
               key={key}
               onClick={() => {
                 onClick?.()
-                onClose?.()
+                onDismiss?.(id)
               }}
             />
           ))}
