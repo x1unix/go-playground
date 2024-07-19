@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import {
   Stack,
   IconButton,
@@ -7,6 +7,7 @@ import {
   DefaultButton,
   PrimaryButton,
   useTheme,
+  MotionTimings,
 } from '@fluentui/react'
 import { FontIcon } from '@fluentui/react/lib/Icon'
 import {
@@ -67,9 +68,47 @@ export const Notification: React.FunctionComponent<NotificationProps> = ({
   onDismiss,
   onDismissed,
 }) => {
+  const elementRef = useRef<HTMLDivElement | null>(null)
   const { semanticColors, fonts, ...theme } = useTheme()
+
+  useEffect(() => {
+    const { current: elem } = elementRef
+    if (!dismissed || !elem) {
+      return
+    }
+
+    // Animate element swipe out + shrink space around.
+    // Height should be extracted from JS until "calc-size" is not available.
+    const height = elem.clientHeight
+    const animation = elem.animate(
+      [
+        {
+          opacity: '1',
+          maxHeight: `${height}px`,
+          offset: 0,
+        },
+        {
+          opacity: '0.5',
+          transform: 'translate3d(120%, 0, 0)',
+          maxHeight: `${height}px`,
+          offset: 0.5,
+        },
+        {
+          opacity: '0',
+          transform: 'translate3d(120%, 0, 0)',
+          maxHeight: '0',
+          offset: 1.0,
+        },
+      ],
+      { duration: 100, fill: 'forwards', easing: MotionTimings.standard },
+    )
+
+    animation.onfinish = () => onDismissed?.(id)
+    animation.play()
+  }, [id, dismissed, elementRef, onDismissed])
   return (
     <div
+      ref={elementRef}
       className="Notification"
       data-notification-id={id}
       style={{
