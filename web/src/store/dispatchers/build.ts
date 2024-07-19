@@ -121,16 +121,19 @@ const fetchWasmWithProgress = async (dispatch: DispatchFn, fileName: string) => 
       cancelAnimationFrame(prevRafID)
       prevRafID = requestAnimationFrame(() => {
         dispatch(
-          newAddNotificationAction({
-            id: NotificationIDs.WASMAppDownload,
-            type: NotificationType.Info,
-            title: 'Downloading compiled application',
-            canDismiss: false,
-            progress: {
-              total: totalBytes,
-              current: currentBytes,
+          newAddNotificationAction(
+            {
+              id: NotificationIDs.WASMAppDownload,
+              type: NotificationType.Info,
+              title: 'Downloading compiled application',
+              canDismiss: false,
+              progress: {
+                total: totalBytes,
+                current: currentBytes,
+              },
             },
-          }),
+            true,
+          ),
         )
       })
     })
