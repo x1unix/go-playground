@@ -33,14 +33,15 @@ interface NotificationAction {
 }
 
 export interface NotificationProps {
-  id: number | string
+  id: string
   type?: NotificationType
   title: string
   description?: string
   canDismiss?: boolean
   progress?: ProgressState
-  onClose?: () => void
   actions?: NotificationAction[]
+  onDismiss?: (id: string) => void
+  onDismissed?: (id: string) => void
 }
 
 const iconColorPaletteMap: { [k in NotificationType]: keyof ISemanticColors } = {
@@ -79,8 +80,9 @@ export const Notification: React.FunctionComponent<NotificationProps> = ({
   description,
   canDismiss = true,
   type = NotificationType.Info,
-  onClose,
   actions,
+  onDismiss,
+  onDismissed,
 }) => {
   const { semanticColors, fonts, ...theme } = useTheme()
   return (
@@ -108,7 +110,7 @@ export const Notification: React.FunctionComponent<NotificationProps> = ({
             <IconButton
               title="Close"
               ariaLabel="Close notification"
-              onClick={onClose}
+              onClick={() => onDismiss?.(id)}
               style={{
                 color: 'inherit',
                 width: 'auto',
@@ -143,7 +145,7 @@ export const Notification: React.FunctionComponent<NotificationProps> = ({
               key={key}
               onClick={() => {
                 onClick?.()
-                onClose?.()
+                onDismiss?.(id)
               }}
             />
           ))}

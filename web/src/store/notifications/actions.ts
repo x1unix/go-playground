@@ -1,4 +1,4 @@
-import { type Notification } from './state'
+import type { Notification } from './state'
 
 export enum ActionType {
   NEW_NOTIFICATION = 'NEW_NOTIFICATION',
