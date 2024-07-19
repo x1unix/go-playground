@@ -100,7 +100,7 @@ export const Notification: React.FunctionComponent<NotificationProps> = ({
           offset: 1.0,
         },
       ],
-      { duration: 100, fill: 'forwards', easing: MotionTimings.standard },
+      { duration: 200, fill: 'forwards', easing: MotionTimings.standard },
     )
 
     animation.onfinish = () => onDismissed?.(id)
