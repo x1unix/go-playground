@@ -64,7 +64,7 @@ export interface Notification {
    *
    * Used to play notification hide animation before removing an element from state.
    */
-  removed?: boolean
+  dismissed?: boolean
 
   /**
    * Progress bar information.

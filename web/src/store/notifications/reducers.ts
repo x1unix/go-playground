@@ -26,7 +26,7 @@ const reducers = mapByAction<NotificationsState>(
       }
 
       const newNotifications = { ...s }
-      newNotifications[id].removed = true
+      newNotifications[id].dismissed = true
       return newNotifications
     },
     [ActionType.DELETE_REMOVED_NOTIFICATION]: (s: NotificationsState, { payload }: Action<string>) => {

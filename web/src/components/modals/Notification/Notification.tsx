@@ -63,6 +63,7 @@ export const Notification: React.FunctionComponent<NotificationProps> = ({
   canDismiss = true,
   type = NotificationType.Info,
   actions,
+  dismissed,
   onDismiss,
   onDismissed,
 }) => {
