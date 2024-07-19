@@ -64,8 +64,7 @@ const getPercentComplete = (progress: NotificationProps['progress']): number | u
   }
 
   const { current, total } = progress
-  const percentage = (current! * 100) / total!
-  return percentage / 100
+  return (current! * 100) / total!
 }
 
 const NotificationActionButton: React.FC<Omit<NotificationAction, 'key'>> = ({ label, primary, onClick }) => {
