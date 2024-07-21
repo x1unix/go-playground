@@ -1,0 +1,14 @@
+version: '2'
+services:
+  playground:
+    # 'latest' used only for example purposes.
+    # It's strongly recommended to use a specific version (tag).
+    #
+    # Also, you can use image from GitHub Container Registry
+    #image: ghcr.io/x1unix/go-playground/go-playground:latest
+    image: x1unix/go-playground:latest
+    restart: unless-stopped
+    ports:
+      - 8000:8000
+    environment:
+      APP_CLEAN_INTERVAL: '30m'
