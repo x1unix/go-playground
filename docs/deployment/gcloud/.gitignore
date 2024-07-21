@@ -1,0 +1,13 @@
+# Temporary files
+.terraform
+*.backup
+*.tfstate
+
+# HCL vars except example
+*.tfvars
+!example.tfvars
+
+# Temporary plan options
+tplan
+tfplan
+*.tplan

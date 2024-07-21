@@ -11,7 +11,7 @@ Improved Go Playground powered by Monaco Editor and React - [https://goplay.tool
 
 🎉 **Check new upcoming features in latest beta at [beta.goplay.tools](https://beta.goplay.tools)**
 
-![alt text](docs/demo.gif)
+![alt text](docs/img/demo.gif)
 
 ## Features
 
@@ -26,24 +26,9 @@ Improved Go Playground powered by Monaco Editor and React - [https://goplay.tool
 
 And more !
 
-## Installation
+## Installation & deployment
 
-### Docker Container (recommended)
-
-Playground is available as Docker image in [Docker Hub](https://hub.docker.com/r/x1unix/go-playground) and [GitHub Container Registry](https://github.com/x1unix/go-playground/pkgs/container/go-playground%2Fgo-playground).
-
-See [wiki](https://github.com/x1unix/go-playground/wiki/Docker) for usage info.
-
-### Building from source
-
-Service can be built from source (**Go 1.21+** and **Node.js** required):
-
-```bash
-git clone https://github.com/x1unix/go-playground.git
-cd go-playground
-make
-sudo make install
-```
+Please check [deployment documentation](./docs/deployment/README.md).
 
 ### Third-party credits
 
@@ -59,8 +44,8 @@ Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) and [HACKING.md](HACKING.md) 
 
 <a href="https://gno.land/?from=goplay-tools" target="_blank">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="./docs/sponsors/gnoland-dark.svg" width="480">
-        <img alt="Gno.land logo" width="480" src="./docs/sponsors/gnoland-light.svg">
+        <source media="(prefers-color-scheme: dark)" srcset="./docs/img/sponsors/gnoland-dark.svg" width="480">
+        <img alt="Gno.land logo" width="480" src="./docs/img/sponsors/gnoland-light.svg">
     </picture>
 </a>
 
