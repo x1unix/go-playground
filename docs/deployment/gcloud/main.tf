@@ -102,13 +102,19 @@ resource "google_cloud_run_v2_service" "default" {
 
   traffic {
     percent = 100
+    type = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
   }
 }
 
-resource "google_project_iam_member" "run_invoker" {
-  project = var.project_id
-  role    = "roles/run.invoker"
-  member  = "allUsers"
+# Make service public.
+# See: https://cloud.google.com/run/docs/authenticating/public
+resource "google_cloud_run_service_iam_binding" "run_invoker" {
+  location = google_cloud_run_v2_service.default.location
+  service  = google_cloud_run_v2_service.default.name
+  role     = "roles/run.invoker"
+  members = [
+    "allUsers"
+  ]
 }
 
 output "url" {

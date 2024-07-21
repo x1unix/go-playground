@@ -1,5 +1,7 @@
 # Temporary files
 .terraform
+*.backup
+*.tfstate
 
 # HCL vars except example
 *.tfvars
