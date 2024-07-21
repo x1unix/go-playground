@@ -1,11 +1,16 @@
-provider "google" {
+# See: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_v2_service
+
+# Beta provider is required for "empty_dir" storage type.
+provider "google-beta" {
   project = var.project_id
   region  = var.region
 }
 
 resource "google_cloud_run_v2_service" "default" {
+  provider = google-beta
   name     = "gpg-${var.app_env}"
   location = var.region
+  launch_stage = "BETA"
 
   template {
     scaling {
@@ -24,10 +29,11 @@ resource "google_cloud_run_v2_service" "default" {
     containers {
       image = "x1unix/go-playground:${var.app_version}"
       ports {
+        name = "http1"
         container_port = 8000
       }
 
-      resources = {
+      resources {
         cpu_idle = true
         startup_cpu_boost = false
         limits = {
@@ -41,6 +47,7 @@ resource "google_cloud_run_v2_service" "default" {
         value = "console"
       }
 
+      # Disable cache cleanup for stateless containers.
       env {
         name = "APP_SKIP_MOD_CLEANUP"
         value = "1"
@@ -61,17 +68,18 @@ resource "google_cloud_run_v2_service" "default" {
         value = var.sentry_dsn
       }
 
-      env {
-        name = "APP_BUILD_DIR"
-        value = "/var/cache/wasm-builds"
-      }
-
       dynamic "env" {
         for_each = var.env_vars
         content {
-          key = env.key
+          name = env.key
           value = env.value
         }
+      }
+
+      # Use WASM build cache directory.
+      env {
+        name = "APP_BUILD_DIR"
+        value = "/var/cache/wasm-builds"
       }
 
       volume_mounts {
@@ -85,17 +93,15 @@ resource "google_cloud_run_v2_service" "default" {
           port = 8000
         }
         initial_delay_seconds = 10
-        period_seconds        = 10
-        timeout_seconds       = 5
-        success_threshold     = 1
-        failure_threshold     = 3
+        period_seconds = 10
+        timeout_seconds = 5
+        failure_threshold = 3
       }
     }
   }
 
   traffic {
-    percent         = 100
-    latest_revision = true
+    percent = 100
   }
 }
 
@@ -106,5 +112,5 @@ resource "google_project_iam_member" "run_invoker" {
 }
 
 output "url" {
-  value = google_cloud_run_v2_service.default.status[0].url
+  value = google_cloud_run_v2_service.default.uri
 }
