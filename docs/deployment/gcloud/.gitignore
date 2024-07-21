@@ -3,6 +3,9 @@
 *.backup
 *.tfstate
 
+# Lock file not needed for examples.
+.terraform.lock.hcl
+
 # HCL vars except example
 *.tfvars
 !example.tfvars

@@ -1,4 +1,4 @@
-# See: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_v2_service
+# See: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_v2_service 
 
 # Beta provider is required for "empty_dir" storage type.
 provider "google-beta" {
@@ -109,6 +109,7 @@ resource "google_cloud_run_v2_service" "default" {
 # Make service public.
 # See: https://cloud.google.com/run/docs/authenticating/public
 resource "google_cloud_run_service_iam_binding" "run_invoker" {
+  project  = google_cloud_run_v2_service.default.project
   location = google_cloud_run_v2_service.default.location
   service  = google_cloud_run_v2_service.default.name
   role     = "roles/run.invoker"
