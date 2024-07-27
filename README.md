@@ -9,8 +9,6 @@
 
 Improved Go Playground powered by Monaco Editor and React - [https://goplay.tools/](https://goplay.tools)
 
-🎉 **Check new upcoming features in latest beta at [beta.goplay.tools](https://beta.goplay.tools)**
-
 ![alt text](docs/img/demo.gif)
 
 ## Features
