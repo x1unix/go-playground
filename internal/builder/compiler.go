@@ -87,6 +87,11 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Resu
 		return nil, err
 	}
 
+	// Go module is required to build project
+	if _, ok := files["go.mod"]; !ok {
+		files["go.mod"] = generateGoMod(defaultGoModName)
+	}
+
 	aid, err := storage.GetArtifactID(files)
 	if err != nil {
 		return nil, err
@@ -109,11 +114,6 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Resu
 		// Just return precompiled result if data is cached already
 		s.log.Debug("build cached, returning cached file", zap.Stringer("artifact", aid))
 		return result, nil
-	}
-
-	// Go module is required to build project
-	if _, ok := files["go.mod"]; !ok {
-		files["go.mod"] = generateGoMod(defaultGoModName)
 	}
 
 	workspace, err := s.storage.CreateWorkspace(aid, files)
