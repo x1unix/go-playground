@@ -13,3 +13,7 @@
 * Prepare Terraform plan using variables file: \
     `terraform plan -var-file="prod.tfvars" -out=tfplan`
 * Apply a plan using `terraform apply tfplan` command.
+
+## Configuration
+
+See environment variables section in [Docker](../docker/README.md) docs.

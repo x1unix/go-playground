@@ -21,7 +21,7 @@ docker-compose ps
 Playground server can be configured using environment variables described below.
 
 | Environment Variable   | Example                        | Description                                                    |
-| ---------------------- | ------------------------------ | -------------------------------------------------------------- |
+|------------------------|--------------------------------|----------------------------------------------------------------|
 | `GOROOT`               | `/usr/local/go`                | Go root location. Uses `go env GOROOT` as fallback.            |
 | `APP_DEBUG`            | `false`                        | Enables debug logging.                                         |
 | `APP_PLAYGROUND_URL`   | `https://play.golang.org`      | Official Go playground service URL.                            |
@@ -30,6 +30,9 @@ Playground server can be configured using environment variables described below.
 | `APP_CLEAN_INTERVAL`   | `10m`                          | WebAssembly build files cache cleanup interval.                |
 | `APP_SKIP_MOD_CLEANUP` | `1`                            | Disables WASM builds cache cleanup.                            |
 | `APP_PERMIT_ENV_VARS`  | `GOSUMDB,GOPROXY`              | Restricts list of environment variables passed to Go compiler. |
+| `HTTP_READ_TIMEOUT`    | `15s`                          | HTTP request read timeout.                                     |
+| `HTTP_WRITE_TIMEOUT`   | `60s`                          | HTTP response timeout.                                         |
+| `HTTP_IDLE_TIMEOUT`    | `90s`                          | HTTP keep alive timeout.                                       |
 
 ## Building custom image
 
