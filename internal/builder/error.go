@@ -1,6 +1,8 @@
 package builder
 
 import (
+	"bytes"
+	"context"
 	"errors"
 	"fmt"
 )
@@ -30,4 +32,38 @@ func IsBuildError(err error) bool {
 
 	dst := new(BuildError)
 	return errors.As(err, &dst)
+}
+
+func checkContextErrors(err error) (error, bool) {
+	if err == nil {
+		return nil, false
+	}
+
+	if errors.Is(err, context.Canceled) {
+		return err, true
+	}
+
+	if errors.Is(err, context.DeadlineExceeded) {
+		return newBuildError("Go program build timeout exceeded"), true
+	}
+
+	return nil, false
+}
+
+func formatBuildError(ctx context.Context, err error, buff *bytes.Buffer) error {
+	if buff.Len() > 0 {
+		return newBuildError(buff.String())
+	}
+
+	newErr, ok := checkContextErrors(err)
+	if ok {
+		return newErr
+	}
+
+	newErr, ok = checkContextErrors(ctx.Err())
+	if ok {
+		return newErr
+	}
+
+	return newBuildError("Build process returned an error: %s", err)
 }

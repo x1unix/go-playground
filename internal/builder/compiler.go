@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"syscall"
 	"time"
 
@@ -182,7 +181,7 @@ func (s BuildService) runGoTool(ctx context.Context, workDir string, args ...str
 			zap.Error(err), zap.Strings("cmd", cmd.Args), zap.Stringer("stderr", buff),
 		)
 
-		return formatBuildError(err, buff)
+		return formatBuildError(ctx, err, buff)
 	}
 
 	return nil
@@ -212,39 +211,4 @@ func (s BuildService) Clean(ctx context.Context) error {
 	}
 
 	return nil
-}
-
-func formatBuildError(err error, buff *bytes.Buffer) error {
-	if buff.Len() > 0 {
-		return newBuildError(buff.String())
-	}
-
-	if errors.Is(err, context.Canceled) {
-		return err
-	}
-
-	if errors.Is(err, context.DeadlineExceeded) {
-		return newBuildError("Program build timeout exceeded")
-	}
-
-	return formatExitError(err)
-}
-
-func formatExitError(err error) error {
-	exitErr := new(exec.ExitError)
-	if !errors.As(err, &exitErr) || exitErr.ProcessState == nil {
-		return newBuildError("Process returned an error: %s", err)
-	}
-
-	status, ok := exitErr.ProcessState.Sys().(syscall.WaitStatus)
-	if !ok {
-		return newBuildError("Process returned an error: %s", err)
-	}
-
-	switch {
-	case status.Signaled(), status.Stopped():
-		return newBuildError("Program build timeout exceeded, %s", exitErr.ProcessState.String())
-	default:
-		return newBuildError("Process returned an error: %s", err)
-	}
 }
