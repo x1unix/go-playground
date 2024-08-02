@@ -24,6 +24,8 @@ Playground server can be configured using environment variables described below.
 |------------------------|--------------------------------|----------------------------------------------------------------|
 | `GOROOT`               | `/usr/local/go`                | Go root location. Uses `go env GOROOT` as fallback.            |
 | `APP_DEBUG`            | `false`                        | Enables debug logging.                                         |
+| `APP_LOG_LEVEL`        | `info`                         | Logger log level. `debug` requires `APP_DEBUG` env var.        |
+| `APP_LOG_FORMAT`       | `console`, `json`              | Log format                                                     | 
 | `APP_PLAYGROUND_URL`   | `https://play.golang.org`      | Official Go playground service URL.                            |
 | `APP_GOTIP_URL`        | `https://gotipplay.golang.org` | GoTip playground service URL.                                  |
 | `APP_BUILD_DIR`        | `/var/cache/wasm`              | Path to store cached WebAssembly builds.                       |
@@ -45,13 +47,13 @@ make docker [...params]
 ### Required params
 
 | Parameter     | Description                |
-| ------------- | -------------------------- |
+|---------------|----------------------------|
 | `TAG`         | Image tag (version)        |
 | `DOCKER_USER` | Docker repository user     |
 | `DOCKER_PASS` | Docker repository password |
 
 ### Optional params
 
-| Parameter     | Defaults               | Description                |
-| ------------- | ---------------------- | -------------------------- |
-| `IMG_NAME`    | `x1unix/go-playground` | Image tag (version)        |
+| Parameter  | Defaults               | Description         |
+|------------|------------------------|---------------------|
+| `IMG_NAME` | `x1unix/go-playground` | Image tag (version) |
