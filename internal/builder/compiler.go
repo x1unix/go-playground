@@ -14,6 +14,9 @@ import (
 	"go.uber.org/zap"
 )
 
+// defaultGoModName is default module name that will be set if no go.mod provided.
+const defaultGoModName = "app"
+
 // predefinedBuildVars is list of environment vars which contain build values
 var predefinedBuildVars = osutil.EnvironmentVariables{
 	"CGO_ENABLED": "0",
@@ -110,7 +113,7 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Resu
 
 	// Go module is required to build project
 	if _, ok := files["go.mod"]; !ok {
-		files["go.mod"] = generateGoMod(aid.String())
+		files["go.mod"] = generateGoMod(defaultGoModName)
 	}
 
 	workspace, err := s.storage.CreateWorkspace(aid, files)
