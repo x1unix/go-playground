@@ -12,12 +12,27 @@ import (
 	"github.com/x1unix/go-playground/pkg/util/cmdutil"
 )
 
+const (
+	DefaultWriteTimeout = 60 * time.Second
+	DefaultReadTimeout  = 15 * time.Second
+	DefaultIdleTimeout  = 90 * time.Second
+)
+
 type HTTPConfig struct {
 	// Addr is HTTP server listen address
 	Addr string `envconfig:"APP_HTTP_ADDR" json:"addr"`
 
 	// AssetsDir is directory which contains frontend assets
 	AssetsDir string `envconfig:"APP_ASSETS_DIR" json:"assetsDir"`
+
+	// WriteTimeout is HTTP response write timeout.
+	WriteTimeout time.Duration `envconfig:"HTTP_WRITE_TIMEOUT"`
+
+	// ReadTimeout is HTTP request read timeout.
+	ReadTimeout time.Duration `envconfig:"HTTP_READ_TIMEOUT"`
+
+	// IdleTimeout is delay timeout between requests to keep connection alive.
+	IdleTimeout time.Duration `envconfig:"HTTP_IDLE_TIMEOUT"`
 }
 
 func (cfg *HTTPConfig) mountFlagSet(f *flag.FlagSet) {
@@ -28,6 +43,9 @@ func (cfg *HTTPConfig) mountFlagSet(f *flag.FlagSet) {
 
 	f.StringVar(&cfg.Addr, "addr", ":8080", "TCP Listen address")
 	f.StringVar(&cfg.AssetsDir, "static-dir", filepath.Join(wd, "public"), "Path to web page assets (HTML, JS, etc)")
+	f.DurationVar(&cfg.WriteTimeout, "http-write-timeout", DefaultWriteTimeout, "HTTP response write timeout")
+	f.DurationVar(&cfg.ReadTimeout, "http-read-timeout", DefaultReadTimeout, "HTTP request read timeout")
+	f.DurationVar(&cfg.IdleTimeout, "http-idle-timeout", DefaultIdleTimeout, "HTTP keep alive timeout")
 }
 
 type PlaygroundConfig struct {

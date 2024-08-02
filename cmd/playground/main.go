@@ -119,9 +119,9 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 	srv := &http.Server{
 		Addr:         cfg.HTTP.Addr,
 		Handler:      r,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  15 * time.Second,
+		ReadTimeout:  cfg.HTTP.ReadTimeout,
+		WriteTimeout: cfg.HTTP.WriteTimeout,
+		IdleTimeout:  cfg.HTTP.IdleTimeout,
 	}
 
 	if err := startHttpServer(ctx, wg, srv); err != nil {

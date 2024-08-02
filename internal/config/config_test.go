@@ -12,8 +12,11 @@ import (
 func TestFromFlags(t *testing.T) {
 	expect := Config{
 		HTTP: HTTPConfig{
-			Addr:      "testaddr",
-			AssetsDir: "testdir",
+			Addr:         "testaddr",
+			AssetsDir:    "testdir",
+			ReadTimeout:  7 * time.Second,
+			WriteTimeout: 6 * time.Second,
+			IdleTimeout:  3 * time.Second,
 		},
 		Playground: PlaygroundConfig{
 			PlaygroundURL:  "pgurl",
@@ -54,6 +57,9 @@ func TestFromFlags(t *testing.T) {
 		"-sentry-dsn=testdsn",
 		"-sentry-breadcrumbs=1",
 		"-skip-mod-clean",
+		"-http-read-timeout=7s",
+		"-http-write-timeout=6s",
+		"-http-idle-timeout=3s",
 	}
 
 	fl := flag.NewFlagSet("app", flag.PanicOnError)
@@ -96,8 +102,11 @@ func TestFromEnv(t *testing.T) {
 		"process environment variables": {
 			expect: Config{
 				HTTP: HTTPConfig{
-					Addr:      "testaddr",
-					AssetsDir: "testdir",
+					Addr:         "testaddr",
+					AssetsDir:    "testdir",
+					ReadTimeout:  21 * time.Second,
+					WriteTimeout: 22 * time.Second,
+					IdleTimeout:  23 * time.Second,
 				},
 				Playground: PlaygroundConfig{
 					PlaygroundURL:  "pgurl",
@@ -139,6 +148,9 @@ func TestFromEnv(t *testing.T) {
 				"SENTRY_DSN":              "testdsn",
 				"SENTRY_USE_BREADCRUMBS":  "1",
 				"SENTRY_BREADCRUMB_LEVEL": "debug",
+				"HTTP_READ_TIMEOUT":       "21s",
+				"HTTP_WRITE_TIMEOUT":      "22s",
+				"HTTP_IDLE_TIMEOUT":       "23s",
 			},
 		},
 	}

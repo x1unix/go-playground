@@ -34,3 +34,7 @@ Check if service is running:
 ```shell
 systemctl status better-go-playground.service
 ```
+
+## Configuration
+
+See environment variables section in [Docker](../docker/README.md) docs.
