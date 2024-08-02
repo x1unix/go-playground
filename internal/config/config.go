@@ -13,9 +13,11 @@ import (
 )
 
 const (
-	DefaultWriteTimeout = 60 * time.Second
-	DefaultReadTimeout  = 15 * time.Second
-	DefaultIdleTimeout  = 90 * time.Second
+	DefaultWriteTimeout   = 60 * time.Second
+	DefaultReadTimeout    = 15 * time.Second
+	DefaultIdleTimeout    = 90 * time.Second
+	DefaultGoBuildTimeout = 40 * time.Second
+	DefaultCleanInterval  = 10 * time.Minute
 )
 
 type HTTPConfig struct {
@@ -71,6 +73,9 @@ type BuildConfig struct {
 	// CleanupInterval is WebAssembly build artifact cache clean interval
 	CleanupInterval time.Duration `envconfig:"APP_CLEAN_INTERVAL" json:"cleanupInterval"`
 
+	// GoBuildTimeout is Go program build timeout.
+	GoBuildTimeout time.Duration `envconfig:"APP_GO_BUILD_TIMEOUT" json:"goBuildTimeout"`
+
 	// SkipModuleCleanup disables Go module cache cleanup.
 	SkipModuleCleanup bool `envconfig:"APP_SKIP_MOD_CLEANUP" json:"skipModuleCleanup"`
 
@@ -85,7 +90,8 @@ func (cfg *BuildConfig) mountFlagSet(f *flag.FlagSet) {
 	f.StringVar(&cfg.PackagesFile, "f", "packages.json", "Path to packages index JSON file")
 	f.StringVar(&cfg.BuildDir, "wasm-build-dir", os.TempDir(), "Directory for WASM builds")
 	f.BoolVar(&cfg.SkipModuleCleanup, "skip-mod-clean", false, "Skip Go module cache cleanup")
-	f.DurationVar(&cfg.CleanupInterval, "clean-interval", 10*time.Minute, "Build directory cleanup interval")
+	f.DurationVar(&cfg.CleanupInterval, "clean-interval", DefaultCleanInterval, "Build directory cleanup interval")
+	f.DurationVar(&cfg.GoBuildTimeout, "go-build-timeout", DefaultGoBuildTimeout, "Go program build timeout.")
 	f.Var(cmdutil.NewStringsListValue(&cfg.BypassEnvVarsList), "permit-env-vars", "Comma-separated allow list of environment variables passed to Go compiler tool")
 }
 
@@ -104,6 +110,18 @@ type Config struct {
 	Build      BuildConfig      `json:"build"`
 	Log        LogConfig        `json:"log"`
 	Services   ServicesConfig   `json:"services"`
+}
+
+// Validate validates a config and returns error if config is invalid.
+func (cfg Config) Validate() error {
+	if cfg.Build.GoBuildTimeout > cfg.HTTP.WriteTimeout {
+		return fmt.Errorf(
+			"go build timeout (%s) exceeds HTTP response timeout (%s)",
+			cfg.Build.GoBuildTimeout, cfg.HTTP.WriteTimeout,
+		)
+	}
+
+	return nil
 }
 
 // FromFlagSet returns config file which will read values from flags

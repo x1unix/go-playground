@@ -2,6 +2,7 @@ package config
 
 import (
 	"flag"
+	"fmt"
 	"testing"
 	"time"
 
@@ -28,6 +29,7 @@ func TestFromFlags(t *testing.T) {
 			CleanupInterval:   1 * time.Hour,
 			BypassEnvVarsList: []string{"FOO", "BAR"},
 			SkipModuleCleanup: true,
+			GoBuildTimeout:    4 * time.Second,
 		},
 		Services: ServicesConfig{GoogleAnalyticsID: "GA-123456"},
 		Log: LogConfig{
@@ -60,6 +62,7 @@ func TestFromFlags(t *testing.T) {
 		"-http-read-timeout=7s",
 		"-http-write-timeout=6s",
 		"-http-idle-timeout=3s",
+		"-go-build-timeout=4s",
 	}
 
 	fl := flag.NewFlagSet("app", flag.PanicOnError)
@@ -118,6 +121,7 @@ func TestFromEnv(t *testing.T) {
 					CleanupInterval:   1 * time.Hour,
 					BypassEnvVarsList: []string{"FOO", "BAR"},
 					SkipModuleCleanup: true,
+					GoBuildTimeout:    time.Hour,
 				},
 				Services: ServicesConfig{GoogleAnalyticsID: "GA-123456"},
 				Log: LogConfig{
@@ -151,6 +155,7 @@ func TestFromEnv(t *testing.T) {
 				"HTTP_READ_TIMEOUT":       "21s",
 				"HTTP_WRITE_TIMEOUT":      "22s",
 				"HTTP_IDLE_TIMEOUT":       "23s",
+				"APP_GO_BUILD_TIMEOUT":    "1h",
 			},
 		},
 	}
@@ -170,6 +175,51 @@ func TestFromEnv(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, got)
 			require.Equal(t, c.expect, *got)
+		})
+	}
+}
+
+func TestConfig_Validate(t *testing.T) {
+	cases := map[string]struct {
+		cfg       func(t *testing.T) Config
+		expectErr string
+	}{
+		"default config is valid": {
+			cfg: func(t *testing.T) Config {
+				fset := flag.NewFlagSet("foo", flag.PanicOnError)
+				cfg := FromFlagSet(fset)
+				require.NoError(t, fset.Parse([]string{"foo"}))
+				require.NotNil(t, cfg)
+				return *cfg
+			},
+		},
+		"go build timeout": {
+			expectErr: fmt.Sprintf(
+				"go build timeout (%s) exceeds HTTP response timeout (%s)",
+				time.Hour, time.Second,
+			),
+			cfg: func(_ *testing.T) Config {
+				return Config{
+					Build: BuildConfig{
+						GoBuildTimeout: time.Hour,
+					},
+					HTTP: HTTPConfig{
+						WriteTimeout: time.Second,
+					},
+				}
+			},
+		},
+	}
+
+	for n, c := range cases {
+		t.Run(n, func(t *testing.T) {
+			err := c.cfg(t).Validate()
+			if c.expectErr == "" {
+				require.NoError(t, err)
+				return
+			}
+
+			require.EqualError(t, err, c.expectErr)
 		})
 	}
 }

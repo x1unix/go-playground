@@ -40,6 +40,10 @@ func main() {
 	analyzer.SetLogger(logger)
 	defer logger.Sync() //nolint:errcheck
 
+	if err := cfg.Validate(); err != nil {
+		logger.Fatal("invalid server configuration", zap.Error(err))
+	}
+
 	goRoot, err := builder.GOROOT()
 	if err != nil {
 		logger.Fatal("Failed to find GOROOT environment variable value", zap.Error(err))
@@ -53,6 +57,7 @@ func main() {
 func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 	logger.Info("Starting service",
 		zap.String("version", Version), zap.Any("config", cfg))
+
 	analyzer.SetRoot(goRoot)
 	packages, err := analyzer.ReadPackagesFile(cfg.Build.PackagesFile)
 	if err != nil {
@@ -92,7 +97,12 @@ func start(goRoot string, logger *zap.Logger, cfg *config.Config) error {
 		Mount(apiRouter)
 
 	apiv2Router := apiRouter.PathPrefix("/v2").Subrouter()
-	server.NewAPIv2Handler(playgroundClient, buildSvc).Mount(apiv2Router)
+	server.NewAPIv2Handler(server.APIv2HandlerConfig{
+		Client:       playgroundClient,
+		Builder:      buildSvc,
+		BuildTimeout: cfg.Build.GoBuildTimeout,
+	}).Mount(apiv2Router)
+	//server.NewAPIv2Handler(playgroundClient, buildSvc).Mount(apiv2Router)
 
 	// Web UI routes
 	tplVars := server.TemplateArguments{
