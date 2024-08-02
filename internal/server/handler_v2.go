@@ -17,19 +17,31 @@ import (
 
 var ErrEmptyRequest = errors.New("empty request")
 
-type APIv2Handler struct {
-	logger   *zap.Logger
-	compiler builder.BuildService
-	client   *goplay.Client
-	limiter  *rate.Limiter
+type APIv2HandlerConfig struct {
+	Client       *goplay.Client
+	Builder      builder.BuildService
+	BuildTimeout time.Duration
 }
 
-func NewAPIv2Handler(client *goplay.Client, builder builder.BuildService) *APIv2Handler {
+func (cfg APIv2HandlerConfig) buildContext(parentCtx context.Context) (context.Context, context.CancelFunc) {
+	if cfg.BuildTimeout == 0 {
+		return parentCtx, func() {}
+	}
+
+	return context.WithDeadline(parentCtx, time.Now().Add(cfg.BuildTimeout))
+}
+
+type APIv2Handler struct {
+	logger  *zap.Logger
+	limiter *rate.Limiter
+	cfg     APIv2HandlerConfig
+}
+
+func NewAPIv2Handler(cfg APIv2HandlerConfig) *APIv2Handler {
 	return &APIv2Handler{
-		logger:   zap.L().Named("api.v2"),
-		compiler: builder,
-		client:   client,
-		limiter:  rate.NewLimiter(rate.Every(frameTime), compileRequestsPerFrame),
+		logger:  zap.L().Named("api.v2"),
+		cfg:     cfg,
+		limiter: rate.NewLimiter(rate.Every(frameTime), compileRequestsPerFrame),
 	}
 }
 
@@ -38,7 +50,7 @@ func (h *APIv2Handler) HandleGetSnippet(w http.ResponseWriter, r *http.Request) 
 	vars := mux.Vars(r)
 	snippetID := vars["id"]
 
-	snippet, err := h.client.GetSnippet(r.Context(), snippetID)
+	snippet, err := h.cfg.Client.GetSnippet(r.Context(), snippetID)
 	if err != nil {
 		if errors.Is(err, goplay.ErrSnippetNotFound) {
 			return Errorf(http.StatusNotFound, "snippet %q not found", snippetID)
@@ -76,7 +88,7 @@ func (h *APIv2Handler) HandleShare(w http.ResponseWriter, r *http.Request) error
 		return err
 	}
 
-	snippetID, err := h.client.Share(ctx, payload.Reader())
+	snippetID, err := h.cfg.Client.Share(ctx, payload.Reader())
 	if err != nil {
 		return err
 	}
@@ -108,7 +120,7 @@ func (h *APIv2Handler) HandleFormat(w http.ResponseWriter, r *http.Request) erro
 		return err
 	}
 
-	rsp, err := h.client.GoImports(ctx, payload.Bytes(), backend)
+	rsp, err := h.cfg.Client.GoImports(ctx, payload.Bytes(), backend)
 	if err != nil {
 		if isContentLengthError(err) {
 			return ErrSnippetTooLarge
@@ -148,7 +160,7 @@ func (h *APIv2Handler) HandleRun(w http.ResponseWriter, r *http.Request) error {
 		return NewBadRequestError(err)
 	}
 
-	res, err := h.client.Evaluate(ctx, goplay.CompileRequest{
+	res, err := h.cfg.Client.Evaluate(ctx, goplay.CompileRequest{
 		Version: goplay.DefaultVersion,
 		WithVet: params.Vet,
 		Body:    snippet,
@@ -172,7 +184,7 @@ func (h *APIv2Handler) HandleRun(w http.ResponseWriter, r *http.Request) error {
 // HandleCompile handles WebAssembly compile requests.
 func (h *APIv2Handler) HandleCompile(w http.ResponseWriter, r *http.Request) error {
 	// Limit for request timeout
-	ctx, cancel := context.WithDeadline(r.Context(), time.Now().Add(maxBuildTimeDuration))
+	ctx, cancel := h.cfg.buildContext(r.Context())
 	defer cancel()
 
 	// Wait for our queue in line for compilation
@@ -185,11 +197,12 @@ func (h *APIv2Handler) HandleCompile(w http.ResponseWriter, r *http.Request) err
 		return err
 	}
 
-	result, err := h.compiler.Build(ctx, files)
-	if builder.IsBuildError(err) {
-		return NewHTTPError(http.StatusBadRequest, err)
-	}
+	result, err := h.cfg.Builder.Build(ctx, files)
 	if err != nil {
+		if builder.IsBuildError(err) || errors.Is(err, context.Canceled) {
+			return NewHTTPError(http.StatusBadRequest, err)
+		}
+
 		return err
 	}
 
