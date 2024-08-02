@@ -198,10 +198,11 @@ func (h *APIv2Handler) HandleCompile(w http.ResponseWriter, r *http.Request) err
 	}
 
 	result, err := h.cfg.Builder.Build(ctx, files)
-	if builder.IsBuildError(err) {
-		return NewHTTPError(http.StatusBadRequest, err)
-	}
 	if err != nil {
+		if builder.IsBuildError(err) || errors.Is(err, context.Canceled) {
+			return NewHTTPError(http.StatusBadRequest, err)
+		}
+
 		return err
 	}
 
