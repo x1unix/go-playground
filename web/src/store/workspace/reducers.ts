@@ -92,6 +92,7 @@ export const reducers = mapByAction<WorkspaceState>(
       _: WorkspaceState,
       { payload: { id, error, files } }: Action<SnippetLoadPayload>,
     ) => {
+
       if (error || !files) {
         return {
           selectedFile: null,
@@ -111,9 +112,11 @@ export const reducers = mapByAction<WorkspaceState>(
         files,
       }
     },
-    [WorkspaceAction.WORKSPACE_IMPORT]: (_: WorkspaceState, { payload }: Action<WorkspaceState>) => ({
-      ...payload,
-    }),
+    [WorkspaceAction.WORKSPACE_IMPORT]: (_: WorkspaceState, { payload }: Action<WorkspaceState>) => {
+      return {
+        ...payload,
+      }
+    },
     [WorkspaceAction.UPDATE_WORKSPACE_NAME]: (s: WorkspaceState, { payload }: Action<string>) => {
       return { ...s, name: payload };
     }

@@ -35,21 +35,24 @@ export const SaveWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, nameValid
   const [name, setName] = useState(workspaceName)
   const [isDirty, setIsDirty] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
-
-  const isValid = !errorMessage?.length
-
+  const [isValid, setIsValid] = useState(false)
+  
   useEffect(() => {
     if (isOpen) {
       return
     }
     setIsDirty(false)
-    setErrorMessage('Empty workspace name')
   }, [isOpen])
 
   useEffect(() => {
     const errMsg = validateName(name, nameValidator)
     setErrorMessage(errMsg)
+    setIsValid(!errMsg)
   }, [name, nameValidator])
+
+  useEffect(() => {
+    setName(workspaceName)
+  }, [workspaceName])
 
   return (
     <Dialog

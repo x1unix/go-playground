@@ -300,11 +300,14 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
   }
 }
 
-export const Header = connect<StateProps, {}>(({ settings, status, ui, workspace }) => ({
-  darkMode: settings.darkMode,
-  loading: status?.loading,
-  running: status?.running,
-  hideThemeToggle: settings.useSystemTheme,
-  sharedSnippetName: ui?.shareCreated ? ui?.snippetId : undefined,
-  workspaceName: workspace.name
-}))(HeaderContainer)
+export const Header = connect<StateProps, {}>(({ settings, status, ui, workspace }) => {
+  const s = {
+    darkMode: settings.darkMode,
+    loading: status?.loading,
+    running: status?.running,
+    hideThemeToggle: settings.useSystemTheme,
+    sharedSnippetName: ui?.shareCreated ? ui?.snippetId : undefined,
+    workspaceName: workspace.name
+  };
+  return s;
+})(HeaderContainer)
