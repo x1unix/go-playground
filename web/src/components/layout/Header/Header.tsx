@@ -13,6 +13,7 @@ import { SharePopup } from '~/components/utils/SharePopup'
 
 import { dispatchTerminalSettingsChange } from '~/store/terminal'
 import {
+  dispatchDeleteWorkspace,
   dispatchFormatFile,
   dispatchLoadSnippet,
   dispatchLoadSnippetFromSource,
@@ -225,6 +226,12 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
     }
 
     this.setState({ showLoadWorkspace: false })
+  }
+
+  private onWorkspaceDelete(name: string | undefined) {
+    if (name) {
+      this.props.dispatch(dispatchDeleteWorkspace(name))
+    }
   }
 
   private onSaveWorkspaceClose(name: string | undefined) {

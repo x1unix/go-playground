@@ -44,39 +44,49 @@ export const LoadWorkspaceModal: React.FC<Props> = ({ isOpen, onDismiss, onSelec
   return (
     <Dialog label="Workspaces" styles={modalStyles} isOpen={isOpen} onDismiss={onDismiss}>
       <Stack styles={{ root: { margin: `0 -${DefaultSpacing.s1}` } }}>
-        {names.map((name) => (
-          <Stack.Item
-            key={name}
-            styles={{
-              root: mergeStyles({
-                display: 'flex',
-                boxSizing: 'border-box',
-                marginBottom: DefaultSpacing.s1,
-              }) as IStackItemProps['styles'],
-            }}
-          >
-            <Stack
-              horizontal
-              tokens={{ childrenGap: DefaultSpacing.s1 }}
-              horizontalAlign="space-between"
-              style={{ width: '100%' }}
+        {!names || names.length === 0 ? (
+          <div style={{ margin: '8px' }}>No workspaces found</div>
+        ) : (
+          names.map((name) => (
+            <Stack.Item
+              key={name}
+              styles={{
+                root: mergeStyles({
+                  display: 'flex',
+                  boxSizing: 'border-box',
+                  marginBottom: DefaultSpacing.s1,
+                }) as IStackItemProps['styles'],
+              }}
             >
-              <Stack.Item grow>
-                <DefaultButton
-                  text={name}
-                  onClick={() => onSelect?.(name)}
-                  styles={{
-                    root: { width: '100%' },
-                    textContainer: { textTransform: 'capitalize', textAlign: 'left' },
-                  }}
-                />
-              </Stack.Item>
-              <Stack.Item>
-                <IconButton iconProps={{ iconName: 'Delete' }} onClick={() => {}} />
-              </Stack.Item>
-            </Stack>
-          </Stack.Item>
-        ))}
+              <Stack
+                horizontal
+                tokens={{ childrenGap: DefaultSpacing.s1 }}
+                horizontalAlign="space-between"
+                style={{ width: '100%' }}
+              >
+                <Stack.Item grow>
+                  <DefaultButton
+                    text={name}
+                    onClick={() => onSelect?.(name)}
+                    styles={{
+                      root: { width: '100%', borderColor: semanticColors.variantBorder },
+                      textContainer: { textTransform: 'capitalize', textAlign: 'left' },
+                    }}
+                  />
+                </Stack.Item>
+                <Stack.Item>
+                  <IconButton
+                    iconProps={{ iconName: 'Delete' }}
+                    onClick={async () => {
+                      await db.deleteWorkspace(name)
+                      setNames(names.filter((n) => n !== name))
+                    }}
+                  />
+                </Stack.Item>
+              </Stack>
+            </Stack.Item>
+          ))
+        )}
       </Stack>
     </Dialog>
   )

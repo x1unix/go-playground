@@ -87,6 +87,21 @@ export const dispatchLoadWorkspace = (name: string) => async (dispatch: Dispatch
   }
 };
 
+export const dispatchDeleteWorkspace = (name: string) => async (dispatch: DispatchFn) => {
+  try {
+    await db.deleteWorkspace(name);
+  } catch (err) {
+    dispatch(
+      newAddNotificationAction({
+        id: newNotificationId(),
+        type: NotificationType.Error,
+        title: 'Failed to delete workspace',
+        description: `${err}`,
+        canDismiss: true,
+      }),
+    );
+  }
+}
 
 /**
  * Reads and imports files to a workspace.

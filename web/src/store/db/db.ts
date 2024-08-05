@@ -76,6 +76,16 @@ class PlaygroundDB {
       request.onerror = () => reject(request.error);
     });
   }
+
+  public async deleteWorkspace(name: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const store = this.getObjectStore('readwrite');
+      const request = store.delete(name);
+
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
 }
 
 export const db = new PlaygroundDB();
