@@ -44,7 +44,17 @@ export enum WorkspaceAction {
   /**
    * Indicates that workspace name was changed.
    */
-  UPDATE_WORKSPACE_NAME = 'WORKSPACE_UPDATE_NAME',
+  UPDATE_NAME = 'WORKSPACE_UPDATE_NAME',
+
+  /**
+   * Save workspace to storage.
+   */
+  SAVE = 'WORKSPACE_SAVE',
+
+  /**
+   * Load workspace from storage.
+   */
+  LOAD = 'WORKSPACE_LOAD',
 }
 
 export type BulkFileUpdatePayload = Record<string, string>
@@ -71,6 +81,7 @@ export interface SnippetLoadPayload {
 
 // NOTE: not sure if this is the correct location for this definition
 export const updateWorkspaceNameAction = (name: string) => ({
-  type: WorkspaceAction.UPDATE_WORKSPACE_NAME,
+  type: WorkspaceAction.UPDATE_NAME,
   payload: name,
 });
+

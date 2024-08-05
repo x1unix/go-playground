@@ -16,7 +16,7 @@ import {
   dispatchFormatFile,
   dispatchLoadSnippet,
   dispatchLoadSnippetFromSource,
-  dispatchSaveWorkspaceState,
+  dispatchSaveWorkspace,
   dispatchShareSnippet,
   dispatchUpdateWorkspaceName,
 } from '~/store/workspace/dispatchers'
@@ -31,7 +31,7 @@ import {
 } from '~/store'
 
 import './Header.css'
-import { saveWorkspaceState } from '~/store/workspace/config'
+
 import { SaveWorkspaceModal } from '~/components/features/workspace/SaveWorkspaceModal'
 
 /**
@@ -39,12 +39,11 @@ import { SaveWorkspaceModal } from '~/components/features/workspace/SaveWorkspac
  */
 const BTN_SHARE_CLASSNAME = 'Header__btn--share'
 
-
 interface HeaderState {
   showSettings?: boolean
   showAbout?: boolean
   showExamples?: boolean
-  showSaveWorkspace?: boolean,
+  showSaveWorkspace?: boolean
   loading?: boolean
   goVersions?: VersionsInfo
 }
@@ -54,7 +53,7 @@ interface StateProps {
   loading?: boolean
   running?: boolean
   sharedSnippetName?: string | null
-  hideThemeToggle?: boolean,
+  hideThemeToggle?: boolean
   workspaceName?: string
 }
 
@@ -70,7 +69,7 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
       showSettings: false,
       showAbout: false,
       loading: false,
-      showSaveWorkspace: false
+      showSaveWorkspace: false,
     }
   }
 
@@ -127,7 +126,7 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
         iconProps: { iconName: 'Save' },
         disabled: this.isDisabled,
         onClick: () => {
-          this.setState({ showSaveWorkspace: true });
+          this.setState({ showSaveWorkspace: true })
         },
       },
       {
@@ -217,11 +216,12 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
   }
 
   private onSaveWorkspaceClose(name: string | undefined) {
-    if(name) {
-      this.props.dispatch(dispatchUpdateWorkspaceName(name));
+    if (name) {
+      this.props.dispatch(dispatchSaveWorkspace(name))
+      // this.props.dispatch(dispatchUpdateWorkspaceName(name))
     }
 
-    this.setState({ showSaveWorkspace: false});
+    this.setState({ showSaveWorkspace: false })
   }
 
   private onSettingsClose(changes: SettingsChanges) {
@@ -290,9 +290,7 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
         />
         <SaveWorkspaceModal
           isOpen={showSaveWorkspace || false}
-          onClose={(args) => 
-            this.onSaveWorkspaceClose(args)
-          }
+          onClose={(args) => this.onSaveWorkspaceClose(args)}
           workspaceName={this.props.workspaceName}
         />
       </header>
@@ -300,14 +298,11 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
   }
 }
 
-export const Header = connect<StateProps, {}>(({ settings, status, ui, workspace }) => {
-  const s = {
-    darkMode: settings.darkMode,
-    loading: status?.loading,
-    running: status?.running,
-    hideThemeToggle: settings.useSystemTheme,
-    sharedSnippetName: ui?.shareCreated ? ui?.snippetId : undefined,
-    workspaceName: workspace.name
-  };
-  return s;
-})(HeaderContainer)
+export const Header = connect<StateProps, {}>(({ settings, status, ui, workspace }) => ({
+  darkMode: settings.darkMode,
+  loading: status?.loading,
+  running: status?.running,
+  hideThemeToggle: settings.useSystemTheme,
+  sharedSnippetName: ui?.shareCreated ? ui?.snippetId : undefined,
+  workspaceName: workspace.name,
+}))(HeaderContainer)

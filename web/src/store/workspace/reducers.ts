@@ -117,7 +117,7 @@ export const reducers = mapByAction<WorkspaceState>(
         ...payload,
       }
     },
-    [WorkspaceAction.UPDATE_WORKSPACE_NAME]: (s: WorkspaceState, { payload }: Action<string>) => {
+    [WorkspaceAction.UPDATE_NAME]: (s: WorkspaceState, { payload }: Action<string>) => {
       return { ...s, name: payload };
     }
   },

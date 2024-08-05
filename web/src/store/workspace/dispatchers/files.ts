@@ -25,10 +25,6 @@ const scheduleAutosave = (getState: StateProvider) => {
     const {
       workspace: { snippet, ...wp },
     } = getState()
-    if (snippet) {
-      // abort autosave when loaded external snippet.
-      return
-    }
 
     saveWorkspaceState(wp)
   }, AUTOSAVE_INTERVAL)
@@ -39,25 +35,36 @@ const fileNamesFromState = (getState: StateProvider) => {
   return workspace.files ? Object.keys(workspace.files) : []
 }
 
-//////////////////////////////////////////////////////////////
-
 import { updateWorkspaceNameAction } from '../actions'
+import { db } from '~/store/db/db';
 
 export const dispatchUpdateWorkspaceName = (name: string) => (dispatch: DispatchFn) => {
   dispatch(updateWorkspaceNameAction(name))
 }
 
-
-export const dispatchSaveWorkspaceState = () => async (dispatch: DispatchFn, getState: StateProvider) => {
+export const dispatchSaveWorkspace = (name: string) => async (dispatch: DispatchFn, getState: StateProvider) => {
   const s = getState();
-  const {
-    workspace: { snippet, ...wp },
-  } = getState();
+  const { workspace } = s;
 
-  console.log(s);
-}
+  workspace.name = name;
 
-//////////////////////////////////////////////////////////////
+  try {
+    await db.saveWorkspace(workspace);
+    dispatch(updateWorkspaceNameAction(name));
+    scheduleAutosave(getState);
+  } catch (err) {
+    dispatch(
+      newAddNotificationAction({
+        id: newNotificationId(),
+        type: NotificationType.Error,
+        title: 'Failed to save workspace',
+        description: `${err}`,
+        canDismiss: true,
+      }),
+    )
+  }
+
+};
 
 /**
  * Reads and imports files to a workspace.
@@ -173,3 +180,4 @@ export const newFileSelectAction = (filename: string): Action<FilePayload> => ({
 })
 
 export const dispatchResetWorkspace = dispatchImportSource(defaultFiles)
+
