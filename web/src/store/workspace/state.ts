@@ -55,6 +55,11 @@ export interface WorkspaceState {
    * Empty if not set or no snippet is loaded.
    */
   name?: string
+
+  /**
+   * Timestamp of the last workspace save.
+   */
+  timestamp?: number
 }
 
 export const initialWorkspaceState: WorkspaceState = {
