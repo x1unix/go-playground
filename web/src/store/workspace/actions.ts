@@ -40,6 +40,11 @@ export enum WorkspaceAction {
    * Indicates that current file tab changed.
    */
   SELECT_FILE = 'WORKSPACE_SELECT_FILE',
+
+  /**
+   * Indicates that workspace name was changed.
+   */
+  UPDATE_WORKSPACE_NAME = 'WORKSPACE_UPDATE_NAME',
 }
 
 export type BulkFileUpdatePayload = Record<string, string>
@@ -63,3 +68,9 @@ export interface SnippetLoadPayload {
   error?: string | null
   files?: WorkspaceState['files']
 }
+
+// NOTE: not sure if this is the correct location for this definition
+export const updateWorkspaceNameAction = (name: string) => ({
+  type: WorkspaceAction.UPDATE_WORKSPACE_NAME,
+  payload: name,
+});

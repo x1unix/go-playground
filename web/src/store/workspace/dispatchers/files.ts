@@ -39,6 +39,26 @@ const fileNamesFromState = (getState: StateProvider) => {
   return workspace.files ? Object.keys(workspace.files) : []
 }
 
+//////////////////////////////////////////////////////////////
+
+import { updateWorkspaceNameAction } from '../actions'
+
+export const dispatchUpdateWorkspaceName = (name: string) => (dispatch: DispatchFn) => {
+  dispatch(updateWorkspaceNameAction(name))
+}
+
+
+export const dispatchSaveWorkspaceState = () => async (dispatch: DispatchFn, getState: StateProvider) => {
+  const s = getState();
+  const {
+    workspace: { snippet, ...wp },
+  } = getState();
+
+  console.log(s);
+}
+
+//////////////////////////////////////////////////////////////
+
 /**
  * Reads and imports files to a workspace.
  * File names are deduplicated.

@@ -114,6 +114,9 @@ export const reducers = mapByAction<WorkspaceState>(
     [WorkspaceAction.WORKSPACE_IMPORT]: (_: WorkspaceState, { payload }: Action<WorkspaceState>) => ({
       ...payload,
     }),
+    [WorkspaceAction.UPDATE_WORKSPACE_NAME]: (s: WorkspaceState, { payload }: Action<string>) => {
+      return { ...s, name: payload };
+    }
   },
   initialWorkspaceState,
 )

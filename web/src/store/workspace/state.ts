@@ -48,6 +48,13 @@ export interface WorkspaceState {
    * Key-value pair of file names and their content.
    */
   files?: Record<string, string>
+
+  /**
+   * Name of the workspace.
+   * 
+   * Empty if not set or no snippet is loaded.
+   */
+  name?: string
 }
 
 export const initialWorkspaceState: WorkspaceState = {
