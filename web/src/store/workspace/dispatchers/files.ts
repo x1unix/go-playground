@@ -63,8 +63,30 @@ export const dispatchSaveWorkspace = (name: string) => async (dispatch: Dispatch
       }),
     )
   }
-
 };
+
+export const dispatchLoadWorkspace = (name: string) => async (dispatch: DispatchFn) => {
+  try {
+    const workspace = await db.getWorkspaceByName(name);
+    if (workspace) {
+      dispatch({
+        type: WorkspaceAction.WORKSPACE_IMPORT,
+        payload: workspace,
+      });
+    }
+  } catch (err) {
+    dispatch(
+      newAddNotificationAction({
+        id: newNotificationId(),
+        type: NotificationType.Error,
+        title: 'Failed to load workspace',
+        description: `${err}`,
+        canDismiss: true,
+      }),
+    );
+  }
+};
+
 
 /**
  * Reads and imports files to a workspace.

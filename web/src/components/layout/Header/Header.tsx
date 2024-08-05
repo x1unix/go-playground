@@ -16,6 +16,7 @@ import {
   dispatchFormatFile,
   dispatchLoadSnippet,
   dispatchLoadSnippetFromSource,
+  dispatchLoadWorkspace,
   dispatchSaveWorkspace,
   dispatchShareSnippet,
   dispatchUpdateWorkspaceName,
@@ -33,6 +34,7 @@ import {
 import './Header.css'
 
 import { SaveWorkspaceModal } from '~/components/features/workspace/SaveWorkspaceModal'
+import { LoadWorkspaceModal } from '~/components/features/workspace/LoadWorkspaceModal'
 
 /**
  * Unique class name for share button to use as popover target.
@@ -43,6 +45,7 @@ interface HeaderState {
   showSettings?: boolean
   showAbout?: boolean
   showExamples?: boolean
+  showLoadWorkspace?: boolean
   showSaveWorkspace?: boolean
   loading?: boolean
   goVersions?: VersionsInfo
@@ -70,6 +73,7 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
       showAbout: false,
       loading: false,
       showSaveWorkspace: false,
+      showLoadWorkspace: false,
     }
   }
 
@@ -117,7 +121,7 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
         iconProps: { iconName: 'Upload', style: { transform: 'rotate(90deg)' } },
         disabled: this.isDisabled,
         onClick: () => {
-          //this.props.dispatch(dispatchShareSnippet())
+          this.setState({ showLoadWorkspace: true })
         },
       },
       {
@@ -215,10 +219,17 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
     ]
   }
 
+  private onLoadWorkspaceClose(name: string | undefined) {
+    if (name) {
+      this.props.dispatch(dispatchLoadWorkspace(name))
+    }
+
+    this.setState({ showLoadWorkspace: false })
+  }
+
   private onSaveWorkspaceClose(name: string | undefined) {
     if (name) {
       this.props.dispatch(dispatchSaveWorkspace(name))
-      // this.props.dispatch(dispatchUpdateWorkspaceName(name))
     }
 
     this.setState({ showSaveWorkspace: false })
@@ -292,6 +303,15 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
           isOpen={showSaveWorkspace || false}
           onClose={(args) => this.onSaveWorkspaceClose(args)}
           workspaceName={this.props.workspaceName}
+        />
+        <LoadWorkspaceModal
+          isOpen={this.state.showLoadWorkspace || false}
+          onDismiss={() => {
+            this.onLoadWorkspaceClose(undefined)
+          }}
+          onSelect={(x: string) => {
+            this.onLoadWorkspaceClose(x)
+          }}
         />
       </header>
     )
