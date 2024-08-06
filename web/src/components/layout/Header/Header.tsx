@@ -13,10 +13,14 @@ import { SharePopup } from '~/components/utils/SharePopup'
 
 import { dispatchTerminalSettingsChange } from '~/store/terminal'
 import {
+  dispatchDeleteWorkspace,
   dispatchFormatFile,
   dispatchLoadSnippet,
   dispatchLoadSnippetFromSource,
+  dispatchLoadWorkspace,
+  dispatchSaveWorkspace,
   dispatchShareSnippet,
+  dispatchUpdateWorkspaceName,
 } from '~/store/workspace/dispatchers'
 import {
   connect,
@@ -30,6 +34,9 @@ import {
 
 import './Header.css'
 
+import { SaveWorkspaceModal } from '~/components/features/workspace/SaveWorkspaceModal'
+import { LoadWorkspaceModal } from '~/components/features/workspace/LoadWorkspaceModal'
+
 /**
  * Unique class name for share button to use as popover target.
  */
@@ -39,6 +46,8 @@ interface HeaderState {
   showSettings?: boolean
   showAbout?: boolean
   showExamples?: boolean
+  showLoadWorkspace?: boolean
+  showSaveWorkspace?: boolean
   loading?: boolean
   goVersions?: VersionsInfo
 }
@@ -49,6 +58,7 @@ interface StateProps {
   running?: boolean
   sharedSnippetName?: string | null
   hideThemeToggle?: boolean
+  workspaceName?: string
 }
 
 interface Props extends StateProps {
@@ -63,6 +73,8 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
       showSettings: false,
       showAbout: false,
       loading: false,
+      showSaveWorkspace: false,
+      showLoadWorkspace: false,
     }
   }
 
@@ -102,6 +114,24 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
         disabled: this.isDisabled,
         onClick: () => {
           this.props.dispatch(runFileDispatcher)
+        },
+      },
+      {
+        key: 'load',
+        text: 'Load',
+        iconProps: { iconName: 'Upload', style: { transform: 'rotate(90deg)' } },
+        disabled: this.isDisabled,
+        onClick: () => {
+          this.setState({ showLoadWorkspace: true })
+        },
+      },
+      {
+        key: 'save',
+        text: 'Save',
+        iconProps: { iconName: 'Save' },
+        disabled: this.isDisabled,
+        onClick: () => {
+          this.setState({ showSaveWorkspace: true })
         },
       },
       {
@@ -190,6 +220,28 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
     ]
   }
 
+  private onLoadWorkspaceClose(name: string | undefined) {
+    if (name) {
+      this.props.dispatch(dispatchLoadWorkspace(name))
+    }
+
+    this.setState({ showLoadWorkspace: false })
+  }
+
+  private onWorkspaceDelete(name: string | undefined) {
+    if (name) {
+      this.props.dispatch(dispatchDeleteWorkspace(name))
+    }
+  }
+
+  private onSaveWorkspaceClose(name: string | undefined) {
+    if (name) {
+      this.props.dispatch(dispatchSaveWorkspace(name))
+    }
+
+    this.setState({ showSaveWorkspace: false })
+  }
+
   private onSettingsClose(changes: SettingsChanges) {
     if (changes.monaco) {
       // Update monaco state if some of its settings were changed
@@ -218,7 +270,7 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
   }
 
   render() {
-    const { showAbout, showSettings, showExamples } = this.state
+    const { showAbout, showSettings, showExamples, showSaveWorkspace } = this.state
     const { sharedSnippetName } = this.props
     return (
       <header className="header" style={{ backgroundColor: this.theme.palette.white }}>
@@ -254,15 +306,30 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
           onDismiss={() => this.setState({ showExamples: false })}
           onSelect={(s) => this.onSnippetSelected(s)}
         />
+        <SaveWorkspaceModal
+          isOpen={showSaveWorkspace || false}
+          onClose={(args) => this.onSaveWorkspaceClose(args)}
+          workspaceName={this.props.workspaceName}
+        />
+        <LoadWorkspaceModal
+          isOpen={this.state.showLoadWorkspace || false}
+          onDismiss={() => {
+            this.onLoadWorkspaceClose(undefined)
+          }}
+          onSelect={(x: string) => {
+            this.onLoadWorkspaceClose(x)
+          }}
+        />
       </header>
     )
   }
 }
 
-export const Header = connect<StateProps, {}>(({ settings, status, ui }) => ({
+export const Header = connect<StateProps, {}>(({ settings, status, ui, workspace }) => ({
   darkMode: settings.darkMode,
   loading: status?.loading,
   running: status?.running,
   hideThemeToggle: settings.useSystemTheme,
   sharedSnippetName: ui?.shareCreated ? ui?.snippetId : undefined,
+  workspaceName: workspace.name,
 }))(HeaderContainer)

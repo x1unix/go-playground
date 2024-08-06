@@ -25,10 +25,6 @@ const scheduleAutosave = (getState: StateProvider) => {
     const {
       workspace: { snippet, ...wp },
     } = getState()
-    if (snippet) {
-      // abort autosave when loaded external snippet.
-      return
-    }
 
     saveWorkspaceState(wp)
   }, AUTOSAVE_INTERVAL)
@@ -37,6 +33,74 @@ const scheduleAutosave = (getState: StateProvider) => {
 const fileNamesFromState = (getState: StateProvider) => {
   const { workspace } = getState()
   return workspace.files ? Object.keys(workspace.files) : []
+}
+
+import { updateWorkspaceNameAction } from '../actions'
+import { db } from '~/store/db/db';
+
+export const dispatchUpdateWorkspaceName = (name: string) => (dispatch: DispatchFn) => {
+  dispatch(updateWorkspaceNameAction(name))
+}
+
+export const dispatchSaveWorkspace = (name: string) => async (dispatch: DispatchFn, getState: StateProvider) => {
+  const s = getState();
+  const { workspace } = s;
+
+  workspace.name = name;
+
+  try {
+    await db.saveWorkspace(workspace);
+    dispatch(updateWorkspaceNameAction(name));
+    scheduleAutosave(getState);
+  } catch (err) {
+    dispatch(
+      newAddNotificationAction({
+        id: newNotificationId(),
+        type: NotificationType.Error,
+        title: 'Failed to save workspace',
+        description: `${err}`,
+        canDismiss: true,
+      }),
+    )
+  }
+};
+
+export const dispatchLoadWorkspace = (name: string) => async (dispatch: DispatchFn) => {
+  try {
+    const workspace = await db.getWorkspaceByName(name);
+    if (workspace) {
+      dispatch({
+        type: WorkspaceAction.WORKSPACE_IMPORT,
+        payload: workspace,
+      });
+    }
+  } catch (err) {
+    dispatch(
+      newAddNotificationAction({
+        id: newNotificationId(),
+        type: NotificationType.Error,
+        title: 'Failed to load workspace',
+        description: `${err}`,
+        canDismiss: true,
+      }),
+    );
+  }
+};
+
+export const dispatchDeleteWorkspace = (name: string) => async (dispatch: DispatchFn) => {
+  try {
+    await db.deleteWorkspace(name);
+  } catch (err) {
+    dispatch(
+      newAddNotificationAction({
+        id: newNotificationId(),
+        type: NotificationType.Error,
+        title: 'Failed to delete workspace',
+        description: `${err}`,
+        canDismiss: true,
+      }),
+    );
+  }
 }
 
 /**
@@ -153,3 +217,4 @@ export const newFileSelectAction = (filename: string): Action<FilePayload> => ({
 })
 
 export const dispatchResetWorkspace = dispatchImportSource(defaultFiles)
+

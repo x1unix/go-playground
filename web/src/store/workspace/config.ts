@@ -23,12 +23,12 @@ export const loadWorkspaceState = (): WorkspaceState => sanitizeState(config.get
 
 const sanitizeState = (state: WorkspaceState) => {
   // Skip current snippet URL.
-  const { selectedFile, files } = state
+  const { selectedFile, files, name } = state
 
   if (!files) {
     // Save defaults if ws is empty.
     return defaultWorkspace
   }
 
-  return { selectedFile, files }
+  return { selectedFile, files, name }
 }
