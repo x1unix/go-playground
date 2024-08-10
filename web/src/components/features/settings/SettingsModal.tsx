@@ -247,7 +247,7 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
               title="Mouse Wheel Zoom"
               control={
                 <Checkbox
-                  label="Zoom the font in the editor when using the mouse wheel in combination with holding Ctrl"
+                  label="Zoom the font in the editor when using the mouse wheel in combination with holding Ctrl / ⌘ key"
                   defaultChecked={this.props.monaco?.mouseWheelZoom}
                   onChange={(_, val) => {
                     this.touchMonacoProperty('mouseWheelZoom', val)
