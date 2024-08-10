@@ -1,5 +1,5 @@
 import React from 'react'
-import { Checkbox, Dropdown, type IPivotStyles, PivotItem, TextField } from '@fluentui/react'
+import { Checkbox, Dropdown, getTheme, type IPivotStyles, PivotItem, Text, TextField } from '@fluentui/react'
 
 import { AnimatedPivot } from '~/components/elements/tabs/AnimatedPivot'
 import { ThemeableComponent } from '~/components/utils/ThemeableComponent'
@@ -11,6 +11,8 @@ import type { RenderingBackend, TerminalSettings } from '~/store/terminal'
 import { connect, type StateDispatch, type MonacoParamsChanges, type SettingsState } from '~/store'
 
 import { cursorBlinkOptions, cursorLineOptions, fontOptions, terminalBackendOptions } from './options'
+import { controlKeyLabel } from '~/utils/dom'
+import { Kbd } from '~/components/elements/misc/Kbd'
 
 export interface SettingsChanges {
   monaco?: MonacoParamsChanges
@@ -40,7 +42,7 @@ interface SettingsModalState {
 
 const modalStyles = {
   main: {
-    maxWidth: 480,
+    maxWidth: 520,
   },
 }
 
@@ -100,6 +102,7 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
 
   render() {
     const { isOpen } = this.props
+    const { spacing } = getTheme()
 
     return (
       <Dialog label="Settings" onDismiss={() => this.onClose()} isOpen={isOpen} styles={modalStyles}>
@@ -165,8 +168,12 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
               title="Mouse Wheel Zoom"
               control={
                 <Checkbox
-                  label="Zoom the font in the editor when using the mouse wheel in combination with holding Ctrl / ⌘ key"
                   defaultChecked={this.props.monaco?.mouseWheelZoom}
+                  onRenderLabel={() => (
+                    <Text className="ms-Checkbox-text" style={{ marginLeft: spacing.s2 }}>
+                      Zoom the editor font when using mouse wheel and holding <Kbd>{controlKeyLabel()}</Kbd> key
+                    </Text>
+                  )}
                   onChange={(_, val) => {
                     this.touchMonacoProperty('mouseWheelZoom', val)
                   }}
