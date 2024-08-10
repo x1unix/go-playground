@@ -136,6 +136,19 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
               }
             />
             <SettingsProperty
+              key="enableAutoSave"
+              title="Enable Auto Save"
+              control={
+                <Checkbox
+                  label="Restore last editor contents when playground opens"
+                  defaultChecked={this.props.settings?.autoSave}
+                  onChange={(_, val) => {
+                    this.touchSettingsProperty({ autoSave: val })
+                  }}
+                />
+              }
+            />
+            <SettingsProperty
               key="autoDetectTheme"
               title="Use System Theme"
               control={
