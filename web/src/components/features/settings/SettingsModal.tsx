@@ -120,14 +120,14 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
               }
             />
             <SettingsProperty
-              key="minimap"
-              title="Mini Map"
+              key="enableVimMode"
+              title="Enable Vim Mode"
               control={
                 <Checkbox
-                  label="Enable mini map on side"
-                  defaultChecked={this.props.monaco?.minimap}
+                  label="Enables Vim motions in code editor"
+                  defaultChecked={this.props.settings?.enableVimMode}
                   onChange={(_, val) => {
-                    this.touchMonacoProperty('minimap', val)
+                    this.touchSettingsProperty({ enableVimMode: val })
                   }}
                 />
               }
@@ -137,7 +137,7 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
               title="Use System Theme"
               control={
                 <Checkbox
-                  label="Follow system dark mode preference instead of manual toggle."
+                  label="Match editor theme with system dark mode preference"
                   defaultChecked={this.props.settings?.useSystemTheme}
                   onChange={(_, val) => {
                     this.touchSettingsProperty({
@@ -161,14 +161,14 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
               }
             />
             <SettingsProperty
-              key="enableVimMode"
-              title="Enable Vim Mode"
+              key="mouseWheelZoom"
+              title="Mouse Wheel Zoom"
               control={
                 <Checkbox
-                  label="Allows usage of Vim key bindings when editing"
-                  defaultChecked={this.props.settings?.enableVimMode}
+                  label="Zoom the font in the editor when using the mouse wheel in combination with holding Ctrl / ⌘ key"
+                  defaultChecked={this.props.monaco?.mouseWheelZoom}
                   onChange={(_, val) => {
-                    this.touchSettingsProperty({ enableVimMode: val })
+                    this.touchMonacoProperty('mouseWheelZoom', val)
                   }}
                 />
               }
@@ -192,7 +192,7 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
             <SettingsProperty
               key="cursorStyle"
               title="Cursor Style"
-              description="Set the cursor style"
+              description="Controls the cursor style"
               control={
                 <Dropdown
                   options={cursorLineOptions}
@@ -204,8 +204,34 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
               }
             />
             <SettingsProperty
-              key="selectOnLineNumbers"
-              title="Select On Line Numbers"
+              key="smoothScroll"
+              title="Smooth Scrolling"
+              control={
+                <Checkbox
+                  label="Controls whether the editor will scroll using an animation"
+                  defaultChecked={this.props.monaco?.smoothScrolling}
+                  onChange={(_, val) => {
+                    this.touchMonacoProperty('smoothScrolling', val)
+                  }}
+                />
+              }
+            />
+            <SettingsProperty
+              key="minimap"
+              title="Mini Map"
+              control={
+                <Checkbox
+                  label="Controls whether the minimap is shown"
+                  defaultChecked={this.props.monaco?.minimap}
+                  onChange={(_, val) => {
+                    this.touchMonacoProperty('minimap', val)
+                  }}
+                />
+              }
+            />
+            <SettingsProperty
+              key="selectOnGutterClick"
+              title="Select On Gutter Click"
               control={
                 <Checkbox
                   label="Select corresponding line on line number click"
@@ -225,32 +251,6 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
                   defaultChecked={this.props.monaco?.contextMenu}
                   onChange={(_, val) => {
                     this.touchMonacoProperty('contextMenu', val)
-                  }}
-                />
-              }
-            />
-            <SettingsProperty
-              key="smoothScroll"
-              title="Smooth Scrolling"
-              control={
-                <Checkbox
-                  label="Enable that the editor animates scrolling to a position"
-                  defaultChecked={this.props.monaco?.smoothScrolling}
-                  onChange={(_, val) => {
-                    this.touchMonacoProperty('smoothScrolling', val)
-                  }}
-                />
-              }
-            />
-            <SettingsProperty
-              key="mouseWheelZoom"
-              title="Mouse Wheel Zoom"
-              control={
-                <Checkbox
-                  label="Zoom the font in the editor when using the mouse wheel in combination with holding Ctrl / ⌘ key"
-                  defaultChecked={this.props.monaco?.mouseWheelZoom}
-                  onChange={(_, val) => {
-                    this.touchMonacoProperty('mouseWheelZoom', val)
                   }}
                 />
               }
