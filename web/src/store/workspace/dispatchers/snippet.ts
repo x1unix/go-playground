@@ -12,6 +12,7 @@ import {
 import { newLoadingAction, newErrorAction, newUIStateChangeAction } from '~/store/actions/ui'
 import { type SnippetLoadPayload, WorkspaceAction, type BulkFileUpdatePayload } from '../actions'
 import { loadWorkspaceState } from '../config'
+import { getDefaultWorkspaceState } from '../state'
 
 /**
  * Dispatch snippet load from a predefined source.
@@ -54,9 +55,15 @@ export const dispatchLoadSnippetFromSource = (source: SnippetSource) => async (d
 export const dispatchLoadSnippet =
   (snippetId: string | null) => async (dispatch: DispatchFn, getState: StateProvider) => {
     if (!snippetId) {
+      const {
+        settings: { autoSave },
+        workspace: { snippet },
+      } = getState()
+
+      const shouldAutosave = autoSave && !snippet?.id
       dispatch({
         type: WorkspaceAction.WORKSPACE_IMPORT,
-        payload: loadWorkspaceState(),
+        payload: shouldAutosave ? loadWorkspaceState() : getDefaultWorkspaceState(),
       })
       return
     }
