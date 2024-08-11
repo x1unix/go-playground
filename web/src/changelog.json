@@ -1,58 +1,14 @@
 {
   "Interface - General": [
     {
-      "issueId": 316,
-      "url": "pull/316",
-      "description": "New multi-file workspace."
+      "issueId": 400,
+      "url": "issues/400",
+      "description": "Disable auto save by default."
     },
     {
-      "issueId": 372,
-      "url": "pull/372",
-      "description": "Improved examples and settings UX."
-    },
-    {
-      "issueId": 317,
-      "url": "pull/317",
-      "description": "Use relative units for output panel width."
-    }
-  ],
-  "Interface - Code Editor": [
-    {
-      "issueId":362,
-      "url": "pull/362",
-      "description": "Suggest package names in import statements."
-    },
-    {
-      "issueId": 374,
-      "url": "pull/374",
-      "description": "Save editor font size when changed using mouse scroll."
-    },
-    {
-      "issueId": 373,
-      "url": "pull/373",
-      "description": "Added new editor fonts."
-    }
-  ],
-  "Go - WebAssembly": [
-    {
-      "issueId": 359,
-      "url": "pull/359",
-      "description": "Added WebAssembly unit tests support."
-    },
-    {
-      "issueId": 319,
-      "url": "pull/319",
-      "description": "Added third-party libraries support for WebAssembly."
-    },
-    {
-      "issueId": 379,
-      "url": "pull/379",
-      "description": "Use WASM automatically based on Go build tags."
-    },
-    {
-      "issueId": 349,
-      "url": "pull/349",
-      "description": "Yaegi Go interpreter was removed."
+      "issueId": 401,
+      "url": "pull/401",
+      "description": "Improve settings menu."
     }
   ]
 }
