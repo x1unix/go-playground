@@ -8,6 +8,20 @@ const defaultWorkspace: WorkspaceState = {
   files: defaultFiles,
 }
 
+const sanitizeState = (state: WorkspaceState) => {
+  // Skip current snippet URL.
+  const { selectedFile, files } = state
+
+  if (!files) {
+    // Save defaults if ws is empty.
+    return defaultWorkspace
+  }
+
+  return { selectedFile, files }
+}
+
+export const truncateWorkspaceState = () => config.delete(CONFIG_KEY)
+
 export const saveWorkspaceState = (state: WorkspaceState) => {
   const sanitized = sanitizeState(state)
   if (!sanitized.files || Object.keys(sanitized.files).length === 0) {
@@ -20,15 +34,3 @@ export const saveWorkspaceState = (state: WorkspaceState) => {
 }
 
 export const loadWorkspaceState = (): WorkspaceState => sanitizeState(config.getObject(CONFIG_KEY, defaultWorkspace))
-
-const sanitizeState = (state: WorkspaceState) => {
-  // Skip current snippet URL.
-  const { selectedFile, files } = state
-
-  if (!files) {
-    // Save defaults if ws is empty.
-    return defaultWorkspace
-  }
-
-  return { selectedFile, files }
-}

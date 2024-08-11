@@ -12,6 +12,7 @@ import {
   newSettingsChangeAction,
   newToggleThemeAction,
 } from '../actions'
+import { saveWorkspaceState, truncateWorkspaceState } from '../workspace/config'
 
 export function newMonacoParamsChangeDispatcher(changes: MonacoParamsChanges): Dispatcher {
   return (dispatch: DispatchFn, _: StateProvider) => {
@@ -23,7 +24,7 @@ export function newMonacoParamsChangeDispatcher(changes: MonacoParamsChanges): D
 
 export const newSettingsChangeDispatcher =
   (changes: Partial<SettingsState>): Dispatcher =>
-  (dispatch: DispatchFn, _: StateProvider) => {
+  (dispatch: DispatchFn, getState: StateProvider) => {
     if ('useSystemTheme' in changes) {
       config.useSystemTheme = !!changes.useSystemTheme
       changes.darkMode = isDarkModeEnabled()
@@ -35,6 +36,20 @@ export const newSettingsChangeDispatcher =
 
     if ('enableVimMode' in changes) {
       config.enableVimMode = !!changes.enableVimMode
+    }
+
+    if ('autoSave' in changes) {
+      config.autoSave = !!changes.autoSave
+
+      // Immediately save workspace
+      if (changes.autoSave) {
+        const { workspace } = getState()
+        if (!workspace.snippet?.id) {
+          saveWorkspaceState(workspace)
+        }
+      } else {
+        truncateWorkspaceState()
+      }
     }
 
     dispatch(newSettingsChangeAction(changes))

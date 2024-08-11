@@ -27,6 +27,7 @@ import { type SettingsState, type State, type StatusState, type PanelState, type
 
 // TODO: move settings reducers and state to store/settings
 const initialSettingsState: SettingsState = {
+  autoSave: config.autoSave,
   darkMode: config.darkThemeEnabled,
   autoFormat: true,
   useSystemTheme: config.useSystemTheme,

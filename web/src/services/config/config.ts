@@ -9,6 +9,7 @@ import { type MonacoSettings, defaultMonacoSettings } from './monaco'
 
 const DARK_THEME_KEY = 'ui.darkTheme.enabled'
 const USE_SYSTEM_THEME_KEY = 'ui.darkTheme.useSystem'
+const AUTOSAVE_ENABLED = 'ui.autosave.enabled'
 const RUN_TARGET_KEY = 'go.build.target'
 const ENABLE_VIM_MODE_KEY = 'ms.monaco.vimModeEnabled'
 const AUTOFORMAT_KEY = 'go.build.autoFormat'
@@ -29,6 +30,14 @@ const Config = {
 
   set darkThemeEnabled(enable: boolean) {
     this.setBoolean(DARK_THEME_KEY, enable)
+  },
+
+  get autoSave() {
+    return this.getBoolean(AUTOSAVE_ENABLED, false)
+  },
+
+  set autoSave(val: boolean) {
+    this.setBoolean(AUTOSAVE_ENABLED, val)
   },
 
   get useSystemTheme() {

@@ -15,17 +15,29 @@ import { type WorkspaceState, defaultFiles } from '../state'
 
 const AUTOSAVE_INTERVAL = 1000
 
+const isAutosaveEnabled = (getState: StateProvider) => {
+  const { settings } = getState()
+  return settings.autoSave
+}
+
 let saveTimeout: NodeJS.Timeout
+
 const cancelPendingAutosave = () => {
   clearTimeout(saveTimeout)
 }
-const scheduleAutosave = (getState: StateProvider) => {
+
+const scheduleWorkspaceAutosave = (getState: StateProvider) => {
   cancelPendingAutosave()
+  if (!isAutosaveEnabled(getState)) {
+    return
+  }
+
   saveTimeout = setTimeout(() => {
     const {
+      settings: { autoSave },
       workspace: { snippet, ...wp },
     } = getState()
-    if (snippet) {
+    if (snippet?.id || !autoSave) {
       // abort autosave when loaded external snippet.
       return
     }
@@ -88,7 +100,7 @@ export const dispatchImportFile = (files: FileList) => async (dispatch: Dispatch
     })
   }
 
-  scheduleAutosave(getState)
+  scheduleWorkspaceAutosave(getState)
 }
 
 export const dispatchCreateFile =
@@ -112,7 +124,7 @@ export const dispatchCreateFile =
       payload: [{ filename, content }],
     })
 
-    scheduleAutosave(getState)
+    scheduleWorkspaceAutosave(getState)
   }
 
 export const dispatchRemoveFile = (filename: string) => (dispatch: DispatchFn, getState: StateProvider) => {
@@ -121,7 +133,7 @@ export const dispatchRemoveFile = (filename: string) => (dispatch: DispatchFn, g
     payload: { filename },
   })
 
-  scheduleAutosave(getState)
+  scheduleWorkspaceAutosave(getState)
 }
 
 export const dispatchUpdateFile =
@@ -131,7 +143,7 @@ export const dispatchUpdateFile =
       payload: { filename, content },
     })
 
-    scheduleAutosave(getState)
+    scheduleWorkspaceAutosave(getState)
   }
 
 export const dispatchImportSource = (files: Record<string, string>) => (dispatch: DispatchFn, _: StateProvider) => {

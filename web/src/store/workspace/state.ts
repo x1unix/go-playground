@@ -59,3 +59,13 @@ export const initialWorkspaceState: WorkspaceState = {
 export const defaultFiles = {
   [defaultFileName]: defaultFile,
 }
+
+export const getDefaultWorkspaceState = (): WorkspaceState => ({
+  selectedFile: defaultFileName,
+  snippet: {
+    loading: false,
+  },
+  files: {
+    [defaultFileName]: defaultFile,
+  },
+})

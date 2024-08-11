@@ -25,6 +25,7 @@ export interface StatusState {
 export interface SettingsState {
   darkMode: boolean
   useSystemTheme: boolean
+  autoSave: boolean
   autoFormat: boolean
   enableVimMode: boolean
   goProxyUrl: string
