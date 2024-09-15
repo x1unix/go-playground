@@ -5,6 +5,7 @@ export const LightTheme: IPartialTheme = {
 }
 
 export const DarkTheme: IPartialTheme = {
+  isInverted: true,
   palette: {
     neutralLighterAlt: '#282828',
     neutralLighter: '#313131',
