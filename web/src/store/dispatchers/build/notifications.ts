@@ -1,3 +1,4 @@
+import { formatBytes } from '~/utils/format'
 import { type FileUpdatePayload, WorkspaceAction } from '~/store/workspace/actions'
 import { goModFile, goModTemplate } from '~/services/examples'
 import {
@@ -67,11 +68,13 @@ export const wasmErrorNotification = (err: any) => newAddNotificationAction({
   canDismiss: true,
 })
 
-export const downloadProgressNotification = (progress?: NotificationProgress, updateOnly?: boolean) => newAddNotificationAction(
+
+export const downloadProgressNotification = (progress?: Required<Pick<NotificationProgress, 'total' | 'current'>>, updateOnly?: boolean) => newAddNotificationAction(
   {
     id: NotificationIDs.WASMAppDownload,
     type: NotificationType.Info,
     title: 'Downloading compiled application',
+    description: progress ? `${formatBytes(progress.current)} / ${formatBytes(progress.total)}` : undefined,
     canDismiss: false,
     progress: progress ?? {
       indeterminate: true,

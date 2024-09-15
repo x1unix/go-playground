@@ -17,11 +17,6 @@ export interface ExecParams {
   image: ArrayBuffer
 
   /**
-   * Standard i/o streams handler.
-   */
-  // stdio: Stdio
-
-  /**
    * Program execution params.
    */
   params?: StartupParams
