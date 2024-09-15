@@ -27,6 +27,29 @@ export interface NotificationAction {
   onClick?: () => void
 }
 
+export interface NotificationProgress {
+  /**
+   * Identifies that current progress can't be determined but some activity is actually running.
+   */
+  indeterminate?: boolean
+
+  /**
+   * Total number of points to finish the operation.
+   *
+   * Used as a total value to calculate percentage.
+   *
+   * For example: total number of bytes to download.
+   */
+  total?: number
+
+  /**
+   * Current number of points processed.
+   *
+   * For example: current percentage or downloaded bytes count.
+   */
+  current?: number
+}
+
 export interface Notification {
   /**
    * Unique notification ID.
@@ -69,28 +92,7 @@ export interface Notification {
   /**
    * Progress bar information.
    */
-  progress?: {
-    /**
-     * Identifies that current progress can't be determined but some activity is actually running.
-     */
-    indeterminate?: boolean
-
-    /**
-     * Total number of points to finish the operation.
-     *
-     * Used as a total value to calculate percentage.
-     *
-     * For example: total number of bytes to download.
-     */
-    total?: number
-
-    /**
-     * Current number of points processed.
-     *
-     * For example: current percentage or downloaded bytes count.
-     */
-    current?: number
-  }
+  progress?: NotificationProgress
 
   /**
    * List of action buttons to show in a pop-up.
