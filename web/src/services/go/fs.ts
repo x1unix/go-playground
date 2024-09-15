@@ -45,7 +45,7 @@ export interface IFileSystem {
  */
 export interface IWriter {
   // write writes data and returns written bytes count
-  write: (data: Uint8Array) => number
+  write: (data: ArrayBuffer) => number
 }
 
 /**
@@ -75,7 +75,7 @@ export class FileSystemWrapper {
       throw enosys()
     }
 
-    return writer.write(buf)
+    return writer.write(buf.buffer)
   }
 
   write(

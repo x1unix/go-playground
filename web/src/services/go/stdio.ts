@@ -13,12 +13,12 @@ export interface ConsoleLogger {
 export class StdioWrapper {
   constructor(private readonly logger: ConsoleLogger) {}
 
-  private getWriter(kind: EvalEventKind) {
+  private getWriter(kind: EvalEventKind): IWriter {
     return {
-      write: (data: Uint8Array) => {
+      write: (data) => {
         const msg = decoder.decode(data)
         this.logger.log(kind, msg)
-        return data.length
+        return data.byteLength
       },
     }
   }

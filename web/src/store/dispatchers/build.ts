@@ -1,17 +1,17 @@
 import { TargetType } from '~/services/config'
-import { getImportObject, goRun } from '~/services/go'
-import { setTimeoutNanos, SECOND } from '~/utils/duration'
-import { instantiateStreaming } from '~/lib/go'
+import { SECOND, setTimeoutNanos } from '~/utils/duration'
+import { validateResponse } from '~/lib/go'
+import { createStdio, GoProcess } from '~/workers/go/client'
 import { buildGoTestFlags, requiresWasmEnvironment } from '~/lib/sourceutil'
 import client, { type EvalEvent, EvalEventKind } from '~/services/api'
-import { isProjectRequiresGoMod, goModFile, goModTemplate } from '~/services/examples'
+import { goModFile, goModTemplate, isProjectRequiresGoMod } from '~/services/examples'
 
 import { type DispatchFn, type StateProvider } from '../helpers'
 import {
   newAddNotificationAction,
   newRemoveNotificationAction,
-  NotificationType,
   NotificationIDs,
+  NotificationType,
 } from '../notifications'
 import {
   newErrorAction,
@@ -116,7 +116,7 @@ const fetchWasmWithProgress = async (dispatch: DispatchFn, fileName: string) => 
     const rsp = await client.getArtifact(fileName)
     const rspWithProgress = wrapResponseWithProgress(rsp, ({ totalBytes, currentBytes }) => {
       // We want to limit number of emitted events to avoid dozens of re-renders on React side.
-      // If renders are too frequent, most of render queries will be dropped.
+      // If renders are too frequent, most of all render queries will be dropped.
       // This results in empty progress bar.
       cancelAnimationFrame(prevRafID)
       prevRafID = requestAnimationFrame(() => {
@@ -138,10 +138,24 @@ const fetchWasmWithProgress = async (dispatch: DispatchFn, fileName: string) => 
       })
     })
 
-    return await instantiateStreaming(rspWithProgress, getImportObject())
+    await validateResponse(rspWithProgress)
+    return await rspWithProgress.arrayBuffer()
   } catch (err) {
     dispatch(newRemoveNotificationAction(NotificationIDs.WASMAppDownload))
     throw err
+  }
+}
+
+const decoder = new TextDecoder()
+export const newStdoutHandler = (dispatch: DispatchFn) => {
+  return (data: ArrayBuffer, isStderr: boolean) => {
+    dispatch(
+      newProgramWriteAction({
+        Kind: isStderr ? EvalEventKind.Stderr : EvalEventKind.Stdout,
+        Message: decoder.decode(data),
+        Delay: 0,
+      }),
+    )
   }
 }
 
@@ -236,14 +250,31 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
       case TargetType.WebAssembly: {
         const buildResponse = await client.build(files)
 
-        const instance = await fetchWasmWithProgress(dispatch, buildResponse.fileName)
+        const buff = await fetchWasmWithProgress(dispatch, buildResponse.fileName)
         dispatch(newRemoveNotificationAction(NotificationIDs.WASMAppDownload))
         dispatch(newProgramStartAction())
 
-        const argv = buildGoTestFlags(buildResponse)
-        goRun(instance, argv)
-          .then((result) => {
-            console.log('exit code: %d', result)
+        const args = buildGoTestFlags(buildResponse)
+        const stdio = createStdio(newStdoutHandler(dispatch))
+        const proc = new GoProcess()
+        proc
+          .start(buff, stdio, {
+            args,
+          })
+          .then((code) => {
+            if (isNaN(code) || code === 0) {
+              return
+            }
+
+            dispatch(
+              newAddNotificationAction({
+                id: NotificationIDs.WASMAppExitError,
+                type: NotificationType.Warning,
+                title: 'Go program finished',
+                description: `Go program exited with non zero code: ${code}`,
+                canDismiss: true,
+              }),
+            )
           })
           .catch((err) => {
             dispatch(
@@ -266,35 +297,3 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
     dispatch(newErrorAction(err.message))
   }
 }
-
-export const createGoConsoleAdapter = (dispatch: DispatchFn) => ({
-  log: (eventType: EvalEventKind, message: string) => {
-    dispatch(
-      newProgramWriteAction({
-        Kind: eventType,
-        Message: message,
-        Delay: 0,
-      }),
-    )
-  },
-})
-
-export const createGoLifecycleAdapter = (dispatch: DispatchFn) => ({
-  onExit: (code: number) => {
-    dispatch(newProgramFinishAction())
-
-    if (isNaN(code) || code === 0) {
-      return
-    }
-
-    dispatch(
-      newAddNotificationAction({
-        id: NotificationIDs.WASMAppExitError,
-        type: NotificationType.Warning,
-        title: 'Go program finished',
-        description: `Go program exited with non zero code: ${code}`,
-        canDismiss: true,
-      }),
-    )
-  },
-})
