@@ -1,7 +1,8 @@
 import * as Comlink from 'comlink'
+import { formatDuration } from '~/utils/format'
 import type { StartupParams, GoExecutor, WriteListener } from './types'
 
-const WORKER_START_TIMEOUT = 60 * 1000
+const WORKER_START_TIMEOUT = 30 * 1000
 
 type WriteHandler = (data: ArrayBuffer, isStderr: boolean) => void
 
@@ -22,7 +23,7 @@ const withDeadline = async <T>(func: () => Promise<T>, deadline: number): Promis
     let deadlineExceeded = false
     const tid = setTimeout(() => {
       deadlineExceeded = true
-      reject(new Error(`Go worker start timeout (${deadline}ms)`))
+      reject(new Error(`Go worker start timeout exceeded (${formatDuration(deadline)})`))
     }, deadline)
 
     func()
