@@ -32,6 +32,8 @@ export interface ImportObject {
    * Introduced in Go 1.21.x.
    */
   _gotest: Record<string, ImportFunction>
+
+  [k: string]: any
 }
 
 export interface GoInstance {

@@ -22,6 +22,13 @@ export interface DebugOptions {
   debug?: boolean
 }
 
+export const validateResponse = async (resp: Response | PromiseLike<Response>) => {
+  const r: Response = resp instanceof Promise ? await resp : resp
+  if (r.status !== 200) {
+    throw new Error(`Invalid HTTP response: '${r.status} ${r.statusText}' (URL: ${r.url})`)
+  }
+}
+
 export const instantiateStreaming = async (resp: Response | PromiseLike<Response>, importObject) => {
   const r: Response = resp instanceof Promise ? await resp : resp
   if (r.status !== 200) {
