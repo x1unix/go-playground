@@ -3,12 +3,17 @@ import { enosys } from './foundation'
 const PROCID_STUB = -1
 const CWD_STUB = '/'
 
+export type Process = Pick<
+  NodeJS.Process,
+  'getuid' | 'getgid' | 'geteuid' | 'getegid' | 'getgroups' | 'pid' | 'ppid' | 'umask' | 'cwd' | 'chdir'
+>
+
 /**
  * Minimal NodeJS.Process implementation for wasm_exec.js
  *
  * Source: wasm_exec.js:87 in Go 1.17
  */
-const ProcessStub = {
+export const processStub: Process = {
   getuid() {
     return PROCID_STUB
   },
@@ -35,6 +40,4 @@ const ProcessStub = {
   chdir() {
     throw enosys()
   },
-} as any
-
-export default ProcessStub as NodeJS.Process
+}

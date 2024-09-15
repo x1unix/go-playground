@@ -1,7 +1,7 @@
 import '~/lib/go/wasm_exec.js'
 import * as Comlink from 'comlink'
-import { FileSystemWrapper, type IWriter } from '~/services/go/fs'
-import ProcessStub from '~/services/go/process'
+import { FileSystemWrapper, type IWriter } from '~/lib/go/node/fs'
+import { processStub } from '~/lib/go/node/process'
 import { type GoWebAssemblyInstance, GoWrapper, wrapGlobal } from '~/lib/go'
 import type { ExecParams, GoExecutor, Stdio, WriteListener } from './types'
 
@@ -27,7 +27,7 @@ class WorkerHandler implements GoExecutor {
     const fs = new FileSystemWrapper(intoWriter(this.stdio.stdout), intoWriter(this.stdio.stderr))
     const mocks = {
       mocked: true,
-      process: ProcessStub,
+      process: processStub,
       fs,
     }
 
