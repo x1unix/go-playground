@@ -16,6 +16,7 @@ import { Link } from '@fluentui/react/lib/Link'
 import { ChangeLog } from './ChangeLog'
 import { getContentStyles, getIconButtonStyles } from '~/styles/modal'
 import environment from '~/environment'
+import { SponsorsBlock } from './SponsorsBlock'
 
 const TITLE_ID = 'AboutTitle'
 
@@ -92,9 +93,12 @@ export const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) =>
         </div>
         <div className={modalStyles.footer}>
           <div>
-            {/* eslint-disable-next-line react/no-unescaped-entities */}
-            <h3>What's New</h3>
+            <h3>What&apos;s New</h3>
             <ChangeLog />
+          </div>
+          <div>
+            <h3>Sponsors</h3>
+            <SponsorsBlock isDark={theme.isInverted} />
           </div>
           <Stack
             horizontal
