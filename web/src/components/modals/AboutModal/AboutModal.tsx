@@ -38,7 +38,7 @@ export const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) =>
           animationDuration: MotionDurations.duration3,
         },
         main: {
-          maxWidth: '640px',
+          maxWidth: '440px',
         },
         title: {
           fontWeight: FontWeights.semibold,
