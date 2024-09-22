@@ -1,11 +1,15 @@
 import clsx from 'clsx'
 import React from 'react'
-import { Link } from '@fluentui/react/lib/Link'
+import { Link, mergeStyles } from '@fluentui/react'
 
 import changelog from '~/changelog.json'
 import environment from '~/environment'
 
 interface Props extends Pick<React.HTMLProps<HTMLDivElement>, 'className' | 'style'> {}
+
+const listStyles = mergeStyles({
+  paddingLeft: '1rem',
+})
 
 export const ChangeLog: React.FC<Props> = ({ className, ...props }) => {
   return (
@@ -13,7 +17,7 @@ export const ChangeLog: React.FC<Props> = ({ className, ...props }) => {
       {Object.entries(changelog).map(([section, items]) => (
         <div key={section}>
           <b>{section}</b>
-          <ul>
+          <ul className={listStyles}>
             {items.map(({ issueId, url, description }) => (
               <li key={issueId}>
                 <Link href={`${environment.urls.github}/${url}`} target="_blank">
