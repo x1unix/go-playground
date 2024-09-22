@@ -121,12 +121,7 @@ const StatusBar: React.FC<Props> = ({ loading, running, lastError, markers }) =>
         </div>
         <div className="StatusBar__side-right">
           <StatusBarItem icon="Feedback" title="Send feedback" href={environment.urls.issue} iconOnly />
-          <StatusBarItem
-            imageSrc="/github-mark-light-32px.png"
-            title="GitHub"
-            href={environment.urls.github}
-            iconOnly
-          />
+          <StatusBarItem icon="VscGithubInverted" title="GitHub" href={environment.urls.github} iconOnly />
         </div>
       </div>
     </>
