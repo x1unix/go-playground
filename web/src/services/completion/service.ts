@@ -1,5 +1,5 @@
 import { addDays } from 'date-fns'
-import { persistentStore } from '../cache'
+import { keyValue } from '../storage'
 import type { GoImportsList } from './types'
 
 const stdlibImportsKey = 'go.imports.stdlib'
@@ -21,7 +21,7 @@ export class GoCompletionService {
    * Completions with mutated position are no longer validated, so either each new copy should be done
    * or it's much easier to just query the DB.
    */
-  private readonly store = persistentStore
+  private readonly store = keyValue
 
   /**
    * Returns list of known importable Go packages.

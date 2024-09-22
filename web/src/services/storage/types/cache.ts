@@ -1,7 +1,13 @@
+export interface CacheEntry<T = any> {
+  key: string
+  value: T
+  expireAt?: Date
+}
+
 /**
  * Abstract cache implementation
  */
-export interface Storage {
+export interface CacheStorage {
   /**
    * Return an item by key.
    *
