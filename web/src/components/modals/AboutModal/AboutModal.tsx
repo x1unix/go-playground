@@ -7,8 +7,6 @@ import {
   FontSizes,
   mergeStyleSets,
   useTheme,
-  Stack,
-  DefaultButton,
 } from '@fluentui/react'
 import { Modal } from '@fluentui/react/lib/Modal'
 import { Link } from '@fluentui/react/lib/Link'
@@ -17,6 +15,7 @@ import { ChangeLog } from './ChangeLog'
 import { getContentStyles, getIconButtonStyles } from '~/styles/modal'
 import environment from '~/environment'
 import { SponsorsBlock } from './SponsorsBlock'
+import { FooterButtons } from './FooterButtons'
 
 const TITLE_ID = 'AboutTitle'
 
@@ -38,7 +37,7 @@ export const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) =>
           animationDuration: MotionDurations.duration3,
         },
         main: {
-          maxWidth: '640px',
+          maxWidth: '440px',
         },
         title: {
           fontWeight: FontWeights.semibold,
@@ -100,48 +99,7 @@ export const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) =>
             <h3>Sponsors</h3>
             <SponsorsBlock isDark={theme.isInverted} />
           </div>
-          <Stack
-            horizontal
-            wrap
-            horizontalAlign="end"
-            tokens={{
-              childrenGap: 'm',
-            }}
-            style={{
-              marginTop: '1.5rem',
-            }}
-          >
-            <Stack.Item grow={1}>
-              <DefaultButton
-                href={environment.urls.issue}
-                target="_blank"
-                iconProps={{
-                  iconName: 'Bug',
-                }}
-              >
-                Report Bug
-              </DefaultButton>
-            </Stack.Item>
-            <DefaultButton
-              href={environment.urls.github}
-              target="_blank"
-              iconProps={{
-                iconName: 'OpenSource',
-              }}
-            >
-              Source
-            </DefaultButton>
-
-            <DefaultButton
-              href={environment.urls.donate}
-              target="_blank"
-              iconProps={{
-                iconName: 'Heart',
-              }}
-            >
-              Donate
-            </DefaultButton>
-          </Stack>
+          <FooterButtons />
         </div>
       </div>
     </Modal>
