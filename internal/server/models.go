@@ -8,14 +8,29 @@ import (
 	"github.com/x1unix/go-playground/pkg/goplay"
 )
 
-// rawContentLengthHeader is a custom content length header
-// that contains content raw size before compression.
-//
-// The header is used to properly report download progress when
-// payload is transferred with compression.
-//
-// See: /web/src/utils/http.ts
-const rawContentLengthHeader = "X-Raw-Content-Length"
+const (
+	// rawContentLengthHeader is a custom content length header
+	// that contains content raw size before compression.
+	//
+	// The header is used to properly report download progress when
+	// payload is transferred with compression.
+	//
+	// See: /web/src/utils/http.ts
+	rawContentLengthHeader = "X-Raw-Content-Length"
+
+	deprecationMsg = `"This endpoint is deprecated and will be removed in the next release!"`
+)
+
+type deprecatedMessage struct{}
+
+func (_ deprecatedMessage) MarshalJSON() ([]byte, error) {
+	return []byte(deprecationMsg), nil
+}
+
+// DeprecatedHeader is embeddable struct to mark in response that method is deprecated.
+type DeprecatedHeader struct {
+	DeprecationWarning deprecatedMessage `json:"deprecated"`
+}
 
 // SnippetResponse is snippet response
 type SnippetResponse struct {
@@ -62,6 +77,8 @@ func (r VersionResponse) Write(w http.ResponseWriter) {
 
 // SuggestionsResponse is code completion response
 type SuggestionsResponse struct {
+	DeprecatedHeader
+
 	// Suggestions are list of suggestions for monaco
 	Suggestions []*analyzer.CompletionItem `json:"suggestions"`
 }
@@ -73,6 +90,8 @@ func (r SuggestionsResponse) Write(w http.ResponseWriter) {
 
 // BuildResponseV1 is build response for legacy API.
 type BuildResponseV1 struct {
+	DeprecatedHeader
+
 	// Formatted contains goimport'ed code.
 	Formatted string `json:"formatted,omitempty"`
 

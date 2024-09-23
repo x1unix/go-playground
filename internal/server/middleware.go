@@ -34,7 +34,7 @@ func DeprecatedEndpoint(h HandlerFunc, sunsetDate time.Time) HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		w.Header().Set("Deprecation", "true")
 		w.Header().Set("Sunset", sunsetDateStr)
-		w.Header().Set("Warning", `299 - "Deprecated API, use /api/v2 instead"`)
+		w.Header().Set("Warning", `299 - "This endpoint is deprecated and will be removed in the next release!"`)
 		return h(w, r)
 	}
 }
@@ -44,7 +44,8 @@ func handleError(err error, w http.ResponseWriter) {
 		return
 	}
 
-	if httpErr, ok := err.(*HTTPError); ok {
+	httpErr := new(HTTPError)
+	if errors.As(err, &httpErr) {
 		httpErr.WriteResponse(w)
 		return
 	}

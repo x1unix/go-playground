@@ -28,7 +28,7 @@ const (
 	artifactParamVal = "artifactId"
 )
 
-var apiv1SunsetDate = time.Date(2025, time.January, 1, 0, 0, 0, 0, time.UTC)
+var apiv1SunsetDate = time.Date(2024, time.October, 1, 0, 0, 0, 0, time.UTC)
 
 type BackendVersionProvider interface {
 	GetVersions(ctx context.Context) (*VersionsInformation, error)
@@ -67,14 +67,16 @@ func NewAPIv1Handler(cfg ServiceConfig, client *goplay.Client, packages []*analy
 func (s *APIv1Handler) Mount(r *mux.Router) {
 	r.Path("/version").
 		HandlerFunc(WrapHandler(s.HandleGetVersion))
-	r.Path("/suggest").
-		HandlerFunc(WrapHandler(s.HandleGetSuggestion))
 	r.Path("/backends/info").Methods(http.MethodGet).
 		HandlerFunc(WrapHandler(s.HandleGetVersions))
 	r.Path("/artifacts/{artifactId:[a-fA-F0-9]+}.wasm").Methods(http.MethodGet).
 		HandlerFunc(WrapHandler(s.HandleArtifactRequest))
 
-	// Deprecated endpoints
+	// TODO: remove suggest in the next release
+	r.Path("/suggest").
+		HandlerFunc(WrapHandler(DeprecatedEndpoint(s.HandleGetSuggestion, apiv1SunsetDate)))
+
+	// TODO: remove deprecated apis below
 	r.Path("/run").Methods(http.MethodPost).
 		HandlerFunc(WrapHandler(DeprecatedEndpoint(s.HandleRunCode, apiv1SunsetDate)))
 	r.Path("/compile").Methods(http.MethodPost).
