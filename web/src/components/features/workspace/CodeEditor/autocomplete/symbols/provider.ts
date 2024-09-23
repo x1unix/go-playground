@@ -1,5 +1,5 @@
 import type * as monaco from 'monaco-editor'
-import { type IAPIClient } from '~/services/api'
+import type { GoCompletionService } from '~/services/completion'
 import { asyncDebounce } from '../../utils'
 import snippets from './snippets'
 import { parseExpression } from './parse'
@@ -7,11 +7,11 @@ import { parseExpression } from './parse'
 const SUGGESTIONS_DEBOUNCE_DELAY = 500
 
 export class GoCompletionItemProvider implements monaco.languages.CompletionItemProvider {
-  private readonly getSuggestionFunc: IAPIClient['getSuggestions']
+  private readonly getSuggestionFunc: GoCompletionService['getSymbolSuggestions']
 
-  constructor(private readonly client: IAPIClient) {
+  constructor(completionSvc: GoCompletionService) {
     this.getSuggestionFunc = asyncDebounce(
-      async (query) => await client.getSuggestions(query),
+      async (query) => await completionSvc.getSymbolSuggestions(query),
       SUGGESTIONS_DEBOUNCE_DELAY,
     )
   }
@@ -52,8 +52,8 @@ export class GoCompletionItemProvider implements monaco.languages.CompletionItem
       .map((s) => ({ ...s, range }))
 
     try {
-      const { suggestions } = await this.getSuggestionFunc(query)
-      if (!suggestions) {
+      const suggestions = await this.getSuggestionFunc(query)
+      if (!suggestions?.length) {
         return {
           suggestions: relatedSnippets,
         }
@@ -63,7 +63,7 @@ export class GoCompletionItemProvider implements monaco.languages.CompletionItem
         suggestions: relatedSnippets.concat(suggestions.map((s) => ({ ...s, range }))),
       }
     } catch (err: any) {
-      console.error(`Failed to get code completion from server: ${err.message}`)
+      console.error(`Failed to get completion items: ${err.message}`)
       return { suggestions: relatedSnippets }
     }
   }

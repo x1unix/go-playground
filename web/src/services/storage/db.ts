@@ -10,9 +10,14 @@ export class DatabaseStorage extends Dexie {
 
   constructor() {
     super('CacheStore')
+
+    // Init table with 2 indexes:
+    //
+    // [recordType+packageName+prefix]  - For monaco autocompletion
+    // [recordType+packageName+label]   - For hover (codelens)
     this.version(2).stores({
       keyValue: 'key',
-      completionItems: '++id,label,recordType,prefix,packageName',
+      completionItems: '++id,recordType,[recordType+packageName+prefix],[recordType+packageName+label]',
     })
   }
 }

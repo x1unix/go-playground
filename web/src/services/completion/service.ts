@@ -1,7 +1,7 @@
 import { db, keyValue } from '../storage'
 import { type CompletionRecord, CompletionRecordType } from '../storage/types'
-import type { GoImportsFile } from './types'
-import { buildCompletionRecord, completionRecordsFromMap, importRecordsIntoSymbols } from './utils'
+import type { GoImportsFile, SuggestionQuery } from './types'
+import { buildCompletionRecord, completionRecordsFromMap, importRecordsIntoSymbols, buildTableQuery } from './utils'
 
 const completionVersionKey = 'completionItems.version'
 
@@ -22,6 +22,13 @@ export class GoCompletionService {
   private readonly keyValue = keyValue
 
   /**
+   * Returns whether cache was previously populated.
+   */
+  isWarmUp() {
+    return this.cachePopulated
+  }
+
+  /**
    * Returns list of known importable Go packages.
    *
    * Returns value from cache if available.
@@ -32,26 +39,41 @@ export class GoCompletionService {
     return await this.getStandardPackages()
   }
 
-  isWarmUp() {
-    return this.cachePopulated
+  /**
+   * Returns symbol or literal suggestions by prefix and package name.
+   */
+  async getSymbolSuggestions(query: SuggestionQuery) {
+    await this.checkCacheReady()
+
+    const { keys, values } = buildTableQuery(query)
+    const results = await this.db.completionItems.where(keys).equals(values).sortBy('label')
+    return results
   }
 
   private async getStandardPackages() {
+    await this.checkCacheReady()
+    const symbols = await this.db.completionItems.where('recordType').equals(CompletionRecordType.ImportPath).toArray()
+    return symbols
+  }
+
+  private async checkCacheReady() {
+    if (this.cachePopulated) {
+      return true
+    }
+
     // TODO: add invalidation by Go version
     const version = await this.keyValue.getItem<string>(completionVersionKey)
     if (!version) {
-      const { importPaths } = await this.populateCache()
-      return importPaths
+      await this.populateCache()
+      return true
     }
 
-    const symbols = await this.db.completionItems.where('recordType').equals(CompletionRecordType.ImportPath).toArray()
-    if (!symbols) {
-      const { importPaths } = await this.populateCache()
-      return importPaths
+    const count = await this.db.completionItems.count()
+    this.cachePopulated = count > 0
+    if (!this.cachePopulated) {
+      await this.populateCache()
     }
-
-    this.cachePopulated = true
-    return symbols
+    return this.cachePopulated
   }
 
   private async populateCache() {
@@ -64,8 +86,11 @@ export class GoCompletionService {
 
     // Completion options for import paths and package names are 2 separate records.
     const importPaths = data.packages.map((pkg) => buildCompletionRecord(pkg, CompletionRecordType.ImportPath))
-    const symbols = [...completionRecordsFromMap(data.symbols), ...importRecordsIntoSymbols(data.packages)]
-    const records: CompletionRecord[] = [...importPaths, ...symbols]
+    const records: CompletionRecord[] = [
+      ...importPaths,
+      ...completionRecordsFromMap(data.symbols),
+      ...importRecordsIntoSymbols(data.packages),
+    ]
 
     await Promise.all([
       this.db.completionItems.clear(),
@@ -74,6 +99,5 @@ export class GoCompletionService {
     ])
 
     this.cachePopulated = true
-    return { importPaths, symbols }
   }
 }

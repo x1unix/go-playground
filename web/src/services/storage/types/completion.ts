@@ -10,6 +10,11 @@ export enum CompletionRecordType {
 }
 
 /**
+ * Type represents CompletionRecord keys that can be used for query using DB index.
+ */
+export type IndexableKey = keyof Omit<CompletionRecord, keyof CompletionItem>
+
+/**
  * Entity represends completion record stored in a cache.
  *
  * Extends monaco type with some extra indexing information.
@@ -29,5 +34,5 @@ export interface CompletionRecord extends monaco.languages.CompletionItem {
   /**
    * Package name to what this symbol belongs.
    */
-  packageName?: string
+  packageName: string
 }

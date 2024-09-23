@@ -2,6 +2,11 @@ import type * as monaco from 'monaco-editor'
 
 export type CompletionItems = monaco.languages.CompletionItem[]
 
+export interface SuggestionQuery {
+  packageName?: string
+  value: string
+}
+
 /**
  * Go standard packages list dumped by `pkgindexer` tool.
  */
