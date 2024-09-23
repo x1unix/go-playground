@@ -8,11 +8,11 @@ If you have any suggestions to improve this document, please feel free to submit
 
 ## Glossary
 
-| Term      | Description                           |
-| --------- | ------------------------------------- |
-| FE        | Front-end web application.            |
-| BE        | Back-end, REST API service.           |
-| WASM      | WebAssembly.                          |
+| Term | Description                 |
+|------|-----------------------------|
+| FE   | Front-end web application.  |
+| BE   | Back-end, REST API service. |
+| WASM | WebAssembly.                |
 
 ## Project Components
 
@@ -48,19 +48,17 @@ FE app relies on a set of WASM programs written in Go for language-specific task
 
 WASM Go programs are located in [`cmd/wasm`](./cmd/wasm/) directory.
 
-| Package    | Description                                                                                                                 |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `analyzer` | Very simple Go syntax checker.                                                                                              |
+| Package    | Description                    |
+|------------|--------------------------------|
+| `analyzer` | Very simple Go syntax checker. |
 
 ### Tools & Scripts
 
 Project uses a set of Go programs to prepare assets necessary for a project.
 
-| Name               | Description                                                                    |
-| ------------------ | ------------------------------------------------------------------------------ |
-| `pkgindexer`       | Collects list of Go standard packages into JSON file for FE app autocomplete.  |
-| `collect-builtin`  | Prepares list of Go packages for BE API `/suggest` endpoint.                   |
-| `collector`        | Obsolete and unused.                                                           |
+| Name         | Description                                                                      |
+|--------------|----------------------------------------------------------------------------------|
+| `pkgindexer` | Collects list of Go packages and symbols into JSON file for FE app autocomplete. |
 
 > [!NOTE]
 > Tools are located in [`tools`](./tools) directory.
@@ -82,7 +80,7 @@ Please ensure that you have installed:
 Run following commands to configure a just cloned project:
 
 | Command           | Purpose                                                  |
-| ----------------- | -------------------------------------------------------- |
+|-------------------|----------------------------------------------------------|
 | `make preinstall` | Installs NPM packages for a web app.                     |
 | `make wasm`       | Builds WebAssembly binaries used by the web app.         |
 | `make pkg-index`  | Generates Go packages index for autocomplete in web app. |
@@ -91,10 +89,10 @@ Run following commands to configure a just cloned project:
 
 Front-end web app and Go API server are executed using separate make commands:
 
-| Command    | Purpose                                      |
-| ---------- | -------------------------------------------- |
-| `make run` | Starts Go API web server.                    |
-| `make ui`  | Starts Vite dev server with web app.         |
+| Command    | Purpose                              |
+|------------|--------------------------------------|
+| `make run` | Starts Go API web server.            |
+| `make ui`  | Starts Vite dev server with web app. |
 
 Backend is running at port `8000` and front-end is running on port `3000`.
 
