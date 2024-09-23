@@ -1,2 +1,2 @@
 export type * from './cache'
-export type * from './completion'
+export * from './completion'

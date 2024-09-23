@@ -12,7 +12,7 @@ export class DatabaseStorage extends Dexie {
     super('CacheStore')
     this.version(2).stores({
       keyValue: 'key',
-      compleitonItems: 'label,packageName',
+      completionItems: '++id,label,recordType,prefix,packageName',
     })
   }
 }
