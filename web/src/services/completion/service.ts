@@ -73,6 +73,7 @@ export class GoCompletionService {
       this.keyValue.setItem(completionVersionKey, data.format),
     ])
 
+    this.cachePopulated = true
     return { importPaths, symbols }
   }
 }
