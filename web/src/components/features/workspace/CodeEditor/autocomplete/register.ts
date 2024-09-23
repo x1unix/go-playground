@@ -1,6 +1,6 @@
 import * as monaco from 'monaco-editor'
 
-import { GoCompletionItemProvider } from './symbols'
+import { GoSymbolsCompletionItemProvider } from './symbols'
 import { GoImportsCompletionProvider } from './imports'
 import type { StateDispatch } from '~/store'
 import { goCompletionService } from '~/services/completion'
@@ -10,7 +10,10 @@ import { goCompletionService } from '~/services/completion'
  */
 export const registerGoLanguageProviders = (dispatcher: StateDispatch) => {
   return [
-    monaco.languages.registerCompletionItemProvider('go', new GoCompletionItemProvider(goCompletionService)),
+    monaco.languages.registerCompletionItemProvider(
+      'go',
+      new GoSymbolsCompletionItemProvider(dispatcher, goCompletionService),
+    ),
     monaco.languages.registerCompletionItemProvider(
       'go',
       new GoImportsCompletionProvider(dispatcher, goCompletionService),

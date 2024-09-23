@@ -8,7 +8,7 @@ const importGroupRegex = /^import\s?\(\s?$/
 const emptyLineOrCommentRegex = /^\s+$|^\s?\/\//
 
 /**
- * Go standard and third-party packages list provider.
+ * Provides completions for import paths inside `import` clause.
  */
 export class GoImportsCompletionProvider extends CacheBasedCompletionProvider<boolean> {
   triggerCharacters = ['"']
@@ -21,8 +21,8 @@ export class GoImportsCompletionProvider extends CacheBasedCompletionProvider<bo
   protected parseCompletionQuery(
     model: monaco.editor.ITextModel,
     position: monaco.Position,
-    context: monaco.languages.CompletionContext,
-    token: monaco.CancellationToken,
+    _context: monaco.languages.CompletionContext,
+    _token: monaco.CancellationToken,
   ): boolean | null {
     const isImportStmt = this.isImportStatementRange(position, model)
     if (!isImportStmt) {

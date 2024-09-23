@@ -13,11 +13,6 @@ const emptySuggestions = { suggestions: [] }
  */
 export abstract class CacheBasedCompletionProvider<TQuery> implements monaco.languages.CompletionItemProvider {
   /**
-   * List of default suggestions that will be provided on error.
-   */
-  protected defaultSuggestions: monaco.languages.CompletionItem[] = []
-
-  /**
    * @param dispatch Redux state dispatcher. Used to push notifications.
    * @param cache Go completion cache service.
    */
@@ -25,6 +20,13 @@ export abstract class CacheBasedCompletionProvider<TQuery> implements monaco.lan
     protected readonly dispatch: StateDispatch,
     protected cache: GoCompletionService,
   ) {}
+
+  /**
+   * List of default fallback suggestions returned on error.
+   */
+  protected getFallbackSuggestions(_query: TQuery): monaco.languages.CompletionList {
+    return emptySuggestions
+  }
 
   /**
    * Method to implement logic of fetching completion items.
@@ -72,9 +74,7 @@ export abstract class CacheBasedCompletionProvider<TQuery> implements monaco.lan
     } catch (err) {
       console.error(err)
       this.showErrorMessage(err)
-      return {
-        suggestions: this.defaultSuggestions,
-      }
+      return this.getFallbackSuggestions(query)
     }
   }
 
