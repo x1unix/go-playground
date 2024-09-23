@@ -1,27 +1,42 @@
 import type * as monaco from 'monaco-editor'
-import { type IAPIClient } from '~/services/api'
+import type { SuggestionQuery } from '~/services/completion'
 import { asyncDebounce } from '../../utils'
 import snippets from './snippets'
 import { parseExpression } from './parse'
+import { CacheBasedCompletionProvider } from '../base'
 
 const SUGGESTIONS_DEBOUNCE_DELAY = 500
 
-export class GoCompletionItemProvider implements monaco.languages.CompletionItemProvider {
-  private readonly getSuggestionFunc: IAPIClient['getSuggestions']
+interface CompletionContext extends SuggestionQuery {
+  range: monaco.IRange
+}
 
-  constructor(private readonly client: IAPIClient) {
-    this.getSuggestionFunc = asyncDebounce(
-      async (query) => await client.getSuggestions(query),
-      SUGGESTIONS_DEBOUNCE_DELAY,
-    )
+/**
+ * Provides completion for symbols such as variables and functions.
+ */
+export class GoSymbolsCompletionItemProvider extends CacheBasedCompletionProvider<CompletionContext> {
+  private readonly getSuggestionFunc = asyncDebounce(
+    async (query) => await this.cache.getSymbolSuggestions(query),
+    SUGGESTIONS_DEBOUNCE_DELAY,
+  )
+
+  protected getFallbackSuggestions({ value, range }: CompletionContext) {
+    // filter snippets by prefix.
+    // usually monaco does that but not always in right way
+    const suggestions = snippets
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
+      .filter((s) => s.label.toString().startsWith(value))
+      .map((s) => ({ ...s, range }))
+
+    return { suggestions }
   }
 
-  async provideCompletionItems(
+  protected parseCompletionQuery(
     model: monaco.editor.ITextModel,
     position: monaco.Position,
-    context: monaco.languages.CompletionContext,
-    token: monaco.CancellationToken,
-  ): Promise<monaco.languages.CompletionList> {
+    _context: monaco.languages.CompletionContext,
+    _token: monaco.CancellationToken,
+  ) {
     const val = model
       .getValueInRange({
         startLineNumber: position.lineNumber,
@@ -33,7 +48,7 @@ export class GoCompletionItemProvider implements monaco.languages.CompletionItem
 
     const query = parseExpression(val)
     if (!query) {
-      return await Promise.resolve({ suggestions: [] })
+      return null
     }
 
     const word = model.getWordUntilPosition(position)
@@ -44,27 +59,16 @@ export class GoCompletionItemProvider implements monaco.languages.CompletionItem
       endColumn: word.endColumn,
     }
 
-    // filter snippets by prefix.
-    // usually monaco does that but not always in right way
-    const relatedSnippets = snippets
-      // eslint-disable-next-line @typescript-eslint/no-base-to-string
-      .filter((s) => s.label.toString().startsWith(query.value))
-      .map((s) => ({ ...s, range }))
+    return { ...query, range }
+  }
 
-    try {
-      const { suggestions } = await this.getSuggestionFunc(query)
-      if (!suggestions) {
-        return {
-          suggestions: relatedSnippets,
-        }
-      }
-
-      return {
-        suggestions: relatedSnippets.concat(suggestions.map((s) => ({ ...s, range }))),
-      }
-    } catch (err: any) {
-      console.error(`Failed to get code completion from server: ${err.message}`)
-      return { suggestions: relatedSnippets }
+  protected async querySuggestions(query: CompletionContext) {
+    const { suggestions: relatedSnippets } = this.getFallbackSuggestions(query)
+    const suggestions = await this.getSuggestionFunc(query)
+    if (!suggestions?.length) {
+      return relatedSnippets
     }
+
+    return relatedSnippets.concat(suggestions.map((s) => ({ ...s, range: query.range })))
   }
 }

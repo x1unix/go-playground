@@ -41,12 +41,6 @@ pkg-index:
 check-yarn:
 	$(call check_tool,$(YARN),'YARN')
 
-# Build targets
-.PHONY: collect-meta
-collect-meta:
-	@echo ":: Building Go packages index..." && \
-	$(GO) run $(TOOLS)/collector -goroot $(GOROOT) -out data/packages.json
-
 .PHONY:preinstall
 preinstall:
 	@echo ":: Checking and installing dependencies..." && \
@@ -74,7 +68,7 @@ analyzer.wasm:
 wasm: wasm_exec.js analyzer.wasm 
 
 .PHONY: build
-build: check-go check-yarn clean preinstall gen collect-meta build-server wasm pkg-index build-ui 
+build: check-go check-yarn clean preinstall gen build-server wasm pkg-index build-ui
 	@echo ":: Copying assets..." && \
 	cp -rfv ./data $(TARGET)/data && \
 	mv -v $(UI)/build $(TARGET)/public && \

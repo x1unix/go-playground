@@ -3,7 +3,6 @@ import { Spinner } from '@fluentui/react'
 import MonacoEditor, { type Monaco } from '@monaco-editor/react'
 import * as monaco from 'monaco-editor'
 
-import apiClient from '~/services/api'
 import { createVimModeAdapter, type StatusBarAdapter, type VimModeKeymap } from '~/plugins/vim/editor'
 import { Analyzer } from '~/services/analyzer'
 import { type MonacoSettings, TargetType } from '~/services/config'
@@ -77,7 +76,7 @@ class CodeEditor extends React.Component<Props> {
   }, 1000)
 
   editorDidMount(editorInstance: monaco.editor.IStandaloneCodeEditor, monacoInstance: Monaco) {
-    this.disposables = registerGoLanguageProviders(apiClient, this.props.dispatch)
+    this.disposables = registerGoLanguageProviders(this.props.dispatch)
     this.editorInstance = editorInstance
     this.monaco = monacoInstance
 

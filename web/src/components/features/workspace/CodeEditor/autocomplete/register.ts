@@ -1,16 +1,22 @@
 import * as monaco from 'monaco-editor'
-import type { IAPIClient } from '~/services/api'
 
-import { GoCompletionItemProvider } from './symbols'
+import { GoSymbolsCompletionItemProvider } from './symbols'
 import { GoImportsCompletionProvider } from './imports'
 import type { StateDispatch } from '~/store'
+import { goCompletionService } from '~/services/completion'
 
 /**
  * Registers all Go autocomplete providers for Monaco editor.
  */
-export const registerGoLanguageProviders = (client: IAPIClient, dispatcher: StateDispatch) => {
+export const registerGoLanguageProviders = (dispatcher: StateDispatch) => {
   return [
-    monaco.languages.registerCompletionItemProvider('go', new GoCompletionItemProvider(client)),
-    monaco.languages.registerCompletionItemProvider('go', new GoImportsCompletionProvider(dispatcher)),
+    monaco.languages.registerCompletionItemProvider(
+      'go',
+      new GoSymbolsCompletionItemProvider(dispatcher, goCompletionService),
+    ),
+    monaco.languages.registerCompletionItemProvider(
+      'go',
+      new GoImportsCompletionProvider(dispatcher, goCompletionService),
+    ),
   ]
 }

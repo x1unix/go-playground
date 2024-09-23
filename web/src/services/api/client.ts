@@ -1,5 +1,4 @@
 import * as axios from 'axios'
-import { type languages } from 'monaco-editor'
 import {
   Backend,
   type VersionResponse,
@@ -9,7 +8,7 @@ import {
   type VersionsInfo,
   type FilesPayload,
 } from './models'
-import { type IAPIClient } from './interface'
+import type { IAPIClient } from './interface'
 
 export class Client implements IAPIClient {
   private readonly client: axios.AxiosInstance
@@ -24,13 +23,6 @@ export class Client implements IAPIClient {
 
   async getVersion(): Promise<VersionResponse> {
     return await this.get<VersionResponse>(`/version?=${Date.now()}`)
-  }
-
-  async getSuggestions(query: { packageName?: string; value?: string }): Promise<languages.CompletionList> {
-    const queryParams = Object.keys(query)
-      .map((k) => `${k}=${query[k]}`)
-      .join('&')
-    return await this.get<languages.CompletionList>(`/suggest?${queryParams}`)
   }
 
   async build(files: Record<string, string>): Promise<BuildResponse> {
