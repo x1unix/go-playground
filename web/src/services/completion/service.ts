@@ -1,7 +1,14 @@
 import { db, keyValue } from '../storage'
-import { type CompletionRecord, CompletionRecordType } from '../storage/types'
-import type { GoImportsFile, SuggestionQuery } from './types'
-import { buildCompletionRecord, completionRecordsFromMap, importRecordsIntoSymbols, buildTableQuery } from './utils'
+import type { GoIndexFile, SuggestionQuery } from './types'
+import {
+  completionFromPackage,
+  completionFromSymbol,
+  findPackagePathFromContext,
+  importCompletionFromPackage,
+  intoPackageIndexItem,
+  intoSymbolIndexItem,
+} from './utils'
+import { type SymbolIndexItem } from '~/services/storage/types'
 
 const completionVersionKey = 'completionItems.version'
 
@@ -45,15 +52,43 @@ export class GoCompletionService {
   async getSymbolSuggestions(query: SuggestionQuery) {
     await this.checkCacheReady()
 
-    const { keys, values } = buildTableQuery(query)
-    const results = await this.db.completionItems.where(keys).equals(values).sortBy('label')
-    return results
+    if (query.packageName) {
+      return await this.getMemberSuggestion(query as Required<SuggestionQuery>)
+    }
+
+    return await this.getLiteralSuggestion(query)
+  }
+
+  private async getMemberSuggestion({ value, packageName, context }: Required<SuggestionQuery>) {
+    // If package with specified name is imported - filter symbols
+    // to avoid overlap with packages with eponymous name.
+    const packagePath = findPackagePathFromContext(context, packageName)
+
+    const query: Partial<SymbolIndexItem> = packagePath
+      ? {
+          packagePath,
+        }
+      : { packageName, prefix: value }
+
+    const symbols = await this.db.symbolIndex.where(query).toArray()
+    return symbols.map((symbol) => completionFromSymbol(symbol, context, !!packagePath))
+  }
+
+  private async getLiteralSuggestion({ value, context }: SuggestionQuery) {
+    const packages = await this.db.packageIndex.where('prefix').equals(value).toArray()
+    const builtins = await this.db.symbolIndex.where('packagePath').equals('builtin').toArray()
+
+    const packageCompletions = packages.map((item) => completionFromPackage(item, context))
+    const symbolsCompletions = builtins.map((item) => completionFromSymbol(item, context, false))
+
+    return packageCompletions.concat(symbolsCompletions)
   }
 
   private async getStandardPackages() {
     await this.checkCacheReady()
-    const symbols = await this.db.completionItems.where('recordType').equals(CompletionRecordType.ImportPath).toArray()
-    return symbols
+
+    const results = await this.db.packageIndex.toArray()
+    return results.map(importCompletionFromPackage)
   }
 
   private async checkCacheReady() {
@@ -68,7 +103,7 @@ export class GoCompletionService {
       return true
     }
 
-    const count = await this.db.completionItems.count()
+    const count = await this.db.packageIndex.count()
     this.cachePopulated = count > 0
     if (!this.cachePopulated) {
       await this.populateCache()
@@ -77,25 +112,26 @@ export class GoCompletionService {
   }
 
   private async populateCache() {
-    const rsp = await fetch('/data/imports.json')
+    const rsp = await fetch('/data/go-index.json')
     if (!rsp.ok) {
       throw new Error(`${rsp.status} ${rsp.statusText}`)
     }
 
-    const data: GoImportsFile = await rsp.json()
+    const data: GoIndexFile = await rsp.json()
+    if (data.version > 1) {
+      console.warn(`unsupported symbol index version: ${data.version}, skip update.`)
+      return
+    }
 
-    // Completion options for import paths and package names are 2 separate records.
-    const importPaths = data.packages.map((pkg) => buildCompletionRecord(pkg, CompletionRecordType.ImportPath))
-    const records: CompletionRecord[] = [
-      ...importPaths,
-      ...completionRecordsFromMap(data.symbols),
-      ...importRecordsIntoSymbols(data.packages),
-    ]
+    const packages = data.packages.map(intoPackageIndexItem)
+    const symbols = data.symbols.map(intoSymbolIndexItem)
 
     await Promise.all([
-      this.db.completionItems.clear(),
-      this.db.completionItems.bulkAdd(records),
-      this.keyValue.setItem(completionVersionKey, data.format),
+      this.db.packageIndex.clear(),
+      this.db.symbolIndex.clear(),
+      this.db.packageIndex.bulkAdd(packages),
+      this.db.symbolIndex.bulkAdd(symbols),
+      this.keyValue.setItem(completionVersionKey, data.go),
     ])
 
     this.cachePopulated = true
