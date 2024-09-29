@@ -26,15 +26,18 @@ const ANALYZE_DEBOUNCE_TIME = 500
 // ask monaco-editor/react to use our own Monaco instance.
 configureMonacoLoader()
 
-const mapWorkspaceProps = ({ files, selectedFile }: WorkspaceState) => {
+const mapWorkspaceProps = ({ files, selectedFile, snippet }: WorkspaceState) => {
+  const projectId = snippet?.id ?? ''
   if (!selectedFile) {
     return {
+      projectId,
       code: '',
       fileName: '',
     }
   }
 
   return {
+    projectId,
     code: files?.[selectedFile],
     fileName: selectedFile,
   }
@@ -43,10 +46,11 @@ const mapWorkspaceProps = ({ files, selectedFile }: WorkspaceState) => {
 interface CodeEditorState {
   code?: string
   loading?: boolean
+  fileName: string
+  projectId: string
 }
 
 interface Props extends CodeEditorState {
-  fileName: string
   darkMode: boolean
   vimModeEnabled: boolean
   isServerEnvironment: boolean
