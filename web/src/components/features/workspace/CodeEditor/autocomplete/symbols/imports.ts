@@ -382,6 +382,10 @@ export const buildImportContext = (model: monaco.editor.ITextModel): SuggestionC
       blockPaths: lastImportBlock.imports.map(({ path }) => path),
       blockType: lastImportBlock.isMultiline ? ImportClauseType.Block : ImportClauseType.Single,
       range: lastImportBlock.range,
+      totalRange: {
+        startLineNumber: packageLine,
+        endLineNumber: lastImportBlock.range.endLineNumber,
+      },
     }
   }
 
@@ -396,6 +400,10 @@ export const buildImportContext = (model: monaco.editor.ITextModel): SuggestionC
     blockType: ImportClauseType.None,
     range: fallbackRange,
     prependNewLine: true,
+    totalRange: {
+      startLineNumber: packageLine,
+      endLineNumber: packageLine + 1,
+    },
   }
 
   // No imports, figure out if there is an empty line after package clause.

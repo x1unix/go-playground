@@ -33,6 +33,13 @@ export interface SuggestionContext {
     allPaths?: Set<string>
 
     /**
+     * Start and end line of area containing all imports.
+     *
+     * This area will be monitored for changes to update document imports cache.
+     */
+    totalRange?: Pick<monaco.IRange, 'startLineNumber' | 'endLineNumber'>
+
+    /**
      * Imports in a last block related to `range`.
      */
     blockPaths?: string[]
