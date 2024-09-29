@@ -1,26 +1,23 @@
 import type * as monaco from 'monaco-editor'
-import type { SuggestionQuery } from '~/services/completion'
+import type { SuggestionContext, SuggestionQuery } from '~/services/completion'
 import { asyncDebounce } from '../../utils'
 import snippets from './snippets'
 import { parseExpression } from './parse'
 import { CacheBasedCompletionProvider } from '../base'
+import { buildImportContext } from './imports'
 
 const SUGGESTIONS_DEBOUNCE_DELAY = 500
-
-interface CompletionContext extends SuggestionQuery {
-  range: monaco.IRange
-}
 
 /**
  * Provides completion for symbols such as variables and functions.
  */
-export class GoSymbolsCompletionItemProvider extends CacheBasedCompletionProvider<CompletionContext> {
+export class GoSymbolsCompletionItemProvider extends CacheBasedCompletionProvider<SuggestionQuery> {
   private readonly getSuggestionFunc = asyncDebounce(
     async (query) => await this.cache.getSymbolSuggestions(query),
     SUGGESTIONS_DEBOUNCE_DELAY,
   )
 
-  protected getFallbackSuggestions({ value, range }: CompletionContext) {
+  protected getFallbackSuggestions({ value, context: { range } }: SuggestionQuery) {
     // filter snippets by prefix.
     // usually monaco does that but not always in right way
     const suggestions = snippets
@@ -59,16 +56,24 @@ export class GoSymbolsCompletionItemProvider extends CacheBasedCompletionProvide
       endColumn: word.endColumn,
     }
 
-    return { ...query, range }
+    const context: SuggestionContext = {
+      range,
+      imports: buildImportContext(model),
+    }
+
+    return { ...query, context }
   }
 
-  protected async querySuggestions(query: CompletionContext) {
+  protected async querySuggestions(query: SuggestionQuery) {
     const { suggestions: relatedSnippets } = this.getFallbackSuggestions(query)
     const suggestions = await this.getSuggestionFunc(query)
     if (!suggestions?.length) {
       return relatedSnippets
     }
 
-    return relatedSnippets.concat(suggestions.map((s) => ({ ...s, range: query.range })))
+    const {
+      context: { range },
+    } = query
+    return relatedSnippets.concat(suggestions.map((s) => ({ ...s, range })))
   }
 }

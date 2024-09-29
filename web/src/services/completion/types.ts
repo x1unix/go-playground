@@ -55,7 +55,7 @@ export interface SuggestionContext {
      *
      * @see prependNewLine
      */
-    range: monaco.IRange
+    range?: monaco.IRange
 
     /**
      * Indicates whether extra new line should be appended before `import` clause.

@@ -55,7 +55,7 @@ const importPackageTextEdit = (
   importPath: string,
   { imports }: SuggestionContext,
 ): ISingleEditOperation[] | undefined => {
-  if (imports.allPaths?.has(importPath)) {
+  if (!imports.range || imports.allPaths?.has(importPath)) {
     return undefined
   }
 
