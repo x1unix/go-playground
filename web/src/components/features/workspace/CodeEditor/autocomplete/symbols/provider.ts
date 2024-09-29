@@ -1,10 +1,11 @@
 import type * as monaco from 'monaco-editor'
-import type { SuggestionContext, SuggestionQuery } from '~/services/completion'
+import type { StateDispatch } from '~/store'
+import type { GoCompletionService, SuggestionContext, SuggestionQuery } from '~/services/completion'
 import { asyncDebounce } from '../../utils'
 import snippets from './snippets'
 import { parseExpression } from './parse'
 import { CacheBasedCompletionProvider } from '../base'
-import { buildImportContext } from './imports'
+import type { DocumentMetadataCache } from '../cache'
 
 const SUGGESTIONS_DEBOUNCE_DELAY = 500
 
@@ -12,18 +13,21 @@ const SUGGESTIONS_DEBOUNCE_DELAY = 500
  * Provides completion for symbols such as variables and functions.
  */
 export class GoSymbolsCompletionItemProvider extends CacheBasedCompletionProvider<SuggestionQuery> {
+  private readonly metadataCache: DocumentMetadataCache
   private readonly getSuggestionFunc = asyncDebounce(
-    async (query) => await this.cache.getSymbolSuggestions(query),
+    async (query) => await this.completionSvc.getSymbolSuggestions(query),
     SUGGESTIONS_DEBOUNCE_DELAY,
   )
 
-  protected getFallbackSuggestions({ value, context: { range } }: SuggestionQuery) {
+  constructor(dispatch: StateDispatch, compSvc: GoCompletionService, metadataCache: DocumentMetadataCache) {
+    super(dispatch, compSvc)
+    this.metadataCache = metadataCache
+  }
+
+  protected getFallbackSuggestions({ value, context: { range } }: SuggestionQuery): monaco.languages.CompletionList {
     // filter snippets by prefix.
     // usually monaco does that but not always in right way
-    const suggestions = snippets
-      // eslint-disable-next-line @typescript-eslint/no-base-to-string
-      .filter((s) => s.label.toString().startsWith(value))
-      .map((s) => ({ ...s, range }))
+    const suggestions = snippets.filter((s) => s.label.startsWith(value)).map((s) => ({ ...s, range }))
 
     return { suggestions }
   }
@@ -56,9 +60,10 @@ export class GoSymbolsCompletionItemProvider extends CacheBasedCompletionProvide
       endColumn: word.endColumn,
     }
 
+    const imports = this.metadataCache.getMetadata(model.uri.path, model)
     const context: SuggestionContext = {
       range,
-      imports: buildImportContext(model),
+      imports,
     }
 
     return { ...query, context }

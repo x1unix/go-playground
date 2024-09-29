@@ -1,6 +1,6 @@
 import * as monaco from 'monaco-editor'
 
-import { ImportClauseType, type SuggestionContext } from '~/services/completion'
+import { ImportClauseType, type ImportsContext } from '~/services/completion'
 
 type Tokens = monaco.Token[][]
 
@@ -298,7 +298,7 @@ const traverseImportGroup = (
     }
   }
 
-  throw new ParseError(header.line + 1, 1, 'unterminated import block')
+  throw new ParseError(header.line, 1, 'unterminated import block')
 }
 
 const findImportBlock = (offset: number, model: monaco.editor.ITextModel, tokens: Tokens): ImportBlock | null => {
@@ -333,7 +333,7 @@ const findImportBlock = (offset: number, model: monaco.editor.ITextModel, tokens
 /**
  * Gathers information about Go imports in a model and provides information necessary for auto-import for suggestions.
  */
-export const buildImportContext = (model: monaco.editor.ITextModel): SuggestionContext['imports'] => {
+export const buildImportContext = (model: monaco.editor.ITextModel): ImportsContext => {
   const tokens = monaco.editor.tokenize(model.getValue(), model.getLanguageId())
 
   const packagePos = findPackageBlock(tokens)
@@ -396,7 +396,7 @@ export const buildImportContext = (model: monaco.editor.ITextModel): SuggestionC
     }
   }
 
-  const importCtx: SuggestionContext['imports'] = {
+  const importCtx: ImportsContext = {
     blockType: ImportClauseType.None,
     range: fallbackRange,
     prependNewLine: true,

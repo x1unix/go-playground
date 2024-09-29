@@ -14,11 +14,11 @@ const emptySuggestions = { suggestions: [] }
 export abstract class CacheBasedCompletionProvider<TQuery> implements monaco.languages.CompletionItemProvider {
   /**
    * @param dispatch Redux state dispatcher. Used to push notifications.
-   * @param cache Go completion cache service.
+   * @param completionSvc Go completion cache service.
    */
   constructor(
     protected readonly dispatch: StateDispatch,
-    protected cache: GoCompletionService,
+    protected completionSvc: GoCompletionService,
   ) {}
 
   /**
@@ -58,7 +58,7 @@ export abstract class CacheBasedCompletionProvider<TQuery> implements monaco.lan
       return emptySuggestions
     }
 
-    const shouldDisplayPreload = !this.cache.isWarmUp()
+    const shouldDisplayPreload = !this.completionSvc.isWarmUp()
     try {
       if (shouldDisplayPreload) {
         this.showLoadingProgress()
