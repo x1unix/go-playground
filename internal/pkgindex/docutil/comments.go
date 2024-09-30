@@ -99,15 +99,8 @@ func hasPackagePrefix(c string) bool {
 		return false
 	}
 
-	pfx := []rune(pkgDocPrefix)
-	for i, char := range c[len(pkgDocPrefix):] {
-		char = unicode.ToLower(char)
-		if char != pfx[i] {
-			return false
-		}
-	}
-
-	return true
+	pfx := c[:len(pkgDocPrefix)]
+	return strings.EqualFold(pfx, pkgDocPrefix)
 }
 
 // isDirective reports whether c is a comment directive.
