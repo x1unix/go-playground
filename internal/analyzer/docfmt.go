@@ -1,6 +1,11 @@
 package analyzer
 
-import "strings"
+import (
+	"bytes"
+	"go/ast"
+	"go/doc/comment"
+	"strings"
+)
 
 const (
 	newLineChar = '\n'
@@ -27,7 +32,27 @@ func isDocLine(line string) bool {
 	return false
 }
 
+// ParseCommentGroup parses comments from AST and returns them in Markdown format.
+func ParseCommentGroup(group *ast.CommentGroup) []byte {
+	if group == nil || len(group.List) == 0 {
+		return nil
+	}
+
+	var (
+		parser  comment.Parser
+		printer comment.Printer
+	)
+
+	str := group.Text()
+	parsedDoc := parser.Parse(str)
+	mdDoc := printer.Markdown(parsedDoc)
+	mdDoc = bytes.TrimSuffix(mdDoc, []byte("\n"))
+	return mdDoc
+}
+
 // FormatDocString parses Go comment and returns a markdown-formatted string.
+//
+// Deprecated: use ParseCommentGroup instead.
 func FormatDocString(str string) MarkdownString {
 	if str == "" {
 		return MarkdownString{Value: str}

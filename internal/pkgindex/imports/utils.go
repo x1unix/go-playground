@@ -1,4 +1,4 @@
-package pkgindex
+package imports
 
 import (
 	"bytes"
@@ -41,4 +41,19 @@ func ResolveGoRoot() (string, error) {
 	}
 
 	return goroot, nil
+}
+
+func IsDirIgnored(basename string, ignoreVendor bool) bool {
+	switch basename {
+	case "cmd", "internal", "builtin", "testdata":
+		return true
+	case "vendor":
+		return ignoreVendor
+	}
+
+	return false
+}
+
+func IsVendorDir(dirName string) bool {
+	return dirName == "vendor"
 }

@@ -92,6 +92,7 @@ export interface SymbolInfo {
   documentation: string
   detail: string
   insertText: string
+  insertTextRules: monaco.languages.CompletionItemInsertTextRule
   kind: monaco.languages.CompletionItemKind
   package: {
     name: string
@@ -99,6 +100,11 @@ export interface SymbolInfo {
   }
 }
 
+/**
+ * Go index file response type.
+ *
+ * Should be in sync with `/internal/pkgindex/index/types.go`!
+ */
 export interface GoIndexFile {
   /**
    * File format version.

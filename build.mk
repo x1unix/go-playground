@@ -32,10 +32,15 @@ check-go:
 		exit 1; \
 	fi
 
-.PHONY: pkg-index
-pkg-index:
-	@echo ":: Generating Go packages index..." && \
-	$(GO) run ./tools/pkgindexer -o $(UI)/public/data/imports.json
+.PHONY: imports-index
+imports-index:
+	@echo ":: Generating Go imports index..." && \
+	$(GO) run ./tools/pkgindexer imports -o $(UI)/public/data/imports.json
+
+.PHONY: go-index
+go-index:
+	@echo ":: Generating Go symbols index..." && \
+	$(GO) run ./tools/pkgindexer index -o $(UI)/public/data/go-index.json
 
 .PHONY:check-yarn
 check-yarn:
@@ -68,7 +73,7 @@ analyzer.wasm:
 wasm: wasm_exec.js analyzer.wasm 
 
 .PHONY: build
-build: check-go check-yarn clean preinstall gen build-server wasm pkg-index build-ui
+build: check-go check-yarn clean preinstall gen build-server wasm go-index imports-index build-ui
 	@echo ":: Copying assets..." && \
 	cp -rfv ./data $(TARGET)/data && \
 	mv -v $(UI)/build $(TARGET)/public && \

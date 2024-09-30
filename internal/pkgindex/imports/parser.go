@@ -1,4 +1,4 @@
-package pkgindex
+package imports
 
 import (
 	"context"
@@ -6,13 +6,10 @@ import (
 	"go/parser"
 	"go/token"
 	"path/filepath"
-	"strings"
 
-	"github.com/x1unix/go-playground/internal/analyzer"
+	"github.com/x1unix/go-playground/internal/pkgindex/docutil"
 	"github.com/x1unix/go-playground/pkg/monaco"
 )
-
-const goDocDomain = "pkg.go.dev"
 
 type PackageParseParams struct {
 	RootDir    string
@@ -22,10 +19,6 @@ type PackageParseParams struct {
 
 func (params PackageParseParams) PackagePath() string {
 	return filepath.Join(params.RootDir, params.ImportPath)
-}
-
-func formatGoDocLink(importPath string) string {
-	return fmt.Sprintf("[%[2]s on %[1]s](https://%[1]s/%[2]s)", goDocDomain, importPath)
 }
 
 // ParseImportCompletionItem parses a Go package at a given GOROOT and constructs monaco CompletionItem from it.
@@ -38,7 +31,7 @@ func ParseImportCompletionItem(ctx context.Context, params PackageParseParams) (
 		InsertText: params.ImportPath,
 	}
 
-	docString := formatGoDocLink(params.ImportPath)
+	var docString string
 
 	fset := token.NewFileSet()
 	for _, fname := range params.Files {
@@ -60,14 +53,14 @@ func ParseImportCompletionItem(ctx context.Context, params PackageParseParams) (
 		result.Detail = src.Name.String()
 
 		// Package doc should start with "Package xxx", see issue #367.
-		docComment := strings.TrimSpace(doc.Text())
-		if !validatePackageDoc(docComment) {
-			continue
+		if docutil.IsPackageDoc(doc) {
+			docString = docutil.BuildPackageDoc(doc, params.ImportPath)
+			break
 		}
+	}
 
-		docComment = strings.TrimSpace(analyzer.FormatDocString(docComment).Value)
-		docString = docComment + "\n\n" + docString
-		break
+	if docString == "" {
+		docString = docutil.EmptyPackageDoc(params.ImportPath)
 	}
 
 	result.Label.SetString(params.ImportPath)
@@ -76,9 +69,4 @@ func ParseImportCompletionItem(ctx context.Context, params PackageParseParams) (
 		IsTrusted: true,
 	})
 	return result, nil
-}
-
-func validatePackageDoc(str string) bool {
-	normalizedStr := strings.ToLower(str)
-	return strings.HasPrefix(normalizedStr, "package ")
 }
