@@ -2,7 +2,6 @@ package index
 
 import (
 	"fmt"
-	"go/token"
 	"log"
 	"os"
 	"path"
@@ -77,7 +76,7 @@ func ScanRoot(goRoot string) (*GoIndexFile, error) {
 		// Edge case: "builtin" package exists only for documentation purposes
 		// and not importable.
 		// Also skip empty packages (usually part of vendor path).
-		if result.pkgInfo.ImportPath != docutil.BuiltinPackage && len(result.symbols) != 0 {
+		if result.pkgInfo.ImportPath != docutil.BuiltinPackage && len(result.symbols) > 0 {
 			packages = append(packages, result.pkgInfo)
 		}
 
@@ -92,73 +91,6 @@ func ScanRoot(goRoot string) (*GoIndexFile, error) {
 	}, nil
 }
 
-type traverseResult struct {
-	pkgInfo PackageInfo
-	symbols []SymbolInfo
-}
-
-func traverseScanEntry(entry scanEntry, queue *imports.Queue[scanEntry]) (*traverseResult, error) {
-	var (
-		pkgInfo PackageInfo
-		symbols []SymbolInfo
-	)
-
-	dirents, err := os.ReadDir(entry.path)
-	if err != nil {
-		return nil, fmt.Errorf("can't read dir %q: %w", entry.path, err)
-	}
-
-	fset := token.NewFileSet()
-	for _, dirent := range dirents {
-		name := dirent.Name()
-		absPath := filepath.Join(entry.path, name)
-
-		if !dirent.IsDir() {
-			if strings.HasSuffix(name, "_test.go") || !strings.HasSuffix(name, ".go") {
-				continue
-			}
-
-			f, err := parseFile(fset, absPath, fileParseParams{
-				parseDoc:   pkgInfo.Documentation != "",
-				importPath: entry.importPath,
-			})
-			if err != nil {
-				return nil, fmt.Errorf("can't parse file %q: %w", absPath, err)
-			}
-
-			symbols = append(symbols, f.symbols...)
-			pkgInfo.Name = f.packageName
-			if f.doc != nil {
-				pkgInfo.Documentation = docutil.BuildPackageDoc(f.doc, entry.importPath)
-			}
-			continue
-		}
-
-		if isDirIgnored(name) {
-			continue
-		}
-
-		// TODO: should nested vendors be supported?
-		if imports.IsVendorDir(name) {
-			queue.Add(scanEntry{
-				isVendor: true,
-				path:     absPath,
-			})
-			continue
-		}
-
-		queue.Add(scanEntry{
-			path:       absPath,
-			importPath: path.Join(),
-		})
-	}
-
-	return &traverseResult{
-		pkgInfo: pkgInfo,
-		symbols: symbols,
-	}, nil
-}
-
 func enqueueRootEntries(rootDir string, parentImportPath string, queue *imports.Queue[scanEntry]) error {
 	entries, err := os.ReadDir(rootDir)
 	if err != nil {
@@ -166,7 +98,7 @@ func enqueueRootEntries(rootDir string, parentImportPath string, queue *imports.
 	}
 
 	for _, entry := range entries {
-		if !entry.IsDir() || isDirIgnored(entry.Name()) {
+		if !entry.IsDir() || isDirIgnored(entry.Name()) || isImportPathIgnored(entry.Name()) {
 			continue
 		}
 
@@ -194,9 +126,15 @@ func enqueueRootEntries(rootDir string, parentImportPath string, queue *imports.
 
 func isDirIgnored(basename string) bool {
 	switch basename {
+	// Arena experiment was rejected and removed
 	case "cmd", "internal", "testdata":
 		return true
 	}
 
 	return false
+}
+
+func isImportPathIgnored(importPath string) bool {
+	// Arena experiment was rejected and removed
+	return importPath == "arena"
 }
