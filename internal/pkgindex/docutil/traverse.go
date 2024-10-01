@@ -10,19 +10,20 @@ import (
 )
 
 type TraverseOpts struct {
-	AllowUnexported bool
-	FileSet         *token.FileSet
-	SnippetFormat   monaco.CompletionItemInsertTextRule
+	Filter        Filter
+	FileSet       *token.FileSet
+	SnippetFormat monaco.CompletionItemInsertTextRule
 }
 
 type TraverseReducer = func(items ...monaco.CompletionItem)
 
 // CollectCompletionItems traverses root file declarations and transforms them into completion items.
 func CollectCompletionItems(decls []ast.Decl, opts TraverseOpts, reducer TraverseReducer) error {
+	filter := filterOrDefault(opts.Filter)
 	for _, decl := range decls {
 		switch t := decl.(type) {
 		case *ast.FuncDecl:
-			if !t.Name.IsExported() && !opts.AllowUnexported {
+			if filter.Ignore(t.Name.String()) {
 				continue
 			}
 
@@ -40,7 +41,7 @@ func CollectCompletionItems(decls []ast.Decl, opts TraverseOpts, reducer Travers
 				continue
 			}
 
-			items, err := DeclToCompletionItem(opts.FileSet, t, opts.AllowUnexported)
+			items, err := DeclToCompletionItem(opts.FileSet, t, filter)
 			if err != nil {
 				return fmt.Errorf(
 					"can't parse decl %s: %w (at %s)",

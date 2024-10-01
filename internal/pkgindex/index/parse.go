@@ -8,6 +8,10 @@ import (
 	"go/token"
 )
 
+var ignoreBuiltins = docutil.NewIgnoreList(
+	"Type", "Type1", "IntegerType", "FloatType", "ComplexType",
+)
+
 type sourceSummary struct {
 	packageName string
 	doc         *ast.CommentGroup
@@ -17,6 +21,14 @@ type sourceSummary struct {
 type fileParseParams struct {
 	importPath string
 	parseDoc   bool
+}
+
+func getFilter(importPath string) docutil.Filter {
+	if importPath == docutil.BuiltinPackage {
+		return ignoreBuiltins
+	}
+
+	return docutil.UnexportedFilter{}
 }
 
 func parseFile(fset *token.FileSet, fpath string, params fileParseParams) (*sourceSummary, error) {
@@ -42,9 +54,9 @@ func parseFile(fset *token.FileSet, fpath string, params fileParseParams) (*sour
 	}
 
 	opts := docutil.TraverseOpts{
-		AllowUnexported: params.importPath == docutil.BuiltinPackage,
-		FileSet:         fset,
-		SnippetFormat:   monaco.InsertAsSnippet,
+		FileSet:       fset,
+		Filter:        getFilter(params.importPath),
+		SnippetFormat: monaco.InsertAsSnippet,
 	}
 
 	err = docutil.CollectCompletionItems(root.Decls, opts, func(items ...monaco.CompletionItem) {

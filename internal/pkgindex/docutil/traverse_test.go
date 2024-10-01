@@ -15,24 +15,26 @@ import (
 
 func TestTypeToCompletionItem(t *testing.T) {
 	cases := map[string]struct {
-		filePath        string
-		expectFile      string
-		expectErr       string
-		dumpOnly        bool
-		allowUnexported bool
+		filePath   string
+		expectFile string
+		expectErr  string
+		dumpOnly   bool
+		ignore     []string
 	}{
 		//"bufio": {
 		//	filePath: "testdata/bufio/bufio.go",
 		//},
-		//"simple": {
-		//	filePath:   "testdata/simple/types.go",
-		//	expectFile: "testdata/simple/expect.json",
-		//},
+		"simple": {
+			dumpOnly:   true,
+			filePath:   "testdata/simple/types.go",
+			expectFile: "testdata/simple/expect.json",
+		},
 		"builtin": {
-			dumpOnly:        true,
-			allowUnexported: true,
-			filePath:        "testdata/builtin/builtin.go",
-			expectFile:      "testdata/builtin/expect.json",
+			ignore: []string{
+				"Type", "Type1", "IntegerType", "FloatType", "ComplexType",
+			},
+			filePath:   "testdata/builtin/builtin.go",
+			expectFile: "testdata/builtin/expect.json",
 		},
 	}
 
@@ -44,9 +46,11 @@ func TestTypeToCompletionItem(t *testing.T) {
 			require.NoError(t, err)
 
 			opts := TraverseOpts{
-				AllowUnexported: c.allowUnexported,
-				FileSet:         fset,
-				SnippetFormat:   monaco.InsertAsSnippet,
+				FileSet:       fset,
+				SnippetFormat: monaco.InsertAsSnippet,
+			}
+			if len(c.ignore) > 0 {
+				opts.Filter = NewIgnoreList(c.ignore...)
 			}
 
 			var (

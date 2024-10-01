@@ -25,7 +25,7 @@ func CompletionItemFromFunc(fset *token.FileSet, fn *ast.FuncDecl, snippetFormat
 	})
 
 	// TODO: ensure that body is removed
-	item.Detail, err = DeclToString(fset, fn)
+	item.Detail, err = PrintFuncSignature(fset, fn)
 	if err != nil {
 		return item, err
 	}

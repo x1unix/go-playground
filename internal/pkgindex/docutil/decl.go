@@ -7,27 +7,28 @@ import (
 	"go/token"
 )
 
-func DeclToCompletionItem(fset *token.FileSet, specGroup *ast.GenDecl, allowUnexported bool) ([]monaco.CompletionItem, error) {
+func DeclToCompletionItem(fset *token.FileSet, specGroup *ast.GenDecl, filter Filter) ([]monaco.CompletionItem, error) {
 	if len(specGroup.Specs) == 0 {
 		return nil, nil
 	}
 
+	filter = filterOrDefault(filter)
 	block, err := NewBlockData(specGroup)
 	if err != nil {
 		return nil, err
 	}
 
-	// block declarations have documentation inside block child, e.g:
-	//	var (
-	//   // doc
-	//   foo = 1
-	//  )
+	traverseCtx := TraverseContext{
+		FileSet: fset,
+		Block:   block,
+		Filter:  filter,
+	}
 
 	completions := make([]monaco.CompletionItem, 0, len(specGroup.Specs))
 	for _, spec := range specGroup.Specs {
 		switch t := spec.(type) {
 		case *ast.TypeSpec:
-			if !t.Name.IsExported() && !allowUnexported {
+			if filter.Ignore(t.Name.String()) {
 				continue
 			}
 
@@ -38,7 +39,7 @@ func DeclToCompletionItem(fset *token.FileSet, specGroup *ast.GenDecl, allowUnex
 
 			completions = append(completions, item)
 		case *ast.ValueSpec:
-			items, err := ValueToCompletionItem(fset, block, t, allowUnexported)
+			items, err := ValueToCompletionItem(traverseCtx, t)
 			if err != nil {
 				return nil, err
 			}

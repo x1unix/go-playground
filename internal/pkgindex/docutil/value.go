@@ -8,25 +8,32 @@ import (
 	"github.com/x1unix/go-playground/pkg/monaco"
 )
 
+type TraverseContext struct {
+	FileSet *token.FileSet
+	Block   BlockData
+	Filter  Filter
+}
+
 // ValueToCompletionItem constructs completion item from value declaration.
 //
 // Able to handle special edge cases for builtin declarations.
-func ValueToCompletionItem(fset *token.FileSet, block BlockData, spec *ast.ValueSpec, allowUnexported bool) ([]monaco.CompletionItem, error) {
-	blockDoc := getValueDocumentation(block, spec)
+func ValueToCompletionItem(ctx TraverseContext, spec *ast.ValueSpec) ([]monaco.CompletionItem, error) {
+	filter := filterOrDefault(ctx.Filter)
+	blockDoc := getValueDocumentation(ctx.Block, spec)
 
 	items := make([]monaco.CompletionItem, 0, len(spec.Values))
 	for _, val := range spec.Names {
-		if !val.IsExported() && !allowUnexported {
+		if filter.Ignore(val.Name) {
 			continue
 		}
 
-		detail, err := detailFromIdent(fset, block, val)
+		detail, err := detailFromIdent(ctx.FileSet, ctx.Block, val)
 		if err != nil {
 			return nil, err
 		}
 
 		item := monaco.CompletionItem{
-			Kind:       block.Kind,
+			Kind:       ctx.Block.Kind,
 			InsertText: val.Name,
 			Detail:     detail,
 		}
@@ -60,7 +67,7 @@ func detailFromIdent(fset *token.FileSet, block BlockData, ident *ast.Ident) (st
 		return "", nil
 	}
 
-	signature, err := DeclToString(fset, valDecl)
+	signature, err := PrintDecl(fset, valDecl)
 	if err != nil {
 		return "", fmt.Errorf(
 			"%w (value name: %s, pos: %s)", err, ident.Name, GetDeclPosition(fset, ident),
