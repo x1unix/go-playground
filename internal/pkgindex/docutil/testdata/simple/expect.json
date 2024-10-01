@@ -1,0 +1,33 @@
+[
+  {
+    "label": "ErrInvalidUnreadByte",
+    "documentation": {
+      "value": "ErrInvalidUnreadByte occurs when invalid use of UnreadByte is done."
+    },
+    "insertText": "ErrInvalidUnreadByte",
+    "kind": 4
+  },
+  {
+    "label": "Bar",
+    "documentation": null,
+    "detail": "var Bar = 32",
+    "insertText": "Bar",
+    "kind": 4
+  },
+  {
+    "label": "Foo",
+    "documentation": null,
+    "detail": "var Foo int32",
+    "insertText": "Foo",
+    "kind": 4
+  },
+  {
+    "label": "Baz",
+    "documentation": {
+      "value": "Baz is a sample value."
+    },
+    "detail": "var Baz bool",
+    "insertText": "Baz",
+    "kind": 4
+  }
+]

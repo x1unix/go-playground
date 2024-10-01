@@ -2,14 +2,12 @@ package index
 
 import (
 	"fmt"
+	"github.com/x1unix/go-playground/internal/pkgindex/docutil"
+	"github.com/x1unix/go-playground/internal/pkgindex/imports"
 	"go/token"
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
-
-	"github.com/x1unix/go-playground/internal/pkgindex/docutil"
-	"github.com/x1unix/go-playground/internal/pkgindex/imports"
 )
 
 type traverseResult struct {
@@ -19,8 +17,10 @@ type traverseResult struct {
 
 func traverseScanEntry(entry scanEntry, queue *imports.Queue[scanEntry]) (*traverseResult, error) {
 	var (
-		pkgInfo PackageInfo
 		symbols []SymbolInfo
+		pkgInfo = PackageInfo{
+			ImportPath: entry.importPath,
+		}
 	)
 
 	dirents, err := os.ReadDir(entry.path)
@@ -34,12 +34,12 @@ func traverseScanEntry(entry scanEntry, queue *imports.Queue[scanEntry]) (*trave
 		absPath := filepath.Join(entry.path, name)
 
 		if !dirent.IsDir() {
-			if strings.HasSuffix(name, "_test.go") || !strings.HasSuffix(name, ".go") {
+			if !docutil.IsGoSourceFile(name) {
 				continue
 			}
 
 			f, err := parseFile(fset, absPath, fileParseParams{
-				parseDoc:   pkgInfo.Documentation == "",
+				parseDoc:   pkgInfo.Doc == "",
 				importPath: entry.importPath,
 			})
 			if err != nil {
@@ -49,7 +49,7 @@ func traverseScanEntry(entry scanEntry, queue *imports.Queue[scanEntry]) (*trave
 			symbols = append(symbols, f.symbols...)
 			pkgInfo.Name = f.packageName
 			if f.doc != nil {
-				pkgInfo.Documentation = docutil.BuildPackageDoc(f.doc, entry.importPath)
+				pkgInfo.Doc = docutil.BuildPackageDoc(f.doc, entry.importPath)
 			}
 			continue
 		}

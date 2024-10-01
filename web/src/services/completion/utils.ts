@@ -12,20 +12,22 @@ const stubRange = undefined as any as monaco.IRange
 
 const packageCompletionKind = 8
 
-export const intoPackageIndexItem = ({ name, importPath, documentation }: PackageInfo): PackageIndexItem => ({
+export const intoPackageIndexItem = ({ name, importPath, doc }: PackageInfo): PackageIndexItem => ({
   importPath,
   name,
   prefix: getPrefix(name),
-  documentation: {
-    value: documentation,
-    isTrusted: true,
-  },
+  documentation: doc
+    ? {
+        value: doc,
+        isTrusted: true,
+      }
+    : undefined,
 })
 
 export const intoSymbolIndexItem = ({
   name,
   package: pkg,
-  documentation,
+  doc,
   ...completion
 }: SymbolInfo): SymbolIndexItem => ({
   ...completion,
@@ -34,10 +36,12 @@ export const intoSymbolIndexItem = ({
   label: name,
   packageName: pkg.name,
   packagePath: pkg.path,
-  documentation: {
-    value: documentation,
-    isTrusted: true,
-  },
+  documentation: doc
+    ? {
+        value: doc,
+        isTrusted: true,
+      }
+    : undefined,
 })
 
 export const importCompletionFromPackage = ({ importPath, name, documentation }: PackageIndexItem): CompletionItem => ({

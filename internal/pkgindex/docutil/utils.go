@@ -33,6 +33,18 @@ func TokenToCompletionItemKind(tok token.Token) (monaco.CompletionItemKind, bool
 	return k, ok
 }
 
+// IsGoSourceFile returns whether a file name is a Go source file.
+//
+// Returns false for unit test files (this is intentional behavior).
+func IsGoSourceFile(name string) bool {
+	return strings.HasSuffix(name, "_test.go") || !strings.HasSuffix(name, ".go")
+}
+
+// CommentGroupEmpty checks whether passed command group is empty.
+func CommentGroupEmpty(g *ast.CommentGroup) bool {
+	return g == nil || len(g.List) == 0
+}
+
 // GetDeclRange returns AST node range in document.
 func GetDeclRange(fset *token.FileSet, decl ast.Decl) (start token.Position, end token.Position) {
 	f := fset.File(decl.Pos())

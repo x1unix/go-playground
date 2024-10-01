@@ -1,0 +1,429 @@
+[
+  {
+    "label": "bool",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "bool",
+    "kind": 5
+  },
+  {
+    "label": "true",
+    "documentation": null,
+    "detail": "const true = 0 == 0",
+    "insertText": "true",
+    "kind": 14
+  },
+  {
+    "label": "false",
+    "documentation": null,
+    "detail": "const false = 0 != 0",
+    "insertText": "false",
+    "kind": 14
+  },
+  {
+    "label": "uint8",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "uint8",
+    "kind": 5
+  },
+  {
+    "label": "uint16",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "uint16",
+    "kind": 5
+  },
+  {
+    "label": "uint32",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "uint32",
+    "kind": 5
+  },
+  {
+    "label": "uint64",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "uint64",
+    "kind": 5
+  },
+  {
+    "label": "int8",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "int8",
+    "kind": 5
+  },
+  {
+    "label": "int16",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "int16",
+    "kind": 5
+  },
+  {
+    "label": "int32",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "int32",
+    "kind": 5
+  },
+  {
+    "label": "int64",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "int64",
+    "kind": 5
+  },
+  {
+    "label": "float32",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "float32",
+    "kind": 5
+  },
+  {
+    "label": "float64",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "float64",
+    "kind": 5
+  },
+  {
+    "label": "complex64",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "complex64",
+    "kind": 5
+  },
+  {
+    "label": "complex128",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "complex128",
+    "kind": 5
+  },
+  {
+    "label": "string",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "string",
+    "kind": 5
+  },
+  {
+    "label": "int",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "int",
+    "kind": 5
+  },
+  {
+    "label": "uint",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "uint",
+    "kind": 5
+  },
+  {
+    "label": "uintptr",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "uintptr",
+    "kind": 5
+  },
+  {
+    "label": "byte",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "byte",
+    "kind": 5
+  },
+  {
+    "label": "rune",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "rune",
+    "kind": 5
+  },
+  {
+    "label": "any",
+    "documentation": {
+      "value": ""
+    },
+    "detail": "type any = interface{}",
+    "insertText": "any",
+    "kind": 7
+  },
+  {
+    "label": "comparable",
+    "documentation": {
+      "value": ""
+    },
+    "detail": "type comparable interface{ comparable }",
+    "insertText": "comparable",
+    "kind": 7
+  },
+  {
+    "label": "iota",
+    "documentation": null,
+    "detail": "const iota = 0",
+    "insertText": "iota",
+    "kind": 14
+  },
+  {
+    "label": "nil",
+    "documentation": null,
+    "detail": "var nil Type",
+    "insertText": "nil",
+    "kind": 4
+  },
+  {
+    "label": "Type",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "Type",
+    "kind": 5
+  },
+  {
+    "label": "Type1",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "Type1",
+    "kind": 5
+  },
+  {
+    "label": "IntegerType",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "IntegerType",
+    "kind": 5
+  },
+  {
+    "label": "FloatType",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "FloatType",
+    "kind": 5
+  },
+  {
+    "label": "ComplexType",
+    "documentation": {
+      "value": ""
+    },
+    "insertText": "ComplexType",
+    "kind": 5
+  },
+  {
+    "label": "append",
+    "documentation": {
+      "value": "The append built-in function appends elements to the end of a slice. If it has sufficient capacity, the destination is resliced to accommodate the new elements. If it does not, a new underlying array will be allocated. Append returns the updated slice. It is therefore necessary to store the result of append, often in the variable holding the slice itself:\n\n\tslice = append(slice, elem1, elem2)\n\tslice = append(slice, anotherSlice...)\n\nAs a special case, it is legal to append a string to a byte slice, like this:\n\n\tslice = append([]byte(\"hello \"), \"world\"...)"
+    },
+    "detail": "func append(slice []Type, elems ...Type) []Type",
+    "insertText": "append(${1:slice}, ${2:elems})",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "copy",
+    "documentation": {
+      "value": "The copy built-in function copies elements from a source slice into a destination slice. (As a special case, it also will copy bytes from a string to a slice of bytes.) The source and destination may overlap. Copy returns the number of elements copied, which will be the minimum of len(src) and len(dst)."
+    },
+    "detail": "func copy(dst, src []Type) int",
+    "insertText": "copy(${1:dst}, ${2:src})",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "delete",
+    "documentation": {
+      "value": "The delete built-in function deletes the element with the specified key (m\\[key]) from the map. If m is nil or there is no such element, delete is a no-op."
+    },
+    "detail": "func delete(m map[Type]Type1, key Type)",
+    "insertText": "delete(${1:m}, ${2:key})",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "len",
+    "documentation": {
+      "value": "The len built-in function returns the length of v, according to its type:\n\n\tArray: the number of elements in v.\n\tPointer to array: the number of elements in *v (even if v is nil).\n\tSlice, or map: the number of elements in v; if v is nil, len(v) is zero.\n\tString: the number of bytes in v.\n\tChannel: the number of elements queued (unread) in the channel buffer;\n\t         if v is nil, len(v) is zero.\n\nFor some arguments, such as a string literal or a simple array expression, the result can be a constant. See the Go language specification's \"Length and capacity\" section for details."
+    },
+    "detail": "func len(v Type) int",
+    "insertText": "len(${1:v})",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "cap",
+    "documentation": {
+      "value": "The cap built-in function returns the capacity of v, according to its type:\n\n\tArray: the number of elements in v (same as len(v)).\n\tPointer to array: the number of elements in *v (same as len(v)).\n\tSlice: the maximum length the slice can reach when resliced;\n\tif v is nil, cap(v) is zero.\n\tChannel: the channel buffer capacity, in units of elements;\n\tif v is nil, cap(v) is zero.\n\nFor some arguments, such as a simple array expression, the result can be a constant. See the Go language specification's \"Length and capacity\" section for details."
+    },
+    "detail": "func cap(v Type) int",
+    "insertText": "cap(${1:v})",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "make",
+    "documentation": {
+      "value": "The make built-in function allocates and initializes an object of type slice, map, or chan (only). Like new, the first argument is a type, not a value. Unlike new, make's return type is the same as the type of its argument, not a pointer to it. The specification of the result depends on the type:\n\n\tSlice: The size specifies the length. The capacity of the slice is\n\tequal to its length. A second integer argument may be provided to\n\tspecify a different capacity; it must be no smaller than the\n\tlength. For example, make([]int, 0, 10) allocates an underlying array\n\tof size 10 and returns a slice of length 0 and capacity 10 that is\n\tbacked by this underlying array.\n\tMap: An empty map is allocated with enough space to hold the\n\tspecified number of elements. The size may be omitted, in which case\n\ta small starting size is allocated.\n\tChannel: The channel's buffer is initialized with the specified\n\tbuffer capacity. If zero, or the size is omitted, the channel is\n\tunbuffered."
+    },
+    "detail": "func make(t Type, size ...IntegerType) Type",
+    "insertText": "make(${1:t}, ${2:size})",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "max",
+    "documentation": {
+      "value": "The max built-in function returns the largest value of a fixed number of arguments of [cmp.Ordered](/cmp#Ordered) types. There must be at least one argument. If T is a floating-point type and any of the arguments are NaNs, max will return NaN."
+    },
+    "detail": "func max[T cmp.Ordered](x T, y ...T) T",
+    "insertText": "max[${1:T}](${2:x}, ${3:y})",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "min",
+    "documentation": {
+      "value": "The min built-in function returns the smallest value of a fixed number of arguments of [cmp.Ordered](/cmp#Ordered) types. There must be at least one argument. If T is a floating-point type and any of the arguments are NaNs, min will return NaN."
+    },
+    "detail": "func min[T cmp.Ordered](x T, y ...T) T",
+    "insertText": "min[${1:T}](${2:x}, ${3:y})",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "new",
+    "documentation": {
+      "value": "The new built-in function allocates memory. The first argument is a type, not a value, and the value returned is a pointer to a newly allocated zero value of that type."
+    },
+    "detail": "func new(Type) *Type",
+    "insertText": "new()",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "complex",
+    "documentation": {
+      "value": "The complex built-in function constructs a complex value from two floating-point values. The real and imaginary parts must be of the same size, either float32 or float64 (or assignable to them), and the return value will be the corresponding complex type (complex64 for float32, complex128 for float64)."
+    },
+    "detail": "func complex(r, i FloatType) ComplexType",
+    "insertText": "complex(${1:r}, ${2:i})",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "real",
+    "documentation": {
+      "value": "The real built-in function returns the real part of the complex number c. The return value will be floating point type corresponding to the type of c."
+    },
+    "detail": "func real(c ComplexType) FloatType",
+    "insertText": "real(${1:c})",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "imag",
+    "documentation": {
+      "value": "The imag built-in function returns the imaginary part of the complex number c. The return value will be floating point type corresponding to the type of c."
+    },
+    "detail": "func imag(c ComplexType) FloatType",
+    "insertText": "imag(${1:c})",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "clear",
+    "documentation": {
+      "value": "The clear built-in function clears maps and slices. For maps, clear deletes all entries, resulting in an empty map. For slices, clear sets all elements up to the length of the slice to the zero value of the respective element type. If the argument type is a type parameter, the type parameter's type set must contain only map or slice types, and clear performs the operation implied by the type argument."
+    },
+    "detail": "func clear[T ~[]Type | ~map[Type]Type1](t T)",
+    "insertText": "clear[${1:T}](${2:t})",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "close",
+    "documentation": {
+      "value": "The close built-in function closes a channel, which must be either bidirectional or send-only. It should be executed only by the sender, never the receiver, and has the effect of shutting down the channel after the last sent value is received. After the last value has been received from a closed channel c, any receive from c will succeed without blocking, returning the zero value for the channel element. The form\n\n\tx, ok := \u003c-c\n\nwill also set ok to false for a closed and empty channel."
+    },
+    "detail": "func close(c chan\u003c- Type)",
+    "insertText": "close(${1:c})",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "panic",
+    "documentation": {
+      "value": "The panic built-in function stops normal execution of the current goroutine. When a function F calls panic, normal execution of F stops immediately. Any functions whose execution was deferred by F are run in the usual way, and then F returns to its caller. To the caller G, the invocation of F then behaves like a call to panic, terminating G's execution and running any deferred functions. This continues until all functions in the executing goroutine have stopped, in reverse order. At that point, the program is terminated with a non-zero exit code. This termination sequence is called panicking and can be controlled by the built-in function recover.\n\nStarting in Go 1.21, calling panic with a nil interface value or an untyped nil causes a run-time error (a different panic). The GODEBUG setting panicnil=1 disables the run-time error."
+    },
+    "detail": "func panic(v any)",
+    "insertText": "panic(${1:v})",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "recover",
+    "documentation": {
+      "value": "The recover built-in function allows a program to manage behavior of a panicking goroutine. Executing a call to recover inside a deferred function (but not any function called by it) stops the panicking sequence by restoring normal execution and retrieves the error value passed to the call of panic. If recover is called outside the deferred function it will not stop a panicking sequence. In this case, or when the goroutine is not panicking, recover returns nil.\n\nPrior to Go 1.21, recover would also return nil if panic is called with a nil argument. See \\[panic] for details."
+    },
+    "detail": "func recover() any",
+    "insertText": "recover()",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "print",
+    "documentation": {
+      "value": "The print built-in function formats its arguments in an implementation-specific way and writes the result to standard error. Print is useful for bootstrapping and debugging; it is not guaranteed to stay in the language."
+    },
+    "detail": "func print(args ...Type)",
+    "insertText": "print(${1:args})",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "println",
+    "documentation": {
+      "value": "The println built-in function formats its arguments in an implementation-specific way and writes the result to standard error. Spaces are always added between arguments and a newline is appended. Println is useful for bootstrapping and debugging; it is not guaranteed to stay in the language."
+    },
+    "detail": "func println(args ...Type)",
+    "insertText": "println(${1:args})",
+    "insertTextRules": 4,
+    "kind": 1
+  },
+  {
+    "label": "error",
+    "documentation": {
+      "value": ""
+    },
+    "detail": "type error interface {\n\tError() string\n}",
+    "insertText": "error",
+    "kind": 7
+  }
+]
