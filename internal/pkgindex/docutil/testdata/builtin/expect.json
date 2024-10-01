@@ -2,7 +2,7 @@
   {
     "label": "bool",
     "documentation": {
-      "value": ""
+      "value": "bool is the set of boolean values, true and false."
     },
     "insertText": "bool",
     "kind": 5
@@ -24,7 +24,7 @@
   {
     "label": "uint8",
     "documentation": {
-      "value": ""
+      "value": "uint8 is the set of all unsigned 8-bit integers. Range: 0 through 255."
     },
     "insertText": "uint8",
     "kind": 5
@@ -32,7 +32,7 @@
   {
     "label": "uint16",
     "documentation": {
-      "value": ""
+      "value": "uint16 is the set of all unsigned 16-bit integers. Range: 0 through 65535."
     },
     "insertText": "uint16",
     "kind": 5
@@ -40,7 +40,7 @@
   {
     "label": "uint32",
     "documentation": {
-      "value": ""
+      "value": "uint32 is the set of all unsigned 32-bit integers. Range: 0 through 4294967295."
     },
     "insertText": "uint32",
     "kind": 5
@@ -48,7 +48,7 @@
   {
     "label": "uint64",
     "documentation": {
-      "value": ""
+      "value": "uint64 is the set of all unsigned 64-bit integers. Range: 0 through 18446744073709551615."
     },
     "insertText": "uint64",
     "kind": 5
@@ -56,7 +56,7 @@
   {
     "label": "int8",
     "documentation": {
-      "value": ""
+      "value": "int8 is the set of all signed 8-bit integers. Range: -128 through 127."
     },
     "insertText": "int8",
     "kind": 5
@@ -64,7 +64,7 @@
   {
     "label": "int16",
     "documentation": {
-      "value": ""
+      "value": "int16 is the set of all signed 16-bit integers. Range: -32768 through 32767."
     },
     "insertText": "int16",
     "kind": 5
@@ -72,7 +72,7 @@
   {
     "label": "int32",
     "documentation": {
-      "value": ""
+      "value": "int32 is the set of all signed 32-bit integers. Range: -2147483648 through 2147483647."
     },
     "insertText": "int32",
     "kind": 5
@@ -80,7 +80,7 @@
   {
     "label": "int64",
     "documentation": {
-      "value": ""
+      "value": "int64 is the set of all signed 64-bit integers. Range: -9223372036854775808 through 9223372036854775807."
     },
     "insertText": "int64",
     "kind": 5
@@ -88,7 +88,7 @@
   {
     "label": "float32",
     "documentation": {
-      "value": ""
+      "value": "float32 is the set of all IEEE 754 32-bit floating-point numbers."
     },
     "insertText": "float32",
     "kind": 5
@@ -96,7 +96,7 @@
   {
     "label": "float64",
     "documentation": {
-      "value": ""
+      "value": "float64 is the set of all IEEE 754 64-bit floating-point numbers."
     },
     "insertText": "float64",
     "kind": 5
@@ -104,7 +104,7 @@
   {
     "label": "complex64",
     "documentation": {
-      "value": ""
+      "value": "complex64 is the set of all complex numbers with float32 real and imaginary parts."
     },
     "insertText": "complex64",
     "kind": 5
@@ -112,7 +112,7 @@
   {
     "label": "complex128",
     "documentation": {
-      "value": ""
+      "value": "complex128 is the set of all complex numbers with float64 real and imaginary parts."
     },
     "insertText": "complex128",
     "kind": 5
@@ -120,7 +120,7 @@
   {
     "label": "string",
     "documentation": {
-      "value": ""
+      "value": "string is the set of all strings of 8-bit bytes, conventionally but not necessarily representing UTF-8-encoded text. A string may be empty, but not nil. Values of string type are immutable."
     },
     "insertText": "string",
     "kind": 5
@@ -128,7 +128,7 @@
   {
     "label": "int",
     "documentation": {
-      "value": ""
+      "value": "int is a signed integer type that is at least 32 bits in size. It is a distinct type, however, and not an alias for, say, int32."
     },
     "insertText": "int",
     "kind": 5
@@ -136,7 +136,7 @@
   {
     "label": "uint",
     "documentation": {
-      "value": ""
+      "value": "uint is an unsigned integer type that is at least 32 bits in size. It is a distinct type, however, and not an alias for, say, uint32."
     },
     "insertText": "uint",
     "kind": 5
@@ -144,7 +144,7 @@
   {
     "label": "uintptr",
     "documentation": {
-      "value": ""
+      "value": "uintptr is an integer type that is large enough to hold the bit pattern of any pointer."
     },
     "insertText": "uintptr",
     "kind": 5
@@ -152,7 +152,7 @@
   {
     "label": "byte",
     "documentation": {
-      "value": ""
+      "value": "byte is an alias for uint8 and is equivalent to uint8 in all ways. It is used, by convention, to distinguish byte values from 8-bit unsigned integer values."
     },
     "insertText": "byte",
     "kind": 5
@@ -160,7 +160,7 @@
   {
     "label": "rune",
     "documentation": {
-      "value": ""
+      "value": "rune is an alias for int32 and is equivalent to int32 in all ways. It is used, by convention, to distinguish character values from integer values."
     },
     "insertText": "rune",
     "kind": 5
@@ -168,7 +168,7 @@
   {
     "label": "any",
     "documentation": {
-      "value": ""
+      "value": "any is an alias for interface{} and is equivalent to interface{} in all ways."
     },
     "detail": "type any = interface{}",
     "insertText": "any",
@@ -177,7 +177,7 @@
   {
     "label": "comparable",
     "documentation": {
-      "value": ""
+      "value": "comparable is an interface that is implemented by all comparable types (booleans, numbers, strings, pointers, channels, arrays of comparable types, structs whose fields are all comparable types). The comparable interface may only be used as a type parameter constraint, not as the type of a variable."
     },
     "detail": "type comparable interface{ comparable }",
     "insertText": "comparable",
@@ -185,14 +185,18 @@
   },
   {
     "label": "iota",
-    "documentation": null,
+    "documentation": {
+      "value": "iota is a predeclared identifier representing the untyped integer ordinal number of the current const specification in a (usually parenthesized) const declaration. It is zero-indexed."
+    },
     "detail": "const iota = 0",
     "insertText": "iota",
     "kind": 14
   },
   {
     "label": "nil",
-    "documentation": null,
+    "documentation": {
+      "value": "nil is a predeclared identifier representing the zero value for a pointer, channel, func, interface, map, or slice type."
+    },
     "detail": "var nil Type",
     "insertText": "nil",
     "kind": 4
@@ -200,7 +204,7 @@
   {
     "label": "Type",
     "documentation": {
-      "value": ""
+      "value": "Type is here for the purposes of documentation only. It is a stand-in for any Go type, but represents the same type for any given function invocation."
     },
     "insertText": "Type",
     "kind": 5
@@ -208,7 +212,7 @@
   {
     "label": "Type1",
     "documentation": {
-      "value": ""
+      "value": "Type1 is here for the purposes of documentation only. It is a stand-in for any Go type, but represents the same type for any given function invocation."
     },
     "insertText": "Type1",
     "kind": 5
@@ -216,7 +220,7 @@
   {
     "label": "IntegerType",
     "documentation": {
-      "value": ""
+      "value": "IntegerType is here for the purposes of documentation only. It is a stand-in for any integer type: int, uint, int8 etc."
     },
     "insertText": "IntegerType",
     "kind": 5
@@ -224,7 +228,7 @@
   {
     "label": "FloatType",
     "documentation": {
-      "value": ""
+      "value": "FloatType is here for the purposes of documentation only. It is a stand-in for either float type: float32 or float64."
     },
     "insertText": "FloatType",
     "kind": 5
@@ -232,7 +236,7 @@
   {
     "label": "ComplexType",
     "documentation": {
-      "value": ""
+      "value": "ComplexType is here for the purposes of documentation only. It is a stand-in for either complex type: complex64 or complex128."
     },
     "insertText": "ComplexType",
     "kind": 5
@@ -420,7 +424,7 @@
   {
     "label": "error",
     "documentation": {
-      "value": ""
+      "value": "The error built-in interface type is the conventional interface for representing an error condition, with the nil value representing no error."
     },
     "detail": "type error interface {\n\tError() string\n}",
     "insertText": "error",

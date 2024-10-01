@@ -40,17 +40,17 @@ func ValueToCompletionItem(fset *token.FileSet, block BlockData, spec *ast.Value
 }
 
 func getValueDocumentation(block BlockData, spec *ast.ValueSpec) *monaco.IMarkdownString {
-	commentGroup := block.Decl.Doc
-	if !block.IsGroup || len(block.Decl.Specs) > 1 || CommentGroupEmpty(commentGroup) {
-		commentGroup = spec.Doc
+	g := block.Decl.Doc
+	if block.IsGroup || len(block.Decl.Specs) > 1 || CommentGroupEmpty(g) {
+		g = spec.Doc
 	}
 
-	if CommentGroupEmpty(commentGroup) {
+	if CommentGroupEmpty(g) {
 		return nil
 	}
 
 	return &monaco.IMarkdownString{
-		Value: string(FormatCommentGroup(spec.Doc)),
+		Value: string(FormatCommentGroup(g)),
 	}
 }
 
