@@ -37,7 +37,7 @@ func TokenToCompletionItemKind(tok token.Token) (monaco.CompletionItemKind, bool
 //
 // Returns false for unit test files (this is intentional behavior).
 func IsGoSourceFile(name string) bool {
-	return strings.HasSuffix(name, "_test.go") || !strings.HasSuffix(name, ".go")
+	return strings.HasSuffix(name, ".go") && !strings.HasSuffix(name, "_test.go")
 }
 
 // CommentGroupEmpty checks whether passed command group is empty.
