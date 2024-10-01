@@ -41,23 +41,24 @@ func NewBlockData(specGroup *ast.GenDecl) (BlockData, error) {
 	}, nil
 }
 
-// TypeToCompletionItem returns completion item from type declaration inside block.
-func TypeToCompletionItem(fset *token.FileSet, block BlockData, spec *ast.TypeSpec) (monaco.CompletionItem, error) {
+// TypeToSymbol returns completion item from type declaration inside block.
+func TypeToSymbol(fset *token.FileSet, block BlockData, spec *ast.TypeSpec) (Symbol, error) {
 	// Block declarations contain doc inside each child.
-	doc := getTypeDoc(block, spec)
-
-	item := monaco.CompletionItem{
-		Kind:       block.Kind,
-		InsertText: spec.Name.Name,
+	item := Symbol{
+		Label:         spec.Name.Name,
+		Kind:          block.Kind,
+		InsertText:    spec.Name.Name,
+		Documentation: getTypeDoc(block, spec),
 	}
-	item.Label.String = spec.Name.Name
 
 	isPrimitive := false
 	switch spec.Type.(type) {
 	case *ast.InterfaceType:
+		item.Detail = "interface{...}"
 		item.Kind = monaco.Interface
 	case *ast.StructType:
 		// TODO: prefill struct members
+		item.Detail = "struct{...}"
 		item.InsertText = item.InsertText + "{}"
 		item.Kind = monaco.Struct
 	case *ast.Ident:
@@ -67,17 +68,16 @@ func TypeToCompletionItem(fset *token.FileSet, block BlockData, spec *ast.TypeSp
 	if !isPrimitive {
 		signature, err := PrintDecl(fset, block.Decl)
 		if err != nil {
-			return item, fmt.Errorf("%w (type: %q, pos: %s)", err, item.Label.String, GetDeclPosition(fset, spec))
+			return item, fmt.Errorf("%w (type: %q, pos: %s)", err, item.Label, GetDeclPosition(fset, spec))
 		}
 
-		item.Detail = signature
+		item.Signature = signature
 	}
 
-	item.Documentation.SetValue(doc)
 	return item, nil
 }
 
-func getTypeDoc(block BlockData, spec *ast.TypeSpec) *monaco.IMarkdownString {
+func getTypeDoc(block BlockData, spec *ast.TypeSpec) string {
 	g := block.Decl.Doc
 	if block.IsGroup || len(block.Decl.Specs) > 1 {
 		// standalone type declarations are still considered as block.
@@ -85,10 +85,8 @@ func getTypeDoc(block BlockData, spec *ast.TypeSpec) *monaco.IMarkdownString {
 	}
 
 	if CommentGroupEmpty(g) {
-		return nil
+		return ""
 	}
 
-	return &monaco.IMarkdownString{
-		Value: string(FormatCommentGroup(g)),
-	}
+	return string(FormatCommentGroup(g))
 }

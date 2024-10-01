@@ -1,6 +1,9 @@
 package index
 
-import "github.com/x1unix/go-playground/pkg/monaco"
+import (
+	"github.com/x1unix/go-playground/internal/pkgindex/docutil"
+	"github.com/x1unix/go-playground/pkg/monaco"
+)
 
 const GoIndexFileVersion = 1
 
@@ -25,6 +28,9 @@ type SymbolInfo struct {
 	// Detail is symbol summary.
 	Detail string `json:"detail,omitempty"`
 
+	// Signature contains type declaration including public fields.
+	Signature string `json:"signature,omitempty"`
+
 	// InsertText is text to be inserted by completion.
 	InsertText string `json:"insertText"`
 
@@ -38,24 +44,15 @@ type SymbolInfo struct {
 	Package SymbolSource `json:"package"`
 }
 
-func SymbolInfoFromCompletionItem(item monaco.CompletionItem, src SymbolSource) SymbolInfo {
-	doc := item.Documentation.String
-	if item.Documentation.Value != nil {
-		doc = item.Documentation.Value.Value
-	}
-
-	label := item.Label.String
-	if item.Label.Value != nil {
-		label = item.Label.Value.Label
-	}
-
+func IntoSymbolInfo(item docutil.Symbol, src SymbolSource) SymbolInfo {
 	return SymbolInfo{
-		Name:            label,
-		Doc:             doc,
+		Name:            item.Label,
+		Doc:             item.Documentation,
 		Detail:          item.Detail,
 		InsertText:      item.InsertText,
 		InsertTextRules: item.InsertTextRules,
 		Kind:            item.Kind,
+		Signature:       item.Signature,
 		Package:         src,
 	}
 }

@@ -6,7 +6,6 @@ import (
 	"go/token"
 	"golang.org/x/exp/slices"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -21,11 +20,11 @@ func TestTypeToCompletionItem(t *testing.T) {
 		dumpOnly   bool
 		ignore     []string
 	}{
-		//"bufio": {
-		//	filePath: "testdata/bufio/bufio.go",
-		//},
+		"bufio": {
+			filePath:   "testdata/bufio/bufio.go",
+			expectFile: "testdata/bufio/expect.json",
+		},
 		"simple": {
-			dumpOnly:   true,
 			filePath:   "testdata/simple/types.go",
 			expectFile: "testdata/simple/expect.json",
 		},
@@ -54,10 +53,10 @@ func TestTypeToCompletionItem(t *testing.T) {
 			}
 
 			var (
-				got  []monaco.CompletionItem
-				want []monaco.CompletionItem
+				got  []Symbol
+				want []Symbol
 			)
-			err = CollectCompletionItems(r.Decls, opts, func(items ...monaco.CompletionItem) {
+			err = CollectSymbols(r.Decls, opts, func(items ...Symbol) {
 				got = append(got, items...)
 			})
 			if c.expectErr != "" {
@@ -81,11 +80,11 @@ func TestTypeToCompletionItem(t *testing.T) {
 			})
 
 			require.NoError(t, json.NewDecoder(f).Decode(&want))
-			slices.SortFunc(got, func(a, b monaco.CompletionItem) bool {
-				return strings.Compare(a.Label.String, b.Label.String) == -1
+			slices.SortFunc(got, func(a, b Symbol) bool {
+				return a.Compare(b) == -1
 			})
-			slices.SortFunc(want, func(a, b monaco.CompletionItem) bool {
-				return strings.Compare(a.Label.String, b.Label.String) == -1
+			slices.SortFunc(want, func(a, b Symbol) bool {
+				return a.Compare(b) == -1
 			})
 
 			require.Equal(t, want, got)
@@ -93,7 +92,7 @@ func TestTypeToCompletionItem(t *testing.T) {
 	}
 }
 
-func dumpCompletionItems(t *testing.T, items []monaco.CompletionItem, dst string) {
+func dumpCompletionItems(t *testing.T, items []Symbol, dst string) {
 	f, err := os.OpenFile(dst, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
 	require.NoError(t, err)
 	defer f.Close()

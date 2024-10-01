@@ -15,9 +15,6 @@ var (
 	ErrInvalidUnreadRune = errors.New("bufio: invalid use of UnreadRune")
 	ErrBufferFull        = errors.New("bufio: buffer full")
 	ErrNegativeCount     = errors.New("bufio: negative count")
-	Bar                  = 32
-	Foo                  int32
-	Baz                  bool = false
 )
 
 // Buffered input.

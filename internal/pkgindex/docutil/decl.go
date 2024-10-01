@@ -2,12 +2,12 @@ package docutil
 
 import (
 	"fmt"
-	"github.com/x1unix/go-playground/pkg/monaco"
 	"go/ast"
 	"go/token"
 )
 
-func DeclToCompletionItem(fset *token.FileSet, specGroup *ast.GenDecl, filter Filter) ([]monaco.CompletionItem, error) {
+// DeclToSymbol constructs symbol from generic type of value spec.
+func DeclToSymbol(fset *token.FileSet, specGroup *ast.GenDecl, filter Filter) ([]Symbol, error) {
 	if len(specGroup.Specs) == 0 {
 		return nil, nil
 	}
@@ -24,7 +24,7 @@ func DeclToCompletionItem(fset *token.FileSet, specGroup *ast.GenDecl, filter Fi
 		Filter:  filter,
 	}
 
-	completions := make([]monaco.CompletionItem, 0, len(specGroup.Specs))
+	completions := make([]Symbol, 0, len(specGroup.Specs))
 	for _, spec := range specGroup.Specs {
 		switch t := spec.(type) {
 		case *ast.TypeSpec:
@@ -32,14 +32,14 @@ func DeclToCompletionItem(fset *token.FileSet, specGroup *ast.GenDecl, filter Fi
 				continue
 			}
 
-			item, err := TypeToCompletionItem(fset, block, t)
+			item, err := TypeToSymbol(fset, block, t)
 			if err != nil {
 				return nil, err
 			}
 
 			completions = append(completions, item)
 		case *ast.ValueSpec:
-			items, err := ValueToCompletionItem(traverseCtx, t)
+			items, err := ValueToSymbol(traverseCtx, t)
 			if err != nil {
 				return nil, err
 			}

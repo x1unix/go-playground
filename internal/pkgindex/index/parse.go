@@ -59,9 +59,9 @@ func parseFile(fset *token.FileSet, fpath string, params fileParseParams) (*sour
 		SnippetFormat: monaco.InsertAsSnippet,
 	}
 
-	err = docutil.CollectCompletionItems(root.Decls, opts, func(items ...monaco.CompletionItem) {
+	err = docutil.CollectSymbols(root.Decls, opts, func(items ...docutil.Symbol) {
 		for _, item := range items {
-			summary.symbols = append(summary.symbols, SymbolInfoFromCompletionItem(item, src))
+			summary.symbols = append(summary.symbols, IntoSymbolInfo(item, src))
 		}
 	})
 

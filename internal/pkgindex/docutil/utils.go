@@ -114,8 +114,8 @@ func WriteParamsList(sb *strings.Builder, snippetIndex int, params *ast.FieldLis
 	return offset
 }
 
-// DeclToString returns string representation of passed AST node.
-func DeclToString(fset *token.FileSet, decl any) (string, error) {
+// PrintDecl returns string representation of passed AST node.
+func PrintDecl(fset *token.FileSet, decl any) (string, error) {
 	// Remove comments block from AST node to keep only node body
 	trimmedDecl := removeCommentFromDecl(decl)
 

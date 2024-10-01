@@ -1,0 +1,44 @@
+[
+  {
+    "label": "ErrInvalidUnreadByte",
+    "insertText": "ErrInvalidUnreadByte",
+    "kind": 4,
+    "insertTextRules": 0
+  },
+  {
+    "label": "ErrInvalidUnreadRune",
+    "insertText": "ErrInvalidUnreadRune",
+    "kind": 4,
+    "insertTextRules": 0
+  },
+  {
+    "label": "ErrBufferFull",
+    "insertText": "ErrBufferFull",
+    "kind": 4,
+    "insertTextRules": 0
+  },
+  {
+    "label": "ErrNegativeCount",
+    "insertText": "ErrNegativeCount",
+    "kind": 4,
+    "insertTextRules": 0
+  },
+  {
+    "label": "Reader",
+    "documentation": "Reader implements buffering for an io.Reader object.",
+    "detail": "struct{...}",
+    "insertText": "Reader{}",
+    "signature": "type Reader struct {\n\tbuf\t\t[]byte\n\trd\t\tio.Reader\t// reader provided by the client\n\tr, w\t\tint\t\t// buf read and write positions\n\terr\t\terror\n\tlastByte\tint\t// last byte read for UnreadByte; -1 means invalid\n\tlastRuneSize\tint\t// size of last rune read for UnreadRune; -1 means invalid\n}",
+    "kind": 6,
+    "insertTextRules": 0
+  },
+  {
+    "label": "NewReaderSize",
+    "documentation": "NewReaderSize returns a new \\[Reader] whose buffer has at least the specified size. If the argument io.Reader is already a \\[Reader] with large enough size, it returns the underlying \\[Reader].",
+    "detail": "func(rd io.Reader, size int) *Reader",
+    "insertText": "NewReaderSize(${1:rd}, ${2:size})",
+    "signature": "func NewReaderSize(rd io.Reader, size int) *Reader",
+    "kind": 1,
+    "insertTextRules": 4
+  }
+]

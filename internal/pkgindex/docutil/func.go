@@ -8,24 +8,25 @@ import (
 	"github.com/x1unix/go-playground/pkg/monaco"
 )
 
-// CompletionItemFromFunc constructs completion item from a function AST declaration.
+// SymbolFromFunc constructs completion item from a function AST declaration.
 //
 // Function documentation is generated in Markdown format.
-func CompletionItemFromFunc(fset *token.FileSet, fn *ast.FuncDecl, snippetFormat monaco.CompletionItemInsertTextRule) (item monaco.CompletionItem, err error) {
+func SymbolFromFunc(fset *token.FileSet, fn *ast.FuncDecl, snippetFormat monaco.CompletionItemInsertTextRule) (item Symbol, err error) {
 	isSnippet := snippetFormat == monaco.InsertAsSnippet
-	item = monaco.CompletionItem{
+	item = Symbol{
+		Label:           fn.Name.String(),
 		Kind:            monaco.Function,
 		InsertTextRules: snippetFormat,
 		InsertText:      buildFuncInsertStatement(fn, isSnippet),
+		Documentation:   string(FormatCommentGroup(fn.Doc)),
 	}
 
-	item.Label.SetString(fn.Name.String())
-	item.Documentation.SetValue(&monaco.IMarkdownString{
-		Value: string(FormatCommentGroup(fn.Doc)),
-	})
+	item.Detail, err = PrintFuncAnonymous(fset, fn)
+	if err != nil {
+		return item, err
+	}
 
-	// TODO: ensure that body is removed
-	item.Detail, err = PrintFuncSignature(fset, fn)
+	item.Signature, err = PrintFuncPrototype(fset, fn)
 	if err != nil {
 		return item, err
 	}
@@ -50,4 +51,17 @@ func buildFuncInsertStatement(decl *ast.FuncDecl, asSnippet bool) string {
 	WriteParamsList(sb, offset, typ.Params)
 	sb.WriteString(")")
 	return sb.String()
+}
+
+// PrintFuncPrototype returns function string representation without its body.
+func PrintFuncPrototype(fset *token.FileSet, decl *ast.FuncDecl) (string, error) {
+	// drop body from func
+	fn := *decl
+	fn.Body = nil
+	return PrintDecl(fset, &fn)
+}
+
+// PrintFuncAnonymous similar to PrintFuncPrototype, but omits function name.
+func PrintFuncAnonymous(fset *token.FileSet, decl *ast.FuncDecl) (string, error) {
+	return PrintDecl(fset, decl.Type)
 }

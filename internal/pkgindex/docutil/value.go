@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
-
-	"github.com/x1unix/go-playground/pkg/monaco"
 )
 
 type TraverseContext struct {
@@ -14,14 +12,14 @@ type TraverseContext struct {
 	Filter  Filter
 }
 
-// ValueToCompletionItem constructs completion item from value declaration.
+// ValueToSymbol constructs completion item from value declaration.
 //
 // Able to handle special edge cases for builtin declarations.
-func ValueToCompletionItem(ctx TraverseContext, spec *ast.ValueSpec) ([]monaco.CompletionItem, error) {
+func ValueToSymbol(ctx TraverseContext, spec *ast.ValueSpec) ([]Symbol, error) {
 	filter := filterOrDefault(ctx.Filter)
 	blockDoc := getValueDocumentation(ctx.Block, spec)
 
-	items := make([]monaco.CompletionItem, 0, len(spec.Values))
+	items := make([]Symbol, 0, len(spec.Values))
 	for _, val := range spec.Names {
 		if filter.Ignore(val.Name) {
 			continue
@@ -32,33 +30,31 @@ func ValueToCompletionItem(ctx TraverseContext, spec *ast.ValueSpec) ([]monaco.C
 			return nil, err
 		}
 
-		item := monaco.CompletionItem{
-			Kind:       ctx.Block.Kind,
-			InsertText: val.Name,
-			Detail:     detail,
+		item := Symbol{
+			Label:         val.Name,
+			Kind:          ctx.Block.Kind,
+			InsertText:    val.Name,
+			Detail:        detail,
+			Documentation: blockDoc,
 		}
 
-		item.Label.String = val.Name
-		item.Documentation.SetValue(blockDoc)
 		items = append(items, item)
 	}
 
 	return items, nil
 }
 
-func getValueDocumentation(block BlockData, spec *ast.ValueSpec) *monaco.IMarkdownString {
+func getValueDocumentation(block BlockData, spec *ast.ValueSpec) string {
 	g := block.Decl.Doc
 	if block.IsGroup || len(block.Decl.Specs) > 1 || CommentGroupEmpty(g) {
 		g = spec.Doc
 	}
 
 	if CommentGroupEmpty(g) {
-		return nil
+		return ""
 	}
 
-	return &monaco.IMarkdownString{
-		Value: string(FormatCommentGroup(g)),
-	}
+	return string(FormatCommentGroup(g))
 }
 
 func detailFromIdent(fset *token.FileSet, block BlockData, ident *ast.Ident) (string, error) {

@@ -15,10 +15,12 @@ type TraverseOpts struct {
 	SnippetFormat monaco.CompletionItemInsertTextRule
 }
 
-type TraverseReducer = func(items ...monaco.CompletionItem)
+type TraverseReducer = func(items ...Symbol)
 
-// CollectCompletionItems traverses root file declarations and transforms them into completion items.
-func CollectCompletionItems(decls []ast.Decl, opts TraverseOpts, reducer TraverseReducer) error {
+// CollectSymbols traverses root file declarations and transforms them into completion items.
+//
+// Important: type methods are ignored.
+func CollectSymbols(decls []ast.Decl, opts TraverseOpts, reducer TraverseReducer) error {
 	filter := filterOrDefault(opts.Filter)
 	for _, decl := range decls {
 		switch t := decl.(type) {
@@ -27,7 +29,12 @@ func CollectCompletionItems(decls []ast.Decl, opts TraverseOpts, reducer Travers
 				continue
 			}
 
-			item, err := CompletionItemFromFunc(opts.FileSet, t, monaco.InsertAsSnippet)
+			if t.Recv != nil {
+				// Ignore type methods, at-least for now.
+				continue
+			}
+
+			item, err := SymbolFromFunc(opts.FileSet, t, monaco.InsertAsSnippet)
 			if err != nil {
 				return fmt.Errorf(
 					"can't parse function %s: %w (pos: %s)",
@@ -41,7 +48,7 @@ func CollectCompletionItems(decls []ast.Decl, opts TraverseOpts, reducer Travers
 				continue
 			}
 
-			items, err := DeclToCompletionItem(opts.FileSet, t, filter)
+			items, err := DeclToSymbol(opts.FileSet, t, filter)
 			if err != nil {
 				return fmt.Errorf(
 					"can't parse decl %s: %w (at %s)",

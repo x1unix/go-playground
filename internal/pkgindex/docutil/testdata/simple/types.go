@@ -11,4 +11,11 @@ var (
 
 	// Baz is a sample value.
 	Baz bool = false
+
+	// this var should be ignored
+	private = true
 )
+
+func MyPublicFunc(foo int) (int, error) {
+	return foo / 32, nil
+}
