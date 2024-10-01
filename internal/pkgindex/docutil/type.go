@@ -65,7 +65,7 @@ func TypeToCompletionItem(fset *token.FileSet, block BlockData, spec *ast.TypeSp
 	}
 
 	if !isPrimitive {
-		signature, err := DeclToString(fset, block.Decl)
+		signature, err := PrintDecl(fset, block.Decl)
 		if err != nil {
 			return item, fmt.Errorf("%w (type: %q, pos: %s)", err, item.Label.String, GetDeclPosition(fset, spec))
 		}
