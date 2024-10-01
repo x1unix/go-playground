@@ -44,10 +44,7 @@ func NewBlockData(specGroup *ast.GenDecl) (BlockData, error) {
 // TypeToCompletionItem returns completion item from type declaration inside block.
 func TypeToCompletionItem(fset *token.FileSet, block BlockData, spec *ast.TypeSpec) (monaco.CompletionItem, error) {
 	// Block declarations contain doc inside each child.
-	declCommentGroup := spec.Comment
-	if block.IsGroup {
-		declCommentGroup = block.Decl.Doc
-	}
+	doc := getTypeDoc(block, spec)
 
 	item := monaco.CompletionItem{
 		Kind:       block.Kind,
@@ -76,9 +73,22 @@ func TypeToCompletionItem(fset *token.FileSet, block BlockData, spec *ast.TypeSp
 		item.Detail = signature
 	}
 
-	item.Documentation.SetValue(&monaco.IMarkdownString{
-		Value: string(FormatCommentGroup(declCommentGroup)),
-	})
-
+	item.Documentation.SetValue(doc)
 	return item, nil
+}
+
+func getTypeDoc(block BlockData, spec *ast.TypeSpec) *monaco.IMarkdownString {
+	g := block.Decl.Doc
+	if block.IsGroup || len(block.Decl.Specs) > 1 {
+		// standalone type declarations are still considered as block.
+		g = spec.Doc
+	}
+
+	if CommentGroupEmpty(g) {
+		return nil
+	}
+
+	return &monaco.IMarkdownString{
+		Value: string(FormatCommentGroup(g)),
+	}
 }
