@@ -84,13 +84,13 @@ export interface SuggestionQuery {
 export interface PackageInfo {
   name: string
   importPath: string
-  documentation: string
+  doc?: string
 }
 
 export interface SymbolInfo {
   name: string
-  documentation: string
-  detail: string
+  doc?: string
+  detail?: string
   insertText: string
   insertTextRules: monaco.languages.CompletionItemInsertTextRule
   kind: monaco.languages.CompletionItemKind

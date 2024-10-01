@@ -8,7 +8,7 @@ export type CompletionItems = monaco.languages.CompletionItem[]
  */
 export interface NormalizedCompletionItem extends Omit<monaco.languages.CompletionItem, 'label' | 'range'> {
   label: string
-  documentation: monaco.IMarkdownString
+  documentation?: monaco.IMarkdownString
 }
 
 /**
@@ -33,7 +33,7 @@ export interface PackageIndexItem {
   /**
    * Inherited from CompletionItem.
    */
-  documentation: monaco.IMarkdownString
+  documentation?: monaco.IMarkdownString
 }
 
 /**

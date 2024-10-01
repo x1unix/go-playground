@@ -11,19 +11,19 @@ type PackageInfo struct {
 	// ImportPath is full import path of a package.
 	ImportPath string `json:"importPath"`
 
-	// Documentation is documentation in Markdown format.
-	Documentation string `json:"documentation"`
+	// Doc is documentation in Markdown format.
+	Doc string `json:"doc,omitempty"`
 }
 
 type SymbolInfo struct {
 	// Name is symbol name.
 	Name string `json:"name"`
 
-	// Documentation is documentation in Markdown format.
-	Documentation string `json:"documentation"`
+	// Doc is documentation in Markdown format.
+	Doc string `json:"doc,omitempty"`
 
 	// Detail is symbol summary.
-	Detail string `json:"detail"`
+	Detail string `json:"detail,omitempty"`
 
 	// InsertText is text to be inserted by completion.
 	InsertText string `json:"insertText"`
@@ -51,7 +51,7 @@ func SymbolInfoFromCompletionItem(item monaco.CompletionItem, src SymbolSource) 
 
 	return SymbolInfo{
 		Name:            label,
-		Documentation:   doc,
+		Doc:             doc,
 		Detail:          item.Detail,
 		InsertText:      item.InsertText,
 		InsertTextRules: item.InsertTextRules,
