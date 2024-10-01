@@ -13,10 +13,16 @@ import (
 	"github.com/x1unix/go-playground/internal/pkgindex/imports"
 )
 
-// queueSize is based on max occupation of a queue during test scan of Go 1.23.
-//
-// See: Queue.MaxOccupancy
-const queueSize = 120
+const (
+	// queueSize is based on max occupation of a queue during test scan of Go 1.23.
+	//
+	// See: Queue.MaxOccupancy
+	queueSize = 120
+
+	// Go 1.23 has 185 packages and over 70k total symbols.
+	pkgBuffSize = 185
+	symBuffSize = 78000
+)
 
 type scanEntry struct {
 	isVendor   bool
@@ -45,9 +51,8 @@ func ScanRoot(goRoot string) (*GoIndexFile, error) {
 		return nil, err
 	}
 
-	// There are 213 packages in Go 1.23
-	packages := make([]PackageInfo, 0, 213)
-	symbols := make([]SymbolInfo, 0, 300)
+	packages := make([]PackageInfo, 0, pkgBuffSize)
+	symbols := make([]SymbolInfo, 0, symBuffSize)
 
 	for queue.Occupied() {
 		v, ok := queue.Pop()

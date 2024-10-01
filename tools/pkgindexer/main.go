@@ -109,7 +109,7 @@ func runGenIndex(flags Flags) error {
 		return err
 	}
 
-	log.Printf("Scanned %d packages", len(entries.Packages))
+	log.Printf("Scanned %d packages and %d symbols", len(entries.Packages), len(entries.Symbols))
 	return nil
 }
 
