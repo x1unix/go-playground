@@ -68,8 +68,9 @@ export class GoCompletionService {
     const query: Partial<SymbolIndexItem> = packagePath
       ? {
           packagePath,
+          prefix: value.toLowerCase(),
         }
-      : { packageName, prefix: value }
+      : { packageName, prefix: value.toLowerCase() }
 
     const symbols = await this.db.symbolIndex.where(query).toArray()
     return symbols.map((symbol) => completionFromSymbol(symbol, context, !!packagePath))

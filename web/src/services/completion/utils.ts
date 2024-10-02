@@ -12,6 +12,8 @@ const stubRange = undefined as any as monaco.IRange
 
 const packageCompletionKind = 8
 
+const fallbackValue = (str: string, defaults?: string | undefined) => (str.length ? str : defaults)
+
 const stringToMarkdown = (value: string): monaco.IMarkdownString | undefined => {
   if (!value.length) {
     return undefined
@@ -44,7 +46,7 @@ export const constructSymbols = ({
   names.map((name, i) => ({
     key: `${packages[i][SymbolSourceKey.Path]}.${name}`,
     label: name,
-    detail: details[i],
+    detail: fallbackValue(details[i], name),
     signature: signatures[i],
     kind: kinds[i],
     insertText: insertTexts[i],
