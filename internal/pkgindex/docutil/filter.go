@@ -37,12 +37,12 @@ type composedFilter []Filter
 
 func (filters composedFilter) Ignore(typeName string) bool {
 	for _, f := range filters {
-		if !f.Ignore(typeName) {
-			return false
+		if f.Ignore(typeName) {
+			return true
 		}
 	}
 
-	return true
+	return false
 }
 
 // ComposeFilters allows composing multiple symbol filters into one.
