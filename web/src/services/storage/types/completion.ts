@@ -61,4 +61,9 @@ export interface SymbolIndexItem extends NormalizedCompletionItem {
    * Package name part of package path
    */
   packageName: string
+
+  /**
+   * Signature represents full symbol signature to show on hover.
+   */
+  signature: string
 }

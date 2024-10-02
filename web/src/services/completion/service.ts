@@ -3,10 +3,10 @@ import type { GoIndexFile, SuggestionQuery } from './types'
 import {
   completionFromPackage,
   completionFromSymbol,
+  constructPackages,
+  constructSymbols,
   findPackagePathFromContext,
   importCompletionFromPackage,
-  intoPackageIndexItem,
-  intoSymbolIndexItem,
 } from './utils'
 import { type SymbolIndexItem } from '~/services/storage/types'
 
@@ -17,6 +17,7 @@ const completionVersionKey = 'completionItems.version'
  */
 export class GoCompletionService {
   private cachePopulated = false
+  private populatePromise?: Promise<void>
 
   /**
    * Store keeps completions in cache.
@@ -112,28 +113,35 @@ export class GoCompletionService {
   }
 
   private async populateCache() {
-    const rsp = await fetch('/data/go-index.json')
-    if (!rsp.ok) {
-      throw new Error(`${rsp.status} ${rsp.statusText}`)
+    if (!this.populatePromise) {
+      // Cache population might be triggered by multiple actors outside.
+      this.populatePromise = (async () => {
+        const rsp = await fetch('/data/go-index.json')
+        if (!rsp.ok) {
+          throw new Error(`${rsp.status} ${rsp.statusText}`)
+        }
+
+        const data: GoIndexFile = await rsp.json()
+        if (data.version > 1) {
+          console.warn(`unsupported symbol index version: ${data.version}, skip update.`)
+          return
+        }
+
+        const packages = constructPackages(data.packages)
+        const symbols = constructSymbols(data.symbols)
+
+        await Promise.all([
+          this.db.packageIndex.clear(),
+          this.db.symbolIndex.clear(),
+          this.db.packageIndex.bulkAdd(packages),
+          this.db.symbolIndex.bulkAdd(symbols),
+          this.keyValue.setItem(completionVersionKey, data.go),
+        ])
+
+        this.cachePopulated = true
+      })()
     }
 
-    const data: GoIndexFile = await rsp.json()
-    if (data.version > 1) {
-      console.warn(`unsupported symbol index version: ${data.version}, skip update.`)
-      return
-    }
-
-    const packages = data.packages.map(intoPackageIndexItem)
-    const symbols = data.symbols.map(intoSymbolIndexItem)
-
-    await Promise.all([
-      this.db.packageIndex.clear(),
-      this.db.symbolIndex.clear(),
-      this.db.packageIndex.bulkAdd(packages),
-      this.db.symbolIndex.bulkAdd(symbols),
-      this.keyValue.setItem(completionVersionKey, data.go),
-    ])
-
-    this.cachePopulated = true
+    await this.populatePromise
   }
 }

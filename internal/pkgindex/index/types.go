@@ -7,6 +7,8 @@ import (
 
 const GoIndexFileVersion = 1
 
+type FlatSymbolSource [2]string
+
 type PackageInfo struct {
 	// Name is package name.
 	Name string `json:"name"`
@@ -64,7 +66,7 @@ type Symbols struct {
 	Kinds []monaco.CompletionItemKind `json:"kinds"`
 
 	// Packages contains information where particular symbol belongs (to what package).
-	Packages []SymbolSource `json:"packages"`
+	Packages []FlatSymbolSource `json:"packages"`
 }
 
 func NewSymbols(capacity int) Symbols {
@@ -76,7 +78,7 @@ func NewSymbols(capacity int) Symbols {
 		InsertTexts:     make([]string, 0, capacity),
 		InsertTextRules: make([]monaco.CompletionItemInsertTextRule, 0, capacity),
 		Kinds:           make([]monaco.CompletionItemKind, 0, capacity),
-		Packages:        make([]SymbolSource, 0, capacity),
+		Packages:        make([]FlatSymbolSource, 0, capacity),
 	}
 }
 
@@ -88,7 +90,7 @@ func (s *Symbols) Append(src SymbolSource, sym docutil.Symbol) {
 	s.InsertTexts = append(s.InsertTexts, sym.InsertText)
 	s.InsertTextRules = append(s.InsertTextRules, sym.InsertTextRules)
 	s.Kinds = append(s.Kinds, sym.Kind)
-	s.Packages = append(s.Packages, src)
+	s.Packages = append(s.Packages, src.Flatten())
 }
 
 // SymbolSource holds information where symbol belongs to.
@@ -98,6 +100,10 @@ type SymbolSource struct {
 
 	// Path is import path of a package.
 	Path string `json:"path"`
+}
+
+func (s SymbolSource) Flatten() FlatSymbolSource {
+	return FlatSymbolSource{s.Name, s.Path}
 }
 
 // GoIndexFile contains flat list of all Go packages and symbols (functions, types and values).

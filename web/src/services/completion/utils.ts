@@ -1,5 +1,5 @@
 import type * as monaco from 'monaco-editor'
-import { ImportClauseType, type PackageInfo, type SuggestionContext, type SymbolInfo } from './types'
+import { ImportClauseType, type Packages, type SuggestionContext, type Symbols, SymbolSourceKey } from './types'
 import type { PackageIndexItem, SymbolIndexItem } from '../storage/types'
 
 type CompletionItem = monaco.languages.CompletionItem
@@ -12,37 +12,48 @@ const stubRange = undefined as any as monaco.IRange
 
 const packageCompletionKind = 8
 
-export const intoPackageIndexItem = ({ name, importPath, doc }: PackageInfo): PackageIndexItem => ({
-  importPath,
-  name,
-  prefix: getPrefix(name),
-  documentation: doc
-    ? {
-        value: doc,
-        isTrusted: true,
-      }
-    : undefined,
-})
+const stringToMarkdown = (value: string): monaco.IMarkdownString | undefined => {
+  if (!value.length) {
+    return undefined
+  }
 
-export const intoSymbolIndexItem = ({
-  name,
-  package: pkg,
-  doc,
-  ...completion
-}: SymbolInfo): SymbolIndexItem => ({
-  ...completion,
-  key: `${pkg.path}.${name}`,
-  prefix: getPrefix(name),
-  label: name,
-  packageName: pkg.name,
-  packagePath: pkg.path,
-  documentation: doc
-    ? {
-        value: doc,
-        isTrusted: true,
-      }
-    : undefined,
-})
+  return {
+    value,
+    isTrusted: true,
+  }
+}
+
+export const constructPackages = ({ names, paths, docs }: Packages): PackageIndexItem[] =>
+  names.map((name, i) => ({
+    name,
+    importPath: paths[i],
+    prefix: getPrefix(names[i]),
+    documentation: stringToMarkdown(docs[i]),
+  }))
+
+export const constructSymbols = ({
+  names,
+  docs,
+  details,
+  signatures,
+  insertTexts,
+  insertTextRules,
+  kinds,
+  packages,
+}: Symbols): SymbolIndexItem[] =>
+  names.map((name, i) => ({
+    key: `${packages[i][SymbolSourceKey.Path]}.${name}`,
+    label: name,
+    detail: details[i],
+    signature: signatures[i],
+    kind: kinds[i],
+    insertText: insertTexts[i],
+    insertTextRules: insertTextRules[i],
+    prefix: getPrefix(name),
+    packageName: packages[i][SymbolSourceKey.Name],
+    packagePath: packages[i][SymbolSourceKey.Path],
+    documentation: stringToMarkdown(docs[i]),
+  }))
 
 export const importCompletionFromPackage = ({ importPath, name, documentation }: PackageIndexItem): CompletionItem => ({
   label: importPath,

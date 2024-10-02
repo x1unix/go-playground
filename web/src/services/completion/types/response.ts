@@ -1,9 +1,11 @@
 import type * as monaco from 'monaco-editor'
 
-interface SymbolSource {
-  name: string
-  path: string
+export enum SymbolSourceKey {
+  Name = 0,
+  Path = 1,
 }
+
+type SymbolSource = [name: string, path: string]
 
 /**
  * @see internal/pkgindex/index/types.go
@@ -12,6 +14,7 @@ export interface Symbols {
   names: string[]
   docs: string[]
   details: string[]
+  signatures: string[]
   insertTexts: string[]
   insertTextRules: monaco.languages.CompletionItemInsertTextRule[]
   kinds: monaco.languages.CompletionItemKind[]
