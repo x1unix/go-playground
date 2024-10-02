@@ -2,12 +2,13 @@ package index
 
 import (
 	"fmt"
-	"github.com/x1unix/go-playground/internal/pkgindex/docutil"
-	"github.com/x1unix/go-playground/internal/pkgindex/imports"
 	"go/token"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/x1unix/go-playground/internal/pkgindex/docutil"
+	"github.com/x1unix/go-playground/internal/pkgindex/imports"
 )
 
 type traverseResult struct {
