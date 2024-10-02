@@ -17,6 +17,7 @@ func newCmdIndex(g *globalFlags) *cobra.Command {
 		Short: "Generate index file with standard Go packages and symbols",
 		Long:  "Generate a JSON file that contains list of all standard Go packages and its symbols. Used in new version of app",
 		PreRunE: func(_ *cobra.Command, _ []string) error {
+			index.Debug = flags.verbose
 			return flags.validate()
 		},
 		RunE: func(_ *cobra.Command, _ []string) error {
@@ -27,6 +28,7 @@ func newCmdIndex(g *globalFlags) *cobra.Command {
 	cmd.Flags().StringVarP(&flags.outFile, "output", "o", "", "Path to output file. When enpty, prints to stdout")
 	cmd.Flags().BoolVarP(&flags.prettyPrint, "pretty", "P", false, "Add indents to JSON output")
 	cmd.Flags().BoolVar(&flags.stdout, "stdout", false, "Dump result into stdout")
+	cmd.Flags().BoolVarP(&flags.verbose, "verbose", "v", false, "Enable verbose logging")
 	return cmd
 }
 

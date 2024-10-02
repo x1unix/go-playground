@@ -35,12 +35,12 @@ check-go:
 .PHONY: imports-index
 imports-index:
 	@echo ":: Generating Go imports index..." && \
-	$(GO) run ./tools/pkgindexer imports -o $(UI)/public/data/imports.json
+	$(GO) run ./tools/pkgindexer imports -o $(UI)/public/data/imports.json $(OPTS)
 
 .PHONY: go-index
 go-index:
 	@echo ":: Generating Go symbols index..." && \
-	$(GO) run ./tools/pkgindexer index -o $(UI)/public/data/go-index.json
+	$(GO) run ./tools/pkgindexer index -o $(UI)/public/data/go-index.json $(OPTS)
 
 .PHONY:check-yarn
 check-yarn:

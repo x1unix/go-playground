@@ -19,10 +19,12 @@ const (
 	// See: Queue.MaxOccupancy
 	queueSize = 120
 
-	// Go 1.23 has 185 packages and over 70k total symbols.
-	pkgBuffSize = 185
-	symBuffSize = 78000
+	// Go 1.23 has 182 packages and over 9k total symbols for linux.
+	pkgBuffSize = 182
+	symBuffSize = 9000
 )
+
+var Debug = false
 
 type scanEntry struct {
 	isVendor   bool
@@ -83,6 +85,8 @@ func ScanRoot(goRoot string) (*GoIndexFile, error) {
 		// Also skip empty packages (usually part of vendor path).
 		if result.pkgInfo.ImportPath != docutil.BuiltinPackage && result.symbolsCount > 0 {
 			packages.Append(result.pkgInfo)
+		} else if Debug {
+			log.Printf("Skip pkg: %s", result.pkgInfo.ImportPath)
 		}
 	}
 

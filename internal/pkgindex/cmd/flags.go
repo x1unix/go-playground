@@ -29,6 +29,7 @@ func (f globalFlags) withDefaults() (globalFlags, error) {
 
 type importsFlags struct {
 	*globalFlags
+	verbose     bool
 	prettyPrint bool
 	stdout      bool
 	outFile     string
