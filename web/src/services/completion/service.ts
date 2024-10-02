@@ -65,12 +65,13 @@ export class GoCompletionService {
     // to avoid overlap with packages with eponymous name.
     const packagePath = findPackagePathFromContext(context, packageName)
 
+    const prefix = value.toLowerCase()
     const query: Partial<SymbolIndexItem> = packagePath
       ? {
           packagePath,
-          prefix: value.toLowerCase(),
+          prefix,
         }
-      : { packageName, prefix: value.toLowerCase() }
+      : { packageName, prefix }
 
     const symbols = await this.db.symbolIndex.where(query).toArray()
     return symbols.map((symbol) => completionFromSymbol(symbol, context, !!packagePath))

@@ -54,7 +54,8 @@ export class DocumentMetadataCache {
    */
   getMetadata(fileName: string, model: monaco.editor.ITextModel) {
     const data = this.cache.get(fileName)
-    if (data) {
+    if (data && !data.hasError) {
+      console.log('use cache', data)
       return data
     }
 
@@ -63,6 +64,7 @@ export class DocumentMetadataCache {
 
   private updateCache(fileName: string, model: monaco.editor.ITextModel) {
     const context = buildImportContext(model)
+    console.log('cache empty, update meta', context)
     this.cache.set(fileName, context)
     return context
   }

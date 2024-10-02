@@ -19,6 +19,11 @@ export enum ImportClauseType {
 
 export interface ImportsContext {
   /**
+   * Whether any error was detected during context build.
+   */
+  hasError?: boolean
+
+  /**
    * List of import paths from all import blocks.
    */
   allPaths?: Set<string>

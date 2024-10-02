@@ -57,7 +57,7 @@ const findPackageBlock = (tokens: Tokens) => {
 
 interface ImportHeader {
   line: number
-  foundParent?: boolean
+  hasOpenParen?: boolean
   argTokens?: monaco.Token[]
 }
 
@@ -89,7 +89,7 @@ const findImportHeader = (offset: number, tokens: Tokens): ImportHeader | null =
 
     switch (rest[k].type) {
       case GoToken.Parenthesis:
-        return { line: i, foundParent: true }
+        return { line: i, hasOpenParen: true }
       case GoToken.Ident:
       case GoToken.String:
         // probably it's a single-line import.
@@ -121,26 +121,30 @@ const unquote = (str: string) => {
   return str
 }
 
-const readToken = (line: number, tok: monaco.Token, model: monaco.editor.ITextModel): string => {
-  const word = model.getWordAtPosition({
-    lineNumber: line + 1,
-    column: tok.offset + 1,
-  })?.word
-  if (!word) {
-    throw new ParseError(line, tok.offset, 'parseToken: invalid range')
-  }
-
-  return word
+interface ReadTokenParams {
+  line: number
+  tokens: monaco.Token[]
+  model: monaco.editor.ITextModel
 }
 
-const checkParenthesis = (line: number, token: monaco.Token, model: monaco.editor.ITextModel) => {
-  const isParent = token.type === GoToken.Parenthesis
-  let isClose = false
-  if (isParent) {
-    isClose = readToken(line, token, model) === ')'
+const readToken = (index: number, { line, tokens, model }: ReadTokenParams): string => {
+  const token = tokens[index]
+  const endIdx = tokens[index + 1]?.offset
+  const word = model.getLineContent(line + 1)
+  if (!word || !token) {
+    throw new ParseError(line, token.offset, 'parseToken: invalid range')
   }
 
-  return { isParent, isClose }
+  return word.slice(token.offset, endIdx)
+}
+
+const checkParenthesis = (index: number, params: ReadTokenParams) => {
+  const { tokens } = params
+  const isParen = tokens[index].type === GoToken.Parenthesis
+  const value = readToken(index, params)
+
+  const isClose = isParen && value === ')'
+  return { isParen, isClose, value }
 }
 
 interface ImportBlock {
@@ -162,18 +166,24 @@ interface ImportRow {
 const readImportLine = (line: number, model: monaco.editor.ITextModel, row: monaco.Token[]): ImportStmt | null => {
   const i = row.findIndex(isNotEmptyToken)
   const token = row[i]
+  const params: ReadTokenParams = {
+    line: line,
+    tokens: row,
+    model: model,
+  }
   switch (token.type) {
     case GoToken.Ident: {
-      const ident = readToken(line, token, model)
-      const pathTok = row.find(isNotEmptyToken)
-      if (!pathTok) {
+      const ident = readToken(i, params)
+      const pathPos = row.findIndex(isNotEmptyToken)
+      if (pathPos === -1) {
         throw new ParseError(line, i, 'missing import path after ident')
       }
-      return { alias: ident, path: readToken(line, pathTok, model) }
+
+      return { alias: ident, path: readToken(pathPos, params) }
     }
     case GoToken.String:
       return {
-        path: readToken(line, token, model),
+        path: readToken(i, params),
       }
     default:
       throw new UnexpectedTokenError(line, token)
@@ -191,9 +201,14 @@ const readImportBlockLine = (line: number, model: monaco.editor.ITextModel, row:
     }
 
     const token = slice[i]
+    const params: ReadTokenParams = {
+      line,
+      model,
+      tokens: slice
+    }
     slice = slice.slice(i + 1)
-    const { isParent, isClose } = checkParenthesis(line, token, model)
-    if (isParent) {
+    const { isParen, isClose, value } = checkParenthesis(i, params)
+    if (isParen) {
       if (lastIdent) {
         throw new UnexpectedTokenError(line, token)
       }
@@ -213,14 +228,15 @@ const readImportBlockLine = (line: number, model: monaco.editor.ITextModel, row:
           throw new UnexpectedTokenError(line, token)
         }
 
-        lastIdent = readToken(line, token, model)
+        lastIdent = value
+        // lastIdent = readToken(line, token, model)
         break
       }
       case GoToken.Comment: {
         break
       }
       case GoToken.String: {
-        const path = unquote(readToken(line, token, model))
+        const path = unquote(value.trim())
         if (path) {
           imports.push(lastIdent ? { path, alias: lastIdent } : { path })
         }
@@ -242,7 +258,7 @@ const traverseImportGroup = (
   header: ImportHeader,
   tokens: Tokens,
 ): ImportBlock | null => {
-  let groupStartFound = header.foundParent ?? false
+  let groupStartFound = header.hasOpenParen ?? false
   const imports: ImportStmt[] = []
   const range = {
     startLineNumber: header.line,
@@ -258,9 +274,15 @@ const traverseImportGroup = (
       continue
     }
 
+    const params: ReadTokenParams = {
+      model,
+      line: i,
+      tokens: row,
+    }
+
     const token = row[j]
-    const { isParent, isClose } = checkParenthesis(i, token, model)
-    if (isParent) {
+    const { isParen, isClose } = checkParenthesis(j, params)
+    if (isParen) {
       if (groupStartFound && isClose) {
         range.endLineNumber = i + 1
         range.endColumn = token.offset + 2
@@ -335,7 +357,17 @@ const findImportBlock = (offset: number, model: monaco.editor.ITextModel, tokens
  */
 export const buildImportContext = (model: monaco.editor.ITextModel): ImportsContext => {
   const tokens = monaco.editor.tokenize(model.getValue(), model.getLanguageId())
+  return importContextFromTokens(model, tokens)
+}
 
+/**
+ * Builds import context from raw tokenized source and model.
+ *
+ * This is a workaround function for vitest as Monaco language pack can't be loaded in jsdom env.
+ *
+ * Regular users should use `buildImportContext` instead.
+ */
+export const importContextFromTokens = (model: monaco.editor.ITextModel, tokens: monaco.Token[][]): ImportsContext => {
   const packagePos = findPackageBlock(tokens)
   if (packagePos === -1) {
     // Invalid syntax, discard any import suggestions.
@@ -366,7 +398,8 @@ export const buildImportContext = (model: monaco.editor.ITextModel): ImportsCont
         break
       }
 
-      offset = block.range.endLineNumber + 1
+      // returned line starts from 1, keep as is as we count from 0.
+      offset = block.range.endLineNumber
       lastImportBlock = block
       allImports.push(...block.imports.map(({ path }) => path))
     } catch (err) {
@@ -378,6 +411,7 @@ export const buildImportContext = (model: monaco.editor.ITextModel): ImportsCont
   if (lastImportBlock) {
     // TODO: support named imports
     return {
+      hasError,
       allPaths: new Set(allImports),
       blockPaths: lastImportBlock.imports.map(({ path }) => path),
       blockType: lastImportBlock.isMultiline ? ImportClauseType.Block : ImportClauseType.Single,
@@ -392,6 +426,7 @@ export const buildImportContext = (model: monaco.editor.ITextModel): ImportsCont
   if (hasError) {
     // syntax error at first import block, skip
     return {
+      hasError,
       blockType: ImportClauseType.None,
     }
   }
