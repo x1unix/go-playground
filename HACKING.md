@@ -74,6 +74,9 @@ Please ensure that you have installed:
 * [Node Version Manager](https://github.com/nvm-sh/nvm) or Node.js 20 (`lts/iron`)
 * [Yarn](https://yarnpkg.com/) package manager.
 * Go 1.22+
+* Protobuf:
+    * [protoc](https://developers.google.com/protocol-buffers)
+    * [Protobuf Go plugins](https://grpc.io/docs/languages/go/quickstart/)
 
 ### First-time setup
 

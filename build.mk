@@ -81,4 +81,4 @@ build: check-go check-yarn clean preinstall gen build-server wasm go-index impor
 
 .PHONY:gen
 gen:
-	@find . -name '*_gen.go' -exec go generate -v {} \;
+	@find . -name 'generate.go' -exec go generate -v {} \;
