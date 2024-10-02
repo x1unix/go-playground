@@ -86,7 +86,7 @@ Run following commands to configure a just cloned project:
 |-------------------|----------------------------------------------------------|
 | `make preinstall` | Installs NPM packages for a web app.                     |
 | `make wasm`       | Builds WebAssembly binaries used by the web app.         |
-| `make pkg-index`  | Generates Go packages index for autocomplete in web app. |
+| `make go-index`   | Generates Go packages index for autocomplete in web app. |
 
 ### Running Project
 
