@@ -7,7 +7,8 @@ import (
 )
 
 type globalFlags struct {
-	goRoot string
+	goRoot       string
+	heapProfFile string
 }
 
 func (f globalFlags) withDefaults() (globalFlags, error) {
