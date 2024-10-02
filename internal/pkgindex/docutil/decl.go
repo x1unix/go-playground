@@ -6,16 +6,16 @@ import (
 	"go/token"
 )
 
-// DeclToSymbol constructs symbol from generic type of value spec.
-func DeclToSymbol(fset *token.FileSet, specGroup *ast.GenDecl, filter Filter) ([]Symbol, error) {
+// CollectDecls collects symbols from generic type of value spec.
+func CollectDecls(fset *token.FileSet, specGroup *ast.GenDecl, filter Filter, collector Collector) (count int, err error) {
 	if len(specGroup.Specs) == 0 {
-		return nil, nil
+		return 0, nil
 	}
 
 	filter = filterOrDefault(filter)
 	block, err := NewBlockData(specGroup)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 
 	traverseCtx := TraverseContext{
@@ -24,7 +24,6 @@ func DeclToSymbol(fset *token.FileSet, specGroup *ast.GenDecl, filter Filter) ([
 		Filter:  filter,
 	}
 
-	completions := make([]Symbol, 0, len(specGroup.Specs))
 	for _, spec := range specGroup.Specs {
 		switch t := spec.(type) {
 		case *ast.TypeSpec:
@@ -34,25 +33,22 @@ func DeclToSymbol(fset *token.FileSet, specGroup *ast.GenDecl, filter Filter) ([
 
 			item, err := TypeToSymbol(fset, block, t)
 			if err != nil {
-				return nil, err
+				return count, err
 			}
 
-			completions = append(completions, item)
+			count++
+			collector.CollectSymbol(item)
 		case *ast.ValueSpec:
-			items, err := ValueToSymbol(traverseCtx, t)
+			n, err := CollectValues(traverseCtx, t, collector)
 			if err != nil {
-				return nil, err
+				return count, err
 			}
 
-			if len(items) == 0 {
-				continue
-			}
-
-			completions = append(completions, items...)
+			count += n
 		default:
-			return nil, fmt.Errorf("unsupported declaration type %T", t)
+			return count, fmt.Errorf("unsupported declaration type %T", t)
 		}
 	}
 
-	return completions, nil
+	return count, nil
 }

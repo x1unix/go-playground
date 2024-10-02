@@ -51,8 +51,8 @@ func ScanRoot(goRoot string) (*GoIndexFile, error) {
 		return nil, err
 	}
 
-	packages := make([]PackageInfo, 0, pkgBuffSize)
-	symbols := make([]SymbolInfo, 0, symBuffSize)
+	packages := NewPackages(pkgBuffSize)
+	symbols := NewSymbols(symBuffSize)
 
 	for queue.Occupied() {
 		v, ok := queue.Pop()
@@ -69,7 +69,7 @@ func ScanRoot(goRoot string) (*GoIndexFile, error) {
 			continue
 		}
 
-		result, err := traverseScanEntry(v, queue)
+		result, err := traverseScanEntry(v, queue, symbols.Append)
 		if err != nil {
 			return nil, fmt.Errorf("error while scanning package %q: %w", v.importPath, err)
 		}
@@ -81,11 +81,9 @@ func ScanRoot(goRoot string) (*GoIndexFile, error) {
 		// Edge case: "builtin" package exists only for documentation purposes
 		// and not importable.
 		// Also skip empty packages (usually part of vendor path).
-		if result.pkgInfo.ImportPath != docutil.BuiltinPackage && len(result.symbols) > 0 {
-			packages = append(packages, result.pkgInfo)
+		if result.pkgInfo.ImportPath != docutil.BuiltinPackage && result.symbolsCount > 0 {
+			packages.Append(result.pkgInfo)
 		}
-
-		symbols = append(symbols, result.symbols...)
 	}
 
 	return &GoIndexFile{

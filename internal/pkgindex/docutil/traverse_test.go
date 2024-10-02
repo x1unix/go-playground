@@ -56,9 +56,9 @@ func TestTypeToCompletionItem(t *testing.T) {
 				got  []Symbol
 				want []Symbol
 			)
-			err = CollectSymbols(r.Decls, opts, func(items ...Symbol) {
-				got = append(got, items...)
-			})
+			n, err := CollectSymbols(r.Decls, opts, CollectorFunc(func(item Symbol) {
+				got = append(got, item)
+			}))
 			if c.expectErr != "" {
 				require.Error(t, err)
 				require.Contains(t, err.Error(), c.expectErr)
@@ -88,6 +88,7 @@ func TestTypeToCompletionItem(t *testing.T) {
 			})
 
 			require.Equal(t, want, got)
+			require.Equal(t, len(got), n)
 		})
 	}
 }

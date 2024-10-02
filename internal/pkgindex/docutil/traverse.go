@@ -15,12 +15,10 @@ type TraverseOpts struct {
 	SnippetFormat monaco.CompletionItemInsertTextRule
 }
 
-type TraverseReducer = func(items ...Symbol)
-
 // CollectSymbols traverses root file declarations and transforms them into completion items.
 //
 // Important: type methods are ignored.
-func CollectSymbols(decls []ast.Decl, opts TraverseOpts, reducer TraverseReducer) error {
+func CollectSymbols(decls []ast.Decl, opts TraverseOpts, collector Collector) (count int, err error) {
 	filter := filterOrDefault(opts.Filter)
 	for _, decl := range decls {
 		switch t := decl.(type) {
@@ -36,27 +34,28 @@ func CollectSymbols(decls []ast.Decl, opts TraverseOpts, reducer TraverseReducer
 
 			item, err := SymbolFromFunc(opts.FileSet, t, monaco.InsertAsSnippet)
 			if err != nil {
-				return fmt.Errorf(
+				return count, fmt.Errorf(
 					"can't parse function %s: %w (pos: %s)",
 					t.Name.String(), err, GetDeclPosition(opts.FileSet, t),
 				)
 			}
 
-			reducer(item)
+			count++
+			collector.CollectSymbol(item)
 		case *ast.GenDecl:
 			if t.Tok == token.IMPORT {
 				continue
 			}
 
-			items, err := DeclToSymbol(opts.FileSet, t, filter)
+			n, err := CollectDecls(opts.FileSet, t, filter, collector)
 			if err != nil {
-				return fmt.Errorf(
+				return count, fmt.Errorf(
 					"can't parse decl %s: %w (at %s)",
 					t.Tok, err, GetDeclPosition(opts.FileSet, t),
 				)
 			}
 
-			reducer(items...)
+			count += n
 		default:
 			fname := opts.FileSet.File(decl.Pos()).Name()
 			log.Printf(
@@ -66,5 +65,5 @@ func CollectSymbols(decls []ast.Decl, opts TraverseOpts, reducer TraverseReducer
 		}
 	}
 
-	return nil
+	return count, nil
 }

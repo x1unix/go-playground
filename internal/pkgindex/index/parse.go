@@ -12,15 +12,18 @@ var ignoreBuiltins = docutil.NewIgnoreList(
 	"Type", "Type1", "IntegerType", "FloatType", "ComplexType",
 )
 
+type CollectFn = func(src SymbolSource, sym docutil.Symbol)
+
 type sourceSummary struct {
-	packageName string
-	doc         *ast.CommentGroup
-	symbols     []SymbolInfo
+	packageName  string
+	symbolsCount int
+	doc          *ast.CommentGroup
 }
 
 type fileParseParams struct {
 	importPath string
 	parseDoc   bool
+	collector  CollectFn
 }
 
 func getFilter(importPath string) docutil.Filter {
@@ -39,7 +42,6 @@ func parseFile(fset *token.FileSet, fpath string, params fileParseParams) (*sour
 
 	summary := sourceSummary{
 		packageName: root.Name.String(),
-		symbols:     make([]SymbolInfo, 0, len(root.Decls)),
 	}
 
 	// "go/doc" ignores some packages from GOROOT thus it doesn't work for us.
@@ -53,17 +55,17 @@ func parseFile(fset *token.FileSet, fpath string, params fileParseParams) (*sour
 		Path: params.importPath,
 	}
 
+	collector := docutil.CollectorFunc(func(sym docutil.Symbol) {
+		params.collector(src, sym)
+	})
+
 	opts := docutil.TraverseOpts{
 		FileSet:       fset,
 		Filter:        getFilter(params.importPath),
 		SnippetFormat: monaco.InsertAsSnippet,
 	}
 
-	err = docutil.CollectSymbols(root.Decls, opts, func(items ...docutil.Symbol) {
-		for _, item := range items {
-			summary.symbols = append(summary.symbols, IntoSymbolInfo(item, src))
-		}
-	})
+	summary.symbolsCount, err = docutil.CollectSymbols(root.Decls, opts, collector)
 
 	if err != nil {
 		return nil, err

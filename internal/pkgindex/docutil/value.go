@@ -12,14 +12,13 @@ type TraverseContext struct {
 	Filter  Filter
 }
 
-// ValueToSymbol constructs completion item from value declaration.
+// CollectValues constructs completion item from value declaration.
 //
 // Able to handle special edge cases for builtin declarations.
-func ValueToSymbol(ctx TraverseContext, spec *ast.ValueSpec) ([]Symbol, error) {
+func CollectValues(ctx TraverseContext, spec *ast.ValueSpec, collector Collector) (count int, err error) {
 	filter := filterOrDefault(ctx.Filter)
 	blockDoc := getValueDocumentation(ctx.Block, spec)
 
-	items := make([]Symbol, 0, len(spec.Values))
 	for _, val := range spec.Names {
 		if filter.Ignore(val.Name) {
 			continue
@@ -27,7 +26,7 @@ func ValueToSymbol(ctx TraverseContext, spec *ast.ValueSpec) ([]Symbol, error) {
 
 		detail, err := detailFromIdent(ctx.FileSet, ctx.Block, val)
 		if err != nil {
-			return nil, err
+			return count, err
 		}
 
 		item := Symbol{
@@ -38,10 +37,11 @@ func ValueToSymbol(ctx TraverseContext, spec *ast.ValueSpec) ([]Symbol, error) {
 			Documentation: blockDoc,
 		}
 
-		items = append(items, item)
+		count++
+		collector.CollectSymbol(item)
 	}
 
-	return items, nil
+	return count, nil
 }
 
 func getValueDocumentation(block BlockData, spec *ast.ValueSpec) string {

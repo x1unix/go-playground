@@ -8,10 +8,8 @@ import (
 )
 
 func newCmdIndex(g *globalFlags) *cobra.Command {
-	flags := indexFlags{
-		importsFlags: importsFlags{
-			globalFlags: g,
-		},
+	flags := importsFlags{
+		globalFlags: g,
 	}
 
 	cmd := &cobra.Command{
@@ -26,23 +24,22 @@ func newCmdIndex(g *globalFlags) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&flags.format, "format", "F", "json", "Output format: proto or json")
 	cmd.Flags().StringVarP(&flags.outFile, "output", "o", "", "Path to output file. When enpty, prints to stdout")
 	cmd.Flags().BoolVarP(&flags.prettyPrint, "pretty", "P", false, "Add indents to JSON output")
 	cmd.Flags().BoolVar(&flags.stdout, "stdout", false, "Dump result into stdout")
 	return cmd
 }
 
-func runGenIndex(flags indexFlags) error {
+func runGenIndex(flags importsFlags) error {
 	entries, err := index.ScanRoot(flags.goRoot)
 	if err != nil {
 		return err
 	}
 
-	if err := writeOutput(flags.importsFlags, entries); err != nil {
+	if err := writeOutput(flags, entries); err != nil {
 		return err
 	}
 
-	log.Printf("Scanned %d packages and %d symbols", len(entries.Packages), len(entries.Symbols))
+	log.Printf("Scanned %d packages and %d symbols", len(entries.Packages.Names), len(entries.Symbols.Names))
 	return nil
 }

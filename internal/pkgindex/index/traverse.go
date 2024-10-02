@@ -11,13 +11,13 @@ import (
 )
 
 type traverseResult struct {
-	pkgInfo PackageInfo
-	symbols []SymbolInfo
+	pkgInfo      PackageInfo
+	symbolsCount int
 }
 
-func traverseScanEntry(entry scanEntry, queue *imports.Queue[scanEntry]) (*traverseResult, error) {
+func traverseScanEntry(entry scanEntry, queue *imports.Queue[scanEntry], collector CollectFn) (*traverseResult, error) {
 	var (
-		symbols []SymbolInfo
+		count   int
 		pkgInfo = PackageInfo{
 			ImportPath: entry.importPath,
 		}
@@ -41,12 +41,13 @@ func traverseScanEntry(entry scanEntry, queue *imports.Queue[scanEntry]) (*trave
 			f, err := parseFile(fset, absPath, fileParseParams{
 				parseDoc:   pkgInfo.Doc == "",
 				importPath: entry.importPath,
+				collector:  collector,
 			})
 			if err != nil {
 				return nil, fmt.Errorf("can't parse file %q: %w", absPath, err)
 			}
 
-			symbols = append(symbols, f.symbols...)
+			count += f.symbolsCount
 			pkgInfo.Name = f.packageName
 			if f.doc != nil {
 				pkgInfo.Doc = docutil.BuildPackageDoc(f.doc, entry.importPath)
@@ -76,12 +77,12 @@ func traverseScanEntry(entry scanEntry, queue *imports.Queue[scanEntry]) (*trave
 		}
 	}
 
-	if len(symbols) == 0 {
+	if count == 0 {
 		return nil, nil
 	}
 
 	return &traverseResult{
-		pkgInfo: pkgInfo,
-		symbols: symbols,
+		pkgInfo:      pkgInfo,
+		symbolsCount: count,
 	}, nil
 }
