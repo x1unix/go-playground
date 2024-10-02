@@ -1,0 +1,48 @@
+package cmd
+
+import (
+	"log"
+
+	"github.com/spf13/cobra"
+	"github.com/x1unix/go-playground/internal/pkgindex/index"
+)
+
+func newCmdIndex(g *globalFlags) *cobra.Command {
+	flags := indexFlags{
+		importsFlags: importsFlags{
+			globalFlags: g,
+		},
+	}
+
+	cmd := &cobra.Command{
+		Use:   "index [-r goroot] [-o output]",
+		Short: "Generate index file with standard Go packages and symbols",
+		Long:  "Generate a JSON file that contains list of all standard Go packages and its symbols. Used in new version of app",
+		PreRunE: func(_ *cobra.Command, _ []string) error {
+			return flags.validate()
+		},
+		RunE: func(_ *cobra.Command, _ []string) error {
+			return runGenIndex(flags)
+		},
+	}
+
+	cmd.Flags().StringVarP(&flags.format, "format", "F", "json", "Output format: proto or json")
+	cmd.Flags().StringVarP(&flags.outFile, "output", "o", "", "Path to output file. When enpty, prints to stdout")
+	cmd.Flags().BoolVarP(&flags.prettyPrint, "pretty", "P", false, "Add indents to JSON output")
+	cmd.Flags().BoolVar(&flags.stdout, "stdout", false, "Dump result into stdout")
+	return cmd
+}
+
+func runGenIndex(flags indexFlags) error {
+	entries, err := index.ScanRoot(flags.goRoot)
+	if err != nil {
+		return err
+	}
+
+	if err := writeOutput(flags.importsFlags, entries); err != nil {
+		return err
+	}
+
+	log.Printf("Scanned %d packages and %d symbols", len(entries.Packages), len(entries.Symbols))
+	return nil
+}
