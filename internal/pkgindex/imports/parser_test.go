@@ -12,6 +12,8 @@ import (
 	"github.com/x1unix/go-playground/pkg/monaco"
 )
 
+const goDocDomain = "pkg.go.dev"
+
 func TestParseImportCompletionItem(t *testing.T) {
 	cases := map[string]struct {
 		pkgName          string
