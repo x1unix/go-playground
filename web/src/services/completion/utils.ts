@@ -12,7 +12,7 @@ const stubRange = undefined as any as monaco.IRange
 
 const packageCompletionKind = 8
 
-const fallbackValue = (str: string, defaults?: string | undefined) => (str.length ? str : defaults)
+const discardIfEmpty = (str: string, defaults?: string | undefined) => (str.length ? str : defaults)
 
 const stringToMarkdown = (value: string): monaco.IMarkdownString | undefined => {
   if (!value.length) {
@@ -46,7 +46,7 @@ export const constructSymbols = ({
   names.map((name, i) => ({
     key: `${packages[i][SymbolSourceKey.Path]}.${name}`,
     label: name,
-    detail: fallbackValue(details[i], name),
+    detail: discardIfEmpty(details[i], name),
     signature: signatures[i],
     kind: kinds[i],
     insertText: insertTexts[i],
@@ -138,6 +138,10 @@ const pkgNameFromPath = (importPath: string) => {
 export const findPackagePathFromContext = ({ imports }: SuggestionContext, pkgName: string): string | undefined => {
   if (!imports.allPaths) {
     return undefined
+  }
+
+  if (imports.allPaths.has(pkgName)) {
+    return pkgName
   }
 
   for (const importPath of imports.allPaths.keys()) {

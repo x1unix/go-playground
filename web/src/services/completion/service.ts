@@ -1,5 +1,5 @@
 import { db, keyValue } from '../storage'
-import type { GoIndexFile, SuggestionQuery } from './types'
+import type { GoIndexFile, LiteralQuery, PackageSymbolQuery, SuggestionQuery } from './types'
 import {
   completionFromPackage,
   completionFromSymbol,
@@ -53,31 +53,33 @@ export class GoCompletionService {
   async getSymbolSuggestions(query: SuggestionQuery) {
     await this.checkCacheReady()
 
-    if (query.packageName) {
-      return await this.getMemberSuggestion(query as Required<SuggestionQuery>)
+    if ('packageName' in query) {
+      return await this.getMemberSuggestion(query)
     }
 
     return await this.getLiteralSuggestion(query)
   }
 
-  private async getMemberSuggestion({ value, packageName, context }: Required<SuggestionQuery>) {
+  private async getMemberSuggestion({ value, packageName, context }: PackageSymbolQuery) {
     // If package with specified name is imported - filter symbols
     // to avoid overlap with packages with eponymous name.
     const packagePath = findPackagePathFromContext(context, packageName)
 
-    const prefix = value.toLowerCase()
-    const query: Partial<SymbolIndexItem> = packagePath
+    const filter: Partial<SymbolIndexItem> = packagePath
       ? {
           packagePath,
-          prefix,
         }
-      : { packageName, prefix }
+      : { packageName }
 
-    const symbols = await this.db.symbolIndex.where(query).toArray()
+    if (value) {
+      filter.prefix = value.charAt(0).toLowerCase()
+    }
+
+    const symbols = await this.db.symbolIndex.where(filter).toArray()
     return symbols.map((symbol) => completionFromSymbol(symbol, context, !!packagePath))
   }
 
-  private async getLiteralSuggestion({ value, context }: SuggestionQuery) {
+  private async getLiteralSuggestion({ value, context }: LiteralQuery) {
     const packages = await this.db.packageIndex.where('prefix').equals(value).toArray()
     const builtins = await this.db.symbolIndex.where('packagePath').equals('builtin').toArray()
 

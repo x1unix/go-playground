@@ -80,8 +80,15 @@ export interface SuggestionContext {
   imports: ImportsContext
 }
 
-export interface SuggestionQuery {
-  packageName?: string
+export interface LiteralQuery {
   value: string
   context: SuggestionContext
 }
+
+export interface PackageSymbolQuery {
+  packageName: string
+  value?: string
+  context: SuggestionContext
+}
+
+export type SuggestionQuery = LiteralQuery | PackageSymbolQuery

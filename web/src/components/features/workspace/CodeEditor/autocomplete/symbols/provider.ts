@@ -13,6 +13,7 @@ const SUGGESTIONS_DEBOUNCE_DELAY = 500
  * Provides completion for symbols such as variables and functions.
  */
 export class GoSymbolsCompletionItemProvider extends CacheBasedCompletionProvider<SuggestionQuery> {
+  triggerCharacters = Array.from('.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
   private readonly metadataCache: DocumentMetadataCache
   private readonly getSuggestionFunc = asyncDebounce(
     async (query) => await this.completionSvc.getSymbolSuggestions(query),
@@ -24,12 +25,19 @@ export class GoSymbolsCompletionItemProvider extends CacheBasedCompletionProvide
     this.metadataCache = metadataCache
   }
 
-  protected getFallbackSuggestions({ value, context: { range } }: SuggestionQuery): monaco.languages.CompletionList {
+  protected getFallbackSuggestions(query: SuggestionQuery): monaco.languages.CompletionList {
+    if ('packageName' in query) {
+      return { suggestions: [] }
+    }
+
     // filter snippets by prefix.
     // usually monaco does that but not always in right way
-    const suggestions = snippets.filter((s) => s.label.startsWith(value)).map((s) => ({ ...s, range }))
+    const { value } = query
+    const items = value ? snippets.filter((s) => s.label.startsWith(value)) : snippets
 
-    return { suggestions }
+    return {
+      suggestions: items,
+    }
   }
 
   protected parseCompletionQuery(
@@ -71,14 +79,11 @@ export class GoSymbolsCompletionItemProvider extends CacheBasedCompletionProvide
 
   protected async querySuggestions(query: SuggestionQuery) {
     const { suggestions: relatedSnippets } = this.getFallbackSuggestions(query)
-    const suggestions = await this.getSuggestionFunc(query)
-    if (!suggestions?.length) {
+    const results = await this.getSuggestionFunc(query)
+    if (!results?.length) {
       return relatedSnippets
     }
 
-    const {
-      context: { range },
-    } = query
-    return relatedSnippets.concat(suggestions.map((s) => ({ ...s, range })))
+    return relatedSnippets.length ? relatedSnippets.concat(results) : results
   }
 }
