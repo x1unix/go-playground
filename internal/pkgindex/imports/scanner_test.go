@@ -1,4 +1,4 @@
-package pkgindex
+package imports
 
 import (
 	"testing"

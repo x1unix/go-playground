@@ -1,6 +1,6 @@
-// Package pkgindex implements functionality for generating Monaco code completion data
+// Package imports implements functionality for generating Monaco code completion data
 // from documentation and symbols extracted from Go source files.
-package pkgindex
+package imports
 
 import (
 	"bufio"
@@ -43,7 +43,7 @@ func NewGoRootScanner(goRoot string) GoRootScanner {
 }
 
 func (s *GoRootScanner) Scan() (*GoRootSummary, error) {
-	version, err := checkVersion(s.goRoot)
+	version, err := CheckVersionFile(s.goRoot)
 	if err != nil {
 		return nil, fmt.Errorf("can't extract Go SDK version: %w", err)
 	}
@@ -66,24 +66,23 @@ func (s *GoRootScanner) start() ([]monaco.CompletionItem, error) {
 		return nil, fmt.Errorf("cannot open Go SDK directory: %w", err)
 	}
 
-	q := newQueue(queueInitSize)
+	q := NewQueue[string](queueInitSize)
 	for _, entry := range entries {
 		if !entry.Type().IsDir() {
 			continue
 		}
 
 		pkgName := entry.Name()
-		switch pkgName {
-		case "cmd", "internal", "vendor", "builtin":
+		if IsDirIgnored(pkgName, true) {
 			continue
 		}
 
-		q.add(pkgName)
+		q.Add(pkgName)
 	}
 
 	results := make([]monaco.CompletionItem, 0, resultsInitSize)
-	for q.occupied() {
-		pkgName, ok := q.pop()
+	for q.Occupied() {
+		pkgName, ok := q.Pop()
 		if !ok {
 			break
 		}
@@ -93,7 +92,7 @@ func (s *GoRootScanner) start() ([]monaco.CompletionItem, error) {
 			return nil, err
 		}
 
-		q.add(result.children...)
+		q.Add(result.children...)
 		if result.hasPkg {
 			results = append(results, result.item)
 		}
@@ -147,7 +146,7 @@ func (s *GoRootScanner) visitPackage(rootDir string, importPath string) (scanRes
 	}, nil
 }
 
-func checkVersion(root string) (string, error) {
+func CheckVersionFile(root string) (string, error) {
 	f, err := os.Open(filepath.Join(root, "VERSION"))
 	if err != nil {
 		return "", fmt.Errorf("cannot open version file: %w", err)

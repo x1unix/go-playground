@@ -18,7 +18,7 @@ import { getTimeNowUsageMarkers, asyncDebounce, debounce } from './utils'
 import { attachCustomCommands } from './commands'
 import { LANGUAGE_GOLANG, stateToOptions } from './props'
 import { configureMonacoLoader } from './loader'
-import { registerGoLanguageProviders } from './autocomplete'
+import { DocumentMetadataCache, registerGoLanguageProviders } from './autocomplete'
 import type { VimState } from '~/store/vim/state'
 
 const ANALYZE_DEBOUNCE_TIME = 500
@@ -26,15 +26,18 @@ const ANALYZE_DEBOUNCE_TIME = 500
 // ask monaco-editor/react to use our own Monaco instance.
 configureMonacoLoader()
 
-const mapWorkspaceProps = ({ files, selectedFile }: WorkspaceState) => {
+const mapWorkspaceProps = ({ files, selectedFile, snippet }: WorkspaceState) => {
+  const projectId = snippet?.id ?? ''
   if (!selectedFile) {
     return {
+      projectId,
       code: '',
       fileName: '',
     }
   }
 
   return {
+    projectId,
     code: files?.[selectedFile],
     fileName: selectedFile,
   }
@@ -43,10 +46,11 @@ const mapWorkspaceProps = ({ files, selectedFile }: WorkspaceState) => {
 interface CodeEditorState {
   code?: string
   loading?: boolean
+  fileName: string
+  projectId: string
 }
 
 interface Props extends CodeEditorState {
-  fileName: string
   darkMode: boolean
   vimModeEnabled: boolean
   isServerEnvironment: boolean
@@ -62,6 +66,7 @@ class CodeEditor extends React.Component<Props> {
   private vimCommandAdapter?: StatusBarAdapter
   private monaco?: Monaco
   private disposables?: monaco.IDisposable[]
+  private readonly metadataCache = new DocumentMetadataCache()
 
   private readonly debouncedAnalyzeFunc = asyncDebounce(async (fileName: string, code: string) => {
     return await this.doAnalyze(fileName, code)
@@ -76,7 +81,7 @@ class CodeEditor extends React.Component<Props> {
   }, 1000)
 
   editorDidMount(editorInstance: monaco.editor.IStandaloneCodeEditor, monacoInstance: Monaco) {
-    this.disposables = registerGoLanguageProviders(this.props.dispatch)
+    this.disposables = registerGoLanguageProviders(this.props.dispatch, this.metadataCache)
     this.editorInstance = editorInstance
     this.monaco = monacoInstance
 
@@ -174,7 +179,11 @@ class CodeEditor extends React.Component<Props> {
     this.vimAdapter?.dispose()
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.projectId !== this.props.projectId) {
+      this.metadataCache.flush()
+    }
+
     if (this.isFileOrEnvironmentChanged(prevProps)) {
       // Update editor markers on file or environment changes
       void this.debouncedAnalyzeFunc(this.props.fileName, this.props.code)
@@ -187,6 +196,7 @@ class CodeEditor extends React.Component<Props> {
     this.disposables?.forEach((d) => d.dispose())
     this.analyzer?.dispose()
     this.vimAdapter?.dispose()
+    this.metadataCache.flush()
 
     if (!this.editorInstance) {
       return
@@ -198,13 +208,15 @@ class CodeEditor extends React.Component<Props> {
     this.editorInstance.dispose()
   }
 
-  onChange(newValue: string | undefined, _: monaco.editor.IModelContentChangedEvent) {
+  onChange(newValue: string | undefined, e: monaco.editor.IModelContentChangedEvent) {
     if (!newValue) {
+      this.metadataCache.flush(this.props.fileName)
       return
     }
 
-    this.props.dispatch(dispatchUpdateFile(this.props.fileName, newValue))
     const { fileName, code } = this.props
+    this.metadataCache.handleUpdate(fileName, e)
+    this.props.dispatch(dispatchUpdateFile(fileName, newValue))
     void this.debouncedAnalyzeFunc(fileName, code)
   }
 

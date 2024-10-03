@@ -1,0 +1,39 @@
+[
+  {
+    "label": "ErrInvalidUnreadByte",
+    "documentation": "ErrInvalidUnreadByte occurs when invalid use of UnreadByte is done.",
+    "insertText": "ErrInvalidUnreadByte",
+    "kind": 4,
+    "insertTextRules": 0
+  },
+  {
+    "label": "Bar",
+    "detail": "var Bar = 32",
+    "insertText": "Bar",
+    "kind": 4,
+    "insertTextRules": 0
+  },
+  {
+    "label": "Foo",
+    "detail": "var Foo int32",
+    "insertText": "Foo",
+    "kind": 4,
+    "insertTextRules": 0
+  },
+  {
+    "label": "Baz",
+    "documentation": "Baz is a sample value.",
+    "detail": "var Baz bool",
+    "insertText": "Baz",
+    "kind": 4,
+    "insertTextRules": 0
+  },
+  {
+    "label": "MyPublicFunc",
+    "detail": "func(foo int) (int, error)",
+    "insertText": "MyPublicFunc(${1:foo})",
+    "signature": "func MyPublicFunc(foo int) (int, error)",
+    "kind": 1,
+    "insertTextRules": 4
+  }
+]

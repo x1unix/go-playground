@@ -1,4 +1,4 @@
-package pkgindex
+package imports
 
 import "github.com/x1unix/go-playground/pkg/monaco"
 

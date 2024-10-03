@@ -1,10 +1,11 @@
-import { resolve } from 'path'
+import { resolve, join } from 'path'
 import react from '@vitejs/plugin-react-swc'
-import { defineConfig } from 'vite'
+import { defineConfig, type UserConfig } from 'vite'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import svgr from 'vite-plugin-svgr'
 import tsConfigPaths from 'vite-tsconfig-paths'
 import { createHtmlPlugin } from 'vite-plugin-html'
+import 'vitest/config'
 
 const {
   NODE_ENV = 'dev',
@@ -20,6 +21,18 @@ export default defineConfig({
     alias: {
       '~': resolve(__dirname, './src'),
     },
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: join(__dirname, 'src/setupTests.ts'),
+    alias: [
+      {
+        find: /^monaco-editor$/,
+        replacement:
+          join(__dirname,'node_modules/monaco-editor/esm/vs/editor/editor.api'),
+      },
+    ],
   },
   server: {
     port: 3000,

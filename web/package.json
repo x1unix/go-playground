@@ -7,7 +7,7 @@
     "@fluentui/react": "^8.52.3",
     "@monaco-editor/loader": "^1.4.0",
     "@monaco-editor/react": "^4.6.0",
-    "@testing-library/jest-dom": "^5.16.2",
+    "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
     "@types/file-saver": "^2.0.7",
@@ -19,6 +19,7 @@
     "@typescript-eslint/eslint-plugin": "^7.16.0",
     "@typescript-eslint/parser": "^7.16.0",
     "@vitejs/plugin-react-swc": "^3.5.0",
+    "@vitest/coverage-v8": "^2.1.2",
     "@xterm/addon-canvas": "^0.6.0-beta.1",
     "@xterm/addon-fit": "^0.9.0-beta.1",
     "@xterm/addon-image": "^0.7.0-beta.1",
@@ -48,6 +49,7 @@
     "eslint-plugin-testing-library": "^5.0.1",
     "eslint-plugin-unused-imports": "^3.0.0",
     "file-saver": "^2.0.5",
+    "jsdom": "^25.0.1",
     "monaco-editor": "^0.45.0",
     "monaco-vim": "^0.3.4",
     "prettier": "^3.2.4",
@@ -68,6 +70,7 @@
     "vite-plugin-static-copy": "^1.0.1",
     "vite-plugin-svgr": "^4.2.0",
     "vite-tsconfig-paths": "^4.3.1",
+    "vitest": "^2.1.2",
     "web-vitals": "^2.1.4",
     "workbox-background-sync": "^6.5.4",
     "workbox-broadcast-update": "^6.5.4",
@@ -108,7 +111,5 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {
-    "vitest": "^1.6.0"
-  }
+  "devDependencies": {}
 }

@@ -82,9 +82,14 @@ func (u *UnionString[T]) UnmarshalJSON(data []byte) error {
 	}
 
 	var dst any
-	if data[0] == '"' {
+	switch data[0] {
+	case '"', '\'':
 		dst = &u.String
-	} else {
+	case 'n', 'u':
+		// null or undefined
+		return nil
+	default:
+		u.Value = new(T)
 		dst = u.Value
 	}
 

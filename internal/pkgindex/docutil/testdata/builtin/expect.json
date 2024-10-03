@@ -1,0 +1,354 @@
+[
+  {
+    "label": "bool",
+    "documentation": "bool is the set of boolean values, true and false.",
+    "insertText": "bool",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "true",
+    "detail": "const true = 0 == 0",
+    "insertText": "true",
+    "kind": 14,
+    "insertTextRules": 0
+  },
+  {
+    "label": "false",
+    "detail": "const false = 0 != 0",
+    "insertText": "false",
+    "kind": 14,
+    "insertTextRules": 0
+  },
+  {
+    "label": "uint8",
+    "documentation": "uint8 is the set of all unsigned 8-bit integers. Range: 0 through 255.",
+    "insertText": "uint8",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "uint16",
+    "documentation": "uint16 is the set of all unsigned 16-bit integers. Range: 0 through 65535.",
+    "insertText": "uint16",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "uint32",
+    "documentation": "uint32 is the set of all unsigned 32-bit integers. Range: 0 through 4294967295.",
+    "insertText": "uint32",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "uint64",
+    "documentation": "uint64 is the set of all unsigned 64-bit integers. Range: 0 through 18446744073709551615.",
+    "insertText": "uint64",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "int8",
+    "documentation": "int8 is the set of all signed 8-bit integers. Range: -128 through 127.",
+    "insertText": "int8",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "int16",
+    "documentation": "int16 is the set of all signed 16-bit integers. Range: -32768 through 32767.",
+    "insertText": "int16",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "int32",
+    "documentation": "int32 is the set of all signed 32-bit integers. Range: -2147483648 through 2147483647.",
+    "insertText": "int32",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "int64",
+    "documentation": "int64 is the set of all signed 64-bit integers. Range: -9223372036854775808 through 9223372036854775807.",
+    "insertText": "int64",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "float32",
+    "documentation": "float32 is the set of all IEEE 754 32-bit floating-point numbers.",
+    "insertText": "float32",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "float64",
+    "documentation": "float64 is the set of all IEEE 754 64-bit floating-point numbers.",
+    "insertText": "float64",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "complex64",
+    "documentation": "complex64 is the set of all complex numbers with float32 real and imaginary parts.",
+    "insertText": "complex64",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "complex128",
+    "documentation": "complex128 is the set of all complex numbers with float64 real and imaginary parts.",
+    "insertText": "complex128",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "string",
+    "documentation": "string is the set of all strings of 8-bit bytes, conventionally but not necessarily representing UTF-8-encoded text. A string may be empty, but not nil. Values of string type are immutable.",
+    "insertText": "string",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "int",
+    "documentation": "int is a signed integer type that is at least 32 bits in size. It is a distinct type, however, and not an alias for, say, int32.",
+    "insertText": "int",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "uint",
+    "documentation": "uint is an unsigned integer type that is at least 32 bits in size. It is a distinct type, however, and not an alias for, say, uint32.",
+    "insertText": "uint",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "uintptr",
+    "documentation": "uintptr is an integer type that is large enough to hold the bit pattern of any pointer.",
+    "insertText": "uintptr",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "byte",
+    "documentation": "byte is an alias for uint8 and is equivalent to uint8 in all ways. It is used, by convention, to distinguish byte values from 8-bit unsigned integer values.",
+    "insertText": "byte",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "rune",
+    "documentation": "rune is an alias for int32 and is equivalent to int32 in all ways. It is used, by convention, to distinguish character values from integer values.",
+    "insertText": "rune",
+    "kind": 5,
+    "insertTextRules": 0
+  },
+  {
+    "label": "any",
+    "documentation": "any is an alias for interface{} and is equivalent to interface{} in all ways.",
+    "detail": "interface{...}",
+    "insertText": "any",
+    "signature": "type any = interface{}",
+    "kind": 7,
+    "insertTextRules": 0
+  },
+  {
+    "label": "comparable",
+    "documentation": "comparable is an interface that is implemented by all comparable types (booleans, numbers, strings, pointers, channels, arrays of comparable types, structs whose fields are all comparable types). The comparable interface may only be used as a type parameter constraint, not as the type of a variable.",
+    "detail": "interface{...}",
+    "insertText": "comparable",
+    "signature": "type comparable interface{ comparable }",
+    "kind": 7,
+    "insertTextRules": 0
+  },
+  {
+    "label": "iota",
+    "documentation": "iota is a predeclared identifier representing the untyped integer ordinal number of the current const specification in a (usually parenthesized) const declaration. It is zero-indexed.",
+    "detail": "const iota = 0",
+    "insertText": "iota",
+    "kind": 14,
+    "insertTextRules": 0
+  },
+  {
+    "label": "nil",
+    "documentation": "nil is a predeclared identifier representing the zero value for a pointer, channel, func, interface, map, or slice type.",
+    "detail": "var nil Type",
+    "insertText": "nil",
+    "kind": 4,
+    "insertTextRules": 0
+  },
+  {
+    "label": "append",
+    "documentation": "The append built-in function appends elements to the end of a slice. If it has sufficient capacity, the destination is resliced to accommodate the new elements. If it does not, a new underlying array will be allocated. Append returns the updated slice. It is therefore necessary to store the result of append, often in the variable holding the slice itself:\n\n\tslice = append(slice, elem1, elem2)\n\tslice = append(slice, anotherSlice...)\n\nAs a special case, it is legal to append a string to a byte slice, like this:\n\n\tslice = append([]byte(\"hello \"), \"world\"...)",
+    "detail": "func(slice []Type, elems ...Type) []Type",
+    "insertText": "append(${1:slice}, ${2:elems})",
+    "signature": "func append(slice []Type, elems ...Type) []Type",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "copy",
+    "documentation": "The copy built-in function copies elements from a source slice into a destination slice. (As a special case, it also will copy bytes from a string to a slice of bytes.) The source and destination may overlap. Copy returns the number of elements copied, which will be the minimum of len(src) and len(dst).",
+    "detail": "func(dst, src []Type) int",
+    "insertText": "copy(${1:dst}, ${2:src})",
+    "signature": "func copy(dst, src []Type) int",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "delete",
+    "documentation": "The delete built-in function deletes the element with the specified key (m\\[key]) from the map. If m is nil or there is no such element, delete is a no-op.",
+    "detail": "func(m map[Type]Type1, key Type)",
+    "insertText": "delete(${1:m}, ${2:key})",
+    "signature": "func delete(m map[Type]Type1, key Type)",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "len",
+    "documentation": "The len built-in function returns the length of v, according to its type:\n\n\tArray: the number of elements in v.\n\tPointer to array: the number of elements in *v (even if v is nil).\n\tSlice, or map: the number of elements in v; if v is nil, len(v) is zero.\n\tString: the number of bytes in v.\n\tChannel: the number of elements queued (unread) in the channel buffer;\n\t         if v is nil, len(v) is zero.\n\nFor some arguments, such as a string literal or a simple array expression, the result can be a constant. See the Go language specification's \"Length and capacity\" section for details.",
+    "detail": "func(v Type) int",
+    "insertText": "len(${1:v})",
+    "signature": "func len(v Type) int",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "cap",
+    "documentation": "The cap built-in function returns the capacity of v, according to its type:\n\n\tArray: the number of elements in v (same as len(v)).\n\tPointer to array: the number of elements in *v (same as len(v)).\n\tSlice: the maximum length the slice can reach when resliced;\n\tif v is nil, cap(v) is zero.\n\tChannel: the channel buffer capacity, in units of elements;\n\tif v is nil, cap(v) is zero.\n\nFor some arguments, such as a simple array expression, the result can be a constant. See the Go language specification's \"Length and capacity\" section for details.",
+    "detail": "func(v Type) int",
+    "insertText": "cap(${1:v})",
+    "signature": "func cap(v Type) int",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "make",
+    "documentation": "The make built-in function allocates and initializes an object of type slice, map, or chan (only). Like new, the first argument is a type, not a value. Unlike new, make's return type is the same as the type of its argument, not a pointer to it. The specification of the result depends on the type:\n\n\tSlice: The size specifies the length. The capacity of the slice is\n\tequal to its length. A second integer argument may be provided to\n\tspecify a different capacity; it must be no smaller than the\n\tlength. For example, make([]int, 0, 10) allocates an underlying array\n\tof size 10 and returns a slice of length 0 and capacity 10 that is\n\tbacked by this underlying array.\n\tMap: An empty map is allocated with enough space to hold the\n\tspecified number of elements. The size may be omitted, in which case\n\ta small starting size is allocated.\n\tChannel: The channel's buffer is initialized with the specified\n\tbuffer capacity. If zero, or the size is omitted, the channel is\n\tunbuffered.",
+    "detail": "func(t Type, size ...IntegerType) Type",
+    "insertText": "make(${1:t}, ${2:size})",
+    "signature": "func make(t Type, size ...IntegerType) Type",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "max",
+    "documentation": "The max built-in function returns the largest value of a fixed number of arguments of [cmp.Ordered](/cmp#Ordered) types. There must be at least one argument. If T is a floating-point type and any of the arguments are NaNs, max will return NaN.",
+    "detail": "func[T cmp.Ordered](x T, y ...T) T",
+    "insertText": "max[${1:T}](${2:x}, ${3:y})",
+    "signature": "func max[T cmp.Ordered](x T, y ...T) T",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "min",
+    "documentation": "The min built-in function returns the smallest value of a fixed number of arguments of [cmp.Ordered](/cmp#Ordered) types. There must be at least one argument. If T is a floating-point type and any of the arguments are NaNs, min will return NaN.",
+    "detail": "func[T cmp.Ordered](x T, y ...T) T",
+    "insertText": "min[${1:T}](${2:x}, ${3:y})",
+    "signature": "func min[T cmp.Ordered](x T, y ...T) T",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "new",
+    "documentation": "The new built-in function allocates memory. The first argument is a type, not a value, and the value returned is a pointer to a newly allocated zero value of that type.",
+    "detail": "func(Type) *Type",
+    "insertText": "new()",
+    "signature": "func new(Type) *Type",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "complex",
+    "documentation": "The complex built-in function constructs a complex value from two floating-point values. The real and imaginary parts must be of the same size, either float32 or float64 (or assignable to them), and the return value will be the corresponding complex type (complex64 for float32, complex128 for float64).",
+    "detail": "func(r, i FloatType) ComplexType",
+    "insertText": "complex(${1:r}, ${2:i})",
+    "signature": "func complex(r, i FloatType) ComplexType",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "real",
+    "documentation": "The real built-in function returns the real part of the complex number c. The return value will be floating point type corresponding to the type of c.",
+    "detail": "func(c ComplexType) FloatType",
+    "insertText": "real(${1:c})",
+    "signature": "func real(c ComplexType) FloatType",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "imag",
+    "documentation": "The imag built-in function returns the imaginary part of the complex number c. The return value will be floating point type corresponding to the type of c.",
+    "detail": "func(c ComplexType) FloatType",
+    "insertText": "imag(${1:c})",
+    "signature": "func imag(c ComplexType) FloatType",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "clear",
+    "documentation": "The clear built-in function clears maps and slices. For maps, clear deletes all entries, resulting in an empty map. For slices, clear sets all elements up to the length of the slice to the zero value of the respective element type. If the argument type is a type parameter, the type parameter's type set must contain only map or slice types, and clear performs the operation implied by the type argument.",
+    "detail": "func[T ~[]Type | ~map[Type]Type1](t T)",
+    "insertText": "clear[${1:T}](${2:t})",
+    "signature": "func clear[T ~[]Type | ~map[Type]Type1](t T)",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "close",
+    "documentation": "The close built-in function closes a channel, which must be either bidirectional or send-only. It should be executed only by the sender, never the receiver, and has the effect of shutting down the channel after the last sent value is received. After the last value has been received from a closed channel c, any receive from c will succeed without blocking, returning the zero value for the channel element. The form\n\n\tx, ok := \u003c-c\n\nwill also set ok to false for a closed and empty channel.",
+    "detail": "func(c chan\u003c- Type)",
+    "insertText": "close(${1:c})",
+    "signature": "func close(c chan\u003c- Type)",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "panic",
+    "documentation": "The panic built-in function stops normal execution of the current goroutine. When a function F calls panic, normal execution of F stops immediately. Any functions whose execution was deferred by F are run in the usual way, and then F returns to its caller. To the caller G, the invocation of F then behaves like a call to panic, terminating G's execution and running any deferred functions. This continues until all functions in the executing goroutine have stopped, in reverse order. At that point, the program is terminated with a non-zero exit code. This termination sequence is called panicking and can be controlled by the built-in function recover.\n\nStarting in Go 1.21, calling panic with a nil interface value or an untyped nil causes a run-time error (a different panic). The GODEBUG setting panicnil=1 disables the run-time error.",
+    "detail": "func(v any)",
+    "insertText": "panic(${1:v})",
+    "signature": "func panic(v any)",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "recover",
+    "documentation": "The recover built-in function allows a program to manage behavior of a panicking goroutine. Executing a call to recover inside a deferred function (but not any function called by it) stops the panicking sequence by restoring normal execution and retrieves the error value passed to the call of panic. If recover is called outside the deferred function it will not stop a panicking sequence. In this case, or when the goroutine is not panicking, recover returns nil.\n\nPrior to Go 1.21, recover would also return nil if panic is called with a nil argument. See \\[panic] for details.",
+    "detail": "func() any",
+    "insertText": "recover()",
+    "signature": "func recover() any",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "print",
+    "documentation": "The print built-in function formats its arguments in an implementation-specific way and writes the result to standard error. Print is useful for bootstrapping and debugging; it is not guaranteed to stay in the language.",
+    "detail": "func(args ...Type)",
+    "insertText": "print(${1:args})",
+    "signature": "func print(args ...Type)",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "println",
+    "documentation": "The println built-in function formats its arguments in an implementation-specific way and writes the result to standard error. Spaces are always added between arguments and a newline is appended. Println is useful for bootstrapping and debugging; it is not guaranteed to stay in the language.",
+    "detail": "func(args ...Type)",
+    "insertText": "println(${1:args})",
+    "signature": "func println(args ...Type)",
+    "kind": 1,
+    "insertTextRules": 4
+  },
+  {
+    "label": "error",
+    "documentation": "The error built-in interface type is the conventional interface for representing an error condition, with the nil value representing no error.",
+    "detail": "interface{...}",
+    "insertText": "error",
+    "signature": "type error interface {\n\tError() string\n}",
+    "kind": 7,
+    "insertTextRules": 0
+  }
+]

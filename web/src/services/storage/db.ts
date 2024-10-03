@@ -1,23 +1,21 @@
 import Dexie, { type Table } from 'dexie'
-import type { CacheEntry, CompletionRecord } from './types'
+import type { CacheEntry, PackageIndexItem, SymbolIndexItem } from './types'
 
 /**
  * IndexedDB-based cache implementation.
  */
 export class DatabaseStorage extends Dexie {
   keyValue!: Table<CacheEntry, string>
-  completionItems!: Table<CompletionRecord, string>
+  packageIndex!: Table<PackageIndexItem, string>
+  symbolIndex!: Table<SymbolIndexItem, string>
 
   constructor() {
     super('CacheStore')
 
-    // Init table with 2 indexes:
-    //
-    // [recordType+packageName+prefix]  - For monaco autocompletion
-    // [recordType+packageName+label]   - For hover (codelens)
     this.version(2).stores({
       keyValue: 'key',
-      completionItems: '++id,recordType,[recordType+packageName+prefix],[recordType+packageName+label]',
+      packageIndex: 'importPath, prefix, name',
+      symbolIndex: 'key, packagePath, [packageName+prefix], [packageName+label], [packagePath+prefix]',
     })
   }
 }

@@ -1,4 +1,4 @@
-package pkgindex
+package imports
 
 import (
 	"context"
@@ -11,6 +11,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/x1unix/go-playground/pkg/monaco"
 )
+
+const goDocDomain = "pkg.go.dev"
 
 func TestParseImportCompletionItem(t *testing.T) {
 	cases := map[string]struct {

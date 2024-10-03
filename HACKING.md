@@ -74,6 +74,9 @@ Please ensure that you have installed:
 * [Node Version Manager](https://github.com/nvm-sh/nvm) or Node.js 20 (`lts/iron`)
 * [Yarn](https://yarnpkg.com/) package manager.
 * Go 1.22+
+* Protobuf:
+    * [protoc](https://developers.google.com/protocol-buffers)
+    * [Protobuf Go plugins](https://grpc.io/docs/languages/go/quickstart/)
 
 ### First-time setup
 
@@ -83,7 +86,7 @@ Run following commands to configure a just cloned project:
 |-------------------|----------------------------------------------------------|
 | `make preinstall` | Installs NPM packages for a web app.                     |
 | `make wasm`       | Builds WebAssembly binaries used by the web app.         |
-| `make pkg-index`  | Generates Go packages index for autocomplete in web app. |
+| `make go-index`   | Generates Go packages index for autocomplete in web app. |
 
 ### Running Project
 

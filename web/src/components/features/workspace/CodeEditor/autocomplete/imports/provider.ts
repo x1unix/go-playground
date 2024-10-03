@@ -14,7 +14,7 @@ export class GoImportsCompletionProvider extends CacheBasedCompletionProvider<bo
   triggerCharacters = ['"']
 
   protected async querySuggestions(_: boolean): Promise<monaco.languages.CompletionItem[]> {
-    const suggestions = await this.cache.getImportSuggestions()
+    const suggestions = await this.completionSvc.getImportSuggestions()
     return suggestions
   }
 

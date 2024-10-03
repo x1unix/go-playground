@@ -3,6 +3,11 @@ import * as monaco from 'monaco-editor'
 /* eslint-disable no-template-curly-in-string */
 
 const Rule = monaco.languages.CompletionItemInsertTextRule
+
+interface Snippet extends Omit<monaco.languages.CompletionItem, 'label'> {
+  label: string
+}
+
 /**
  * List of snippets for editor
  */
@@ -95,4 +100,4 @@ const snippets = [
   ...s,
 }))
 
-export default snippets as monaco.languages.CompletionItem[]
+export default snippets as Snippet[]

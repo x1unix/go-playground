@@ -3,36 +3,67 @@ import type * as monaco from 'monaco-editor'
 export type CompletionItem = monaco.languages.CompletionItem
 export type CompletionItems = monaco.languages.CompletionItem[]
 
-export enum CompletionRecordType {
-  None,
-  ImportPath,
-  Symbol,
+/**
+ * Normalized version of CompletionItem that contains fixed types instead of union (e.g. Foo | Bar)
+ */
+export interface NormalizedCompletionItem extends Omit<monaco.languages.CompletionItem, 'label' | 'range'> {
+  label: string
+  documentation?: monaco.IMarkdownString
 }
 
 /**
- * Type represents CompletionRecord keys that can be used for query using DB index.
+ * Represents record from package index.
  */
-export type IndexableKey = keyof Omit<CompletionRecord, keyof CompletionItem>
-
-/**
- * Entity represends completion record stored in a cache.
- *
- * Extends monaco type with some extra indexing information.
- */
-export interface CompletionRecord extends monaco.languages.CompletionItem {
+export interface PackageIndexItem {
   /**
-   * Completion category
+   * Full import path.
    */
-  recordType: CompletionRecordType
+  importPath: string
 
   /**
-   * Symbol name's first letter.
-   * Used as monaco triggers completion provider only after first character appear.
+   * Package name.
+   */
+  name: string
+
+  /**
+   * Prefix for search by first letter supplied by Monaco.
    */
   prefix: string
 
   /**
-   * Package name to what this symbol belongs.
+   * Inherited from CompletionItem.
+   */
+  documentation?: monaco.IMarkdownString
+}
+
+/**
+ * Represents record from symbol index.
+ */
+export interface SymbolIndexItem extends NormalizedCompletionItem {
+  /**
+   * Key is compound pair of package name and symbol name.
+   *
+   * E.g. `syscall/js.Value`
+   */
+  key: string
+
+  /**
+   * Prefix for search by first letter supplied by Monaco.
+   */
+  prefix: string
+
+  /**
+   * Full package path to which this symbol belongs.
+   */
+  packagePath: string
+
+  /**
+   * Package name part of package path
    */
   packageName: string
+
+  /**
+   * Signature represents full symbol signature to show on hover.
+   */
+  signature: string
 }
