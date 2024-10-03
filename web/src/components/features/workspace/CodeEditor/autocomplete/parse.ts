@@ -210,7 +210,7 @@ const readImportBlockLine = (line: number, model: monaco.editor.ITextModel, row:
     const params: ReadTokenParams = {
       line,
       model,
-      tokens: slice
+      tokens: slice,
     }
     slice = slice.slice(i + 1)
     const { isParen, isClose, value } = checkParenthesis(i, params)
