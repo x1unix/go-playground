@@ -167,9 +167,9 @@ const readImportLine = (line: number, model: monaco.editor.ITextModel, row: mona
   const i = row.findIndex(isNotEmptyToken)
   const token = row[i]
   const params: ReadTokenParams = {
-    line: line,
+    line,
+    model,
     tokens: row,
-    model: model,
   }
   switch (token.type) {
     case GoToken.Ident: {
