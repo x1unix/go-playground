@@ -56,7 +56,7 @@ const findPackageBlock = (tokens: Tokens) => {
 }
 
 interface ImportHeader {
-  line: number
+  rowIndex: number
   hasOpenParen?: boolean
   argTokens?: monaco.Token[]
 }
@@ -84,17 +84,17 @@ const findImportHeader = (offset: number, tokens: Tokens): ImportHeader | null =
     const rest = row.slice(j + 1)
     const k = rest.findIndex(isNotEmptyToken)
     if (k === -1) {
-      return { line: i }
+      return { rowIndex: i }
     }
 
     switch (rest[k].type) {
       case GoToken.Parenthesis:
-        return { line: i, hasOpenParen: true }
+        return { rowIndex: i, hasOpenParen: true }
       case GoToken.Ident:
       case GoToken.String:
         // probably it's a single-line import.
         return {
-          line: i,
+          rowIndex: i,
           argTokens: rest.slice(k),
         }
       default:
@@ -174,16 +174,22 @@ const readImportLine = (line: number, model: monaco.editor.ITextModel, row: mona
   switch (token.type) {
     case GoToken.Ident: {
       const ident = readToken(i, params)
-      const pathPos = row.findIndex(isNotEmptyToken)
+      const restTokens = row.slice(i + 1)
+      const pathPos = restTokens.findIndex(isNotEmptyToken)
       if (pathPos === -1) {
         throw new ParseError(line, i, 'missing import path after ident')
       }
 
-      return { alias: ident, path: readToken(pathPos, params) }
+      const importPath = readToken(pathPos, {
+        ...params,
+        tokens: restTokens,
+      }).trim()
+
+      return { alias: ident, path: unquote(importPath) }
     }
     case GoToken.String:
       return {
-        path: readToken(i, params),
+        path: unquote(readToken(i, params).trim()),
       }
     default:
       throw new UnexpectedTokenError(line, token)
@@ -261,13 +267,13 @@ const traverseImportGroup = (
   let groupStartFound = header.hasOpenParen ?? false
   const imports: ImportStmt[] = []
   const range = {
-    startLineNumber: header.line,
+    startLineNumber: header.rowIndex,
     startColumn: 1,
     endLineNumber: -1,
     endColumn: -1,
   }
 
-  for (let i = header.line + 1; i < tokens.length; i++) {
+  for (let i = header.rowIndex + 1; i < tokens.length; i++) {
     const row = tokens[i]
     const j = row.findIndex(isNotEmptyToken)
     if (j === -1) {
@@ -320,7 +326,7 @@ const traverseImportGroup = (
     }
   }
 
-  throw new ParseError(header.line, 1, 'unterminated import block')
+  throw new ParseError(header.rowIndex, 1, 'unterminated import block')
 }
 
 const findImportBlock = (offset: number, model: monaco.editor.ITextModel, tokens: Tokens): ImportBlock | null => {
@@ -335,18 +341,20 @@ const findImportBlock = (offset: number, model: monaco.editor.ITextModel, tokens
   }
 
   // single line import
-  const importStmt = readImportLine(header.line, model, header.argTokens)
+  const importStmt = readImportLine(header.rowIndex, model, header.argTokens)
   if (!importStmt) {
     // syntax error.
     return null
   }
 
+  // monaco lines start at 1
+  const lineNo = header.rowIndex + 1
   return {
     range: {
-      startLineNumber: header.line,
-      endLineNumber: header.line,
+      startLineNumber: lineNo,
+      endLineNumber: lineNo,
       startColumn: 1,
-      endColumn: header.argTokens[header.argTokens.length - 1].offset,
+      endColumn: model.getLineLength(lineNo) + 1,
     },
     imports: [importStmt],
   }
@@ -400,6 +408,8 @@ export const importContextFromTokens = (model: monaco.editor.ITextModel, tokens:
 
       // returned line starts from 1, keep as is as we count from 0.
       offset = block.range.endLineNumber
+      // offset = block.range.endLineNumber + (block.isMultiline ? 0 : 1)
+      // offset = block.range.endLineNumber + 1
       lastImportBlock = block
       allImports.push(...block.imports.map(({ path }) => path))
     } catch (err) {

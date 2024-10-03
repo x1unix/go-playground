@@ -1,8 +1,8 @@
 import * as monaco from 'monaco-editor'
 import path from 'path'
-import { assert, test, describe } from 'vitest'
+import { assert, describe, test } from 'vitest'
 import { importContextFromTokens } from './parse'
-import type { ImportsContext } from '~/services/completion'
+import { ImportClauseType, type ImportsContext } from '~/services/completion'
 
 // Core language packs aren't loaded in vitest.
 // Autoloading via import also doesn't work.
@@ -18,44 +18,110 @@ const getFixture = async (filename: string) => {
 }
 
 interface TestCase {
-  label: string
   sourceFile: string
   want: ImportsContext
 }
 
-const cases: TestCase[] = [
-  {
-    label: 'should parse group imports',
-    sourceFile: 'grouped.txt',
-    want: {
-      hasError: false,
-      allPaths: new Set(['fmt']),
-      blockPaths: ['fmt'],
-      blockType: 2,
-      range: {
-        startLineNumber: 2,
-        startColumn: 1,
-        endLineNumber: 5,
-        endColumn: 2,
-      },
-      totalRange: {
-        startLineNumber: 1,
-        endLineNumber: 5,
-      },
-    },
-  },
-]
+const runContextTest = async ({ sourceFile, want }: TestCase) => {
+  const input = await getFixture(sourceFile)
+  const model = monaco.editor.createModel(input, 'go', monaco.Uri.file(sourceFile))
+  const tokens = monaco.editor.tokenize(model.getValue(), model.getLanguageId())
 
-describe.each(cases)('buildImportContext', ({ label, sourceFile, want }) => {
+  const ctx = importContextFromTokens(model, tokens)
+  model.dispose()
+
+  assert.deepEqual(ctx, want)
+}
+
+describe('buildImportContest', () => {
   monaco.languages.register({ id: 'go' })
   monaco.languages.setMonarchTokensProvider('go', language)
 
-  test(label, async () => {
-    const input = await getFixture(sourceFile)
-    const model = monaco.editor.createModel(input, 'go', monaco.Uri.file('/file.go'))
-    const tokens = monaco.editor.tokenize(model.getValue(), model.getLanguageId())
+  test('should support inline import', async () => {
+    await runContextTest({
+      sourceFile: 'single.txt',
+      want: {
+        hasError: false,
+        allPaths: new Set(['fmt']),
+        blockPaths: ['fmt'],
+        blockType: ImportClauseType.Single,
+        range: {
+          startLineNumber: 3,
+          startColumn: 1,
+          endLineNumber: 3,
+          endColumn: 13,
+        },
+        totalRange: {
+          startLineNumber: 1,
+          endLineNumber: 3,
+        },
+      },
+    })
+  })
 
-    const ctx = importContextFromTokens(model, tokens)
-    assert.deepEqual(want, ctx)
+  test('should parse single group', async () => {
+    await runContextTest({
+      sourceFile: 'grouped.txt',
+      want: {
+        hasError: false,
+        allPaths: new Set(['fmt', 'bar']),
+        blockPaths: ['fmt', 'bar'],
+        blockType: ImportClauseType.Block,
+        range: {
+          startLineNumber: 2,
+          startColumn: 1,
+          endLineNumber: 6,
+          endColumn: 2,
+        },
+        totalRange: {
+          startLineNumber: 1,
+          endLineNumber: 6,
+        },
+      },
+    })
+  })
+
+  test('should support multiple import blocks', async () => {
+    await runContextTest({
+      sourceFile: 'multiple.txt',
+      want: {
+        hasError: false,
+        allPaths: new Set(['fmt', 'bar', 'baz']),
+        blockPaths: ['baz'],
+        blockType: ImportClauseType.Single,
+        range: {
+          startLineNumber: 8,
+          startColumn: 1,
+          endLineNumber: 8,
+          endColumn: 19,
+        },
+        totalRange: {
+          startLineNumber: 1,
+          endLineNumber: 8,
+        },
+      },
+    })
+  })
+
+  test('should be able to handle partial files', async () => {
+    await runContextTest({
+      sourceFile: 'corrupted.txt',
+      want: {
+        hasError: true,
+        allPaths: new Set(['fmt']),
+        blockPaths: ['fmt'],
+        blockType: ImportClauseType.Single,
+        range: {
+          startLineNumber: 3,
+          endLineNumber: 3,
+          startColumn: 1,
+          endColumn: 13,
+        },
+        totalRange: {
+          startLineNumber: 1,
+          endLineNumber: 3,
+        },
+      },
+    })
   })
 })
