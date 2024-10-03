@@ -267,7 +267,7 @@ const traverseImportGroup = (
   let groupStartFound = header.hasOpenParen ?? false
   const imports: ImportStmt[] = []
   const range = {
-    startLineNumber: header.rowIndex,
+    startLineNumber: header.rowIndex + 1,
     startColumn: 1,
     endLineNumber: -1,
     endColumn: -1,
@@ -422,6 +422,7 @@ export const importContextFromTokens = (model: monaco.editor.ITextModel, tokens:
     // TODO: support named imports
     return {
       hasError,
+      // prependNewLine: lastImportBlock.isMultiline,
       allPaths: new Set(allImports),
       blockPaths: lastImportBlock.imports.map(({ path }) => path),
       blockType: lastImportBlock.isMultiline ? ImportClauseType.Block : ImportClauseType.Single,

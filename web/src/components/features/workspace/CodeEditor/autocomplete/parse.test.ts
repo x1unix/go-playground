@@ -37,6 +37,28 @@ describe('buildImportContest', () => {
   monaco.languages.register({ id: 'go' })
   monaco.languages.setMonarchTokensProvider('go', language)
 
+  test('should generate correct ranges', async () => {
+    await runContextTest({
+      sourceFile: 'hello.txt',
+      want: {
+        hasError: false,
+        allPaths: new Set(['fmt']),
+        blockPaths: ['fmt'],
+        blockType: ImportClauseType.Block,
+        range: {
+          startLineNumber: 3,
+          startColumn: 1,
+          endLineNumber: 5,
+          endColumn: 2,
+        },
+        totalRange: {
+          startLineNumber: 1,
+          endLineNumber: 5,
+        },
+      },
+    })
+  })
+
   test('should support inline import', async () => {
     await runContextTest({
       sourceFile: 'single.txt',
@@ -68,7 +90,7 @@ describe('buildImportContest', () => {
         blockPaths: ['fmt', 'bar'],
         blockType: ImportClauseType.Block,
         range: {
-          startLineNumber: 2,
+          startLineNumber: 3,
           startColumn: 1,
           endLineNumber: 6,
           endColumn: 2,
