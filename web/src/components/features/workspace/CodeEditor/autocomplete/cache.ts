@@ -2,6 +2,8 @@ import type * as monaco from 'monaco-editor'
 import type { ImportsContext } from '~/services/completion'
 import { buildImportContext } from './parse'
 
+const stripSlash = (str: string) => str[0] == '/' ? str.slice(1) : str
+
 /**
  * Stores document metadata (such as symbols, imports) in cache.
  */
@@ -53,9 +55,11 @@ export class DocumentMetadataCache {
    * Populates data from model if it's not cached.
    */
   getMetadata(fileName: string, model: monaco.editor.ITextModel) {
+    // model file name has slash at root
+    fileName = stripSlash(fileName)
+
     const data = this.cache.get(fileName)
     if (data && !data.hasError) {
-      console.log('use cache', data)
       return data
     }
 
@@ -64,7 +68,6 @@ export class DocumentMetadataCache {
 
   private updateCache(fileName: string, model: monaco.editor.ITextModel) {
     const context = buildImportContext(model)
-    console.log('cache empty, update meta', context)
     this.cache.set(fileName, context)
     return context
   }
