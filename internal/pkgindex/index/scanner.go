@@ -32,13 +32,6 @@ type scanEntry struct {
 	importPath string
 }
 
-func (ent scanEntry) makeChild(dirName string) scanEntry {
-	return scanEntry{
-		path:       filepath.Join(ent.path, dirName),
-		importPath: path.Join(ent.importPath, dirName),
-	}
-}
-
 func ScanRoot(goRoot string) (*GoIndexFile, error) {
 	goVersion, err := imports.CheckVersionFile(goRoot)
 	if err != nil {
@@ -124,7 +117,7 @@ func enqueueRootEntries(rootDir string, parentImportPath string, queue *imports.
 		}
 		queue.Add(scanEntry{
 			path:       absPath,
-			importPath: entry.Name(),
+			importPath: importPath,
 		})
 	}
 
