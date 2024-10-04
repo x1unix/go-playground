@@ -5,7 +5,6 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
-	"golang.org/x/sync/errgroup"
 	"runtime"
 	"strings"
 	"time"
@@ -14,6 +13,7 @@ import (
 	"github.com/x1unix/go-playground/internal/util/syncx"
 	"github.com/x1unix/go-playground/pkg/goplay"
 	"go.uber.org/zap"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
