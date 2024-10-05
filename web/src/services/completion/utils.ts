@@ -151,3 +151,33 @@ export const findPackagePathFromContext = ({ imports }: SuggestionContext, pkgNa
     }
   }
 }
+
+const goDocDomain = 'pkg.go.dev'
+export const symbolHoverDoc = ({
+  label,
+  packageName,
+  packagePath,
+  signature,
+  documentation,
+}: SymbolIndexItem): monaco.IMarkdownString[] => {
+  const doc: monaco.IMarkdownString[] = []
+
+  if (signature) {
+    doc.push({
+      value: '```go\n' + signature + '\n```',
+    })
+  }
+
+  if (documentation) {
+    doc.push(documentation)
+  }
+
+  const docLabel = packagePath === 'builtin' ? label : `${packageName}.${label}`
+  const linkLabel = `${docLabel} on ${goDocDomain}`
+  doc.push({
+    value: `[${linkLabel}](https://${goDocDomain}/${packagePath}#${label})`,
+    isTrusted: true,
+  })
+
+  return doc
+}

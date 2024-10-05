@@ -2,6 +2,7 @@ import * as monaco from 'monaco-editor'
 
 import { GoSymbolsCompletionItemProvider } from './symbols'
 import { GoImportsCompletionProvider } from './imports'
+import { GoHoverProvider } from './hover'
 import type { StateDispatch } from '~/store'
 import { goCompletionService } from '~/services/completion'
 import type { DocumentMetadataCache } from './cache'
@@ -19,5 +20,6 @@ export const registerGoLanguageProviders = (dispatcher: StateDispatch, cache: Do
       'go',
       new GoImportsCompletionProvider(dispatcher, goCompletionService),
     ),
+    monaco.languages.registerHoverProvider('go', new GoHoverProvider(goCompletionService, cache)),
   ]
 }

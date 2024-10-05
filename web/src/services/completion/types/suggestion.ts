@@ -92,3 +92,5 @@ export interface PackageSymbolQuery {
 }
 
 export type SuggestionQuery = LiteralQuery | PackageSymbolQuery
+
+export type HoverQuery = LiteralQuery | Required<PackageSymbolQuery>
