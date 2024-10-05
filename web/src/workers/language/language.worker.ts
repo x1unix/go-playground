@@ -11,7 +11,7 @@ import {
   importCompletionFromPackage,
   symbolHoverDoc,
 } from './utils'
-import { type SymbolIndexItem } from '~/services/storage/types'
+import type { SymbolIndexItem } from '~/services/storage/types'
 
 const completionVersionKey = 'completionItems.version'
 
