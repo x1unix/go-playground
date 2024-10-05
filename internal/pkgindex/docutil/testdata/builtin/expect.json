@@ -236,7 +236,7 @@
   },
   {
     "label": "max",
-    "documentation": "The max built-in function returns the largest value of a fixed number of arguments of [cmp.Ordered](/cmp#Ordered) types. There must be at least one argument. If T is a floating-point type and any of the arguments are NaNs, max will return NaN.",
+    "documentation": "The max built-in function returns the largest value of a fixed number of arguments of [cmp.Ordered](https://pkg.go.dev/cmp/#Ordered) types. There must be at least one argument. If T is a floating-point type and any of the arguments are NaNs, max will return NaN.",
     "detail": "func[T cmp.Ordered](x T, y ...T) T",
     "insertText": "max[${1:T}](${2:x}, ${3:y})",
     "signature": "func max[T cmp.Ordered](x T, y ...T) T",
@@ -245,7 +245,7 @@
   },
   {
     "label": "min",
-    "documentation": "The min built-in function returns the smallest value of a fixed number of arguments of [cmp.Ordered](/cmp#Ordered) types. There must be at least one argument. If T is a floating-point type and any of the arguments are NaNs, min will return NaN.",
+    "documentation": "The min built-in function returns the smallest value of a fixed number of arguments of [cmp.Ordered](https://pkg.go.dev/cmp/#Ordered) types. There must be at least one argument. If T is a floating-point type and any of the arguments are NaNs, min will return NaN.",
     "detail": "func[T cmp.Ordered](x T, y ...T) T",
     "insertText": "min[${1:T}](${2:x}, ${3:y})",
     "signature": "func min[T cmp.Ordered](x T, y ...T) T",
