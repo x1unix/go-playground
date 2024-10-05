@@ -34,14 +34,11 @@ const checkPackageNameToken = (tokens: monaco.Token[], tokenPos: number) => {
         foundDot = true
         break
       case GoToken.None:
-        if (!foundIdent) {
-          // no ident
-          return -1
+        if (foundIdent && foundDot) {
+          return identPos
         }
 
-        // we don't expect dots anymore
-        foundDot = true
-        break
+        return -1
       case GoToken.Ident:
         if (foundIdent) {
           // twice ident
@@ -84,17 +81,17 @@ const resolveHoverValue = (line: string, tokens: monaco.Token[], tokenPos: numbe
 
   // check if there is a symbol behind to determine direction to move.
   const pkgNamePos = checkPackageNameToken(tokens, tokenPos - 1)
-  if (pkgNamePos !== -1) {
-    const pkgName = tokenToString(line, tokens, pkgNamePos)
-    range.startColumn = tokens[pkgNamePos].offset + 1
-    return {
-      packageName: pkgName,
-      value: hoverValue,
-      range,
-    }
+  if (pkgNamePos === -1) {
+    return { value: hoverValue, range }
   }
 
-  return { value: hoverValue, range }
+  const pkgName = tokenToString(line, tokens, pkgNamePos)
+  range.startColumn = tokens[pkgNamePos].offset + 1
+  return {
+    packageName: pkgName,
+    value: hoverValue,
+    range,
+  }
 }
 
 const keywordHoverValue = (line: string, tokens: monaco.Token[], tokenPos: number): HoverValue => {
