@@ -175,7 +175,7 @@ export const symbolHoverDoc = ({
   }
 
   const docLabel = packagePath === 'builtin' ? label : `${packageName}.${label}`
-  const linkLabel = `${docLabel} on ${goDocDomain}`
+  const linkLabel = `\`${docLabel}\` on ${goDocDomain}`
   doc.push({
     value: `[${linkLabel}](https://${goDocDomain}/${packagePath}#${label})`,
     isTrusted: true,

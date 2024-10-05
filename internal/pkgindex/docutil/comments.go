@@ -13,7 +13,7 @@ const (
 	goDocBaseUrl = "https://pkg.go.dev/"
 
 	// Char count of static markup chars from writeGoDocLink.
-	goDocCharsLen = 20
+	goDocCharsLen = 22
 )
 
 // BuildPackageDoc builds markdown documentation for package with a link to GoDoc page.
@@ -45,7 +45,9 @@ func appendGoDocLink(docStr []byte, importPath string) string {
 		sb.WriteString("[")
 	}
 
+	sb.WriteRune('`')
 	sb.WriteString(importPath)
+	sb.WriteRune('`')
 	sb.WriteString(" on pkg.go.dev](")
 	sb.WriteString(goDocBaseUrl)
 	sb.WriteString(importPath)
