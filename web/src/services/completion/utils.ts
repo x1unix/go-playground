@@ -83,6 +83,7 @@ const importPackageTextEdit = (
         {
           text: imports.prependNewLine ? `\n${text}` : text,
           range: imports.range,
+          forceMoveMarkers: true,
         },
       ]
     }
@@ -98,6 +99,7 @@ const importPackageTextEdit = (
         {
           text: `import (\n${importLines}\n)`,
           range: imports.range,
+          forceMoveMarkers: true,
         },
       ]
     }
@@ -173,7 +175,7 @@ export const symbolHoverDoc = ({
   }
 
   const docLabel = packagePath === 'builtin' ? label : `${packageName}.${label}`
-  const linkLabel = `${docLabel} on ${goDocDomain}`
+  const linkLabel = `\`${docLabel}\` on ${goDocDomain}`
   doc.push({
     value: `[${linkLabel}](https://${goDocDomain}/${packagePath}#${label})`,
     isTrusted: true,

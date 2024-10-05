@@ -41,6 +41,11 @@ export enum GoToken {
 }
 
 /**
+ * Returns whether identifier is exported.
+ */
+export const isExported = (name: string) => name[0] === name[0].toUpperCase()
+
+/**
  * Returns whether a passed token type is a document-able Go keyword.
  */
 export const isKeywordValueToken = (tokenType: string) => {

@@ -20,6 +20,7 @@ import { LANGUAGE_GOLANG, stateToOptions } from './props'
 import { configureMonacoLoader } from './loader'
 import { DocumentMetadataCache, registerGoLanguageProviders } from './autocomplete'
 import type { VimState } from '~/store/vim/state'
+import classes from './CodeEditor.module.css'
 
 const ANALYZE_DEBOUNCE_TIME = 500
 
@@ -66,6 +67,7 @@ class CodeEditor extends React.Component<Props> {
   private vimCommandAdapter?: StatusBarAdapter
   private monaco?: Monaco
   private disposables?: monaco.IDisposable[]
+  private saveTimeoutId?: ReturnType<typeof setTimeout>
   private readonly metadataCache = new DocumentMetadataCache()
 
   private readonly debouncedAnalyzeFunc = asyncDebounce(async (fileName: string, code: string) => {
@@ -124,7 +126,7 @@ class CodeEditor extends React.Component<Props> {
         label: 'Build And Run Code',
         contextMenuGroupId: 'navigation',
         keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
-        run: (ed, ...args) => {
+        run: () => {
           this.props.dispatch(runFileDispatcher)
         },
       },
@@ -133,7 +135,7 @@ class CodeEditor extends React.Component<Props> {
         label: 'Format Code (goimports)',
         contextMenuGroupId: 'navigation',
         keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF],
-        run: (ed, ...args) => {
+        run: () => {
           this.props.dispatch(dispatchFormatFile())
         },
       },
@@ -216,8 +218,23 @@ class CodeEditor extends React.Component<Props> {
 
     const { fileName, code } = this.props
     this.metadataCache.handleUpdate(fileName, e)
-    this.props.dispatch(dispatchUpdateFile(fileName, newValue))
     void this.debouncedAnalyzeFunc(fileName, code)
+
+    // HACK: delay state updates to workaround cursor reset on completion.
+    //
+    // Some completion items may contain additional text edit commands.
+    // Accepting such completion trigger multiple document edit events in a row.
+    // Each edit event triggers Redux store update which causes re-render.
+    //
+    // Store update occurs before last change is applied.
+    // This causes race condition and cursor reset bug.
+    if (this.saveTimeoutId) {
+      clearTimeout(this.saveTimeoutId)
+    }
+
+    this.saveTimeoutId = setTimeout(() => {
+      this.props.dispatch(dispatchUpdateFile(fileName, newValue))
+    }, 100)
   }
 
   private async doAnalyze(fileName: string, code: string) {
@@ -263,6 +280,7 @@ class CodeEditor extends React.Component<Props> {
     const options = stateToOptions(this.props.options)
     return (
       <MonacoEditor
+        className={classes.CodeEditor}
         language={LANGUAGE_GOLANG}
         theme={this.props.darkMode ? 'vs-dark' : 'vs-light'}
         value={this.props.code}
