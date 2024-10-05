@@ -30,7 +30,7 @@ export class GoHoverProvider implements monaco.languages.HoverProvider {
     }
 
     const { startColumn, endColumn } = query.range
-    const imports = this.metadataCache.getMetadata(model.uri.path, model)
+    const imports = this.metadataCache.getMetadata(model)
     const hoverValue = await this.langWorker.getHoverValue({
       ...query,
       context: {

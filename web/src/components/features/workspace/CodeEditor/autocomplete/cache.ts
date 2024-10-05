@@ -54,9 +54,9 @@ export class DocumentMetadataCache {
    *
    * Populates data from model if it's not cached.
    */
-  getMetadata(fileName: string, model: monaco.editor.ITextModel) {
+  getMetadata(model: monaco.editor.ITextModel) {
     // model file name has slash at root
-    fileName = stripSlash(fileName)
+    const fileName = stripSlash(model.uri.path)
 
     const data = this.cache.get(fileName)
     if (data && !data.hasError) {

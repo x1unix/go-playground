@@ -2,6 +2,7 @@ import type * as monaco from 'monaco-editor'
 import type { StateDispatch } from '~/store'
 import { newAddNotificationAction, newRemoveNotificationAction, NotificationType } from '~/store/notifications'
 import type { LanguageWorker } from '~/workers/language'
+import type { DocumentMetadataCache } from './cache'
 
 const notificationId = 'GoImportsListLoad'
 const emptySuggestions = { suggestions: [] }
@@ -16,10 +17,12 @@ export abstract class CacheBasedCompletionProvider<TQuery> implements monaco.lan
 
   /**
    * @param dispatch Redux state dispatcher. Used to push notifications.
+   * @param metadataCache Document metadata cache.
    * @param langWorker Go completion worker.
    */
   constructor(
     protected readonly dispatch: StateDispatch,
+    protected readonly metadataCache: DocumentMetadataCache,
     protected langWorker: LanguageWorker,
   ) {}
 

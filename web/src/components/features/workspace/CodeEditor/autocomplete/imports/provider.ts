@@ -23,7 +23,7 @@ export class GoImportsCompletionProvider extends CacheBasedCompletionProvider<bo
     _context: monaco.languages.CompletionContext,
     _token: monaco.CancellationToken,
   ): boolean | null {
-    const isImportStmt = this.isImportStatementRange(position, model)
+    const isImportStmt = this.isImportStatementRange(model, position)
     if (!isImportStmt) {
       return null
     }
@@ -31,8 +31,14 @@ export class GoImportsCompletionProvider extends CacheBasedCompletionProvider<bo
     return true
   }
 
-  private isImportStatementRange(pos: monaco.Position, model: monaco.editor.ITextModel) {
-    // Very unoptimized, stupid and doesn't cover edge cases but might work for start.
+  private isImportStatementRange(model: monaco.editor.ITextModel, pos: monaco.IPosition) {
+    const meta = this.metadataCache.getMetadata(model)
+    if (!meta.hasError && meta.totalRange) {
+      const { startLineNumber: minLine, endLineNumber: maxLine } = meta.totalRange
+      return pos.lineNumber >= minLine && pos.lineNumber <= maxLine
+    }
+
+    // Fallback if metadata can't be populated for some reason.
     const line = model.getLineContent(pos.lineNumber)
     if (inlineImportRegex.test(line)) {
       return true

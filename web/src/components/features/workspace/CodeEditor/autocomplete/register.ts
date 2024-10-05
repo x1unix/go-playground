@@ -15,9 +15,9 @@ export const registerGoLanguageProviders = (dispatcher: StateDispatch, cache: Do
   return [
     monaco.languages.registerCompletionItemProvider(
       'go',
-      new GoSymbolsCompletionItemProvider(dispatcher, worker, cache),
+      new GoSymbolsCompletionItemProvider(dispatcher, cache, worker),
     ),
-    monaco.languages.registerCompletionItemProvider('go', new GoImportsCompletionProvider(dispatcher, worker)),
+    monaco.languages.registerCompletionItemProvider('go', new GoImportsCompletionProvider(dispatcher, cache, worker)),
     monaco.languages.registerHoverProvider('go', new GoHoverProvider(worker, cache)),
   ]
 }
