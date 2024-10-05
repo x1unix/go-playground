@@ -20,6 +20,7 @@ import { LANGUAGE_GOLANG, stateToOptions } from './props'
 import { configureMonacoLoader } from './loader'
 import { DocumentMetadataCache, registerGoLanguageProviders } from './autocomplete'
 import type { VimState } from '~/store/vim/state'
+import classes from './CodeEditor.module.css'
 
 const ANALYZE_DEBOUNCE_TIME = 500
 
@@ -279,6 +280,7 @@ class CodeEditor extends React.Component<Props> {
     const options = stateToOptions(this.props.options)
     return (
       <MonacoEditor
+        className={classes.CodeEditor}
         language={LANGUAGE_GOLANG}
         theme={this.props.darkMode ? 'vs-dark' : 'vs-light'}
         value={this.props.code}

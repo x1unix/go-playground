@@ -1,0 +1,6 @@
+/* Mimic vscode styles for documentation contents */
+.CodeEditor :global(.monaco-hover-content) a,
+.CodeEditor :global(.markdown-docs) a
+{
+  text-decoration: none;
+}
