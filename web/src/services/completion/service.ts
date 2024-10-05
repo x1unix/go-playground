@@ -76,6 +76,7 @@ export class GoCompletionService {
    * Returns hover documentation for a symbol.
    */
   async getHoverValue(query: HoverQuery): Promise<monaco.languages.Hover | null> {
+    await this.checkCacheReady()
     const filter = this.buildHoverFilter(query)
     const entry = await this.db.symbolIndex.where(filter).first()
     if (!entry) {
