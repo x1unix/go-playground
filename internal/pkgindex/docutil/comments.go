@@ -61,7 +61,9 @@ func FormatCommentGroup(group *ast.CommentGroup) []byte {
 
 	var (
 		parser  comment.Parser
-		printer comment.Printer
+		printer = comment.Printer{
+			DocLinkBaseURL: goDocBaseUrl,
+		}
 	)
 
 	str := group.Text()
