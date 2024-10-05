@@ -83,6 +83,7 @@ const importPackageTextEdit = (
         {
           text: imports.prependNewLine ? `\n${text}` : text,
           range: imports.range,
+          forceMoveMarkers: true,
         },
       ]
     }
@@ -98,6 +99,7 @@ const importPackageTextEdit = (
         {
           text: `import (\n${importLines}\n)`,
           range: imports.range,
+          forceMoveMarkers: true,
         },
       ]
     }
