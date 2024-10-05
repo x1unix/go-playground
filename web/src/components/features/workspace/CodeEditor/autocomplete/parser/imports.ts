@@ -1,18 +1,7 @@
 import * as monaco from 'monaco-editor'
 
 import { ImportClauseType, type ImportsContext } from '~/services/completion'
-
-type Tokens = monaco.Token[][]
-
-enum GoToken {
-  None = '',
-  Comment = 'comment.go',
-  KeywordPackage = 'keyword.package.go',
-  KeywordImport = 'keyword.import.go',
-  Parenthesis = 'delimiter.parenthesis.go',
-  Ident = 'identifier.go',
-  String = 'string.go',
-}
+import { isNotEmptyToken, GoToken, type Tokens } from './tokens'
 
 class ParseError extends Error {
   constructor(line: number, col: number, msg: string) {
@@ -25,8 +14,6 @@ class UnexpectedTokenError extends ParseError {
     super(line, token.offset, `unexpected token "${token.type}`)
   }
 }
-
-const isNotEmptyToken = ({ type }: monaco.Token) => type !== GoToken.None
 
 const findPackageBlock = (tokens: Tokens) => {
   for (let i = 0; i < tokens.length; i++) {

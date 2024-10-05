@@ -15,7 +15,12 @@ export class DatabaseStorage extends Dexie {
     this.version(2).stores({
       keyValue: 'key',
       packageIndex: 'importPath, prefix, name',
-      symbolIndex: 'key, packagePath, [packageName+prefix], [packageName+label], [packagePath+prefix]',
+      symbolIndex: `
+        key,
+        packagePath,
+        [packageName+prefix],
+        [packageName+label],
+        [packagePath+prefix]`,
     })
   }
 }

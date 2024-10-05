@@ -1,5 +1,6 @@
+import type * as monaco from 'monaco-editor'
 import { db, keyValue } from '../storage'
-import type { GoIndexFile, LiteralQuery, PackageSymbolQuery, SuggestionQuery } from './types'
+import type { GoIndexFile, HoverQuery, LiteralQuery, PackageSymbolQuery, SuggestionQuery } from './types'
 import {
   completionFromPackage,
   completionFromSymbol,
@@ -7,10 +8,13 @@ import {
   constructSymbols,
   findPackagePathFromContext,
   importCompletionFromPackage,
+  symbolHoverDoc,
 } from './utils'
 import { type SymbolIndexItem } from '~/services/storage/types'
 
 const completionVersionKey = 'completionItems.version'
+
+const isPackageQuery = (q: SuggestionQuery): q is PackageSymbolQuery => 'packageName' in q
 
 /**
  * Provides data sources for autocomplete services.
@@ -37,6 +41,54 @@ export class GoCompletionService {
   }
 
   /**
+   * Returns list of predefined builtins.
+   *
+   * Used to speed-up hover operations.
+   */
+  async getBuiltinNames() {
+    await this.checkCacheReady()
+    const items = await this.db.symbolIndex.where({ packageName: 'builtin' }).toArray()
+    return items.map(({ label }) => label)
+  }
+
+  private buildHoverFilter(query: HoverQuery): Partial<SymbolIndexItem> {
+    const isPackageMember = 'packageName' in query
+    if (!isPackageMember) {
+      return {
+        key: `builtin.${query.value}`,
+      }
+    }
+
+    const pkgPath = findPackagePathFromContext(query.context, query.packageName)
+    if (pkgPath) {
+      return {
+        key: `${pkgPath}.${query.value}`,
+      }
+    }
+
+    return {
+      packageName: query.packageName,
+      label: query.value,
+    }
+  }
+
+  /**
+   * Returns hover documentation for a symbol.
+   */
+  async getHoverValue(query: HoverQuery): Promise<monaco.languages.Hover | null> {
+    const filter = this.buildHoverFilter(query)
+    const entry = await this.db.symbolIndex.where(filter).first()
+    if (!entry) {
+      return null
+    }
+
+    return {
+      contents: symbolHoverDoc(entry),
+      range: query.context.range,
+    }
+  }
+
+  /**
    * Returns list of known importable Go packages.
    *
    * Returns value from cache if available.
@@ -53,7 +105,7 @@ export class GoCompletionService {
   async getSymbolSuggestions(query: SuggestionQuery) {
     await this.checkCacheReady()
 
-    if ('packageName' in query) {
+    if (isPackageQuery(query)) {
       return await this.getMemberSuggestion(query)
     }
 
