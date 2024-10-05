@@ -1,5 +1,6 @@
 import type * as monaco from 'monaco-editor'
-import { db, keyValue } from '../storage'
+import * as Comlink from 'comlink'
+import { db, keyValue } from '~/services/storage'
 import type { GoIndexFile, HoverQuery, LiteralQuery, PackageSymbolQuery, SuggestionQuery } from './types'
 import {
   completionFromPackage,
@@ -16,10 +17,7 @@ const completionVersionKey = 'completionItems.version'
 
 const isPackageQuery = (q: SuggestionQuery): q is PackageSymbolQuery => 'packageName' in q
 
-/**
- * Provides data sources for autocomplete services.
- */
-export class GoCompletionService {
+export class WorkerHandler {
   private cachePopulated = false
   private populatePromise?: Promise<void>
 
@@ -202,3 +200,5 @@ export class GoCompletionService {
     await this.populatePromise
   }
 }
+
+Comlink.expose(new WorkerHandler())

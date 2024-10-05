@@ -1,7 +1,7 @@
 import type * as monaco from 'monaco-editor'
-import type { GoCompletionService } from '~/services/completion'
 import type { StateDispatch } from '~/store'
 import { newAddNotificationAction, newRemoveNotificationAction, NotificationType } from '~/store/notifications'
+import type { LanguageWorker } from '~/workers/language'
 
 const notificationId = 'GoImportsListLoad'
 const emptySuggestions = { suggestions: [] }
@@ -12,13 +12,15 @@ const emptySuggestions = { suggestions: [] }
  * Implements routine logic of displaying preloader if cache is not ready, error handling and etc.
  */
 export abstract class CacheBasedCompletionProvider<TQuery> implements monaco.languages.CompletionItemProvider {
+  protected isWarmUp = false
+
   /**
    * @param dispatch Redux state dispatcher. Used to push notifications.
-   * @param completionSvc Go completion cache service.
+   * @param langWorker Go completion worker.
    */
   constructor(
     protected readonly dispatch: StateDispatch,
-    protected completionSvc: GoCompletionService,
+    protected langWorker: LanguageWorker,
   ) {}
 
   /**
@@ -47,6 +49,12 @@ export abstract class CacheBasedCompletionProvider<TQuery> implements monaco.lan
     token: monaco.CancellationToken,
   ): TQuery | null
 
+  private async isCacheReady() {
+    if (this.isWarmUp) {
+      return true
+    }
+  }
+
   async provideCompletionItems(
     model: monaco.editor.ITextModel,
     position: monaco.Position,
@@ -58,15 +66,15 @@ export abstract class CacheBasedCompletionProvider<TQuery> implements monaco.lan
       return emptySuggestions
     }
 
-    const shouldDisplayPreload = !this.completionSvc.isWarmUp()
+    const isCacheReady = await this.isCacheReady()
     try {
-      if (shouldDisplayPreload) {
+      if (!isCacheReady) {
         this.showLoadingProgress()
       }
 
       const suggestions = await this.querySuggestions(query)
 
-      if (shouldDisplayPreload) {
+      if (!isCacheReady) {
         this.dispatch(newRemoveNotificationAction(notificationId))
       }
 

@@ -1,6 +1,6 @@
 import type * as monaco from 'monaco-editor'
 import type { StateDispatch } from '~/store'
-import type { GoCompletionService, SuggestionContext, SuggestionQuery } from '~/services/completion'
+import type { LanguageWorker, SuggestionContext, SuggestionQuery } from '~/workers/language'
 import { asyncDebounce } from '../../utils'
 import snippets from './snippets'
 import { parseExpression } from './parse'
@@ -16,11 +16,11 @@ export class GoSymbolsCompletionItemProvider extends CacheBasedCompletionProvide
   triggerCharacters = Array.from('.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
   private readonly metadataCache: DocumentMetadataCache
   private readonly getSuggestionFunc = asyncDebounce(
-    async (query) => await this.completionSvc.getSymbolSuggestions(query),
+    async (query) => await this.langWorker.getSymbolSuggestions(query),
     SUGGESTIONS_DEBOUNCE_DELAY,
   )
 
-  constructor(dispatch: StateDispatch, compSvc: GoCompletionService, metadataCache: DocumentMetadataCache) {
+  constructor(dispatch: StateDispatch, compSvc: LanguageWorker, metadataCache: DocumentMetadataCache) {
     super(dispatch, compSvc)
     this.metadataCache = metadataCache
   }

@@ -1,6 +1,6 @@
 import * as monaco from 'monaco-editor'
 
-import { ImportClauseType, type ImportsContext } from '~/services/completion'
+import { ImportClauseType, type ImportsContext } from '~/workers/language/types'
 import { isNotEmptyToken, GoToken, type Tokens } from './tokens'
 
 class ParseError extends Error {

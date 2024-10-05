@@ -1,6 +1,6 @@
 import type * as monaco from 'monaco-editor'
 import { ImportClauseType, type Packages, type SuggestionContext, type Symbols, SymbolSourceKey } from './types'
-import type { PackageIndexItem, SymbolIndexItem } from '../storage/types'
+import type { PackageIndexItem, SymbolIndexItem } from '~/services/storage/types'
 
 type CompletionItem = monaco.languages.CompletionItem
 

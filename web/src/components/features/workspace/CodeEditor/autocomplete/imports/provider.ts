@@ -14,8 +14,7 @@ export class GoImportsCompletionProvider extends CacheBasedCompletionProvider<bo
   triggerCharacters = ['"']
 
   protected async querySuggestions(_: boolean): Promise<monaco.languages.CompletionItem[]> {
-    const suggestions = await this.completionSvc.getImportSuggestions()
-    return suggestions
+    return await this.langWorker.getImportSuggestions()
   }
 
   protected parseCompletionQuery(
@@ -39,7 +38,7 @@ export class GoImportsCompletionProvider extends CacheBasedCompletionProvider<bo
       return true
     }
 
-    // try locate nearest import block
+    // try to locate nearest import block
     for (let i = pos.lineNumber - 1; i > 0; i--) {
       const line = model.getLineContent(i)
 

@@ -58,7 +58,7 @@ export class GoProcess {
    * @param params Program startup params.
    */
   async start(image: ArrayBuffer, stdio: SyncStdio, params?: StartupParams) {
-    this.worker = new Worker(new URL('./worker.ts', import.meta.url), {
+    this.worker = new Worker(new URL('./go.worker.ts', import.meta.url), {
       type: 'module',
     })
 
