@@ -1,5 +1,5 @@
 import type * as monaco from 'monaco-editor'
-import type { ImportsContext } from '~/services/completion'
+import type { ImportsContext } from '~/workers/language/types'
 import { buildImportContext } from './parser/imports'
 
 const stripSlash = (str: string) => (str[0] === '/' ? str.slice(1) : str)
@@ -54,9 +54,9 @@ export class DocumentMetadataCache {
    *
    * Populates data from model if it's not cached.
    */
-  getMetadata(fileName: string, model: monaco.editor.ITextModel) {
+  getMetadata(model: monaco.editor.ITextModel) {
     // model file name has slash at root
-    fileName = stripSlash(fileName)
+    const fileName = stripSlash(model.uri.path)
 
     const data = this.cache.get(fileName)
     if (data && !data.hasError) {

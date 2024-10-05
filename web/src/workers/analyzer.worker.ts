@@ -2,6 +2,8 @@ import '~/lib/go/wasm_exec.js'
 import { instantiateStreaming } from '~/lib/go/common'
 import { getWasmUrl } from '~/services/api/resources'
 
+// TODO: refactor this together with the Go worker API
+
 declare const self: DedicatedWorkerGlobalScope
 
 const FN_EXIT = 'exit'

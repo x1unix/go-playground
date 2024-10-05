@@ -1,13 +1,13 @@
 import type * as monaco from 'monaco-editor'
-import type { GoCompletionService } from '~/services/completion'
 import type { DocumentMetadataCache } from '../cache'
 import { queryFromPosition } from './parse'
+import type { LanguageWorker } from '~/workers/language'
 
 export class GoHoverProvider implements monaco.languages.HoverProvider {
   private builtins?: Set<string>
 
   constructor(
-    protected completionSvc: GoCompletionService,
+    protected langWorker: LanguageWorker,
     protected metadataCache: DocumentMetadataCache,
   ) {}
 
@@ -21,7 +21,7 @@ export class GoHoverProvider implements monaco.languages.HoverProvider {
     const isLiteral = !('packageName' in query)
     if (isLiteral) {
       if (!this.builtins) {
-        this.builtins = new Set(await this.completionSvc.getBuiltinNames())
+        this.builtins = new Set(await this.langWorker.getBuiltinNames())
       }
 
       if (!this.builtins.has(query.value)) {
@@ -30,8 +30,8 @@ export class GoHoverProvider implements monaco.languages.HoverProvider {
     }
 
     const { startColumn, endColumn } = query.range
-    const imports = this.metadataCache.getMetadata(model.uri.path, model)
-    const hoverValue = await this.completionSvc.getHoverValue({
+    const imports = this.metadataCache.getMetadata(model)
+    const hoverValue = await this.langWorker.getHoverValue({
       ...query,
       context: {
         imports,

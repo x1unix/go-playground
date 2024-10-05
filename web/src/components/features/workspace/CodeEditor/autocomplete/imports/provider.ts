@@ -14,8 +14,7 @@ export class GoImportsCompletionProvider extends CacheBasedCompletionProvider<bo
   triggerCharacters = ['"']
 
   protected async querySuggestions(_: boolean): Promise<monaco.languages.CompletionItem[]> {
-    const suggestions = await this.completionSvc.getImportSuggestions()
-    return suggestions
+    return await this.langWorker.getImportSuggestions()
   }
 
   protected parseCompletionQuery(
@@ -24,7 +23,7 @@ export class GoImportsCompletionProvider extends CacheBasedCompletionProvider<bo
     _context: monaco.languages.CompletionContext,
     _token: monaco.CancellationToken,
   ): boolean | null {
-    const isImportStmt = this.isImportStatementRange(position, model)
+    const isImportStmt = this.isImportStatementRange(model, position)
     if (!isImportStmt) {
       return null
     }
@@ -32,14 +31,20 @@ export class GoImportsCompletionProvider extends CacheBasedCompletionProvider<bo
     return true
   }
 
-  private isImportStatementRange(pos: monaco.Position, model: monaco.editor.ITextModel) {
-    // Very unoptimized, stupid and doesn't cover edge cases but might work for start.
+  private isImportStatementRange(model: monaco.editor.ITextModel, pos: monaco.IPosition) {
+    const meta = this.metadataCache.getMetadata(model)
+    if (!meta.hasError && meta.totalRange) {
+      const { startLineNumber: minLine, endLineNumber: maxLine } = meta.totalRange
+      return pos.lineNumber >= minLine && pos.lineNumber <= maxLine
+    }
+
+    // Fallback if metadata can't be populated for some reason.
     const line = model.getLineContent(pos.lineNumber)
     if (inlineImportRegex.test(line)) {
       return true
     }
 
-    // try locate nearest import block
+    // try to locate nearest import block
     for (let i = pos.lineNumber - 1; i > 0; i--) {
       const line = model.getLineContent(i)
 

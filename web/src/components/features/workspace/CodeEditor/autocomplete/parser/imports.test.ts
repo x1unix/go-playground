@@ -2,7 +2,7 @@ import * as monaco from 'monaco-editor'
 import path from 'path'
 import { assert, describe, test } from 'vitest'
 import { importContextFromTokens } from './imports'
-import { ImportClauseType, type ImportsContext } from '~/services/completion'
+import { ImportClauseType, type ImportsContext } from '~/workers/language/types'
 
 // Core language packs aren't loaded in vitest.
 // Autoloading via import also doesn't work.
