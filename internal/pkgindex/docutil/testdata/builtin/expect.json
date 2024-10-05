@@ -8,15 +8,15 @@
   },
   {
     "label": "true",
-    "detail": "const true = 0 == 0",
     "insertText": "true",
+    "signature": "const true = 0 == 0",
     "kind": 14,
     "insertTextRules": 0
   },
   {
     "label": "false",
-    "detail": "const false = 0 != 0",
     "insertText": "false",
+    "signature": "const false = 0 != 0",
     "kind": 14,
     "insertTextRules": 0
   },
@@ -167,16 +167,16 @@
   {
     "label": "iota",
     "documentation": "iota is a predeclared identifier representing the untyped integer ordinal number of the current const specification in a (usually parenthesized) const declaration. It is zero-indexed.",
-    "detail": "const iota = 0",
     "insertText": "iota",
+    "signature": "const iota = 0",
     "kind": 14,
     "insertTextRules": 0
   },
   {
     "label": "nil",
     "documentation": "nil is a predeclared identifier representing the zero value for a pointer, channel, func, interface, map, or slice type.",
-    "detail": "var nil Type",
     "insertText": "nil",
+    "signature": "var nil Type",
     "kind": 4,
     "insertTextRules": 0
   },

@@ -8,23 +8,23 @@
   },
   {
     "label": "Bar",
-    "detail": "var Bar = 32",
     "insertText": "Bar",
+    "signature": "var Bar = 32",
     "kind": 4,
     "insertTextRules": 0
   },
   {
     "label": "Foo",
-    "detail": "var Foo int32",
     "insertText": "Foo",
+    "signature": "var Foo int32",
     "kind": 4,
     "insertTextRules": 0
   },
   {
     "label": "Baz",
     "documentation": "Baz is a sample value.",
-    "detail": "var Baz bool",
     "insertText": "Baz",
+    "signature": "var Baz bool",
     "kind": 4,
     "insertTextRules": 0
   },

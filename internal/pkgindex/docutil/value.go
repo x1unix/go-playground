@@ -24,7 +24,7 @@ func CollectValues(ctx TraverseContext, spec *ast.ValueSpec, collector Collector
 			continue
 		}
 
-		detail, err := detailFromIdent(ctx.FileSet, ctx.Block, val)
+		sign, err := signatureFromIdent(ctx.FileSet, ctx.Block, val)
 		if err != nil {
 			return count, err
 		}
@@ -33,7 +33,7 @@ func CollectValues(ctx TraverseContext, spec *ast.ValueSpec, collector Collector
 			Label:         val.Name,
 			Kind:          ctx.Block.Kind,
 			InsertText:    val.Name,
-			Detail:        detail,
+			Signature:     sign,
 			Documentation: blockDoc,
 		}
 
@@ -57,7 +57,7 @@ func getValueDocumentation(block BlockData, spec *ast.ValueSpec) string {
 	return string(FormatCommentGroup(g))
 }
 
-func detailFromIdent(fset *token.FileSet, block BlockData, ident *ast.Ident) (string, error) {
+func signatureFromIdent(fset *token.FileSet, block BlockData, ident *ast.Ident) (string, error) {
 	valDecl, ok := isIdentPrintable(ident)
 	if !ok {
 		return "", nil
