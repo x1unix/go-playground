@@ -1,18 +1,21 @@
 import React, { Suspense } from 'react'
-import { IStackStyles, mergeStyleSets, Spinner, Stack, useTheme } from "@fluentui/react";
+import { type IStackStyles, mergeStyleSets, Spinner, Stack, useTheme } from '@fluentui/react'
 import { Poster } from '../Poster'
 
 interface ContainerProps {
   styles?: IStackStyles
 }
 
-const SuspenseContainer: React.FC<ContainerProps> = ({ children , styles }) => {
+const SuspenseContainer: React.FC<ContainerProps> = ({ children, styles }) => {
   const theme = useTheme()
-  const stackStyles: IStackStyles = mergeStyleSets({
-    root: {
-      background: theme.semanticColors.bodyBackground,
-    }
-  }, styles)
+  const stackStyles: IStackStyles = mergeStyleSets(
+    {
+      root: {
+        background: theme.semanticColors.bodyBackground,
+      },
+    },
+    styles,
+  )
 
   return (
     <Stack grow verticalFill horizontalAlign="center" verticalAlign="center" styles={stackStyles}>
@@ -26,15 +29,13 @@ interface ErrorProps extends ContainerProps {
   error?: Error
 }
 
-const SuspenseErrorBoundary: React.FC<ErrorProps> = ({ styles, children, error, errorLabel}) => {
-  return (
-    error ? (
-      <SuspenseContainer styles={styles}>
-        <Poster label={errorLabel ?? 'Error'} type="error" message={error.toString()} />
-      </SuspenseContainer>
-    ) : (
-      <>{children}</>
-    )
+const SuspenseErrorBoundary: React.FC<ErrorProps> = ({ styles, children, error, errorLabel }) => {
+  return error ? (
+    <SuspenseContainer styles={styles}>
+      <Poster label={errorLabel ?? 'Error'} type="error" message={error.toString()} />
+    </SuspenseContainer>
+  ) : (
+    <>{children}</>
   )
 }
 
