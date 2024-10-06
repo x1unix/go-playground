@@ -79,6 +79,10 @@ build: check-go check-yarn clean preinstall gen build-server wasm go-index impor
 	mv -v $(UI)/build $(TARGET)/public && \
 	echo ":: Build done - $(TARGET)"
 
+# WASM and generated JSON files are build on CI outside of Docker to speedup build.
+.PHONY: ci-assets
+ci-assets: wasm go-index imports-index
+
 .PHONY:gen
 gen:
 	@find . -name 'generate.go' -exec go generate -v {} \;
