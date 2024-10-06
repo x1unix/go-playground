@@ -1,4 +1,11 @@
 {
+  "Interface - General": [
+    {
+      "issueId": 425,
+      "url": "pull/425",
+      "description": "Reduce application bundle size"
+    }
+  ],
   "Interface - Editor": [
     {
       "issueId": 417,
@@ -9,13 +16,11 @@
       "issueId": 421,
       "url": "pull/421",
       "description": "Show symbol documentation on hover"
-    }
-  ],
-  "Interface - General": [
+    },
     {
-      "issueId": 425,
-      "url": "pull/425",
-      "description": "Reduce application bundle size"
+      "issueId": 430,
+      "url": "pull/430",
+      "description": "Syntax highlight support for go.mod files"
     }
   ],
   "Go - WebAssembly": [
