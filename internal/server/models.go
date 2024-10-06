@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/x1unix/go-playground/internal/analyzer"
 	"github.com/x1unix/go-playground/pkg/goplay"
+	"github.com/x1unix/go-playground/pkg/monaco"
 )
 
 const (
@@ -80,7 +80,7 @@ type SuggestionsResponse struct {
 	DeprecatedHeader
 
 	// Suggestions are list of suggestions for monaco
-	Suggestions []*analyzer.CompletionItem `json:"suggestions"`
+	Suggestions []monaco.CompletionItem `json:"suggestions"`
 }
 
 // Write writes data to response
