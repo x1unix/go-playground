@@ -15,7 +15,6 @@ const concatDisposables = (...items: monaco.IDisposable[]): monaco.IDisposable =
 })
 
 export const registerExtraLanguages = (): monaco.IDisposable => {
-  console.log('register')
   if (!isLangRegistered(LanguageID.GoMod)) {
     monaco.languages.register({
       id: 'go.mod',
