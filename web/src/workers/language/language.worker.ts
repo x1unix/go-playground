@@ -1,5 +1,6 @@
 import type * as monaco from 'monaco-editor'
 import * as Comlink from 'comlink'
+import { addDays } from 'date-fns'
 import { db, keyValue } from '~/services/storage'
 import type { GoIndexFile, HoverQuery, LiteralQuery, PackageSymbolQuery, SuggestionQuery } from './types'
 import {
@@ -14,6 +15,10 @@ import {
 import type { SymbolIndexItem } from '~/services/storage/types'
 
 const completionVersionKey = 'completionItems.version'
+
+const TTL_DAYS = 7
+
+const getExpireTime = () => addDays(new Date(), TTL_DAYS)
 
 const isPackageQuery = (q: SuggestionQuery): q is PackageSymbolQuery => 'packageName' in q
 
@@ -190,7 +195,7 @@ export class WorkerHandler {
           this.db.symbolIndex.clear(),
           this.db.packageIndex.bulkAdd(packages),
           this.db.symbolIndex.bulkAdd(symbols),
-          this.keyValue.setItem(completionVersionKey, data.go),
+          this.keyValue.setItem(completionVersionKey, data.go, getExpireTime()),
         ])
 
         this.cachePopulated = true
