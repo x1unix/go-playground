@@ -10,7 +10,18 @@ const getLineTokens = (str: string, lang: string): monaco.Token[] | null => {
   }
 }
 
-const checkPackageNameToken = (tokens: monaco.Token[], tokenPos: number) => {
+const isDerefOrPtrToken = (line: string, tokens: monaco.Token[], tokenPos: number) => {
+  const str = tokenToString(line, tokens, tokenPos)
+  switch (str) {
+    case '*':
+    case '&':
+      return true
+    default:
+      return false
+  }
+}
+
+const checkPackageNameToken = (line: string, tokens: monaco.Token[], tokenPos: number) => {
   let identPos = -1
   let foundIdent = false
   let foundDot = false
@@ -28,7 +39,7 @@ const checkPackageNameToken = (tokens: monaco.Token[], tokenPos: number) => {
     switch (tok.type) {
       case GoToken.Dot:
         if (foundDot || foundIdent) {
-          return -1
+          return isDerefOrPtrToken(line, tokens, i) && foundIdent ? identPos : -1
         }
 
         foundDot = true
@@ -82,7 +93,7 @@ const resolveHoverValue = (line: string, tokens: monaco.Token[], tokenPos: numbe
   }
 
   // check if there is a symbol behind to determine direction to move.
-  const pkgNamePos = checkPackageNameToken(tokens, tokenPos - 1)
+  const pkgNamePos = checkPackageNameToken(line, tokens, tokenPos - 1)
   if (pkgNamePos === -1) {
     return { value: hoverValue, range }
   }
