@@ -158,7 +158,11 @@ export class WorkerHandler {
     }
 
     // TODO: add invalidation by Go version
-    const version = await this.keyValue.getItem<string>(completionVersionKey)
+    const version = await this.keyValue.getItem<string>(completionVersionKey, (entry) => {
+      // v2.2.0 didn't write TTL by mistake
+      return typeof entry.expireAt !== 'undefined'
+    })
+
     if (!version) {
       await this.populateCache()
       return true
