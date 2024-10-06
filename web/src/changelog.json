@@ -1,14 +1,33 @@
 {
-  "Interface - General": [
+  "Interface - Editor": [
     {
-      "issueId": 400,
-      "url": "issues/400",
-      "description": "Disable auto save by default."
+      "issueId": 417,
+      "url": "pull/417",
+      "description": "Improve autocomplete system"
     },
     {
-      "issueId": 401,
-      "url": "pull/401",
-      "description": "Improve settings menu."
+      "issueId": 421,
+      "url": "pull/421",
+      "description": "Show symbol documentation on hover"
+    }
+  ],
+  "Interface - General": [
+    {
+      "issueId": 425,
+      "url": "pull/425",
+      "description": "Reduce application bundle size"
+    }
+  ],
+  "Go - WebAssembly": [
+    {
+      "issueId": 408,
+      "url": "pull/408",
+      "description": "Upgrade to Go 1.23"
+    },
+    {
+      "issueId": 412,
+      "url": "pull/412",
+      "description": "Run Go programs in a separate worker"
     }
   ]
 }
