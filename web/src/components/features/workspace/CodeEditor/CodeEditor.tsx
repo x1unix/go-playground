@@ -19,7 +19,7 @@ import type { VimState } from '~/store/vim/state'
 import { spawnLanguageWorker } from '~/workers/language'
 import { getTimeNowUsageMarkers, asyncDebounce, debounce } from './utils/utils'
 import { attachCustomCommands } from './utils/commands'
-import { LANGUAGE_GOLANG, stateToOptions } from './utils/props'
+import { languageFromFilename, stateToOptions } from './utils/props'
 import { configureMonacoLoader } from './utils/loader'
 import { DocumentMetadataCache, registerGoLanguageProviders } from './autocomplete'
 import classes from './CodeEditor.module.css'
@@ -273,7 +273,7 @@ class CodeEditorView extends React.Component<Props> {
     return (
       <MonacoEditor
         className={classes.CodeEditor}
-        language={LANGUAGE_GOLANG}
+        language={languageFromFilename(this.props.fileName)}
         theme={this.props.darkMode ? 'vs-dark' : 'vs-light'}
         value={this.props.code}
         defaultValue={this.props.code}

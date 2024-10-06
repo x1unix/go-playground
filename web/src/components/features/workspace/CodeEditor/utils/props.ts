@@ -2,17 +2,7 @@ import type * as monaco from 'monaco-editor'
 import { type MonacoSettings } from '~/services/config'
 import { getFontFamily, getDefaultFontFamily } from '~/services/fonts'
 
-export const LANGUAGE_GOLANG = 'go'
-
-export const DEMO_CODE = [
-  'package main\n',
-  'import (',
-  '\t"fmt"',
-  ')\n',
-  'func main() {',
-  '\tfmt.Println("Hello World")',
-  '}\n',
-].join('\n')
+export const languageFromFilename = (fname: string) => (fname.endsWith('.mod') ? 'gomod' : 'go')
 
 // stateToOptions converts MonacoState to IEditorOptions
 export const stateToOptions = (state: MonacoSettings): monaco.editor.IEditorOptions => {
