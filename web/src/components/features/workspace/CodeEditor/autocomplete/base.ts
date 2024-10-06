@@ -56,6 +56,8 @@ export abstract class CacheBasedCompletionProvider<TQuery> implements monaco.lan
     if (this.isWarmUp) {
       return true
     }
+
+    return await this.langWorker.isWarmUp()
   }
 
   async provideCompletionItems(
@@ -78,6 +80,7 @@ export abstract class CacheBasedCompletionProvider<TQuery> implements monaco.lan
       const suggestions = await this.querySuggestions(query)
 
       if (!isCacheReady) {
+        this.isWarmUp = true
         this.dispatch(newRemoveNotificationAction(notificationId))
       }
 
