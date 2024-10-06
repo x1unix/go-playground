@@ -1,9 +1,7 @@
 package server
 
 import (
-	"bytes"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -71,6 +69,7 @@ func isContentLengthError(err error) bool {
 
 	return false
 }
+
 func backendFromQuery(query url.Values) (goplay.Backend, error) {
 	backendName := query.Get("backend")
 	if backendName == "" {
@@ -82,22 +81,4 @@ func backendFromQuery(query url.Values) (goplay.Backend, error) {
 	}
 
 	return backendName, nil
-}
-
-func getPayloadFromRequest(r *http.Request) ([]byte, error) {
-	// see: https://github.com/golang/playground/blob/master/share.go#L69
-	var buff bytes.Buffer
-	buff.Grow(goplay.MaxSnippetSize)
-
-	defer r.Body.Close()
-	_, err := io.Copy(&buff, io.LimitReader(r.Body, goplay.MaxSnippetSize+1))
-	if err != nil {
-		return nil, Errorf(http.StatusBadGateway, "failed to read request: %w", err)
-	}
-
-	if buff.Len() > goplay.MaxSnippetSize {
-		return nil, ErrSnippetTooLarge
-	}
-
-	return buff.Bytes(), nil
 }

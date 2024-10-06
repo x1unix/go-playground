@@ -1,6 +1,7 @@
 package check
 
 import (
+	"errors"
 	"go/parser"
 	"go/scanner"
 	"go/token"
@@ -14,7 +15,8 @@ func Check(src string) (*Result, error) {
 		return &Result{HasErrors: false}, nil
 	}
 
-	if errList, ok := err.(scanner.ErrorList); ok {
+	var errList scanner.ErrorList
+	if errors.As(err, &errList) {
 		return &Result{HasErrors: true, Markers: errorsListToMarkers(errList)}, nil
 	}
 

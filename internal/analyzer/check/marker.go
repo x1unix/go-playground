@@ -1,44 +1,17 @@
 // Package check checks provided Go code and reports syntax errors
 package check
 
-import "go/scanner"
+import (
+	"go/scanner"
 
-// MarkerSeverity is equivalent for MarkerSeverity type in monaco-editor
-type MarkerSeverity = int
-
-const (
-	// Hint is marker severity from monaco-editor
-	Hint = MarkerSeverity(1)
-	// Info is marker severity from monaco-editor
-	Info = MarkerSeverity(2)
-	// Warning is marker severity from monaco-editor
-	Warning = MarkerSeverity(3)
-	// Error is marker severity from monaco-editor
-	Error = MarkerSeverity(8)
+	"github.com/x1unix/go-playground/pkg/monaco"
 )
 
-// MarkerData is a structure defining a problem/warning/etc.
-// Equivalent to IMarkerData in 'monaco-editor'
-type MarkerData struct {
-	// Severity is marker severity
-	Severity MarkerSeverity `json:"severity"`
-	// StartLineNumber is start line number
-	StartLineNumber int `json:"startLineNumber"`
-	// StartColumn is start column
-	StartColumn int `json:"startColumn"`
-	// EndLineNumber is end line number
-	EndLineNumber int `json:"endLineNumber"`
-	// EndColumn is end column
-	EndColumn int `json:"endColumn"`
-	// Message is marker message
-	Message string `json:"message"`
-}
-
-func errorsListToMarkers(errList scanner.ErrorList) []MarkerData {
-	markers := make([]MarkerData, 0, len(errList))
+func errorsListToMarkers(errList scanner.ErrorList) []monaco.MarkerData {
+	markers := make([]monaco.MarkerData, 0, len(errList))
 	for _, err := range errList {
-		markers = append(markers, MarkerData{
-			Severity:        Error,
+		markers = append(markers, monaco.MarkerData{
+			Severity:        monaco.Error,
 			Message:         err.Msg,
 			StartLineNumber: err.Pos.Line,
 			EndLineNumber:   err.Pos.Line,
@@ -56,5 +29,5 @@ type Result struct {
 	HasErrors bool `json:"hasErrors"`
 
 	// Markers is list of marker data
-	Markers []MarkerData `json:"markers"`
+	Markers []monaco.MarkerData `json:"markers"`
 }

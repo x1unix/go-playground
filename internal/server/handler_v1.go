@@ -3,14 +3,13 @@ package server
 import (
 	"context"
 	"errors"
-	"fmt"
+	"github.com/x1unix/go-playground/pkg/monaco"
 	"io"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/x1unix/go-playground/internal/analyzer"
 	"github.com/x1unix/go-playground/internal/builder"
 	"github.com/x1unix/go-playground/internal/builder/storage"
 	"github.com/x1unix/go-playground/pkg/goplay"
@@ -22,7 +21,6 @@ const (
 	// limit for wasm compile requests per second (250ms per request)
 	compileRequestsPerFrame = 4
 	frameTime               = time.Second
-	maxBuildTimeDuration    = time.Second * 30
 
 	wasmMimeType     = "application/wasm"
 	artifactParamVal = "artifactId"
@@ -38,7 +36,6 @@ type BackendVersionProvider interface {
 type APIv1Handler struct {
 	config          ServiceConfig
 	log             *zap.SugaredLogger
-	index           analyzer.PackageIndex
 	compiler        builder.BuildService
 	versionProvider BackendVersionProvider
 
@@ -51,13 +48,12 @@ type ServiceConfig struct {
 }
 
 // NewAPIv1Handler is APIv1Handler constructor
-func NewAPIv1Handler(cfg ServiceConfig, client *goplay.Client, packages []*analyzer.Package, builder builder.BuildService) *APIv1Handler {
+func NewAPIv1Handler(cfg ServiceConfig, client *goplay.Client, builder builder.BuildService) *APIv1Handler {
 	return &APIv1Handler{
 		config:          cfg,
 		compiler:        builder,
 		client:          client,
 		log:             zap.S().Named("api.v1"),
-		index:           analyzer.BuildPackageIndex(packages),
 		versionProvider: NewBackendVersionService(zap.L(), client, VersionCacheTTL),
 		limiter:         rate.NewLimiter(rate.Every(frameTime), compileRequestsPerFrame),
 	}
@@ -72,72 +68,9 @@ func (s *APIv1Handler) Mount(r *mux.Router) {
 	r.Path("/artifacts/{artifactId:[a-fA-F0-9]+}.wasm").Methods(http.MethodGet).
 		HandlerFunc(WrapHandler(s.HandleArtifactRequest))
 
-	// TODO: remove suggest in the next release
+	// TODO: remove endpoint in the next release
 	r.Path("/suggest").
 		HandlerFunc(WrapHandler(DeprecatedEndpoint(s.HandleGetSuggestion, apiv1SunsetDate)))
-
-	// TODO: remove deprecated apis below
-	r.Path("/run").Methods(http.MethodPost).
-		HandlerFunc(WrapHandler(DeprecatedEndpoint(s.HandleRunCode, apiv1SunsetDate)))
-	r.Path("/compile").Methods(http.MethodPost).
-		HandlerFunc(WrapHandler(DeprecatedEndpoint(s.HandleCompile, apiv1SunsetDate)))
-	r.Path("/format").Methods(http.MethodPost).
-		HandlerFunc(WrapHandler(DeprecatedEndpoint(s.HandleFormatCode, apiv1SunsetDate)))
-	r.Path("/share").Methods(http.MethodPost).
-		HandlerFunc(WrapHandler(DeprecatedEndpoint(s.HandleShare, apiv1SunsetDate)))
-	r.Path("/snippet/{id}").Methods(http.MethodGet).
-		HandlerFunc(WrapHandler(DeprecatedEndpoint(s.HandleGetSnippet, apiv1SunsetDate)))
-}
-
-func (s *APIv1Handler) lookupBuiltin(val string) (*SuggestionsResponse, error) {
-	// Package or built-in lookup
-	pkg, ok := s.index.PackageByName("builtin")
-	if !ok {
-		return nil, fmt.Errorf("failed to find %q package and it's weird", "builtin")
-	}
-
-	if err := pkg.Analyze(); err != nil {
-		return nil, fmt.Errorf("failed to analyze builtin package: %s", err)
-	}
-
-	// Lookup in built-in functions and them package names
-	resp := SuggestionsResponse{
-		Suggestions: pkg.SymbolByChar(val),
-	}
-
-	resp.Suggestions = append(resp.Suggestions, s.index.Match(val)...)
-	return &resp, nil
-}
-
-func (s *APIv1Handler) provideSuggestion(req SuggestionRequest) (*SuggestionsResponse, error) {
-	// Provide package suggestions (if requested)
-	if req.PackageName != "" {
-		pkg, ok := s.index.PackageByName(req.PackageName)
-		if !ok {
-			return nil, fmt.Errorf("package %q doesn't exists in index", req.PackageName)
-		}
-
-		if err := pkg.Analyze(); err != nil {
-			return nil, fmt.Errorf("failed to analyze package %q: %s", req.PackageName, err)
-		}
-
-		var symbols []*analyzer.CompletionItem
-		if req.Value != "" {
-			symbols = pkg.SymbolByChar(req.Value)
-		} else {
-			symbols = pkg.AllSymbols()
-		}
-
-		return &SuggestionsResponse{
-			Suggestions: symbols,
-		}, nil
-	}
-
-	if req.Value == "" {
-		return nil, fmt.Errorf("empty suggestion request value, nothing to provide")
-	}
-
-	return s.lookupBuiltin(req.Value)
 }
 
 // HandleGetVersion handles /api/version
@@ -148,40 +81,10 @@ func (s *APIv1Handler) HandleGetVersion(w http.ResponseWriter, _ *http.Request) 
 
 // HandleGetSuggestion handles code suggestion
 func (s *APIv1Handler) HandleGetSuggestion(w http.ResponseWriter, r *http.Request) error {
-	q := r.URL.Query()
-	value := q.Get("value")
-	pkgName := q.Get("packageName")
-
-	resp, err := s.provideSuggestion(SuggestionRequest{PackageName: pkgName, Value: value})
-	if err != nil {
-		return err
+	resp := SuggestionsResponse{
+		Suggestions: []monaco.CompletionItem{},
 	}
-
 	resp.Write(w)
-	return nil
-}
-
-// HandleFormatCode handles goimports action
-func (s *APIv1Handler) HandleFormatCode(w http.ResponseWriter, r *http.Request) error {
-	src, err := getPayloadFromRequest(r)
-	if err != nil {
-		return err
-	}
-
-	backend, err := backendFromQuery(r.URL.Query())
-	if err != nil {
-		return NewBadRequestError(err)
-	}
-
-	formatted, _, err := s.goImportsCode(r.Context(), src, backend)
-	if err != nil {
-		if goplay.IsCompileError(err) {
-			return NewBadRequestError(err)
-		}
-		return err
-	}
-
-	WriteJSON(w, RunResponse{Formatted: string(formatted)})
 	return nil
 }
 
@@ -226,55 +129,6 @@ func (s *APIv1Handler) HandleGetSnippet(w http.ResponseWriter, r *http.Request) 
 	return nil
 }
 
-// HandleRunCode handles code run
-func (s *APIv1Handler) HandleRunCode(w http.ResponseWriter, r *http.Request) error {
-	ctx := r.Context()
-	src, err := getPayloadFromRequest(r)
-	if err != nil {
-		return err
-	}
-
-	params, err := RunParamsFromQuery(r.URL.Query())
-	if err != nil {
-		return NewBadRequestError(err)
-	}
-
-	var changed bool
-	if params.Format {
-		src, changed, err = s.goImportsCode(ctx, src, params.Backend)
-		if err != nil {
-			if goplay.IsCompileError(err) {
-				return NewHTTPError(http.StatusBadRequest, err)
-			}
-			s.log.Error(err)
-			return err
-		}
-	}
-
-	res, err := s.client.Evaluate(ctx, goplay.CompileRequest{
-		Version: goplay.DefaultVersion,
-		WithVet: params.Vet,
-		Body:    src,
-	}, params.Backend)
-	if err != nil {
-		return err
-	}
-
-	if err := res.HasError(); err != nil {
-		return NewHTTPError(http.StatusBadRequest, err)
-	}
-
-	result := RunResponse{Events: res.Events}
-	if changed {
-		// Return formatted code if goimports had any effect
-		result.Formatted = string(src)
-	}
-
-	s.log.Debugw("response from compiler", "res", res)
-	WriteJSON(w, result)
-	return nil
-}
-
 func (s *APIv1Handler) HandleGetVersions(w http.ResponseWriter, r *http.Request) error {
 	versions, err := s.versionProvider.GetVersions(r.Context())
 	if err != nil {
@@ -313,82 +167,4 @@ func (s *APIv1Handler) HandleArtifactRequest(w http.ResponseWriter, r *http.Requ
 	}
 
 	return nil
-}
-
-// HandleCompile handles WASM build request
-func (s *APIv1Handler) HandleCompile(w http.ResponseWriter, r *http.Request) error {
-	// Limit for request timeout
-	ctx, cancel := context.WithDeadline(r.Context(), time.Now().Add(maxBuildTimeDuration))
-	defer cancel()
-
-	// Wait for our queue in line for compilation
-	if err := s.limiter.Wait(ctx); err != nil {
-		return NewHTTPError(http.StatusTooManyRequests, err)
-	}
-
-	src, err := getPayloadFromRequest(r)
-	if err != nil {
-		return err
-	}
-
-	params, err := RunParamsFromQuery(r.URL.Query())
-	if err != nil {
-		return NewBadRequestError(err)
-	}
-
-	var changed bool
-	if params.Format {
-		src, changed, err = s.goImportsCode(r.Context(), src, params.Backend)
-		if err != nil {
-			if goplay.IsCompileError(err) {
-				return NewHTTPError(http.StatusBadRequest, err)
-			}
-			s.log.Error(err)
-			return err
-		}
-	}
-
-	result, err := s.compiler.Build(ctx, blobToFiles(src))
-	if builder.IsBuildError(err) {
-		return NewHTTPError(http.StatusBadRequest, err)
-	}
-	if err != nil {
-		return err
-	}
-
-	resp := BuildResponseV1{FileName: result.FileName}
-	if changed {
-		// Return formatted code if goimports had any effect
-		resp.Formatted = string(src)
-	}
-
-	WriteJSON(w, resp)
-	return nil
-}
-
-// goImportsCode reads code from request and performs "goimports" on it
-// if any error occurs, it sends error response to client and closes connection
-//
-// if "format" url query param is undefined or set to "false", just returns code as is
-func (s *APIv1Handler) goImportsCode(ctx context.Context, src []byte, backend goplay.Backend) ([]byte, bool, error) {
-	resp, err := s.client.GoImports(ctx, src, backend)
-	if err != nil {
-		if isContentLengthError(err) {
-			return nil, false, ErrSnippetTooLarge
-		}
-
-		s.log.Error(err)
-		return nil, false, err
-	}
-
-	if err = resp.HasError(); err != nil {
-		return nil, false, err
-	}
-
-	changed := resp.Body != string(src)
-	return []byte(resp.Body), changed, nil
-}
-
-func blobToFiles(blob []byte) map[string][]byte {
-	return map[string][]byte{"main.go": blob}
 }

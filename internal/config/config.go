@@ -67,9 +67,6 @@ type BuildConfig struct {
 	// BuildDir is path to directory to cache WebAssembly builds
 	BuildDir string `envconfig:"APP_BUILD_DIR" json:"buildDir"`
 
-	// PackagesFile is path to packages JSON index file
-	PackagesFile string `envconfig:"APP_PKG_FILE" json:"packagesFile"`
-
 	// CleanupInterval is WebAssembly build artifact cache clean interval
 	CleanupInterval time.Duration `envconfig:"APP_CLEAN_INTERVAL" json:"cleanupInterval"`
 
@@ -87,7 +84,6 @@ type BuildConfig struct {
 }
 
 func (cfg *BuildConfig) mountFlagSet(f *flag.FlagSet) {
-	f.StringVar(&cfg.PackagesFile, "f", "packages.json", "Path to packages index JSON file")
 	f.StringVar(&cfg.BuildDir, "wasm-build-dir", os.TempDir(), "Directory for WASM builds")
 	f.BoolVar(&cfg.SkipModuleCleanup, "skip-mod-clean", false, "Skip Go module cache cleanup")
 	f.DurationVar(&cfg.CleanupInterval, "clean-interval", DefaultCleanInterval, "Build directory cleanup interval")
