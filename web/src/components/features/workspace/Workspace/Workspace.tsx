@@ -152,4 +152,6 @@ const Workspace: React.FC<Props> = ({ dispatch, files, selectedFile, snippet }) 
   )
 }
 
-export const ConnectedWorkspace = connect<WorkspaceState, {}>(({ workspace }) => ({ ...workspace }))(Workspace)
+const ConnectedWorkspace = connect<WorkspaceState, {}>(({ workspace }) => ({ ...workspace }))(Workspace)
+
+export default ConnectedWorkspace

@@ -1,1 +1,1 @@
-export * from './Workspace'
+export * from './LazyLoadedWorkspace'

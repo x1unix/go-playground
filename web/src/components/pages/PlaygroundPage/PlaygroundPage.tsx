@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import { dispatchPanelLayoutChange } from '~/store'
 import { dispatchLoadSnippet } from '~/store/workspace'
 import { Header } from '~/components/layout/Header'
-import { ConnectedWorkspace } from '~/components/features/workspace/Workspace'
 import { InspectorPanel } from '~/components/features/inspector/InspectorPanel/InspectorPanel'
 import { NotificationHost } from '~/components/modals/Notification'
 import { Layout } from '~/components/layout/Layout/Layout'
@@ -14,6 +13,7 @@ import { computeSizePercentage } from './utils'
 
 import styles from './PlaygroundPage.module.css'
 import { ConfirmProvider } from '~/components/modals/ConfirmModal'
+import { LazyLoadedWorkspace } from '~/components/features/workspace/Workspace'
 
 interface PageParams {
   snippetID: string
@@ -31,7 +31,7 @@ export const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }
       <Header />
       <Layout layout={panelProps.layout}>
         <ConfirmProvider>
-          <ConnectedWorkspace />
+          <LazyLoadedWorkspace />
           <InspectorPanel
             {...panelProps}
             onLayoutChange={(layout) => {
