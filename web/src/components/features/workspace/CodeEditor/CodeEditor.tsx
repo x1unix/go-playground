@@ -19,9 +19,10 @@ import type { VimState } from '~/store/vim/state'
 import { spawnLanguageWorker } from '~/workers/language'
 import { getTimeNowUsageMarkers, asyncDebounce, debounce } from './utils/utils'
 import { attachCustomCommands } from './utils/commands'
-import { languageFromFilename, stateToOptions } from './utils/props'
+import { stateToOptions } from './utils/props'
 import { configureMonacoLoader } from './utils/loader'
 import { DocumentMetadataCache, registerGoLanguageProviders } from './autocomplete'
+import { languageFromFilename, registerExtraLanguages } from './grammar'
 import classes from './CodeEditor.module.css'
 
 const ANALYZE_DEBOUNCE_TIME = 500
@@ -74,6 +75,7 @@ class CodeEditorView extends React.Component<Props> {
   editorDidMount(editorInstance: monaco.editor.IStandaloneCodeEditor, monacoInstance: Monaco) {
     const [langWorker, workerDisposer] = spawnLanguageWorker()
 
+    this.addDisposer(registerExtraLanguages())
     this.addDisposer(workerDisposer)
     this.addDisposer(...registerGoLanguageProviders(this.props.dispatch, this.metadataCache, langWorker))
     this.editorInstance = editorInstance

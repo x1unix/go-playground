@@ -2,8 +2,6 @@ import type * as monaco from 'monaco-editor'
 import { type MonacoSettings } from '~/services/config'
 import { getFontFamily, getDefaultFontFamily } from '~/services/fonts'
 
-export const languageFromFilename = (fname: string) => (fname.endsWith('.mod') ? 'gomod' : 'go')
-
 // stateToOptions converts MonacoState to IEditorOptions
 export const stateToOptions = (state: MonacoSettings): monaco.editor.IEditorOptions => {
   // fontSize here is intentionally ignored as monaco-editor starts to infinitly change
