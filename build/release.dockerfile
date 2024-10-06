@@ -35,10 +35,8 @@ ENV APP_CLEAN_INTERVAL=10m
 ENV APP_DEBUG=false
 ENV APP_PLAYGROUND_URL='https://go.dev/_'
 ENV APP_GTAG_ID=''
-COPY data ./data
 COPY web/build ./public
 COPY --from=build /tmp/playground/server .
 EXPOSE 8000
 ENTRYPOINT /opt/playground/server \
-    -f='/opt/playground/data/packages.json' \
     -addr=:8000
