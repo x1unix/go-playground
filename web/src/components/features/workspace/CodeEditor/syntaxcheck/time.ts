@@ -34,6 +34,7 @@ export const getTimeNowUsageMarkers = (model: monaco.editor.ITextModel): monaco.
         value: 'More information',
         target: issueUrl,
       },
+      modelVersionId: model.getVersionId(),
       severity: monaco.MarkerSeverity.Warning,
       message: timeNowUsageWarning,
       startLineNumber: lineNumber,

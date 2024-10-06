@@ -55,6 +55,7 @@ export class GoSyntaxChecker implements monaco.IDisposable {
     try {
       const response = await this.worker.checkSyntaxErrors({
         fileName,
+        modelVersionId: model.getVersionId(),
         contents: model.getValue(),
       })
 
