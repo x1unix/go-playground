@@ -30,7 +30,7 @@ FROM golang:${GO_VERSION}-alpine AS production
 ARG GO_VERSION
 ARG WASM_API_VER
 WORKDIR /opt/playground
-ENV GOROOT /usr/local/go
+ENV GOROOT=/usr/local/go
 ENV APP_CLEAN_INTERVAL=10m
 ENV APP_DEBUG=false
 ENV APP_PLAYGROUND_URL='https://go.dev/_'
