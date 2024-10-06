@@ -25,7 +25,6 @@ func TestFromFlags(t *testing.T) {
 		},
 		Build: BuildConfig{
 			BuildDir:          "builddir",
-			PackagesFile:      "pkgfile",
 			CleanupInterval:   1 * time.Hour,
 			BypassEnvVarsList: []string{"FOO", "BAR"},
 			SkipModuleCleanup: true,
@@ -49,7 +48,6 @@ func TestFromFlags(t *testing.T) {
 		"-playground-url=pgurl",
 		"-timeout=2h",
 		"-wasm-build-dir=builddir",
-		"-f=pkgfile",
 		"-clean-interval=1h",
 		"-permit-env-vars=FOO,BAR",
 		"-gtag-id=GA-123456",
@@ -117,7 +115,6 @@ func TestFromEnv(t *testing.T) {
 				},
 				Build: BuildConfig{
 					BuildDir:          "builddir",
-					PackagesFile:      "pkgfile",
 					CleanupInterval:   1 * time.Hour,
 					BypassEnvVarsList: []string{"FOO", "BAR"},
 					SkipModuleCleanup: true,
@@ -141,7 +138,6 @@ func TestFromEnv(t *testing.T) {
 				"APP_PLAYGROUND_URL":      "pgurl",
 				"APP_PLAYGROUND_TIMEOUT":  "2h",
 				"APP_BUILD_DIR":           "builddir",
-				"APP_PKG_FILE":            "pkgfile",
 				"APP_CLEAN_INTERVAL":      "1h",
 				"APP_PERMIT_ENV_VARS":     "FOO,BAR",
 				"APP_GTAG_ID":             "GA-123456",
