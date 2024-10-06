@@ -1,8 +1,7 @@
 import type * as monaco from 'monaco-editor'
 import type { ImportsContext } from '~/workers/language/types'
 import { buildImportContext } from './parser/imports'
-
-const stripSlash = (str: string) => (str[0] === '/' ? str.slice(1) : str)
+import { stripSlash } from './utils'
 
 /**
  * Stores document metadata (such as symbols, imports) in cache.

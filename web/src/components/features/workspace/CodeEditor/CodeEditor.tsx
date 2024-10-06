@@ -4,28 +4,19 @@ import MonacoEditor, { type Monaco } from '@monaco-editor/react'
 import * as monaco from 'monaco-editor'
 
 import { createVimModeAdapter, type StatusBarAdapter, type VimModeKeymap } from '~/plugins/vim/editor'
-import { Analyzer } from '~/services/analyzer'
 import { type MonacoSettings, TargetType } from '~/services/config'
-import {
-  connect,
-  newMarkerAction,
-  newMonacoParamsChangeDispatcher,
-  runFileDispatcher,
-  type StateDispatch,
-  type State,
-} from '~/store'
-import { type WorkspaceState, dispatchFormatFile, dispatchResetWorkspace, dispatchUpdateFile } from '~/store/workspace'
+import { connect, newMonacoParamsChangeDispatcher, type StateDispatch, type State } from '~/store'
+import { type WorkspaceState, dispatchUpdateFile } from '~/store/workspace'
 import type { VimState } from '~/store/vim/state'
 import { spawnLanguageWorker } from '~/workers/language'
-import { getTimeNowUsageMarkers, asyncDebounce, debounce } from './utils/utils'
-import { attachCustomCommands } from './utils/commands'
+import { GoSyntaxChecker } from './syntaxcheck'
+import { debounce } from './utils/utils'
+import { attachCustomCommands, registerEditorActions } from './utils/commands'
 import { stateToOptions } from './utils/props'
 import { configureMonacoLoader } from './utils/loader'
 import { DocumentMetadataCache, registerGoLanguageProviders } from './autocomplete'
 import { languageFromFilename, registerExtraLanguages } from './grammar'
 import classes from './CodeEditor.module.css'
-
-const ANALYZE_DEBOUNCE_TIME = 500
 
 // ask monaco-editor/react to use our own Monaco instance.
 configureMonacoLoader()
@@ -47,18 +38,14 @@ export interface Props extends CodeEditorState {
 }
 
 class CodeEditorView extends React.Component<Props> {
-  private analyzer?: Analyzer
-  private editorInstance?: monaco.editor.IStandaloneCodeEditor
+  private syntaxChecker?: GoSyntaxChecker
+  private editor?: monaco.editor.IStandaloneCodeEditor
   private vimAdapter?: VimModeKeymap
   private vimCommandAdapter?: StatusBarAdapter
   private monaco?: Monaco
   private saveTimeoutId?: ReturnType<typeof setTimeout>
   private readonly disposables: monaco.IDisposable[] = []
   private readonly metadataCache = new DocumentMetadataCache()
-
-  private readonly debouncedAnalyzeFunc = asyncDebounce(async (fileName: string, code: string) => {
-    return await this.doAnalyze(fileName, code)
-  }, ANALYZE_DEBOUNCE_TIME)
 
   private addDisposer(...disposers: monaco.IDisposable[]) {
     this.disposables.push(...disposers)
@@ -72,17 +59,17 @@ class CodeEditorView extends React.Component<Props> {
     )
   }, 1000)
 
-  editorDidMount(editorInstance: monaco.editor.IStandaloneCodeEditor, monacoInstance: Monaco) {
+  editorDidMount(editor: monaco.editor.IStandaloneCodeEditor, monacoInstance: Monaco) {
+    this.syntaxChecker = new GoSyntaxChecker(this.props.dispatch)
     const [langWorker, workerDisposer] = spawnLanguageWorker()
 
-    this.addDisposer(registerExtraLanguages())
-    this.addDisposer(workerDisposer)
+    this.addDisposer(workerDisposer, this.syntaxChecker, registerExtraLanguages())
     this.addDisposer(...registerGoLanguageProviders(this.props.dispatch, this.metadataCache, langWorker))
-    this.editorInstance = editorInstance
+    this.editor = editor
     this.monaco = monacoInstance
 
-    editorInstance.onKeyDown((e) => this.onKeyDown(e))
-    const [vimAdapter, statusAdapter] = createVimModeAdapter(this.props.dispatch, editorInstance)
+    editor.onKeyDown((e) => this.onKeyDown(e))
+    const [vimAdapter, statusAdapter] = createVimModeAdapter(this.props.dispatch, editor)
     this.vimAdapter = vimAdapter
     this.vimCommandAdapter = statusAdapter
 
@@ -90,7 +77,7 @@ class CodeEditorView extends React.Component<Props> {
     // by zoom and editor config object is updated - this cause infinite
     // font change calls with random values.
     if (this.props.options.fontSize) {
-      editorInstance.updateOptions({
+      editor.updateOptions({
         fontSize: this.props.options.fontSize,
       })
     }
@@ -100,58 +87,28 @@ class CodeEditorView extends React.Component<Props> {
       this.vimAdapter.attach()
     }
 
-    if (Analyzer.supported()) {
-      this.analyzer = new Analyzer()
-    } else {
-      console.info('Analyzer requires WebAssembly support')
-    }
-
-    const actions = [
-      {
-        id: 'clear',
-        label: 'Reset contents',
-        contextMenuGroupId: 'navigation',
-        run: () => {
-          this.props.dispatch(dispatchResetWorkspace)
-        },
-      },
-      {
-        id: 'run-code',
-        label: 'Build And Run Code',
-        contextMenuGroupId: 'navigation',
-        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
-        run: () => {
-          this.props.dispatch(runFileDispatcher)
-        },
-      },
-      {
-        id: 'format-code',
-        label: 'Format Code (goimports)',
-        contextMenuGroupId: 'navigation',
-        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF],
-        run: () => {
-          this.props.dispatch(dispatchFormatFile())
-        },
-      },
-    ]
-
     // Persist font size on zoom
     this.addDisposer(
-      editorInstance.onDidChangeConfiguration((e) => {
+      editor.onDidChangeConfiguration((e) => {
         if (e.hasChanged(monaco.editor.EditorOption.fontSize)) {
-          const newFontSize = editorInstance.getOption(monaco.editor.EditorOption.fontSize)
+          const newFontSize = editor.getOption(monaco.editor.EditorOption.fontSize)
           this.persistFontSize(newFontSize)
         }
       }),
     )
 
     // Register custom actions
-    actions.forEach((action) => editorInstance.addAction(action))
-    attachCustomCommands(editorInstance)
-    editorInstance.focus()
+    registerEditorActions(editor, this.props.dispatch)
+    attachCustomCommands(editor)
+    editor.focus()
 
-    const { fileName, code } = this.props
-    void this.debouncedAnalyzeFunc(fileName, code)
+    this.updateModelMarkers()
+  }
+
+  private updateModelMarkers() {
+    this.syntaxChecker?.requestModelMarkers(this.editor?.getModel(), this.editor, {
+      isServerEnvironment: this.props.isServerEnvironment,
+    })
   }
 
   private isFileOrEnvironmentChanged(prevProps: Props) {
@@ -182,7 +139,7 @@ class CodeEditorView extends React.Component<Props> {
 
     if (this.isFileOrEnvironmentChanged(prevProps)) {
       // Update editor markers on file or environment changes
-      void this.debouncedAnalyzeFunc(this.props.fileName, this.props.code)
+      this.updateModelMarkers()
     }
 
     this.applyVimModeChanges(prevProps)
@@ -190,18 +147,17 @@ class CodeEditorView extends React.Component<Props> {
 
   componentWillUnmount() {
     this.disposables?.forEach((d) => d.dispose())
-    this.analyzer?.dispose()
     this.vimAdapter?.dispose()
     this.metadataCache.flush()
 
-    if (!this.editorInstance) {
+    if (!this.editor) {
       return
     }
 
     // Shutdown instance to avoid dangling markers.
-    this.monaco?.editor.removeAllMarkers(this.editorInstance.getId())
+    this.monaco?.editor.removeAllMarkers(this.editor.getId())
     this.monaco?.editor.getModels().forEach((m) => m.dispose())
-    this.editorInstance.dispose()
+    this.editor.dispose()
   }
 
   onChange(newValue: string | undefined, e: monaco.editor.IModelContentChangedEvent) {
@@ -210,9 +166,9 @@ class CodeEditorView extends React.Component<Props> {
       return
     }
 
-    const { fileName, code } = this.props
+    const { fileName } = this.props
     this.metadataCache.handleUpdate(fileName, e)
-    void this.debouncedAnalyzeFunc(fileName, code)
+    this.updateModelMarkers()
 
     // HACK: delay state updates to workaround cursor reset on completion.
     //
@@ -229,36 +185,6 @@ class CodeEditorView extends React.Component<Props> {
     this.saveTimeoutId = setTimeout(() => {
       this.props.dispatch(dispatchUpdateFile(fileName, newValue))
     }, 100)
-  }
-
-  private async doAnalyze(fileName: string, code: string) {
-    if (!fileName.endsWith('.go')) {
-      // Ignore non-go files
-      return
-    }
-
-    // Code analysis contains 2 steps that run on different conditions:
-    // 1. Run Go worker if it's available and check for errors
-    // 2. Add warnings to `time.Now` calls if code runs on server.
-    const promises = [
-      this.analyzer?.getMarkers(code) ?? null,
-      this.props.isServerEnvironment ? Promise.resolve(getTimeNowUsageMarkers(code, this.editorInstance!)) : null,
-    ].filter((p) => !!p)
-
-    const results = await Promise.allSettled(promises)
-    const markers = results.flatMap((r) => {
-      // Can't do in beautiful way due of TS strict checks.
-      if (r.status === 'rejected') {
-        console.error(r.reason)
-        return []
-      }
-
-      return r.value ?? []
-    })
-
-    if (!this.editorInstance) return
-    this.monaco?.editor.setModelMarkers(this.editorInstance.getModel()!, this.editorInstance.getId(), markers)
-    this.props.dispatch(newMarkerAction(fileName, markers))
   }
 
   private onKeyDown(e: monaco.IKeyboardEvent) {
