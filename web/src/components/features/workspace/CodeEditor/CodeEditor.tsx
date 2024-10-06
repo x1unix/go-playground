@@ -17,10 +17,10 @@ import {
 import { type WorkspaceState, dispatchFormatFile, dispatchResetWorkspace, dispatchUpdateFile } from '~/store/workspace'
 import type { VimState } from '~/store/vim/state'
 import { spawnLanguageWorker } from '~/workers/language'
-import { getTimeNowUsageMarkers, asyncDebounce, debounce } from './utils'
-import { attachCustomCommands } from './commands'
-import { LANGUAGE_GOLANG, stateToOptions } from './props'
-import { configureMonacoLoader } from './loader'
+import { getTimeNowUsageMarkers, asyncDebounce, debounce } from './utils/utils'
+import { attachCustomCommands } from './utils/commands'
+import { LANGUAGE_GOLANG, stateToOptions } from './utils/props'
+import { configureMonacoLoader } from './utils/loader'
 import { DocumentMetadataCache, registerGoLanguageProviders } from './autocomplete'
 import classes from './CodeEditor.module.css'
 
@@ -29,7 +29,7 @@ const ANALYZE_DEBOUNCE_TIME = 500
 // ask monaco-editor/react to use our own Monaco instance.
 configureMonacoLoader()
 
-interface CodeEditorState {
+export interface CodeEditorState {
   code?: string
   loading?: boolean
   fileName: string
@@ -41,11 +41,11 @@ interface CodeEditorState {
   vim?: VimState | null
 }
 
-interface Props extends CodeEditorState {
+export interface Props extends CodeEditorState {
   dispatch: StateDispatch
 }
 
-class CodeEditor extends React.Component<Props> {
+class CodeEditorView extends React.Component<Props> {
   private analyzer?: Analyzer
   private editorInstance?: monaco.editor.IStandaloneCodeEditor
   private vimAdapter?: VimModeKeymap
@@ -314,4 +314,4 @@ const mapWorkspaceProps = ({ files, selectedFile, snippet }: WorkspaceState) => 
   }
 }
 
-export const ConnectedCodeEditor = connect<CodeEditorState, {}>(mapStateToProps)(CodeEditor)
+export const CodeEditor = connect<CodeEditorState, {}>(mapStateToProps)(CodeEditorView)

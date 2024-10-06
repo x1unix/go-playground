@@ -1,6 +1,6 @@
 import type * as monaco from 'monaco-editor'
 import type { SuggestionContext, SuggestionQuery } from '~/workers/language'
-import { asyncDebounce } from '../../utils'
+import { asyncDebounce } from '../../utils/utils'
 import snippets from './snippets'
 import { parseExpression } from './parse'
 import { CacheBasedCompletionProvider } from '../base'

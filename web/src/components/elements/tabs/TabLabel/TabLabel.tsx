@@ -11,7 +11,7 @@ import {
   type IStackStyles,
   type IButtonStyles,
 } from '@fluentui/react'
-import type { TabIconStyles } from '../types.ts'
+import type { TabIconStyles } from '../types'
 
 const BUTTON_PRIMARY = 0
 const BUTTON_WHEEL = 1
