@@ -1,10 +1,10 @@
-import React, { Suspense } from 'react'
+import React, { type PropsWithChildren, Suspense } from 'react'
 import { type IStackStyles, mergeStyleSets, Spinner, Stack, useTheme } from '@fluentui/react'
 import { Poster } from '../Poster'
 
-interface ContainerProps {
+type ContainerProps = PropsWithChildren<{
   styles?: IStackStyles
-}
+}>
 
 const SuspenseContainer: React.FC<ContainerProps> = ({ children, styles }) => {
   const theme = useTheme()
@@ -60,7 +60,7 @@ interface State {
   error?: Error
 }
 
-export class SuspenseBoundary extends React.Component<SuspenseProps, State> {
+export class SuspenseBoundary extends React.Component<PropsWithChildren<SuspenseProps>, State> {
   state: State = {}
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
