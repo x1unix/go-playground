@@ -1,13 +1,8 @@
 import React, { useState, useMemo, useRef } from 'react'
 import { useTheme } from '@fluentui/react'
-import { type StateDispatch, connect } from '~/store'
-import {
-  type WorkspaceState,
-  dispatchCreateFile,
-  dispatchRemoveFile,
-  dispatchImportFile,
-  newFileSelectAction,
-} from '~/store/workspace'
+import { useDispatch, useSelector } from 'react-redux'
+import { type State } from '~/store'
+import { dispatchCreateFile, dispatchRemoveFile, dispatchImportFile, newFileSelectAction } from '~/store/workspace'
 
 import { TabView } from '~/components/elements/tabs/TabView'
 import type { TabBarAction, TabIconStyles } from '~/components/elements/tabs/types'
@@ -19,11 +14,9 @@ import { ContentPlaceholder } from '../ContentPlaceholder'
 import { newEmptyFileContent } from './utils'
 import { useConfirmModal } from '~/components/modals/ConfirmModal'
 
-interface Props extends WorkspaceState {
-  dispatch: StateDispatch
-}
-
-const Workspace: React.FC<Props> = ({ dispatch, files, selectedFile, snippet }) => {
+const Workspace: React.FC = () => {
+  const dispatch = useDispatch()
+  const { files, selectedFile, snippet } = useSelector<State, State['workspace']>((state) => state.workspace)
   const { palette, semanticColors } = useTheme()
   const uploadRef = useRef<HTMLInputElement>(null)
   const [modalOpen, setModalOpen] = useState(false)
@@ -152,6 +145,4 @@ const Workspace: React.FC<Props> = ({ dispatch, files, selectedFile, snippet }) 
   )
 }
 
-const ConnectedWorkspace = connect<WorkspaceState, {}>(({ workspace }) => ({ ...workspace }))(Workspace)
-
-export default ConnectedWorkspace
+export default Workspace
