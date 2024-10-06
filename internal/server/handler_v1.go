@@ -168,30 +168,3 @@ func (s *APIv1Handler) HandleArtifactRequest(w http.ResponseWriter, r *http.Requ
 
 	return nil
 }
-
-// goImportsCode reads code from request and performs "goimports" on it
-// if any error occurs, it sends error response to client and closes connection
-//
-// if "format" url query param is undefined or set to "false", just returns code as is
-func (s *APIv1Handler) goImportsCode(ctx context.Context, src []byte, backend goplay.Backend) ([]byte, bool, error) {
-	resp, err := s.client.GoImports(ctx, src, backend)
-	if err != nil {
-		if isContentLengthError(err) {
-			return nil, false, ErrSnippetTooLarge
-		}
-
-		s.log.Error(err)
-		return nil, false, err
-	}
-
-	if err = resp.HasError(); err != nil {
-		return nil, false, err
-	}
-
-	changed := resp.Body != string(src)
-	return []byte(resp.Body), changed, nil
-}
-
-func blobToFiles(blob []byte) map[string][]byte {
-	return map[string][]byte{"main.go": blob}
-}
