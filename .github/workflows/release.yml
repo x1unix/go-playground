@@ -73,7 +73,21 @@ jobs:
         with:
           node-version: "${{env.NODE_VERSION}}"
 
-      - run: |
+      - name: Setup dependencies
+        run: sudo apt-get update && sudo apt-get install -y make
+
+      - name: Setup Go ${{ env.GO_VERSION }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: |
+            go.sum
+
+      - name: Build generated frontend files
+        run: make ci-assets
+
+      - name: Build frontend
+        run: |
           yarn install --silent && yarn build
         working-directory: ./web
         env:
