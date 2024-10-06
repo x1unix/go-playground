@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"github.com/x1unix/go-playground/pkg/monaco"
 	"io"
 	"net/http"
 	"strconv"
@@ -80,7 +81,9 @@ func (s *APIv1Handler) HandleGetVersion(w http.ResponseWriter, _ *http.Request) 
 
 // HandleGetSuggestion handles code suggestion
 func (s *APIv1Handler) HandleGetSuggestion(w http.ResponseWriter, r *http.Request) error {
-	resp := SuggestionsResponse{}
+	resp := SuggestionsResponse{
+		Suggestions: []monaco.CompletionItem{},
+	}
 	resp.Write(w)
 	return nil
 }
