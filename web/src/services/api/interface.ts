@@ -1,9 +1,6 @@
-import type { AxiosInstance } from 'axios'
 import type { VersionResponse, RunResponse, BuildResponse, ShareResponse, VersionsInfo, FilesPayload } from './models'
 
 export interface IAPIClient {
-  readonly axiosClient: AxiosInstance
-
   getVersion: () => Promise<VersionResponse>
 
   run: (files: Record<string, string>, vet: boolean) => Promise<RunResponse>

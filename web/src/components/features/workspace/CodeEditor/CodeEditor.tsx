@@ -12,14 +12,16 @@ import {
   newMonacoParamsChangeDispatcher,
   runFileDispatcher,
   type StateDispatch,
+  type State,
 } from '~/store'
 import { type WorkspaceState, dispatchFormatFile, dispatchResetWorkspace, dispatchUpdateFile } from '~/store/workspace'
-import { getTimeNowUsageMarkers, asyncDebounce, debounce } from './utils'
-import { attachCustomCommands } from './commands'
-import { LANGUAGE_GOLANG, stateToOptions } from './props'
-import { configureMonacoLoader } from './loader'
-import { DocumentMetadataCache, registerGoLanguageProviders } from './autocomplete'
 import type { VimState } from '~/store/vim/state'
+import { spawnLanguageWorker } from '~/workers/language'
+import { getTimeNowUsageMarkers, asyncDebounce, debounce } from './utils/utils'
+import { attachCustomCommands } from './utils/commands'
+import { languageFromFilename, stateToOptions } from './utils/props'
+import { configureMonacoLoader } from './utils/loader'
+import { DocumentMetadataCache, registerGoLanguageProviders } from './autocomplete'
 import classes from './CodeEditor.module.css'
 
 const ANALYZE_DEBOUNCE_TIME = 500
@@ -27,52 +29,39 @@ const ANALYZE_DEBOUNCE_TIME = 500
 // ask monaco-editor/react to use our own Monaco instance.
 configureMonacoLoader()
 
-const mapWorkspaceProps = ({ files, selectedFile, snippet }: WorkspaceState) => {
-  const projectId = snippet?.id ?? ''
-  if (!selectedFile) {
-    return {
-      projectId,
-      code: '',
-      fileName: '',
-    }
-  }
-
-  return {
-    projectId,
-    code: files?.[selectedFile],
-    fileName: selectedFile,
-  }
-}
-
-interface CodeEditorState {
+export interface CodeEditorState {
   code?: string
   loading?: boolean
   fileName: string
   projectId: string
-}
-
-interface Props extends CodeEditorState {
   darkMode: boolean
   vimModeEnabled: boolean
   isServerEnvironment: boolean
   options: MonacoSettings
   vim?: VimState | null
+}
+
+export interface Props extends CodeEditorState {
   dispatch: StateDispatch
 }
 
-class CodeEditor extends React.Component<Props> {
+class CodeEditorView extends React.Component<Props> {
   private analyzer?: Analyzer
   private editorInstance?: monaco.editor.IStandaloneCodeEditor
   private vimAdapter?: VimModeKeymap
   private vimCommandAdapter?: StatusBarAdapter
   private monaco?: Monaco
-  private disposables?: monaco.IDisposable[]
   private saveTimeoutId?: ReturnType<typeof setTimeout>
+  private readonly disposables: monaco.IDisposable[] = []
   private readonly metadataCache = new DocumentMetadataCache()
 
   private readonly debouncedAnalyzeFunc = asyncDebounce(async (fileName: string, code: string) => {
     return await this.doAnalyze(fileName, code)
   }, ANALYZE_DEBOUNCE_TIME)
+
+  private addDisposer(...disposers: monaco.IDisposable[]) {
+    this.disposables.push(...disposers)
+  }
 
   private readonly persistFontSize = debounce((fontSize: number) => {
     this.props.dispatch(
@@ -83,7 +72,10 @@ class CodeEditor extends React.Component<Props> {
   }, 1000)
 
   editorDidMount(editorInstance: monaco.editor.IStandaloneCodeEditor, monacoInstance: Monaco) {
-    this.disposables = registerGoLanguageProviders(this.props.dispatch, this.metadataCache)
+    const [langWorker, workerDisposer] = spawnLanguageWorker()
+
+    this.addDisposer(workerDisposer)
+    this.addDisposer(...registerGoLanguageProviders(this.props.dispatch, this.metadataCache, langWorker))
     this.editorInstance = editorInstance
     this.monaco = monacoInstance
 
@@ -142,7 +134,7 @@ class CodeEditor extends React.Component<Props> {
     ]
 
     // Persist font size on zoom
-    this.disposables.push(
+    this.addDisposer(
       editorInstance.onDidChangeConfiguration((e) => {
         if (e.hasChanged(monaco.editor.EditorOption.fontSize)) {
           const newFontSize = editorInstance.getOption(monaco.editor.EditorOption.fontSize)
@@ -160,13 +152,13 @@ class CodeEditor extends React.Component<Props> {
     void this.debouncedAnalyzeFunc(fileName, code)
   }
 
-  private isFileOrEnvironmentChanged(prevProps) {
+  private isFileOrEnvironmentChanged(prevProps: Props) {
     return (
       prevProps.isServerEnvironment !== this.props.isServerEnvironment || prevProps.fileName !== this.props.fileName
     )
   }
 
-  private applyVimModeChanges(prevProps) {
+  private applyVimModeChanges(prevProps: Props) {
     if (prevProps?.vimModeEnabled === this.props.vimModeEnabled) {
       return
     }
@@ -281,7 +273,7 @@ class CodeEditor extends React.Component<Props> {
     return (
       <MonacoEditor
         className={classes.CodeEditor}
-        language={LANGUAGE_GOLANG}
+        language={languageFromFilename(this.props.fileName)}
         theme={this.props.darkMode ? 'vs-dark' : 'vs-light'}
         value={this.props.code}
         defaultValue={this.props.code}
@@ -295,7 +287,7 @@ class CodeEditor extends React.Component<Props> {
   }
 }
 
-export const ConnectedCodeEditor = connect<CodeEditorState, {}>(({ workspace, ...s }) => ({
+const mapStateToProps = ({ workspace, ...s }: State): CodeEditorState => ({
   ...mapWorkspaceProps(workspace),
   darkMode: s.settings.darkMode,
   vimModeEnabled: s.settings.enableVimMode,
@@ -303,4 +295,23 @@ export const ConnectedCodeEditor = connect<CodeEditorState, {}>(({ workspace, ..
   loading: s.status?.loading,
   options: s.monaco,
   vim: s.vim,
-}))(CodeEditor)
+})
+
+const mapWorkspaceProps = ({ files, selectedFile, snippet }: WorkspaceState) => {
+  const projectId = snippet?.id ?? ''
+  if (!selectedFile) {
+    return {
+      projectId,
+      code: '',
+      fileName: '',
+    }
+  }
+
+  return {
+    projectId,
+    code: files?.[selectedFile],
+    fileName: selectedFile,
+  }
+}
+
+export const CodeEditor = connect<CodeEditorState, {}>(mapStateToProps)(CodeEditorView)

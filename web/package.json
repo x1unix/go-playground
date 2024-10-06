@@ -25,7 +25,6 @@
     "@xterm/addon-image": "^0.7.0-beta.1",
     "@xterm/addon-webgl": "^0.17.0-beta.1",
     "@xterm/xterm": "^5.4.0-beta.1",
-    "axios": "^1.7.4",
     "clsx": "^1.1.1",
     "comlink": "^4.4.1",
     "connected-react-router": "^6.9.2",

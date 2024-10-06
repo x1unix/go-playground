@@ -1,4 +1,3 @@
-import * as axios from 'axios'
 import {
   Backend,
   type VersionResponse,
@@ -11,15 +10,7 @@ import {
 import type { IAPIClient } from './interface'
 
 export class Client implements IAPIClient {
-  private readonly client: axios.AxiosInstance
-
-  get axiosClient() {
-    return this.client
-  }
-
-  constructor(private readonly baseUrl: string) {
-    this.client = axios.default.create({ baseURL: baseUrl })
-  }
+  constructor(private readonly baseUrl: string) {}
 
   async getVersion(): Promise<VersionResponse> {
     return await this.get<VersionResponse>(`/version?=${Date.now()}`)
@@ -60,24 +51,46 @@ export class Client implements IAPIClient {
   }
 
   private async get<T>(uri: string): Promise<T> {
-    try {
-      const resp = await this.client.get<T>(uri)
-      return resp.data
-    } catch (err) {
-      throw Client.extractAPIError(err)
-    }
+    return await this.doRequest<T>(uri, {
+      headers: {
+        Accept: 'application/json',
+      },
+    })
   }
 
-  private async post<T>(uri: string, data: any, cfg?: axios.AxiosRequestConfig): Promise<T> {
-    try {
-      const resp = await this.client.post<T>(uri, data, cfg)
-      return resp.data
-    } catch (err) {
-      throw Client.extractAPIError(err)
-    }
+  private async post<T>(uri: string, data: any): Promise<T> {
+    return await this.doRequest(uri, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
   }
 
-  private static extractAPIError(err: any): Error {
-    return new Error(err?.response?.data?.error ?? err.message)
+  private async doRequest<T>(uri: string, reqInit?: RequestInit): Promise<T> {
+    const reqUrl = this.baseUrl + uri
+    const rsp = await fetch(reqUrl, reqInit)
+    if (rsp.ok) {
+      return (await rsp.json()) as T
+    }
+
+    const isJson = rsp.headers.get('content-type')
+    if (!isJson) {
+      throw new Error(`${rsp.status} ${rsp.statusText}`)
+    }
+
+    let errBody: { error: string }
+    try {
+      errBody = await rsp.json()
+    } catch (_) {
+      // Fallback in case of malformed response
+      errBody = {
+        error: `${rsp.status} ${rsp.statusText}`,
+      }
+    }
+
+    throw new Error(errBody.error)
   }
 }

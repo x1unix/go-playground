@@ -6,7 +6,7 @@ import { TabHeader } from '../TabHeader'
 import type { TabBarAction, TabInfo, TabIconStyles } from '../types'
 
 import { containerStyles, tabHeaderStyles, getTabContentStyles } from './styles'
-import { debounce } from './debounce.ts'
+import { debounce } from './debounce'
 
 interface Props {
   actions?: TabBarAction[]

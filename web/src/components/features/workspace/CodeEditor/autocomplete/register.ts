@@ -5,19 +5,27 @@ import { GoImportsCompletionProvider } from './imports'
 import { GoHoverProvider } from './hover'
 import type { StateDispatch } from '~/store'
 import type { DocumentMetadataCache } from './cache'
-import { getLanguageWorker } from '~/workers/language'
+import type { LanguageWorker } from '~/workers/language'
+
+const LANG_GO = 'go'
 
 /**
  * Registers all Go autocomplete providers for Monaco editor.
  */
-export const registerGoLanguageProviders = (dispatcher: StateDispatch, cache: DocumentMetadataCache) => {
-  const worker = getLanguageWorker()
+export const registerGoLanguageProviders = (
+  dispatcher: StateDispatch,
+  cache: DocumentMetadataCache,
+  langWorker: LanguageWorker,
+) => {
   return [
     monaco.languages.registerCompletionItemProvider(
-      'go',
-      new GoSymbolsCompletionItemProvider(dispatcher, cache, worker),
+      LANG_GO,
+      new GoSymbolsCompletionItemProvider(dispatcher, cache, langWorker),
     ),
-    monaco.languages.registerCompletionItemProvider('go', new GoImportsCompletionProvider(dispatcher, cache, worker)),
-    monaco.languages.registerHoverProvider('go', new GoHoverProvider(worker, cache)),
+    monaco.languages.registerCompletionItemProvider(
+      LANG_GO,
+      new GoImportsCompletionProvider(dispatcher, cache, langWorker),
+    ),
+    monaco.languages.registerHoverProvider(LANG_GO, new GoHoverProvider(langWorker, cache)),
   ]
 }

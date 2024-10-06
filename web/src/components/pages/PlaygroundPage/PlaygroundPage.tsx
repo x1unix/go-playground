@@ -1,25 +1,22 @@
-import React, { useEffect, useRef } from 'react'
+import React, { lazy, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
-import { dispatchPanelLayoutChange } from '~/store'
 import { dispatchLoadSnippet } from '~/store/workspace'
 import { Header } from '~/components/layout/Header'
-import { ConnectedWorkspace } from '~/components/features/workspace/Workspace'
-import { InspectorPanel } from '~/components/features/inspector/InspectorPanel/InspectorPanel'
-import { NotificationHost } from '~/components/modals/Notification'
-import { Layout } from '~/components/layout/Layout/Layout'
 import { ConnectedStatusBar } from '~/components/layout/StatusBar'
-import { computeSizePercentage } from './utils'
 
 import styles from './PlaygroundPage.module.css'
-import { ConfirmProvider } from '~/components/modals/ConfirmModal'
+import { SuspenseBoundary } from '~/components/elements/misc/SuspenseBoundary'
+
+const LazyPlaygroundContent = lazy(async () => await import('./PlaygroundContainer.tsx'))
 
 interface PageParams {
   snippetID: string
 }
 
-export const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }))(({ panelProps, dispatch }: any) => {
+export const PlaygroundPage: React.FC = () => {
+  const dispatch = useDispatch()
   const containerRef = useRef<HTMLDivElement>(null)
   const { snippetID } = useParams<PageParams>()
   useEffect(() => {
@@ -29,31 +26,10 @@ export const PlaygroundPage = connect(({ panel }: any) => ({ panelProps: panel }
   return (
     <div ref={containerRef} className={styles.Playground}>
       <Header />
-      <Layout layout={panelProps.layout}>
-        <ConfirmProvider>
-          <ConnectedWorkspace />
-          <InspectorPanel
-            {...panelProps}
-            onLayoutChange={(layout) => {
-              dispatch(dispatchPanelLayoutChange({ layout }))
-            }}
-            onCollapsed={(collapsed) => {
-              dispatch(dispatchPanelLayoutChange({ collapsed }))
-            }}
-            onResize={(changes) => {
-              if ('height' in changes) {
-                // Height percentage is buggy on resize. Use percents only for width.
-                dispatch(dispatchPanelLayoutChange(changes))
-                return
-              }
-              const result = computeSizePercentage(changes, containerRef.current!)
-              dispatch(dispatchPanelLayoutChange(result))
-            }}
-          />
-          <NotificationHost />
-        </ConfirmProvider>
-      </Layout>
+      <SuspenseBoundary errorLabel="Failed to load workspace" preloaderText="Loading workspace...">
+        <LazyPlaygroundContent parentRef={containerRef} />
+      </SuspenseBoundary>
       <ConnectedStatusBar />
     </div>
   )
-})
+}
