@@ -49,7 +49,7 @@ const modalStyles = {
 const pivotStyles: Partial<IPivotStyles> = {
   itemContainer: {
     // Set height to highest of pivots. See: #371
-    minHeight: 490,
+    minHeight: 567,
   },
 }
 
@@ -219,6 +219,25 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
                   defaultSelectedKey={this.props.monaco?.cursorStyle}
                   onChange={(_, num) => {
                     this.touchMonacoProperty('cursorStyle', num?.key)
+                  }}
+                />
+              }
+            />
+            <SettingsProperty
+              key="tabSize"
+              title="Tab Size"
+              description="The number of spaces a tab is equal to."
+              control={
+                <TextField
+                  type="number"
+                  min={1}
+                  max={12}
+                  defaultValue={`${this.props.monaco?.tabSize ?? 4}`}
+                  onChange={(_, val) => {
+                    const tabSize = Number(val)
+                    if (!isNaN(tabSize)) {
+                      this.touchMonacoProperty('tabSize', tabSize)
+                    }
                   }}
                 />
               }
