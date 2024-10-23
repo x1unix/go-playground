@@ -19,6 +19,7 @@ import (
 	"github.com/x1unix/go-playground/pkg/goplay"
 	"github.com/x1unix/go-playground/pkg/util/cmdutil"
 	"github.com/x1unix/go-playground/pkg/util/osutil"
+	_ "go.uber.org/automaxprocs"
 	"go.uber.org/zap"
 )
 
