@@ -40,7 +40,7 @@ Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) and [HACKING.md](HACKING.md) 
 
 ### Sponsoring
 
-<a href="https://gno.land/?from=goplay-tools" target="_blank">
+<a href="https://gno.land/?utm_source=sponsor&utm_medium=goplay&utm_campaign=DevAcquisition+&utm_content=Devtool" target="_blank">
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="./docs/img/sponsors/gnoland-dark.svg" width="480">
         <img alt="Gno.land logo" width="480" src="./docs/img/sponsors/gnoland-light.svg">

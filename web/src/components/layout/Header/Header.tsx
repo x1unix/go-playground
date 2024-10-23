@@ -1,4 +1,5 @@
 import React from 'react'
+import { addDays } from 'date-fns'
 import { CommandBar, type ICommandBarItemProps, Stack } from '@fluentui/react'
 
 import type { Snippet } from '~/services/examples'
@@ -11,6 +12,7 @@ import { ExamplesModal } from '~/components/features/examples/ExamplesModal'
 import { RunTargetSelector } from '~/components/elements/inputs/RunTargetSelector'
 import { SharePopup } from '~/components/utils/SharePopup'
 
+import { keyValue } from '~/services/storage'
 import { dispatchTerminalSettingsChange } from '~/store/terminal'
 import {
   dispatchFormatFile,
@@ -34,6 +36,12 @@ import './Header.css'
  * Unique class name for share button to use as popover target.
  */
 const BTN_SHARE_CLASSNAME = 'Header__btn--share'
+
+const goVersionsCacheEntry = {
+  key: 'api.go.versions',
+  ttl: () => addDays(new Date(), 7),
+  getInitialValue: async () => await apiClient.getBackendVersions(),
+}
 
 interface HeaderState {
   showSettings?: boolean
@@ -67,8 +75,8 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
   }
 
   componentDidMount(): void {
-    apiClient
-      .getBackendVersions()
+    keyValue
+      .getOrInsert(goVersionsCacheEntry)
       .then((rsp) => {
         this.setState({
           goVersions: rsp,
