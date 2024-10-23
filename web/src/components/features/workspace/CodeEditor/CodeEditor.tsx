@@ -21,6 +21,8 @@ import classes from './CodeEditor.module.css'
 // ask monaco-editor/react to use our own Monaco instance.
 configureMonacoLoader()
 
+const defaultTabSize = 4
+
 export interface CodeEditorState {
   code?: string
   loading?: boolean
@@ -60,7 +62,7 @@ class CodeEditorView extends React.Component<Props> {
   }, 1000)
 
   private configureEditorOverrides(editor: monaco.editor.IStandaloneCodeEditor) {
-    const { tabSize = 4, fontSize } = this.props.options
+    const { tabSize = defaultTabSize, fontSize } = this.props.options
     const opts: Parameters<monaco.editor.IStandaloneCodeEditor['updateOptions']>[0] = {
       detectIndentation: false, // required to override tab sizes
       tabSize,
@@ -157,7 +159,7 @@ class CodeEditorView extends React.Component<Props> {
     const configChanged = prevProps.options !== this.props.options
     if (configChanged) {
       this.editor?.updateOptions({
-        tabSize: this.props.options.tabSize,
+        tabSize: this.props.options.tabSize ?? defaultTabSize,
       })
     }
 
