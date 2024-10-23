@@ -3,6 +3,7 @@ import { DEFAULT_FONT } from '../fonts'
 export interface MonacoSettings {
   fontFamily: string
   fontSize?: number
+  tabSize: number
   fontLigatures: boolean
   cursorBlinking: 'blink' | 'smooth' | 'phase' | 'expand' | 'solid'
   cursorStyle: 'line' | 'block' | 'underline' | 'line-thin' | 'block-outline' | 'underline-thin'
@@ -24,4 +25,5 @@ export const defaultMonacoSettings: MonacoSettings = {
   contextMenu: true,
   smoothScrolling: true,
   mouseWheelZoom: true,
+  tabSize: 4,
 }

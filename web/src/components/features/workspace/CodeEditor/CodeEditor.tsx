@@ -59,7 +59,25 @@ class CodeEditorView extends React.Component<Props> {
     )
   }, 1000)
 
+  private configureEditorOverrides(editor: monaco.editor.IStandaloneCodeEditor) {
+    const { tabSize = 4, fontSize } = this.props.options
+    const opts: Parameters<monaco.editor.IStandaloneCodeEditor['updateOptions']>[0] = {
+      detectIndentation: false, // required to override tab sizes
+      tabSize,
+    }
+
+    // Font should be set only once during boot as when font size changes
+    // by zoom and editor config object is updated - this cause infinite
+    // font change calls with random values.
+    if (fontSize) {
+      opts.fontSize = fontSize
+    }
+
+    editor.updateOptions(opts)
+  }
+
   editorDidMount(editor: monaco.editor.IStandaloneCodeEditor, monacoInstance: Monaco) {
+    this.configureEditorOverrides(editor)
     this.syntaxChecker = new GoSyntaxChecker(this.props.dispatch)
     const [langWorker, workerDisposer] = spawnLanguageWorker()
 
@@ -72,15 +90,6 @@ class CodeEditorView extends React.Component<Props> {
     const [vimAdapter, statusAdapter] = createVimModeAdapter(this.props.dispatch, editor)
     this.vimAdapter = vimAdapter
     this.vimCommandAdapter = statusAdapter
-
-    // Font should be set only once during boot as when font size changes
-    // by zoom and editor config object is updated - this cause infinite
-    // font change calls with random values.
-    if (this.props.options.fontSize) {
-      editor.updateOptions({
-        fontSize: this.props.options.fontSize,
-      })
-    }
 
     if (this.props.vimModeEnabled) {
       console.log('Vim mode enabled')
@@ -133,13 +142,23 @@ class CodeEditorView extends React.Component<Props> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    if (prevProps.projectId !== this.props.projectId) {
+    const projectChanged = prevProps.projectId !== this.props.projectId
+    if (projectChanged) {
       this.metadataCache.flush()
     }
 
     if (this.isFileOrEnvironmentChanged(prevProps)) {
       // Update editor markers on file or environment changes
       this.updateModelMarkers()
+    }
+
+    // HACK: tab size field in prevProps might be a new val instead of prev.
+    // Workaround by comparing a reference.
+    const configChanged = prevProps.options !== this.props.options
+    if (configChanged) {
+      this.editor?.updateOptions({
+        tabSize: this.props.options.tabSize,
+      })
     }
 
     this.applyVimModeChanges(prevProps)
