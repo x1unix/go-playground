@@ -1,38 +1,9 @@
 {
-  "Interface - General": [
-    {
-      "issueId": 425,
-      "url": "pull/425",
-      "description": "Reduce application bundle size"
-    }
-  ],
   "Interface - Editor": [
     {
-      "issueId": 417,
-      "url": "pull/417",
-      "description": "Improve autocomplete system"
-    },
-    {
-      "issueId": 421,
-      "url": "pull/421",
-      "description": "Show symbol documentation on hover"
-    },
-    {
-      "issueId": 430,
-      "url": "pull/430",
-      "description": "Syntax highlight support for go.mod files"
-    }
-  ],
-  "Go - WebAssembly": [
-    {
-      "issueId": 408,
-      "url": "pull/408",
-      "description": "Upgrade to Go 1.23"
-    },
-    {
-      "issueId": 412,
-      "url": "pull/412",
-      "description": "Run Go programs in a separate worker"
+      "issueId": 439,
+      "url": "issues/439",
+      "description": "Make tab size configurable"
     }
   ]
 }
