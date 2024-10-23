@@ -1,7 +1,10 @@
 import React from 'react'
 import { mergeStyleSets, type IStackProps, Stack } from '@fluentui/react'
-import gnolandLight from './img/gnoland-light.svg'
-import gnolandDark from './img/gnoland-dark.svg'
+import gnolandLight from './img/gnoland-light.svg?url'
+import gnolandDark from './img/gnoland-dark.svg?url'
+
+const gnolandUrl =
+  'https://gno.land/?utm_source=sponsor&utm_medium=goplay&utm_campaign=DevAcquisition+&utm_content=Devtool'
 
 interface Props {
   isDark?: boolean
@@ -24,12 +27,15 @@ const tokens: IStackProps['tokens'] = {
 export const SponsorsBlock: React.FC<Props> = ({ isDark }) => (
   <Stack horizontal tokens={tokens} verticalAlign="center">
     <Stack.Item className={styles.image}>
-      <a href="https://gno.land/?from=goplay-tools" target="_blank" rel="noreferrer">
+      <a href={gnolandUrl} target="_blank" rel="noreferrer">
         <img src={isDark ? gnolandDark : gnolandLight} alt="gno.land" />
       </a>
     </Stack.Item>
     <Stack.Item className={styles.text}>
-      gno.land, an open-source smart contract platform powered by Gno, a deterministic variant of Go.
+      <a href={gnolandUrl} target="_blank" rel="noreferrer">
+        gno.land
+      </a>
+      , an open-source smart contract platform powered by Gno, a deterministic variant of Go.
     </Stack.Item>
   </Stack>
 )
