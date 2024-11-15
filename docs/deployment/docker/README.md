@@ -6,7 +6,7 @@ Prebuilt Docker image is available on [Docker Hub](https://hub.docker.com/r/x1un
 
 ### Starting container
 
-Download the [compose.yaml](./compose.yaml) file and run `docker-compose` to bootstrap the service:
+Download the [compose.yml](./compose.yml) file and run `docker-compose` to bootstrap the service:
 
 ```shell
 # Create container and start the service.
