@@ -11,6 +11,9 @@ interface Props {
 }
 
 const styles = mergeStyleSets({
+  link: {
+    color: 'currentColor',
+  },
   image: {
     width: '192px',
     maxHeight: '32px',
@@ -32,7 +35,7 @@ export const SponsorsBlock: React.FC<Props> = ({ isDark }) => (
       </a>
     </Stack.Item>
     <Stack.Item className={styles.text}>
-      <a href={gnolandUrl} target="_blank" rel="noreferrer">
+      <a href={gnolandUrl} className={styles.link} target="_blank" rel="noreferrer">
         gno.land
       </a>
       , an open-source smart contract platform powered by Gno, a deterministic variant of Go.
