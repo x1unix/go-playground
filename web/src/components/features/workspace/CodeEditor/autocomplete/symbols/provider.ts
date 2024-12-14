@@ -48,6 +48,7 @@ export class GoSymbolsCompletionItemProvider extends CacheBasedCompletionProvide
       .trim()
 
     const query = parseExpression(val)
+    console.log('expr', query)
     if (!query) {
       return null
     }

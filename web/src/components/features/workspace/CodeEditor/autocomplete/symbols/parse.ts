@@ -1,5 +1,7 @@
 // Matches package (and method name)
-const queryRegexp = /(^|\s)([a-z0-9_]+)(\.([a-z0-9_]+)?)?$/i
+//
+// See: parse.test.ts
+const queryRegexp = /(?<!["`])(^|\s|\(|\{|\*|&|\+|-|\/|\||=)([a-z0-9_]+)(\.([a-z0-9_]+)?)?$/i
 
 export const parseExpression = (expr: string) => {
   queryRegexp.lastIndex = 0 // Reset regex state

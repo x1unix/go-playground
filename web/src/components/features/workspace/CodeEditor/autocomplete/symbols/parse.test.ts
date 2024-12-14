@@ -37,7 +37,33 @@ describe('parseQuery', () => {
     })
   })
 
+  test('should match function call argument', () => {
+    testParseExpression('(foo.bar', {
+      packageName: 'foo',
+      value: 'bar',
+    })
+  })
+
+  test('should match values near operators', () => {
+    testParseExpression('+ foo', {
+      value: 'foo',
+    })
+  })
+
+  test('should match pointer types', () => {
+    testParseExpression('(t *testing.T', {
+      packageName: 'testing',
+      value: 'T',
+    })
+  })
+
   test('should omit unmatched long expressions', () => {
     testParseExpression('foo.bar.baz', null)
+  })
+
+  test('should not match inside string statement', () => {
+    testParseExpression('" foo', null)
+    testParseExpression('"foo', null)
+    testParseExpression('`foo', null)
   })
 })
