@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"errors"
-	"github.com/x1unix/go-playground/pkg/monaco"
 	"io"
 	"net/http"
 	"strconv"
@@ -25,8 +24,6 @@ const (
 	wasmMimeType     = "application/wasm"
 	artifactParamVal = "artifactId"
 )
-
-var apiv1SunsetDate = time.Date(2024, time.October, 1, 0, 0, 0, 0, time.UTC)
 
 type BackendVersionProvider interface {
 	GetVersions(ctx context.Context) (*VersionsInformation, error)
@@ -67,65 +64,11 @@ func (s *APIv1Handler) Mount(r *mux.Router) {
 		HandlerFunc(WrapHandler(s.HandleGetVersions))
 	r.Path("/artifacts/{artifactId:[a-fA-F0-9]+}.wasm").Methods(http.MethodGet).
 		HandlerFunc(WrapHandler(s.HandleArtifactRequest))
-
-	// TODO: remove endpoint in the next release
-	r.Path("/suggest").
-		HandlerFunc(WrapHandler(DeprecatedEndpoint(s.HandleGetSuggestion, apiv1SunsetDate)))
 }
 
 // HandleGetVersion handles /api/version
 func (s *APIv1Handler) HandleGetVersion(w http.ResponseWriter, _ *http.Request) error {
 	WriteJSON(w, VersionResponse{Version: s.config.Version, APIVersion: "2"})
-	return nil
-}
-
-// HandleGetSuggestion handles code suggestion
-func (s *APIv1Handler) HandleGetSuggestion(w http.ResponseWriter, r *http.Request) error {
-	resp := SuggestionsResponse{
-		Suggestions: []monaco.CompletionItem{},
-	}
-	resp.Write(w)
-	return nil
-}
-
-// HandleShare handles snippet share
-func (s *APIv1Handler) HandleShare(w http.ResponseWriter, r *http.Request) error {
-	shareID, err := s.client.Share(r.Context(), r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		if isContentLengthError(err) {
-			return ErrSnippetTooLarge
-		}
-
-		s.log.Error("failed to share code: ", err)
-		return err
-	}
-
-	WriteJSON(w, ShareResponse{SnippetID: shareID})
-	return nil
-}
-
-// HandleGetSnippet handles snippet load
-func (s *APIv1Handler) HandleGetSnippet(w http.ResponseWriter, r *http.Request) error {
-	vars := mux.Vars(r)
-	snippetID := vars["id"]
-	snippet, err := s.client.GetSnippet(r.Context(), snippetID)
-	if err != nil {
-		if errors.Is(err, goplay.ErrSnippetNotFound) {
-			return Errorf(http.StatusNotFound, "snippet %q not found", snippetID)
-		}
-
-		s.log.Errorw("failed to get snippet",
-			"snippetID", snippetID,
-			"err", err,
-		)
-		return err
-	}
-
-	WriteJSON(w, SnippetResponse{
-		FileName: snippet.FileName,
-		Code:     snippet.Contents,
-	})
 	return nil
 }
 
