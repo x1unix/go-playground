@@ -12,7 +12,7 @@ import {
 import { newLoadingAction, newErrorAction, newUIStateChangeAction } from '~/store/actions/ui'
 import { type SnippetLoadPayload, WorkspaceAction, type BulkFileUpdatePayload } from '../actions'
 import { loadWorkspaceState } from '../config'
-import { getDefaultWorkspaceState } from '../state'
+import { type WorkspaceState, getDefaultWorkspaceState } from '../state'
 
 /**
  * Dispatch snippet load from a predefined source.
@@ -104,9 +104,29 @@ export const dispatchLoadSnippet =
     }
   }
 
+const workspaceHasChanges = (state: WorkspaceState) => {
+  if (state.snippet?.loading) {
+    return false
+  }
+
+  if (!state.snippet?.id) {
+    return true
+  }
+
+  return !!state.dirty
+}
+
+const workspaceNotChangedNotificationID = 'WS_NOT_CHANGED'
+
 export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState: StateProvider) => {
   const notificationId = newNotificationId()
-  const { workspace } = getState()
+  const { workspace, status } = getState()
+
+  if (status?.loading) {
+    // Prevent sharing during any kind of loading progress.
+    // This also prevents concurrent share process.
+    return
+  }
 
   if (!workspace.files) {
     dispatch(
@@ -121,6 +141,29 @@ export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState:
     return
   }
 
+  if (!workspaceHasChanges(workspace)) {
+    // Prevent from sharing already shared shippets
+    dispatch(
+      newAddNotificationAction({
+        id: workspaceNotChangedNotificationID,
+        type: NotificationType.Info,
+        canDismiss: true,
+        title: 'Share snippet',
+        description: "You haven't made any changes to a snippet. Please edit any file before sharing.",
+        actions: [
+          {
+            label: 'OK',
+            key: 'ok',
+            primary: true,
+            onClick: () => newRemoveNotificationAction(workspaceNotChangedNotificationID),
+          },
+        ],
+      }),
+    )
+    return
+  }
+
+  dispatch(newRemoveNotificationAction(workspaceNotChangedNotificationID))
   dispatch(newLoadingAction())
   dispatch(
     newAddNotificationAction({
@@ -149,6 +192,7 @@ export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState:
       type: WorkspaceAction.WORKSPACE_IMPORT,
       payload: {
         ...workspace,
+        dirty: false,
         snippet: {
           id: snippetID,
         },

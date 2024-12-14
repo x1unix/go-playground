@@ -1,6 +1,6 @@
 import * as monaco from 'monaco-editor'
 import { runFileDispatcher, type StateDispatch } from '~/store'
-import { dispatchFormatFile, dispatchResetWorkspace } from '~/store/workspace'
+import { dispatchFormatFile, dispatchResetWorkspace, dispatchShareSnippet } from '~/store/workspace'
 
 /**
  * MonacoDIContainer is undocumented DI service container of monaco editor.
@@ -39,7 +39,21 @@ export const attachCustomCommands = (editorInstance: monaco.editor.IStandaloneCo
   )
 }
 
+const debounced = <TArg>(fn: (arg: TArg) => void, delay: number) => {
+  let tid: ReturnType<typeof setTimeout> | undefined
+
+  return (arg: TArg) => {
+    if (tid) {
+      clearTimeout(tid)
+    }
+
+    tid = setTimeout(fn, delay, arg)
+  }
+}
+
 export const registerEditorActions = (editor: monaco.editor.IStandaloneCodeEditor, dispatcher: StateDispatch) => {
+  const dispatchDebounce = debounced(dispatcher, 750)
+
   const actions = [
     {
       id: 'clear',
@@ -65,6 +79,15 @@ export const registerEditorActions = (editor: monaco.editor.IStandaloneCodeEdito
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF],
       run: () => {
         dispatcher(dispatchFormatFile())
+      },
+    },
+    {
+      id: 'share',
+      label: 'Share Snippet',
+      contextMenuGroupId: 'navigation',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
+      run: () => {
+        dispatchDebounce(dispatchShareSnippet())
       },
     },
   ]
