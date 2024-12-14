@@ -40,7 +40,7 @@ export const attachCustomCommands = (editorInstance: monaco.editor.IStandaloneCo
 }
 
 const debounced = <TArg>(fn: (arg: TArg) => void, delay: number) => {
-  let tid: ReturnType<typeof setTimeout> | undefined = undefined
+  let tid: ReturnType<typeof setTimeout> | undefined
 
   return (arg: TArg) => {
     if (tid) {
@@ -85,7 +85,7 @@ export const registerEditorActions = (editor: monaco.editor.IStandaloneCodeEdito
       id: 'share',
       label: 'Share Snippet',
       contextMenuGroupId: 'navigation',
-      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS ],
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
       run: () => {
         dispatchDebounce(dispatchShareSnippet())
       },

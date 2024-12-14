@@ -149,7 +149,7 @@ export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState:
         type: NotificationType.Info,
         canDismiss: true,
         title: 'Share snippet',
-        description: 'You haven\'t made any changes to a snippet. Please edit any file before sharing.',
+        description: "You haven't made any changes to a snippet. Please edit any file before sharing.",
         actions: [
           {
             label: 'OK',
@@ -157,8 +157,8 @@ export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState:
             primary: true,
             onClick: () => newRemoveNotificationAction(workspaceNotChangedNotificationID),
           },
-        ]
-      })
+        ],
+      }),
     )
     return
   }
