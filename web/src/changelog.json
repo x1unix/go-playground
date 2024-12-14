@@ -1,9 +1,14 @@
 {
   "Interface - Editor": [
     {
-      "issueId": 439,
-      "url": "issues/439",
-      "description": "Make tab size configurable"
+      "issueId": 451,
+      "url": "pull/451",
+      "description": "Add Ctrl/⌘+S shortcut for sharing snippet."
+    },
+    {
+      "issueId": 449,
+      "url": "pull/449",
+      "description": "Fix autocomplete for function argument types."
     }
   ]
 }
