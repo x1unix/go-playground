@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/x1unix/go-playground/internal/builder"
 	"github.com/x1unix/go-playground/internal/builder/storage"
+	"github.com/x1unix/go-playground/internal/server/backendinfo"
 	"github.com/x1unix/go-playground/pkg/goplay"
 	"go.uber.org/zap"
 	"golang.org/x/time/rate"
@@ -25,16 +26,12 @@ const (
 	artifactParamVal = "artifactId"
 )
 
-type BackendVersionProvider interface {
-	GetVersions(ctx context.Context) (*VersionsInformation, error)
-}
-
 // APIv1Handler is API v1 handler
 type APIv1Handler struct {
 	config          ServiceConfig
 	log             *zap.SugaredLogger
 	compiler        builder.BuildService
-	versionProvider BackendVersionProvider
+	versionProvider backendinfo.BackendVersionProvider
 
 	client  *goplay.Client
 	limiter *rate.Limiter
@@ -45,13 +42,13 @@ type ServiceConfig struct {
 }
 
 // NewAPIv1Handler is APIv1Handler constructor
-func NewAPIv1Handler(cfg ServiceConfig, client *goplay.Client, builder builder.BuildService) *APIv1Handler {
+func NewAPIv1Handler(cfg ServiceConfig, client *goplay.Client, builder builder.BuildService, versionProvider backendinfo.BackendVersionProvider) *APIv1Handler {
 	return &APIv1Handler{
 		config:          cfg,
 		compiler:        builder,
 		client:          client,
 		log:             zap.S().Named("api.v1"),
-		versionProvider: NewBackendVersionService(zap.L(), client, VersionCacheTTL),
+		versionProvider: versionProvider,
 		limiter:         rate.NewLimiter(rate.Every(frameTime), compileRequestsPerFrame),
 	}
 }
@@ -73,12 +70,25 @@ func (s *APIv1Handler) HandleGetVersion(w http.ResponseWriter, _ *http.Request) 
 }
 
 func (s *APIv1Handler) HandleGetVersions(w http.ResponseWriter, r *http.Request) error {
-	versions, err := s.versionProvider.GetVersions(r.Context())
+	versions, err := s.versionProvider.GetRemoteVersions(r.Context())
 	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			return nil
+		}
+
 		return err
 	}
 
-	WriteJSON(w, versions)
+	rsp := VersionsInformation{
+		WebAssembly: s.versionProvider.ServerVersion(),
+		Playground: &PlaygroundVersions{
+			GoCurrent:  versions.CurrentStable,
+			GoPrevious: versions.PreviousStable,
+			GoTip:      versions.Nightly,
+		},
+	}
+
+	WriteJSON(w, rsp)
 	return nil
 }
 
