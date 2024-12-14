@@ -48,6 +48,11 @@ export interface WorkspaceState {
    * Key-value pair of file names and their content.
    */
   files?: Record<string, string>
+
+  /**
+   * Indicates whether any of workspace files were changed.
+   */
+  dirty?: boolean
 }
 
 export const initialWorkspaceState: WorkspaceState = {

@@ -11,6 +11,7 @@ export const reducers = mapByAction<WorkspaceState>(
       const addedFiles = Object.fromEntries(items.map(({ filename, content }) => [filename, content]))
       return {
         ...rest,
+        dirty: true,
         selectedFile: items[0].filename,
         files: {
           ...files,
@@ -25,6 +26,7 @@ export const reducers = mapByAction<WorkspaceState>(
       const { files = {}, ...rest } = s
       return {
         ...rest,
+        dirty: true,
         files: {
           ...files,
           [filename]: content,
@@ -69,6 +71,7 @@ export const reducers = mapByAction<WorkspaceState>(
       const { [filename]: _, ...restFiles } = files
       return {
         ...rest,
+        dirty: true,
         selectedFile: newSelectedFile,
         files: restFiles,
       }

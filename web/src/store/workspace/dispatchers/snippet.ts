@@ -121,6 +121,8 @@ export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState:
     return
   }
 
+  console.log('isDirty:', workspace.dirty)
+
   dispatch(newLoadingAction())
   dispatch(
     newAddNotificationAction({
@@ -149,6 +151,7 @@ export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState:
       type: WorkspaceAction.WORKSPACE_IMPORT,
       payload: {
         ...workspace,
+        dirty: false,
         snippet: {
           id: snippetID,
         },
