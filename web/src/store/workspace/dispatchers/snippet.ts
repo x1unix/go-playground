@@ -163,6 +163,7 @@ export const dispatchShareSnippet = () => async (dispatch: DispatchFn, getState:
     return
   }
 
+  dispatch(newRemoveNotificationAction(workspaceNotChangedNotificationID))
   dispatch(newLoadingAction())
   dispatch(
     newAddNotificationAction({
