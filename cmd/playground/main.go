@@ -15,6 +15,7 @@ import (
 	"github.com/x1unix/go-playground/internal/builder/storage"
 	"github.com/x1unix/go-playground/internal/config"
 	"github.com/x1unix/go-playground/internal/server"
+	"github.com/x1unix/go-playground/internal/server/backendinfo"
 	"github.com/x1unix/go-playground/internal/server/webutil"
 	"github.com/x1unix/go-playground/pkg/goplay"
 	"github.com/x1unix/go-playground/pkg/util/cmdutil"
@@ -77,11 +78,16 @@ func start(logger *zap.Logger, cfg *config.Config) error {
 		go cleanupSvc.Start(ctx)
 	}
 
+	backendsInfoSvc := backendinfo.NewBackendVersionService(zap.L(), playgroundClient, backendinfo.ServiceConfig{
+		CacheFile: filepath.Join(cfg.Build.BuildDir, "go-versions.json"),
+		TTL:       backendinfo.DefaultVersionCacheTTL,
+	})
+
 	// Initialize API endpoints
 	r := mux.NewRouter()
 	apiRouter := r.PathPrefix("/api").Subrouter()
 	svcCfg := server.ServiceConfig{Version: Version}
-	server.NewAPIv1Handler(svcCfg, playgroundClient, buildSvc).
+	server.NewAPIv1Handler(svcCfg, playgroundClient, buildSvc, backendsInfoSvc).
 		Mount(apiRouter)
 
 	apiv2Router := apiRouter.PathPrefix("/v2").Subrouter()
@@ -90,7 +96,6 @@ func start(logger *zap.Logger, cfg *config.Config) error {
 		Builder:      buildSvc,
 		BuildTimeout: cfg.Build.GoBuildTimeout,
 	}).Mount(apiv2Router)
-	//server.NewAPIv2Handler(playgroundClient, buildSvc).Mount(apiv2Router)
 
 	// Web UI routes
 	tplVars := server.TemplateArguments{
