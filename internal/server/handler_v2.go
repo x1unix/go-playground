@@ -90,9 +90,6 @@ func (h *APIv2Handler) HandleShare(w http.ResponseWriter, r *http.Request) error
 
 	snippetID, err := h.cfg.Client.Share(ctx, payload.Reader())
 	if err != nil {
-		return err
-	}
-	if err != nil {
 		if isContentLengthError(err) {
 			return ErrSnippetTooLarge
 		}
@@ -147,6 +144,7 @@ func (h *APIv2Handler) HandleFormat(w http.ResponseWriter, r *http.Request) erro
 	return nil
 }
 
+// HandleRun sends snippet to upstream play.go.dev and returns evaluation result.
 func (h *APIv2Handler) HandleRun(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 
