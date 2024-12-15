@@ -130,6 +130,27 @@ func TestBackendVersionService_GetRemoteVersions(t *testing.T) {
 				require.Equal(t, expect, dst.Data)
 			},
 		},
+		"should prefill fallbacks if one on backends is down": {
+			expect: BackendVersions{
+				CurrentStable:  "1.23.1",
+				PreviousStable: "1.22.0",
+				Nightly:        "devel",
+			},
+			constructor: func(t *testing.T, expect BackendVersions) *BackendVersionService {
+				srv := setupTestServer(BackendVersions{
+					CurrentStable: expect.CurrentStable,
+				})
+
+				logger := testutil.GetLogger(t).Desugar()
+				c := goplay.NewClient(srv.URL, "", 5 * time.Second)
+
+				svc := NewBackendVersionService(logger, c, ServiceConfig{
+					TTL: time.Hour,
+				})
+				
+				return svc
+			},
+		},
 	}
 
 	for n, c := range cases {
@@ -175,6 +196,12 @@ func setupTestServer(expects BackendVersions) *httptest.Server {
 			msg = expects.Nightly
 		case goplay.BackendGoCurrent:
 			msg = expects.CurrentStable
+		}
+
+		// Simulate prod down if empty
+		if msg == "" {
+			w.WriteHeader(http.StatusBadGateway)
+			return
 		}
 
 		rsp := goplay.CompileResponse{

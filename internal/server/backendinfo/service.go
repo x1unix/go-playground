@@ -77,6 +77,10 @@ func (svc *BackendVersionService) visitCache() (*cacheEntry, error) {
 		return svc.memCache, nil
 	}
 
+	if svc.cfg.CacheFile == "" {
+		return nil, fs.ErrNotExist
+	}
+
 	f, err := os.Open(svc.cfg.CacheFile)
 	if err != nil {
 		return nil, err
@@ -132,6 +136,10 @@ func (svc *BackendVersionService) cacheVersions(versions *BackendVersions) error
 		Data:      *versions,
 	}
 
+	if svc.cfg.CacheFile == "" {
+		return nil
+	}
+
 	err := os.MkdirAll(filepath.Dir(svc.cfg.CacheFile), 0755)
 	if err != nil {
 		return fmt.Errorf("MkdirAll failed: %w", err)
@@ -174,8 +182,20 @@ func (svc *BackendVersionService) pullBackendVersions(ctx context.Context) (*Bac
 			svc.logger.Debug("Fetching go version for backend", zap.String("backend", e.backend))
 			result, err := svc.fetchGoBackendVersionWithRetry(gCtx, e.backend)
 			if err != nil {
-				return fmt.Errorf("failed to get Go version from Go playground server for backend %q: %w",
-					b.backend, err)
+				// Playground "gotip" and "goprev" backends are often broken
+				// and I'm getting tired of seeing 5xx responses if just one of them is dead.
+				//
+				// Throw only if stable version is down. For others - try to figure out fallback values.
+				if e.backend == goplay.BackendGoCurrent {
+					return fmt.Errorf("failed to get Go version from Go playground server for backend %q: %w",
+						b.backend, err)
+				}
+
+				svc.logger.Warn(
+					"can't fetch Go version for backend, will use fallback",
+					zap.String("backend", e.backend), zap.Error(err),
+				)
+				return nil
 			}
 
 			// We don't afraid race condition because each backend is written to a separate address
@@ -188,6 +208,7 @@ func (svc *BackendVersionService) pullBackendVersions(ctx context.Context) (*Bac
 		return nil, err
 	}
 
+	prefillFallbacks(versionInfo)
 	return versionInfo, nil
 }
 
