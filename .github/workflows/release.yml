@@ -15,7 +15,6 @@ on:
 
 env:
   GO_VERSION: 1.23
-  NODE_VERSION: lts/iron
   WASM_API_VER: v2
   PREV_GO_VERSION: 1.22
 
@@ -69,9 +68,14 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - uses: actions/setup-node@v4
         with:
-          node-version: "${{env.NODE_VERSION}}"
+          cache: 'yarn'
+          node-version-file: '.nvmrc'
+          cache-dependency-path: 'web/yarn.lock'
 
       - name: Setup dependencies
         run: sudo apt-get update && sudo apt-get install -y make
