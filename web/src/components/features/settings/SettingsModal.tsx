@@ -8,21 +8,21 @@ import {
   MessageBarType,
   PivotItem,
   Text,
-  TextField
+  TextField,
 } from '@fluentui/react'
 
-import {AnimatedPivot} from '~/components/elements/tabs/AnimatedPivot'
-import {ThemeableComponent} from '~/components/utils/ThemeableComponent'
-import {Dialog} from '~/components/elements/modals/Dialog'
-import {SettingsProperty} from './SettingsProperty'
-import {DEFAULT_FONT} from '~/services/fonts'
-import type {MonacoSettings} from '~/services/config'
-import type {RenderingBackend, TerminalSettings} from '~/store/terminal'
-import {connect, type MonacoParamsChanges, type SettingsState, type StateDispatch} from '~/store'
+import { AnimatedPivot } from '~/components/elements/tabs/AnimatedPivot'
+import { ThemeableComponent } from '~/components/utils/ThemeableComponent'
+import { Dialog } from '~/components/elements/modals/Dialog'
+import { SettingsProperty } from './SettingsProperty'
+import { DEFAULT_FONT } from '~/services/fonts'
+import type { MonacoSettings } from '~/services/config'
+import type { RenderingBackend, TerminalSettings } from '~/store/terminal'
+import { connect, type MonacoParamsChanges, type SettingsState, type StateDispatch } from '~/store'
 
-import {cursorBlinkOptions, cursorLineOptions, fontOptions, terminalBackendOptions} from './options'
-import {controlKeyLabel} from '~/utils/dom'
-import {Kbd} from '~/components/elements/misc/Kbd'
+import { cursorBlinkOptions, cursorLineOptions, fontOptions, terminalBackendOptions } from './options'
+import { controlKeyLabel } from '~/utils/dom'
+import { Kbd } from '~/components/elements/misc/Kbd'
 
 export interface SettingsChanges {
   monaco?: MonacoParamsChanges
@@ -371,7 +371,9 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
             />
             <div hidden={!this.state.hideTerminalSettings}>
               <MessageBar messageBarType={MessageBarType.warning}>
-                Colored text, screen clear and other features relying on terminal escape sequences will not work.
+                <span>Colored text, screen clear and other features relying on terminal escape sequences require </span>
+                <u>Emulate Terminal</u>
+                <span> option to be enabled.</span>
               </MessageBar>
             </div>
           </PivotItem>
