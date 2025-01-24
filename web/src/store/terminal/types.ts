@@ -7,6 +7,7 @@ export enum RenderingBackend {
 export interface TerminalSettings {
   fontSize: number
   renderingBackend: RenderingBackend
+  disableTerminalEmulation?: boolean
 }
 
 export const defaultTerminalSettings: TerminalSettings = {

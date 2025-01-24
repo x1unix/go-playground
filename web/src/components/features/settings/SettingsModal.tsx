@@ -1,18 +1,28 @@
 import React from 'react'
-import { Checkbox, Dropdown, getTheme, type IPivotStyles, PivotItem, Text, TextField } from '@fluentui/react'
+import {
+  Checkbox,
+  Dropdown,
+  getTheme,
+  type IPivotStyles,
+  MessageBar,
+  MessageBarType,
+  PivotItem,
+  Text,
+  TextField
+} from '@fluentui/react'
 
-import { AnimatedPivot } from '~/components/elements/tabs/AnimatedPivot'
-import { ThemeableComponent } from '~/components/utils/ThemeableComponent'
-import { Dialog } from '~/components/elements/modals/Dialog'
-import { SettingsProperty } from './SettingsProperty'
-import { DEFAULT_FONT } from '~/services/fonts'
-import type { MonacoSettings } from '~/services/config'
-import type { RenderingBackend, TerminalSettings } from '~/store/terminal'
-import { connect, type StateDispatch, type MonacoParamsChanges, type SettingsState } from '~/store'
+import {AnimatedPivot} from '~/components/elements/tabs/AnimatedPivot'
+import {ThemeableComponent} from '~/components/utils/ThemeableComponent'
+import {Dialog} from '~/components/elements/modals/Dialog'
+import {SettingsProperty} from './SettingsProperty'
+import {DEFAULT_FONT} from '~/services/fonts'
+import type {MonacoSettings} from '~/services/config'
+import type {RenderingBackend, TerminalSettings} from '~/store/terminal'
+import {connect, type MonacoParamsChanges, type SettingsState, type StateDispatch} from '~/store'
 
-import { cursorBlinkOptions, cursorLineOptions, fontOptions, terminalBackendOptions } from './options'
-import { controlKeyLabel } from '~/utils/dom'
-import { Kbd } from '~/components/elements/misc/Kbd'
+import {cursorBlinkOptions, cursorLineOptions, fontOptions, terminalBackendOptions} from './options'
+import {controlKeyLabel} from '~/utils/dom'
+import {Kbd} from '~/components/elements/misc/Kbd'
 
 export interface SettingsChanges {
   monaco?: MonacoParamsChanges
@@ -38,6 +48,7 @@ type Props = StateProps &
 
 interface SettingsModalState {
   isOpen?: boolean
+  hideTerminalSettings: boolean
 }
 
 const modalStyles = {
@@ -60,6 +71,7 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
     super(props)
     this.state = {
       isOpen: props.isOpen,
+      hideTerminalSettings: !!this.props.terminal?.disableTerminalEmulation,
     }
   }
 
@@ -89,6 +101,10 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
   }
 
   private touchTerminalSettings(changes: Partial<TerminalSettings>) {
+    if ('disableTerminalEmulation' in changes) {
+      this.setState({ hideTerminalSettings: !!changes.disableTerminalEmulation })
+    }
+
     if (!this.changes.terminal) {
       this.changes.terminal = changes
       return
@@ -322,12 +338,28 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
               }
             />
             <SettingsProperty
+              key="termEmulationEnabled"
+              title="Emulate Terminal"
+              control={
+                <Checkbox
+                  label="Disable this option if you have troubles copying output text."
+                  defaultChecked={!this.props.terminal?.disableTerminalEmulation}
+                  onChange={(_, val) => {
+                    this.touchTerminalSettings({
+                      disableTerminalEmulation: !val,
+                    })
+                  }}
+                />
+              }
+            />
+            <SettingsProperty
               key="terminalBackend"
               title="Rendering Backend"
               description="Set the rendering backend for the terminal."
               control={
                 <Dropdown
                   options={terminalBackendOptions}
+                  disabled={this.state.hideTerminalSettings}
                   defaultSelectedKey={this.props.terminal?.renderingBackend}
                   onChange={(_, val) => {
                     this.touchTerminalSettings({
@@ -337,6 +369,11 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
                 />
               }
             />
+            <div hidden={!this.state.hideTerminalSettings}>
+              <MessageBar messageBarType={MessageBarType.warning}>
+                Colored text, screen clear and other features relying on terminal escape sequences will not work.
+              </MessageBar>
+            </div>
           </PivotItem>
         </AnimatedPivot>
       </Dialog>
