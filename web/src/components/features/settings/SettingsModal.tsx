@@ -1,5 +1,15 @@
 import React from 'react'
-import { Checkbox, Dropdown, getTheme, type IPivotStyles, PivotItem, Text, TextField } from '@fluentui/react'
+import {
+  Checkbox,
+  Dropdown,
+  getTheme,
+  type IPivotStyles,
+  MessageBar,
+  MessageBarType,
+  PivotItem,
+  Text,
+  TextField,
+} from '@fluentui/react'
 
 import { AnimatedPivot } from '~/components/elements/tabs/AnimatedPivot'
 import { ThemeableComponent } from '~/components/utils/ThemeableComponent'
@@ -8,7 +18,7 @@ import { SettingsProperty } from './SettingsProperty'
 import { DEFAULT_FONT } from '~/services/fonts'
 import type { MonacoSettings } from '~/services/config'
 import type { RenderingBackend, TerminalSettings } from '~/store/terminal'
-import { connect, type StateDispatch, type MonacoParamsChanges, type SettingsState } from '~/store'
+import { connect, type MonacoParamsChanges, type SettingsState, type StateDispatch } from '~/store'
 
 import { cursorBlinkOptions, cursorLineOptions, fontOptions, terminalBackendOptions } from './options'
 import { controlKeyLabel } from '~/utils/dom'
@@ -38,6 +48,7 @@ type Props = StateProps &
 
 interface SettingsModalState {
   isOpen?: boolean
+  hideTerminalSettings: boolean
 }
 
 const modalStyles = {
@@ -60,6 +71,7 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
     super(props)
     this.state = {
       isOpen: props.isOpen,
+      hideTerminalSettings: !!this.props.terminal?.disableTerminalEmulation,
     }
   }
 
@@ -89,6 +101,10 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
   }
 
   private touchTerminalSettings(changes: Partial<TerminalSettings>) {
+    if ('disableTerminalEmulation' in changes) {
+      this.setState({ hideTerminalSettings: !!changes.disableTerminalEmulation })
+    }
+
     if (!this.changes.terminal) {
       this.changes.terminal = changes
       return
@@ -328,6 +344,7 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
               control={
                 <Dropdown
                   options={terminalBackendOptions}
+                  disabled={this.state.hideTerminalSettings}
                   defaultSelectedKey={this.props.terminal?.renderingBackend}
                   onChange={(_, val) => {
                     this.touchTerminalSettings({
@@ -337,6 +354,26 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
                 />
               }
             />
+            <SettingsProperty
+              key="termEmulationEnabled"
+              title="Emulate Terminal"
+              control={
+                <Checkbox
+                  label="Enables ANSI terminal escape sequences support using xterm.js."
+                  defaultChecked={!this.props.terminal?.disableTerminalEmulation}
+                  onChange={(_, val) => {
+                    this.touchTerminalSettings({
+                      disableTerminalEmulation: !val,
+                    })
+                  }}
+                />
+              }
+            />
+            <div>
+              <MessageBar messageBarType={MessageBarType.warning}>
+                Disable <u>Emulate Terminal</u> feature if you having troubles copying text from output.
+              </MessageBar>
+            </div>
           </PivotItem>
         </AnimatedPivot>
       </Dialog>
