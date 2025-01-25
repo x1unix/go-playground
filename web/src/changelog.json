@@ -1,14 +1,9 @@
 {
-  "Interface - Editor": [
+  "Interface - Terminal": [
     {
-      "issueId": 451,
-      "url": "pull/451",
-      "description": "Add Ctrl/⌘+S shortcut for sharing snippet."
-    },
-    {
-      "issueId": 449,
-      "url": "pull/449",
-      "description": "Fix autocomplete for function argument types."
+      "issueId": 463,
+      "url": "pull/463",
+      "description": "Add option to disable terminal emulation to address copy text issues on some platforms."
     }
   ]
 }
