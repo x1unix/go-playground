@@ -49,7 +49,8 @@ export const SharePopup: FC<Props> = ({ visible, snippetId, originUrl, onDismiss
         styles={{
           root: [
             {
-              color: bodyBackground,
+              // HACK: for some reason in recent @fluentui/react link color is flickering.
+              color: `${bodyBackground} !important`,
             },
           ],
         }}
