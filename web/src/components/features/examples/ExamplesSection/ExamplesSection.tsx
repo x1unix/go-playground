@@ -9,6 +9,7 @@ import {
   DefaultButton,
   type IButtonProps,
   type IStackItemProps,
+  type IButtonStyles,
 } from '@fluentui/react'
 
 import type { Snippet } from '~/services/examples'
@@ -75,7 +76,7 @@ export const ExamplesSection: React.FC<Props> = ({ label, snippets, onSelect }) 
     },
   }
 
-  const btnStyles = {
+  const btnStyles: IButtonStyles = {
     root: {
       maxWidth: 'none',
       minWidth: 'none',
@@ -83,9 +84,14 @@ export const ExamplesSection: React.FC<Props> = ({ label, snippets, onSelect }) 
       padding: `0 ${DefaultSpacing.s1}`,
       margin: DefaultSpacing.s1,
       borderColor: semanticColors.variantBorder,
+      justifyContent: 'flex-start',
+      alignContent: 'center',
     },
     icon: {
       marginRight: DefaultSpacing.s1,
+      height: '1em',
+      fontSize: '1em',
+      lineHeight: '1em',
     },
     textContainer: {
       textAlign: 'left',
