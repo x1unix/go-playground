@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Stack, DefaultButton, mergeStyleSets } from '@fluentui/react'
+import { Stack, DefaultButton, mergeStyleSets, type IButtonStyles } from '@fluentui/react'
 
 import environment from '~/environment'
 
@@ -13,10 +13,17 @@ const styles = mergeStyleSets({
       flexDirection: 'column',
     },
   },
-  button: {
-    display: 'block',
-  },
 })
+
+const btnStyles: IButtonStyles = {
+  root: {
+    display: 'flex',
+  },
+  icon: {
+    fontSize: '14px',
+    height: '14px',
+  },
+}
 
 export const FooterButtons: React.FC = () => (
   <Stack
@@ -31,7 +38,7 @@ export const FooterButtons: React.FC = () => (
   >
     <Stack.Item grow={1}>
       <DefaultButton
-        className={styles.button}
+        styles={btnStyles}
         href={environment.urls.issue}
         target="_blank"
         iconProps={{
@@ -43,7 +50,7 @@ export const FooterButtons: React.FC = () => (
     </Stack.Item>
     <Stack.Item grow={1}>
       <DefaultButton
-        className={styles.button}
+        styles={btnStyles}
         href={environment.urls.github}
         target="_blank"
         iconProps={{
@@ -56,7 +63,7 @@ export const FooterButtons: React.FC = () => (
 
     <Stack.Item grow={1}>
       <DefaultButton
-        className={styles.button}
+        styles={btnStyles}
         href={environment.urls.donate}
         target="_blank"
         iconProps={{
