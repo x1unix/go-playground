@@ -338,21 +338,6 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
               }
             />
             <SettingsProperty
-              key="termEmulationEnabled"
-              title="Emulate Terminal"
-              control={
-                <Checkbox
-                  label="Disable this option if you have troubles copying output text."
-                  defaultChecked={!this.props.terminal?.disableTerminalEmulation}
-                  onChange={(_, val) => {
-                    this.touchTerminalSettings({
-                      disableTerminalEmulation: !val,
-                    })
-                  }}
-                />
-              }
-            />
-            <SettingsProperty
               key="terminalBackend"
               title="Rendering Backend"
               description="Set the rendering backend for the terminal."
@@ -369,11 +354,24 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
                 />
               }
             />
-            <div hidden={!this.state.hideTerminalSettings}>
+            <SettingsProperty
+              key="termEmulationEnabled"
+              title="Emulate Terminal"
+              control={
+                <Checkbox
+                  label="Enables ANSI terminal escape sequences support using xterm.js."
+                  defaultChecked={!this.props.terminal?.disableTerminalEmulation}
+                  onChange={(_, val) => {
+                    this.touchTerminalSettings({
+                      disableTerminalEmulation: !val,
+                    })
+                  }}
+                />
+              }
+            />
+            <div>
               <MessageBar messageBarType={MessageBarType.warning}>
-                <span>Colored text, screen clear and other features relying on terminal escape sequences require </span>
-                <u>Emulate Terminal</u>
-                <span> option to be enabled.</span>
+                Disable <u>Emulate Terminal</u> feature if you having troubles copying text from output.
               </MessageBar>
             </div>
           </PivotItem>
