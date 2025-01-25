@@ -31,7 +31,7 @@ const config: ITerminalOptions = {
   convertEol: true,
 }
 
-interface Props {
+export interface ConsoleProps {
   status?: StatusState
   fontFamily: string
   fontSize: number
@@ -85,7 +85,7 @@ const CopyButton: React.FC<{
 /**
  * Console is Go program events output component based on xterm.js
  */
-export const Console: React.FC<Props> = ({ fontFamily, fontSize, status, backend }) => {
+export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, backend }) => {
   const theme = useXtermTheme()
   const [offset, setOffset] = useState(0)
   const [isFocused, setIsFocused] = useState(false)

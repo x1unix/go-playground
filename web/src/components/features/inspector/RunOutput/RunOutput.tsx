@@ -1,20 +1,14 @@
 import React, { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 import { Link, MessageBar, MessageBarType, useTheme } from '@fluentui/react'
 
-import { Console } from '~/components/features/inspector/Console'
-import { connect, type StatusState } from '~/store'
-import type { TerminalState } from '~/store/terminal'
-import type { MonacoSettings } from '~/services/config'
+import { Console, type ConsoleProps } from '~/components/features/inspector/Console'
+import { FallbackOutput } from 'components/features/inspector/FallbackOutput'
+import { type State } from '~/store'
 import { DEFAULT_FONT, getDefaultFontFamily, getFontFamily } from '~/services/fonts'
 
 import './RunOutput.css'
 import { splitStringUrls } from './parser'
-
-interface StateProps {
-  status?: StatusState
-  monaco?: MonacoSettings
-  terminal: TerminalState
-}
 
 const linkStyle = {
   root: {
@@ -34,8 +28,18 @@ const highlightLinks = (str: string) =>
     ),
   )
 
-const RunOutput: React.FC<StateProps & {}> = ({ status, monaco, terminal }) => {
+const ConsoleWrapper: React.FC<ConsoleProps & { disableTerminal?: boolean }> = (props) => {
+  if (props.disableTerminal) {
+    return <FallbackOutput {...props} />
+  }
+
+  return <Console {...props} />
+}
+
+export const RunOutput: React.FC = () => {
   const theme = useTheme()
+  const { status, monaco, terminal } = useSelector<State, State>((state) => state)
+
   const { fontSize, renderingBackend } = terminal.settings
   const styles = useMemo(() => {
     const { palette } = theme
@@ -69,15 +73,15 @@ const RunOutput: React.FC<StateProps & {}> = ({ status, monaco, terminal }) => {
             Press &quot;Run&quot; to compile program.
           </div>
         ) : (
-          <Console fontFamily={fontFamily} fontSize={fontSize} status={status} backend={renderingBackend} />
+          <ConsoleWrapper
+            fontFamily={fontFamily}
+            fontSize={fontSize}
+            status={status}
+            backend={renderingBackend}
+            disableTerminal={terminal.settings.disableTerminalEmulation}
+          />
         )}
       </div>
     </div>
   )
 }
-
-export const ConnectedRunOutput = connect<StateProps, {}>(({ status, monaco, terminal }) => ({
-  status,
-  monaco,
-  terminal,
-}))(RunOutput)

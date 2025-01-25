@@ -4,7 +4,7 @@ import { Resizable } from 're-resizable'
 import clsx from 'clsx'
 import { VscChevronDown, VscChevronUp, VscSplitHorizontal, VscSplitVertical } from 'react-icons/vsc'
 
-import { ConnectedRunOutput } from '../RunOutput'
+import { RunOutput } from '../RunOutput'
 import { PanelHeader } from '~/components/elements/panel/PanelHeader'
 import { LayoutType, DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_WIDTH_PERCENT } from '~/styles/layout'
 import './InspectorPanel.css'
@@ -148,7 +148,7 @@ export const InspectorPanel: React.FC<Props> = ({
         }}
       />
       <div className="InspectorPanel__container" hidden={isCollapsed}>
-        <ConnectedRunOutput />
+        <RunOutput />
       </div>
     </Resizable>
   )
