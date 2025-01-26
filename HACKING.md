@@ -82,13 +82,18 @@ Please ensure that you have installed:
 
 Run following commands to configure a just cloned project:
 
-| Command           | Purpose                                                  |
-|-------------------|----------------------------------------------------------|
-| `make preinstall` | Installs NPM packages for a web app.                     |
-| `make wasm`       | Builds WebAssembly binaries used by the web app.         |
-| `make go-index`   | Generates Go packages index for autocomplete in web app. |
+| Command           | Purpose                                                                                                     |
+|-------------------|-------------------------------------------------------------------------------------------------------------|
+| `corepack enable` | Enables [Corepack](https://nodejs.org/api/corepack.html) to use package manager version from `package.json` |
+| `make preinstall` | Installs NPM packages for a web app.                                                                        |
+| `make wasm`       | Builds WebAssembly binaries used by the web app.                                                            |
+| `make go-index`   | Generates Go packages index for autocomplete in web app.                                                    |
 
 ### Running Project
+
+> [!IMPORTANT]
+> If you see `command not found: yarn` error, please ensure that Corepack is enabled.
+> See **First-time setup** section.
 
 Front-end web app and Go API server are executed using separate make commands:
 
