@@ -115,6 +115,12 @@
       "iconColor": "#ff6347"
     },
     {
+      "label": "Iterators",
+      "id": "JsdFcZac4E-",
+      "icon": "VscSymbolArray",
+      "iconColor": "#ffb900"
+    },
+    {
       "label": "Recursion",
       "id": "smWim1q9ofu",
       "icon": "RepeatAll",
