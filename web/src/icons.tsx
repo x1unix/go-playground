@@ -3,6 +3,7 @@ import { initializeIcons as initFluentIcons } from '@fluentui/react/lib/Icons'
 import { registerIcons } from '@fluentui/react/lib/Styling'
 import { SiWebassembly, SiAzurefunctions } from 'react-icons/si'
 import {
+  VscSymbolArray,
   VscSymbolClass,
   VscSymbolMisc,
   VscBracketError,
@@ -27,6 +28,7 @@ export const initializeIcons = () => {
       VscSymbolMisc: <VscSymbolMisc />,
       VscPulse: <VscPulse />,
       VscGithubInverted: <VscGithubInverted />,
+      VscSymbolArray: <VscSymbolArray />,
     },
   })
 }
