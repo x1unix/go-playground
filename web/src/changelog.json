@@ -1,9 +1,9 @@
 {
-  "Interface - Terminal": [
+  "Interface - Misc": [
     {
-      "issueId": 463,
-      "url": "pull/463",
-      "description": "Add option to disable terminal emulation to address copy text issues on some platforms."
+      "issueId": 471,
+      "url": "pull/471",
+      "description": "Add iterators to examples"
     }
   ]
 }
