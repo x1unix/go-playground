@@ -1,6 +1,6 @@
 import { StackReader } from '../stack'
 import { MemoryInspector } from '../debug'
-import { Bool, GoStringType, Int32 } from '../types'
+import { Bool, GoStringType, Int32, Int64 } from '../types'
 import { type GoInstance, type ImportObject, type PendingEvent } from './interface'
 import { type Func, Ref, RefType } from '../pkg/syscall/js'
 import { MemoryView } from '../memory/view'
@@ -58,10 +58,15 @@ export type CallImportHandler = (sp: number, stack: StackReader, mem: MemoryView
  */
 const defaultCmdline = ['js']
 
+export interface WasmWriter {
+  writeSync: (fd: number, data: Uint8Array) => void
+}
+
 export interface Options {
   debug?: boolean
   debugCalls?: string[]
   globalValue?: any
+  stdoutHandler?: WasmWriter
 }
 
 export class GoWrapper {
@@ -69,6 +74,7 @@ export class GoWrapper {
   private _memView: MemoryView | null = null
   private readonly _debug: boolean = false
   private readonly _debugCalls: Set<string>
+  private readonly _stdout?: Options['stdoutHandler']
   private _globalValue: object
   private readonly go: GoInstance
 
@@ -104,11 +110,12 @@ export class GoWrapper {
     return this.go._inst!.exports
   }
 
-  constructor(parent: GoInstance, { debug = false, debugCalls, globalValue }: Options = {}) {
+  constructor(parent: GoInstance, { debug = false, debugCalls, globalValue, stdoutHandler }: Options = {}) {
     this.go = parent
     this._debug = debug
     this._debugCalls = new Set(debugCalls ?? [])
     this._globalValue = globalValue?.Go === GoWrapper ? globalValue : wrapGlobal()
+    this._stdout = stdoutHandler
 
     this.patchImportObject()
   }
@@ -147,6 +154,17 @@ export class GoWrapper {
     this.exportFunction('syscall/js.valueCall', (sp, reader) => {
       this.valueCall(sp, reader)
     })
+
+    if (this._stdout) {
+      this.exportFunction('runtime.wasmWrite', (sp, reader, mem) => {
+        reader.skipHeader()
+        const fd = reader.next<number>(Int64)
+        const bufPtr = reader.next<number>(Int64)
+        const len = reader.next<number>(Int32)
+        const chunk = mem.memory.buffer.slice(bufPtr, bufPtr + len)
+        this._stdout?.writeSync(fd, new Uint8Array(chunk, 0, len))
+      })
+    }
 
     const wasmExitFunc = getImportNamespace(this.go)['runtime.wasmExit']
     this.exportFunction('runtime.wasmExit', (sp, reader) => {

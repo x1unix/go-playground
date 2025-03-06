@@ -33,6 +33,7 @@ class WorkerHandler implements GoExecutor {
 
     const go = new GoWrapper(new globalThis.Go(), {
       globalValue: wrapGlobal(mocks, globalThis),
+      stdoutHandler: fs,
     })
 
     const { instance } = await WebAssembly.instantiate(image, go.importObject)
