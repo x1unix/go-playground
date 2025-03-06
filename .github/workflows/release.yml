@@ -14,9 +14,9 @@ on:
       - created
 
 env:
-  GO_VERSION: 1.23
+  GO_VERSION: 1.24
   WASM_API_VER: v2
-  PREV_GO_VERSION: 1.22
+  PREV_GO_VERSION: 1.23
 
 jobs:
   build:
@@ -73,9 +73,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          cache: 'yarn'
-          node-version-file: '.nvmrc'
-          cache-dependency-path: 'web/yarn.lock'
+          cache: "yarn"
+          node-version-file: ".nvmrc"
+          cache-dependency-path: "web/yarn.lock"
 
       - name: Setup dependencies
         run: sudo apt-get update && sudo apt-get install -y make
