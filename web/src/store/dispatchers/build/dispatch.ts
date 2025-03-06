@@ -5,13 +5,8 @@ import { buildGoTestFlags, requiresWasmEnvironment } from '~/lib/sourceutil'
 import client, { type EvalEvent, EvalEventKind } from '~/services/api'
 import { isProjectRequiresGoMod } from '~/services/examples'
 
-import { type DispatchFn, type StateProvider } from '../../helpers'
-import {
-  newAddNotificationAction,
-  newRemoveNotificationAction,
-  NotificationIDs,
-  NotificationType,
-} from '../../notifications'
+import type { DispatchFn, StateProvider } from '../../helpers'
+import { newRemoveNotificationAction, NotificationIDs } from '../../notifications'
 import {
   newErrorAction,
   newLoadingAction,
@@ -22,8 +17,13 @@ import {
 
 import { type Dispatcher } from '../utils'
 import { type BulkFileUpdatePayload, WorkspaceAction } from '~/store/workspace/actions'
-import { fetchWasmWithProgress, lastElem, hasProgramTimeoutError, newStdoutHandler, runTimeoutNs} from './utils'
-import { goModMissingNotification, goEnvChangedNotification, goProgramExitNotification, wasmErrorNotification } from './notifications'
+import { fetchWasmWithProgress, lastElem, hasProgramTimeoutError, newStdoutHandler, runTimeoutNs } from './utils'
+import {
+  goModMissingNotification,
+  goEnvChangedNotification,
+  goProgramExitNotification,
+  wasmErrorNotification,
+} from './notifications'
 
 const dispatchEvalEvents = (dispatch: DispatchFn, events: EvalEvent[]) => {
   // TODO: support cancellation
