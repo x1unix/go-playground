@@ -1,9 +1,14 @@
 {
-  "Interface - Misc": [
+  "Interface - Bugs": [
     {
       "issueId": 480,
       "url": "pull/480",
       "description": "Fix text wrap in output"
+    },
+    {
+      "issueId": 485,
+      "url": "pull/485",
+      "description": "Fix data race when WASM program prints after exit"
     }
   ],
   "Go - WebAssembly": [
@@ -11,6 +16,11 @@
       "issueId": 481,
       "url": "pull/481",
       "description": "Upgrade to Go 1.24"
+    },
+    {
+      "issueId": 484,
+      "url": "pull/484",
+      "description": "Fix output of Go panics"
     }
   ]
 }
