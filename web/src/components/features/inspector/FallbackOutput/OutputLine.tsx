@@ -33,6 +33,7 @@ const styles = mergeStyleSets({
     border: 'none',
     margin: 0,
     float: 'left',
+    whiteSpace: 'pre-wrap',
   },
 })
 
