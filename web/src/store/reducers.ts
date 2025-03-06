@@ -94,8 +94,8 @@ const reducers = {
       [ActionType.EVAL_EVENT]: (s: StatusState, a: Action<EvalEvent>) => ({
         lastError: null,
         loading: false,
-        running: true,
         dirty: true,
+        running: s.running,
         events: s.events ? s.events.concat(a.payload) : [a.payload],
       }),
       [ActionType.EVAL_FINISH]: (s: StatusState, _: Action) => ({
