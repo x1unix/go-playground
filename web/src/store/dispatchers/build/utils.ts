@@ -6,7 +6,7 @@ import { wrapResponseWithProgress } from '~/utils/http'
 import type { DispatchFn } from '../../helpers'
 import { newRemoveNotificationAction, NotificationIDs } from '../../notifications'
 import { newProgramWriteAction } from '../../actions'
-import { downloadProgressNotification} from './notifications'
+import { downloadProgressNotification } from './notifications'
 
 /**
  * Go program execution timeout in nanoseconds
@@ -42,10 +42,13 @@ export const fetchWasmWithProgress = async (dispatch: DispatchFn, fileName: stri
       cancelAnimationFrame(prevRafID)
       prevRafID = requestAnimationFrame(() => {
         dispatch(
-          downloadProgressNotification({
-            total: totalBytes,
-            current: currentBytes,
-          }, true)
+          downloadProgressNotification(
+            {
+              total: totalBytes,
+              current: currentBytes,
+            },
+            true,
+          ),
         )
       })
     })
@@ -60,11 +63,11 @@ export const fetchWasmWithProgress = async (dispatch: DispatchFn, fileName: stri
 
 const decoder = new TextDecoder()
 export const newStdoutHandler = (dispatch: DispatchFn) => {
-  return (data: ArrayBuffer, isStderr: boolean) => {
+  return (data: ArrayBufferLike, isStderr: boolean) => {
     dispatch(
       newProgramWriteAction({
         Kind: isStderr ? EvalEventKind.Stderr : EvalEventKind.Stdout,
-        Message: decoder.decode(data),
+        Message: decoder.decode(data as ArrayBuffer),
         Delay: 0,
       }),
     )
