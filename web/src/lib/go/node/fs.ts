@@ -45,7 +45,7 @@ export interface IFileSystem {
  */
 export interface IWriter {
   // write writes data and returns written bytes count
-  write: (data: ArrayBuffer) => number
+  write: (data: ArrayBufferLike) => number
 }
 
 /**
@@ -62,6 +62,7 @@ export class FileSystemWrapper {
     O_TRUNC: -1,
     O_APPEND: -1,
     O_EXCL: -1,
+    O_DIRECTORY: -1,
   }
 
   constructor(stdout: IWriter, stderr: IWriter) {

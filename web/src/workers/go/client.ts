@@ -4,7 +4,7 @@ import type { StartupParams, GoExecutor, WriteListener } from './types'
 
 const WORKER_START_TIMEOUT = 30 * 1000
 
-type WriteHandler = (data: ArrayBuffer, isStderr: boolean) => void
+type WriteHandler = (data: ArrayBufferLike, isStderr: boolean) => void
 
 interface SyncStdio {
   stdout: WriteListener

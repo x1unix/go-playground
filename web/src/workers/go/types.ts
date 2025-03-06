@@ -1,4 +1,4 @@
-export type WriteListener = (data: ArrayBuffer) => void
+export type WriteListener = (data: ArrayBufferLike) => void
 
 export interface Stdio {
   stdout: WriteListener
