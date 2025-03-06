@@ -1,9 +1,16 @@
 {
   "Interface - Misc": [
     {
-      "issueId": 471,
-      "url": "pull/471",
-      "description": "Add iterators to examples"
+      "issueId": 480,
+      "url": "pull/480",
+      "description": "Fix text wrap in output"
+    }
+  ],
+  "Go - WebAssembly": [
+    {
+      "issueId": 481,
+      "url": "pull/481",
+      "description": "Upgrade to Go 1.24"
     }
   ]
 }
