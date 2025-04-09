@@ -29,7 +29,7 @@ func NewIgnoreList(names ...string) Filter {
 // UnexportedFilter filters private symbols
 type UnexportedFilter struct{}
 
-func (_ UnexportedFilter) Ignore(typeName string) bool {
+func (UnexportedFilter) Ignore(typeName string) bool {
 	return !token.IsExported(typeName)
 }
 

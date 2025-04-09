@@ -43,7 +43,7 @@ func (p *BufferPool) Put(b RecyclableBuffer) {
 		panic("BufferPool.Put: RecyclableBuffer was already recycled")
 	}
 
-	b.Buffer.Reset()
+	b.Reset()
 	p.pool.Put(b.Buffer)
 	b.pool = nil
 	b.Buffer = nil

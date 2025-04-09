@@ -23,7 +23,7 @@ const (
 
 type deprecatedMessage struct{}
 
-func (_ deprecatedMessage) MarshalJSON() ([]byte, error) {
+func (deprecatedMessage) MarshalJSON() ([]byte, error) {
 	return []byte(deprecationMsg), nil
 }
 

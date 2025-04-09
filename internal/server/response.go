@@ -30,13 +30,11 @@ func (p FilesPayload) Validate() error {
 	for name, src := range p.Files {
 		switch filepath.Ext(name) {
 		case ".go", ".mod":
-			break
+			if len(strings.TrimSpace(src)) == 0 {
+				return fmt.Errorf("empty file %q", name)
+			}
 		default:
 			return fmt.Errorf("invalid file type: %q", name)
-		}
-
-		if len(strings.TrimSpace(src)) == 0 {
-			return fmt.Errorf("empty file %q", name)
 		}
 	}
 

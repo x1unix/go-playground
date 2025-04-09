@@ -1,8 +1,20 @@
+version: "2"
 run:
   tests: false
-issues:
-  exclude-dirs:
-    - pkg/worker
-    - cmd/webworker
-    - web
-    - web/public/examples
+formatters:
+  exclusions:
+    paths:
+      - "pkg/worker/"
+      - "cmd/webworker/"
+      - "web/"
+
+linters:
+  exclusions:
+    rules:
+      - text: ".Close` is not checked"
+        linters:
+          - errcheck
+    paths:
+      - "pkg/worker/"
+      - "cmd/webworker/"
+      - "web/"
