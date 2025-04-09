@@ -13,7 +13,7 @@ type CommandRunner interface {
 
 type OSCommandRunner struct{}
 
-func (_ OSCommandRunner) RunCommand(cmd *exec.Cmd) error {
+func (OSCommandRunner) RunCommand(cmd *exec.Cmd) error {
 	if err := cmd.Start(); err != nil {
 		return err
 	}
