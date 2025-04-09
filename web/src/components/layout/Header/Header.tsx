@@ -252,10 +252,20 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
           isOpen={showSettings}
         />
         <AboutModal
+          isOpen={showAbout}
           onClose={() => {
             this.setState({ showAbout: false })
           }}
-          isOpen={showAbout}
+          onTitleClick={() => {
+            this.setState({ showAbout: false })
+            this.onSnippetSelected({
+              label: 'bad-apple',
+              source: {
+                basePath: 'testdata',
+                files: ['bad-apple.go'],
+              },
+            })
+          }}
         />
         <ExamplesModal
           isOpen={showExamples}

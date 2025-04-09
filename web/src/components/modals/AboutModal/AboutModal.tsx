@@ -16,15 +16,17 @@ import { getContentStyles, getIconButtonStyles } from '~/styles/modal'
 import environment from '~/environment'
 import { SponsorsBlock } from './SponsorsBlock'
 import { FooterButtons } from './FooterButtons'
+import './AboutModal.css'
 
 const TITLE_ID = 'AboutTitle'
 
 interface AboutModalProps {
   isOpen?: boolean
   onClose: () => void
+  onTitleClick?: () => void
 }
 
-export const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) => {
+export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose, onTitleClick }) => {
   const theme = useTheme()
   const contentStyles = getContentStyles(theme)
   const iconButtonStyles = getIconButtonStyles(theme)
@@ -42,11 +44,16 @@ export const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) =>
         title: {
           fontWeight: FontWeights.semibold,
           fontSize: FontSizes.xxLargePlus,
-          padding: '1em 0 2em',
+          margin: '1em 0 2em',
           color: 'transparent',
+          cursor: 'default',
           background:
-            'linear-gradient(to right, rgb(10,97,244) 0%, rgb(16, 187, 187) 100%) repeat scroll 0% 0% / auto padding-box text',
+            'linear-gradient(to right, #0a61f4, #10bbbb, #10d88a, #6e0af4, #f40a6e, #a4e410,  #f45b0a) repeat scroll 0% 0% / auto padding-box text',
+          backgroundSize: '550% 550%',
           textAlign: 'center',
+          '&:hover': {
+            animation: 'logoAnimation 30s infinite',
+          },
         },
         info: {
           display: 'flex',
@@ -67,8 +74,8 @@ export const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) =>
   return (
     <Modal
       titleAriaId={TITLE_ID}
-      isOpen={props.isOpen}
-      onDismiss={props.onClose}
+      isOpen={isOpen}
+      onDismiss={onClose}
       styles={modalStyles}
       containerClassName={modalStyles.container}
     >
@@ -77,11 +84,11 @@ export const AboutModal: React.FC<AboutModalProps> = (props: AboutModalProps) =>
           iconProps={{ iconName: 'Cancel' }}
           styles={iconButtonStyles}
           ariaLabel="Close popup modal"
-          onClick={props.onClose as any}
+          onClick={onClose as any}
         />
       </div>
       <div className={contentStyles.body}>
-        <div id={TITLE_ID} className={modalStyles.title}>
+        <div id={TITLE_ID} className={modalStyles.title} onClick={onTitleClick}>
           Better Go Playground
         </div>
         <div className={modalStyles.info}>
