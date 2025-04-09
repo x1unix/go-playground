@@ -2,6 +2,7 @@ run:
   tests: false
 issues:
   exclude-dirs:
-  - pkg/worker
-  - cmd/webworker
-  - web
+    - pkg/worker
+    - cmd/webworker
+    - web
+    - web/public/examples
