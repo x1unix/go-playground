@@ -261,7 +261,7 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
             this.onSnippetSelected({
               label: 'bad-apple',
               source: {
-                basePath: 'misc',
+                basePath: 'testdata',
                 files: ['bad-apple.go'],
               },
             })

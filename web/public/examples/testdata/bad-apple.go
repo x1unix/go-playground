@@ -21,6 +21,7 @@ var data = `af)Ab#@8N2KCe>AB=nq,%vv)!Zrn~9GO(b1EJ?}C5vHb%Yt0E{>c"eGA_?N@41B:X+u
 func main() {
 	data = strings.ReplaceAll(data, string(0x01), "`")
 	bin := must(base91.StdEncoding.DecodeString(data))
+
 	r := bytes.NewReader(bin)
 	gz := must(gzip.NewReader(r))
 	ar := tar.NewReader(gz)
