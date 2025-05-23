@@ -2,7 +2,10 @@ import type { AnnouncementMessage, IAPIClient } from '../api'
 import type { IConfig } from '../config'
 
 export class AnnouncementService {
-  constructor(private client: IAPIClient, private config: IConfig) {}
+  constructor(
+    private readonly client: IAPIClient,
+    private readonly config: IConfig,
+  ) {}
 
   async getAnnouncement(): Promise<AnnouncementMessage | null> {
     try {

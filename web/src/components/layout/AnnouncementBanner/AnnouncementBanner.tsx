@@ -16,13 +16,13 @@ const barCenteredTextStyle = {
 const barNoIconStyle = {
   icon: {
     display: 'none',
-  }
+  },
 }
 
 export const AnnouncementBanner: React.FC = () => {
   const [message, setMessage] = useState<AnnouncementMessage | null>(null)
   useEffect(() => {
-    announcementService.getAnnouncement().then(setMessage)
+    void announcementService.getAnnouncement().then(setMessage)
   }, [])
 
   if (!message) {

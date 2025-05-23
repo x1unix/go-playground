@@ -9,9 +9,8 @@ const announcementToMessageType: Record<AnnouncementMessage['type'], MessageBarT
   success: MessageBarType.success,
 }
 
-export const getMessageBarType = (msgType: AnnouncementMessage['type']) => (
+export const getMessageBarType = (msgType: AnnouncementMessage['type']) =>
   announcementToMessageType[msgType] ?? MessageBarType.info
-)
 
 const formatText = (style: AnnouncementMessagePart['style'], content: string) => {
   if (!style) {
@@ -34,13 +33,7 @@ const msgChunkToNode = (chunk: AnnouncementMessagePart, i: number) => {
   switch (chunk.type) {
     case 'link':
       return (
-        <Link
-          key={i}
-          href={chunk.value}
-          target='_blank'
-          rel='noopener noreferer'
-          underline
-        >
+        <Link key={i} href={chunk.value} target="_blank" rel="noopener noreferer" underline>
           {formatText(chunk.style, chunk.label ?? chunk.value)} ↗︎
         </Link>
       )
@@ -49,6 +42,4 @@ const msgChunkToNode = (chunk: AnnouncementMessagePart, i: number) => {
   }
 }
 
-export const messagePartsToNode = (parts: AnnouncementMessagePart[]) => (
-  parts.map(msgChunkToNode)
-)
+export const messagePartsToNode = (parts: AnnouncementMessagePart[]) => parts.map(msgChunkToNode)
