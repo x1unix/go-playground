@@ -19,6 +19,14 @@ const barNoIconStyle = {
   },
 }
 
+const barInfoStyle = {
+  text: {
+    a: {
+      color: 'inherit !important',
+    },
+  },
+}
+
 export const AnnouncementBanner: React.FC = () => {
   const [message, setMessage] = useState<AnnouncementMessage | null>(null)
   useEffect(() => {
@@ -32,6 +40,7 @@ export const AnnouncementBanner: React.FC = () => {
   const messageBarStyles = mergeStyleSets(
     message.isCentered && barCenteredTextStyle,
     message.isIconHidden && barNoIconStyle,
+    message.type === 'info' && barInfoStyle,
   )
 
   return (
