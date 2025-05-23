@@ -1,4 +1,12 @@
-import type { VersionResponse, RunResponse, BuildResponse, ShareResponse, VersionsInfo, FilesPayload } from './models'
+import type {
+  VersionResponse,
+  RunResponse,
+  BuildResponse,
+  ShareResponse,
+  VersionsInfo,
+  FilesPayload,
+  AnnouncementMessage,
+} from './models'
 
 export interface IAPIClient {
   getVersion: () => Promise<VersionResponse>
@@ -16,4 +24,6 @@ export interface IAPIClient {
   shareSnippet: (files: Record<string, string>) => Promise<ShareResponse>
 
   getBackendVersions: () => Promise<VersionsInfo>
+
+  getAnnouncementMessage: () => Promise<AnnouncementMessage | null>
 }

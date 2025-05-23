@@ -16,6 +16,7 @@ const AUTOFORMAT_KEY = 'go.build.autoFormat'
 const MONACO_SETTINGS = 'ms.monaco.settings'
 const PANEL_SETTINGS = 'ui.layout.panel'
 const GOPROXY_URL = 'go.env.GOPROXY'
+const LAST_DISMISSED_ANNOUNCEMENT = 'ui.announcements.lastDismissed'
 
 const setThemeStyles = (isDark: boolean) => loadTheme(isDark ? DarkTheme : LightTheme)
 
@@ -62,6 +63,14 @@ const Config = {
 
   set goProxyUrl(newVal: string) {
     this.setString(GOPROXY_URL, newVal)
+  },
+
+  get lastDismissedAnnouncement() {
+    return this.getString<string | null>(LAST_DISMISSED_ANNOUNCEMENT, null)
+  },
+
+  set lastDismissedAnnouncement(announcementId: string) {
+    this.setString(LAST_DISMISSED_ANNOUNCEMENT, announcementId)
   },
 
   get runTargetConfig(): RunTargetConfig {
@@ -182,3 +191,4 @@ const Config = {
 }
 
 export default Config
+export type IConfig = typeof Config

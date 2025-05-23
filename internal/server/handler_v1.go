@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/x1unix/go-playground/internal/announcements"
 	"github.com/x1unix/go-playground/internal/builder"
 	"github.com/x1unix/go-playground/internal/builder/storage"
 	"github.com/x1unix/go-playground/internal/server/backendinfo"
@@ -38,7 +39,8 @@ type APIv1Handler struct {
 }
 
 type ServiceConfig struct {
-	Version string
+	Version      string
+	Announcement *announcements.Announcement
 }
 
 // NewAPIv1Handler is APIv1Handler constructor
@@ -59,6 +61,8 @@ func (s *APIv1Handler) Mount(r *mux.Router) {
 		HandlerFunc(WrapHandler(s.HandleGetVersion))
 	r.Path("/backends/info").Methods(http.MethodGet).
 		HandlerFunc(WrapHandler(s.HandleGetVersions))
+	r.Path("/announcement").Methods(http.MethodGet).
+		HandlerFunc(WrapHandler(s.HandleGetAnnouncement))
 	r.Path("/artifacts/{artifactId:[a-fA-F0-9]+}.wasm").Methods(http.MethodGet).
 		HandlerFunc(WrapHandler(s.HandleArtifactRequest))
 }
@@ -66,6 +70,12 @@ func (s *APIv1Handler) Mount(r *mux.Router) {
 // HandleGetVersion handles /api/version
 func (s *APIv1Handler) HandleGetVersion(w http.ResponseWriter, _ *http.Request) error {
 	WriteJSON(w, VersionResponse{Version: s.config.Version, APIVersion: "2"})
+	return nil
+}
+
+// HandleGetAnnouncement returns service announcement banner contents.
+func (s *APIv1Handler) HandleGetAnnouncement(w http.ResponseWriter, r *http.Request) error {
+	WriteJSON(w, GetAnnouncementResponse{Message: s.config.Announcement})
 	return nil
 }
 

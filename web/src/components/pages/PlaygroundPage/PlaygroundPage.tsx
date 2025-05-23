@@ -8,6 +8,7 @@ import { ConnectedStatusBar } from '~/components/layout/StatusBar'
 
 import styles from './PlaygroundPage.module.css'
 import { SuspenseBoundary } from '~/components/elements/misc/SuspenseBoundary'
+import { LazyAnnouncementBanner } from '~/components/layout/AnnouncementBanner'
 
 const LazyPlaygroundContent = lazy(async () => await import('./PlaygroundContainer.tsx'))
 
@@ -25,6 +26,7 @@ export const PlaygroundPage: React.FC = () => {
 
   return (
     <div ref={containerRef} className={styles.Playground}>
+      <LazyAnnouncementBanner />
       <Header />
       <SuspenseBoundary errorLabel="Failed to load workspace" preloaderText="Loading workspace...">
         <LazyPlaygroundContent parentRef={containerRef} />

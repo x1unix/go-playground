@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/x1unix/go-playground/internal/announcements"
 	"github.com/x1unix/go-playground/pkg/goplay"
 	"github.com/x1unix/go-playground/pkg/monaco"
 )
@@ -160,4 +161,8 @@ type VersionsInformation struct {
 
 	// WebAssembly is host Go version used for building WebAssembly Go files.
 	WebAssembly string `json:"wasm"`
+}
+
+type GetAnnouncementResponse struct {
+	Message *announcements.Announcement `json:"message"`
 }

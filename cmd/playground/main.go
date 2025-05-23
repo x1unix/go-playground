@@ -86,7 +86,10 @@ func start(logger *zap.Logger, cfg *config.Config) error {
 	// Initialize API endpoints
 	r := mux.NewRouter()
 	apiRouter := r.PathPrefix("/api").Subrouter()
-	svcCfg := server.ServiceConfig{Version: Version}
+	svcCfg := server.ServiceConfig{
+		Version:      Version,
+		Announcement: cfg.Misc.Announcement.Value,
+	}
 	server.NewAPIv1Handler(svcCfg, playgroundClient, buildSvc, backendsInfoSvc).
 		Mount(apiRouter)
 
