@@ -41,7 +41,7 @@ export const AnnouncementBanner: React.FC = () => {
       styles={messageBarStyles}
       onDismiss={() => {
         announcementService.dismissAnnouncement(message.key)
-        // setMessage(null)
+        setMessage(null)
       }}
     >
       {messagePartsToNode(message.content)}
