@@ -36,6 +36,20 @@ Playground server can be configured using environment variables described below.
 | `HTTP_READ_TIMEOUT`    | `15s`                          | HTTP request read timeout.                                                                       |
 | `HTTP_WRITE_TIMEOUT`   | `60s`                          | HTTP response timeout.                                                                           |
 | `HTTP_IDLE_TIMEOUT`    | `90s`                          | HTTP keep alive timeout.                                                                         |
+| `SERVER_ANNOUNCEMENT`  |                                | Server announcement message to be displayed on top of page. See [Announcements](#announcements)  |
+
+#### Announcements
+
+Service supports displaying service announcements on a top of a page.\
+This is used to notify users about news suchs as planned server downtime or other important information.
+
+Announcement file is a base64-encoded msgpack string passed into `SERVER_ANNOUNCEMENT` environment variable.
+
+##### Encode announcement
+
+Use [this tool](../../../cmd/announcements/main.go) to encode a JSON file into a encoded announcement string.
+
+Announcement schema can be found [here](../../../internal/announcements/types.go).
 
 ## Building custom image
 
