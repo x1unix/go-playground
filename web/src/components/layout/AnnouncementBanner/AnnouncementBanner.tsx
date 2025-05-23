@@ -20,7 +20,15 @@ const barNoIconStyle = {
 }
 
 const barInfoStyle = {
+  root: {
+    background: '#007fd4',
+    color: '#fff',
+    '.ms-MessageBar-dismissal .ms-Icon': {
+      color: '#fff',
+    },
+  },
   text: {
+    color: 'inherit',
     a: {
       color: 'inherit !important',
     },
