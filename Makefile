@@ -53,6 +53,10 @@ cover:
 	@cat tools/cover.txt | xargs go test -v -covermode=count -coverprofile=/tmp/cover.out && \
 	go tool cover -html=/tmp/cover.out
 
+.PHONY:announcement
+announcement:
+	@go run ./cmd/announcements -f "$(SRC_FILE)"
+
 .PHONY: install
 install:
 	@if [ ! -d "./target" ]; then echo "ERROR: Please build project first by calling 'make'." && exit 2; fi

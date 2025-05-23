@@ -87,7 +87,7 @@ export class Client implements IAPIClient {
    * Returns important announcement message to be displayed at header banner.
    */
   async getAnnouncementMessage(): Promise<AnnouncementMessage | null> {
-    const { message } = await this.get<AnnouncementMessageResponse>('/v2/announcement')
+    const { message } = await this.get<AnnouncementMessageResponse>('/announcement')
     return message
   }
 

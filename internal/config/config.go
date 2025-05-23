@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
+	"github.com/x1unix/go-playground/internal/announcements"
 	"github.com/x1unix/go-playground/pkg/goplay"
 	"github.com/x1unix/go-playground/pkg/util/cmdutil"
 )
@@ -100,12 +101,22 @@ func (cfg *ServicesConfig) mountFlagSet(f *flag.FlagSet) {
 	f.StringVar(&cfg.GoogleAnalyticsID, "gtag-id", "", "Google Analytics tag ID (optional)")
 }
 
+type MiscConfig struct {
+	// Announcement allows to set announcement banner displayed on a header banner.
+	//
+	// This can be used to display a server maintenance warning or other important info.
+	//
+	// Announcement string should be encoded using '/cmd/announcements' tool.
+	Announcement announcements.TextMarshaler `envconfig:"SERVER_ANNOUNCEMENT"`
+}
+
 type Config struct {
 	HTTP       HTTPConfig       `json:"http"`
 	Playground PlaygroundConfig `json:"playground"`
 	Build      BuildConfig      `json:"build"`
 	Log        LogConfig        `json:"log"`
 	Services   ServicesConfig   `json:"services"`
+	Misc       MiscConfig       `json:"misc"`
 }
 
 // Validate validates a config and returns error if config is invalid.

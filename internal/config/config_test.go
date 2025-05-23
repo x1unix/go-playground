@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"github.com/x1unix/go-playground/internal/announcements"
 	"go.uber.org/zap/zapcore"
 )
 
@@ -71,6 +72,19 @@ func TestFromFlags(t *testing.T) {
 }
 
 func TestFromEnv(t *testing.T) {
+	testAnnouncement := &announcements.Announcement{
+		Key:  "test",
+		Type: "info",
+		Content: []announcements.MessagePart{
+			{
+				Type:  "text",
+				Value: "hello world",
+			},
+		},
+	}
+	announcementStr, err := announcements.Encode(testAnnouncement)
+	require.NoError(t, err)
+
 	cases := map[string]struct {
 		expect    Config
 		input     *Config
@@ -154,6 +168,18 @@ func TestFromEnv(t *testing.T) {
 				"APP_GO_BUILD_TIMEOUT":    "1h",
 			},
 		},
+		"parse announcements": {
+			expect: Config{
+				Misc: MiscConfig{
+					Announcement: announcements.TextMarshaler{
+						Value: testAnnouncement,
+					},
+				},
+			},
+			env: map[string]string{
+				"SERVER_ANNOUNCEMENT": announcementStr,
+			},
+		},
 	}
 
 	for n, c := range cases {
@@ -168,6 +194,7 @@ func TestFromEnv(t *testing.T) {
 				require.Contains(t, err.Error(), c.expectErr)
 				return
 			}
+
 			require.NoError(t, err)
 			require.NotNil(t, got)
 			require.Equal(t, c.expect, *got)
