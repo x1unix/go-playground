@@ -24,7 +24,7 @@ const barInfoStyle = {
     background: '#007fd4',
     color: '#fff',
     '.ms-MessageBar-dismissal .ms-Icon': {
-      color: '#fff !important',
+      color: '#fff',
     },
   },
   text: {
