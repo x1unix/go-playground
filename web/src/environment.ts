@@ -16,10 +16,6 @@ const environment = {
     issue: import.meta.env.VITE_GITHUB_URL ?? 'https://github.com/x1unix/go-playground/issues/new',
     donate: import.meta.env.VITE_DONATE_URL ?? 'https://opencollective.com/bttr-go-playground',
   },
-
-  turnstile: {
-    siteKey: import.meta.env.VITE_TURNSTILE_SITE_KEY || null,
-  },
 }
 
 export default environment

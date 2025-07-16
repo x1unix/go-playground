@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 
 interface Props {
-  siteKey: string | null
+  siteKey: string | null | undefined
   className?: string
   onSuccess: (token: string) => void
   renderError: (err: string) => React.ReactNode

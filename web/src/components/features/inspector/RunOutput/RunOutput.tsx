@@ -11,6 +11,7 @@ import './RunOutput.css'
 import { splitStringUrls } from './parser'
 import environment from '~/environment'
 import { TurnstileChallenge } from '~/components/elements/misc/TurnstileChallenge'
+import { useTurnstile } from '~/hooks/turnstile'
 
 const linkStyle = {
   root: {
@@ -41,6 +42,7 @@ const ConsoleWrapper: React.FC<ConsoleProps & { disableTerminal?: boolean }> = (
 export const RunOutput: React.FC = () => {
   const theme = useTheme()
   const dispatch = useDispatch()
+  const turnstile = useTurnstile()
   const { status, monaco, terminal } = useSelector<State, State>((state) => state)
 
   const { fontSize, renderingBackend } = terminal.settings
@@ -69,7 +71,7 @@ export const RunOutput: React.FC = () => {
     content = (
       <TurnstileChallenge
         className="RunOutput__container"
-        siteKey={environment.turnstile.siteKey}
+        siteKey={turnstile?.siteKey}
         onSuccess={(token) => {
           dispatch(
             runFileWithParamsDispatcher({
