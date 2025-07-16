@@ -14,7 +14,8 @@ import (
 )
 
 type TemplateArguments struct {
-	GoogleTagID string
+	GoogleTagID      string
+	TurnstileSiteKey string
 }
 
 type TemplateFileServer struct {

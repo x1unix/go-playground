@@ -51,6 +51,21 @@ Use [this tool](../../../cmd/announcements/main.go) to encode a JSON file into a
 
 Announcement schema can be found [here](../../../internal/announcements/types.go).
 
+#### Captcha
+
+If service is deployed behind Cloudflare WAF, some API endpoints can return *403* error with `cf-mitigated: challenge` header due to false-positive WAF detection.
+
+For such cases, service supports [Cloudflare Turnstile](https://blog.cloudflare.com/en-us/integrating-turnstile-with-the-cloudflare-waf-to-challenge-fetch-requests/) challenges (see [issue](https://github.com/x1unix/go-playground/issues/506)).
+
+Application will display a Turnstile challenge when WAF returns a challenge request.
+
+To enable Turnstile, set following environment variables:
+
+| Name                    | Description |
+| ----------------------- | ----------- |
+| `TURNSTILE_SITE_KEY`    | Site Key    |
+| `TURNSTILE_PRIVATE_KEY` | Private Key |
+
 ## Building custom image
 
 Use **make** to build Docker image from sources:
