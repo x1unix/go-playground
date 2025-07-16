@@ -2,12 +2,13 @@ import { TargetType } from '~/services/config'
 import { SECOND, setTimeoutNanos } from '~/utils/duration'
 import { createStdio, GoProcess } from '~/workers/go/client'
 import { buildGoTestFlags, requiresWasmEnvironment } from '~/lib/sourceutil'
-import client, { type EvalEvent, EvalEventKind } from '~/services/api'
+import client, { type EvalEvent, EvalEventKind, type RequestOpts, isCFError } from '~/services/api'
 import { isProjectRequiresGoMod } from '~/services/examples'
 
 import type { DispatchFn, StateProvider } from '../../helpers'
 import { newRemoveNotificationAction, NotificationIDs } from '../../notifications'
 import {
+  newCFChallengeAction,
   newErrorAction,
   newLoadingAction,
   newProgramFinishAction,
@@ -77,7 +78,11 @@ const dispatchEvalEvents = (dispatch: DispatchFn, events: EvalEvent[]) => {
   }, programEndTime)
 }
 
-export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getState: StateProvider) => {
+export const runFileWithParamsDispatcher = (opts?: RequestOpts): Dispatcher => {
+  return (dispatch, getState) => runFileDispatcher(dispatch, getState, opts)
+}
+
+export const runFileDispatcher = async (dispatch: DispatchFn, getState: StateProvider, opts?: RequestOpts) => {
   dispatch(newRemoveNotificationAction(NotificationIDs.WASMAppExitError))
   dispatch(newRemoveNotificationAction(NotificationIDs.GoModMissing))
 
@@ -119,12 +124,12 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
     switch (runTarget) {
       case TargetType.Server: {
         // TODO: vet
-        const res = await client.run(files, false, backend)
+        const res = await client.run(files, false, backend, opts)
         dispatchEvalEvents(dispatch, res.events)
         break
       }
       case TargetType.WebAssembly: {
-        const buildResponse = await client.build(files)
+        const buildResponse = await client.build(files, opts)
 
         const buff = await fetchWasmWithProgress(dispatch, buildResponse.fileName)
         dispatch(newRemoveNotificationAction(NotificationIDs.WASMAppDownload))
@@ -161,6 +166,10 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
         dispatch(newErrorAction(`AppError: Unknown Go runtime type "${runTarget}"`))
     }
   } catch (err: any) {
+    if (isCFError(err)) {
+      dispatch(newCFChallengeAction())
+      return
+    }
     dispatch(newErrorAction(err.message))
   }
 }

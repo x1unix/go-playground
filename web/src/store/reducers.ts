@@ -78,11 +78,20 @@ const reducers = {
         running: false,
         dirty: true,
         lastError: a.payload,
+        cfChallengeRequested: false,
+      }),
+      [ActionType.CF_CHALLENGE]: (s: StatusState, a: Action<any>) => ({
+        ...s,
+        loading: false,
+        running: false,
+        dirty: true,
+        cfChallengeRequested: true,
       }),
       [ActionType.LOADING_STATE_CHANGE]: (s: StatusState, { payload: { loading } }: Action<LoadingStateChanges>) => ({
         ...s,
         loading,
         running: false,
+        cfChallengeRequested: false,
       }),
       [ActionType.EVAL_START]: (s: StatusState, _: Action) => ({
         lastError: null,
@@ -103,6 +112,7 @@ const reducers = {
         loading: false,
         running: false,
         dirty: true,
+        cfChallengeRequested: false,
       }),
       [ActionType.RUN_TARGET_CHANGE]: (s: StatusState, { payload }: Action<RunTargetConfig>) => {
         // if (payload.target) {

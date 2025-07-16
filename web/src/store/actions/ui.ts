@@ -15,6 +15,11 @@ export const newErrorAction = (err: string) => ({
   payload: err,
 })
 
+export const newCFChallengeAction = () => ({
+  type: ActionType.CF_CHALLENGE,
+  payload: null,
+})
+
 export const newLoadingAction = (loading = true) => ({
   type: ActionType.LOADING_STATE_CHANGE,
   payload: { loading },
