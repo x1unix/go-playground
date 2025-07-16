@@ -18,6 +18,7 @@ export interface StatusState {
   running?: boolean
   dirty?: boolean
   lastError?: string | null
+  cfChallengeRequested?: boolean
   events?: EvalEvent[]
   markers?: Record<string, editor.IMarkerData[] | null>
 }

@@ -3098,6 +3098,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/cloudflare-turnstile@npm:^0.2.2":
+  version: 0.2.2
+  resolution: "@types/cloudflare-turnstile@npm:0.2.2"
+  checksum: 10c0/17dcd6b22cd8c03fc3699b88b1b30d0fac3997557a4189e922aec7f632b8c287b394170cbf09a63598617b3e9a37e65ea6dce3af392e5df02f870e6d6858c0cc
+  languageName: node
+  linkType: hard
+
 "@types/estree@npm:1.0.5, @types/estree@npm:^1.0.0":
   version: 1.0.5
   resolution: "@types/estree@npm:1.0.5"
@@ -10558,6 +10565,7 @@ __metadata:
     "@testing-library/jest-dom": "npm:^6.5.0"
     "@testing-library/react": "npm:^12.1.2"
     "@testing-library/user-event": "npm:^13.5.0"
+    "@types/cloudflare-turnstile": "npm:^0.2.2"
     "@types/file-saver": "npm:^2.0.7"
     "@types/jest": "npm:^27.4.0"
     "@types/node": "npm:^17.0.16"

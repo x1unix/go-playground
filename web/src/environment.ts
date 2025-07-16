@@ -1,6 +1,7 @@
 /**
  * Global environment variables
  */
+
 const environment = {
   appVersion: import.meta.env.VITE_VERSION ?? '1.0.0-snapshot',
   apiUrl: import.meta.env.VITE_LANG_SERVER ?? window.location.origin,

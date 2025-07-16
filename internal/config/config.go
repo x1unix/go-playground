@@ -92,9 +92,17 @@ func (cfg *BuildConfig) mountFlagSet(f *flag.FlagSet) {
 	f.Var(cmdutil.NewStringsListValue(&cfg.BypassEnvVarsList), "permit-env-vars", "Comma-separated allow list of environment variables passed to Go compiler tool")
 }
 
+type TurnstileConfig struct {
+	SiteKey    string `envconfig:"TURNSTILE_SITE_KEY" json:"siteKey"`
+	PrivateKey string `envconfig:"TURNSTILE_PRIVATE_KEY" json:"privateKey"`
+}
+
 type ServicesConfig struct {
 	// GoogleAnalyticsID is Google Analytics tag ID (optional)
 	GoogleAnalyticsID string `envconfig:"APP_GTAG_ID" json:"googleAnalyticsID"`
+
+	// Turnstile contains Cloudflare Turnstile configuration.
+	Turnstile TurnstileConfig `json:"turnstile"`
 }
 
 func (cfg *ServicesConfig) mountFlagSet(f *flag.FlagSet) {
