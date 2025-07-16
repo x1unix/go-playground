@@ -8,11 +8,12 @@ import {
   type ShareResponse,
   type VersionsInfo,
   type FilesPayload,
+  CFError,
 } from './models'
 import type { IAPIClient } from './interface'
 
 export class Client implements IAPIClient {
-  constructor(private readonly baseUrl: string) {}
+  constructor(private readonly baseUrl: string) { }
 
   /**
    * Returns server API version.
@@ -115,6 +116,11 @@ export class Client implements IAPIClient {
     const rsp = await fetch(reqUrl, reqInit)
     if (rsp.ok) {
       return (await rsp.json()) as T
+    }
+
+    const cfMitigated = rsp.headers.get('cf-mitigated')
+    if (cfMitigated && cfMitigated === 'challenge') {
+      throw new CFError(cfMitigated)
     }
 
     const isJson = rsp.headers.get('content-type')
