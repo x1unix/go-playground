@@ -8662,7 +8662,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"p-map@npm:^7.0.2":
+"p-map@npm:^7.0.2, p-map@npm:^7.0.3":
   version: 7.0.3
   resolution: "p-map@npm:7.0.3"
   checksum: 10c0/46091610da2b38ce47bcd1d8b4835a6fa4e832848a6682cf1652bc93915770f4617afc844c10a77d1b3e56d2472bb2d5622353fa3ead01a7f42b04fc8e744a5c
@@ -10623,7 +10623,7 @@ __metadata:
     vite: "npm:^5.4.19"
     vite-plugin-html: "npm:^3.2.2"
     vite-plugin-node-polyfills: "npm:^0.19.0"
-    vite-plugin-static-copy: "npm:^1.0.1"
+    vite-plugin-static-copy: "npm:^2.3.2"
     vite-plugin-svgr: "npm:^4.2.0"
     vite-tsconfig-paths: "npm:^4.3.1"
     vitest: "npm:^2.1.9"
@@ -10855,17 +10855,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite-plugin-static-copy@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "vite-plugin-static-copy@npm:1.0.1"
+"vite-plugin-static-copy@npm:^2.3.2":
+  version: 2.3.2
+  resolution: "vite-plugin-static-copy@npm:2.3.2"
   dependencies:
     chokidar: "npm:^3.5.3"
     fast-glob: "npm:^3.2.11"
     fs-extra: "npm:^11.1.0"
+    p-map: "npm:^7.0.3"
     picocolors: "npm:^1.0.0"
   peerDependencies:
-    vite: ^5.0.0
-  checksum: 10c0/fbec6188dd118799e26c1107b71189c6e452856500ad72ced0a9f6b0008acb6e06496467faad74f633cfd8268f0a89e3b1f726f0606f9883716bbabb6faac2df
+    vite: ^5.0.0 || ^6.0.0
+  checksum: 10c0/6fdc7d21c99022d4c00dc0cec5d448a9aea73ad03547f669c73f600054935c675f23757fb586b9a05353d15a078574f7f8f4af40631e87ac03b6fc554db4ef2a
   languageName: node
   linkType: hard
 
