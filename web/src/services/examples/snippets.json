@@ -135,7 +135,7 @@
     {
       "label": "Defer",
       "id": "5SDVfc_jxbg",
-      "icon": "SiAzurefunctions",
+      "icon": "VscSymbolEvent",
       "iconColor": "#ffb900"
     },
     {
@@ -192,96 +192,96 @@
     }
   ],
   "Concurrency": [
-      {
-        "label": "Goroutines",
-        "id": "I7scqRijEJt",
-        "icon": "SiAzurefunctions",
-        "iconColor": "#00bcf2"
-      },
-      {
-        "label": "Channels",
-        "id": "MaLY7AiAkHM",
-        "icon": "BranchCompare",
-        "iconColor": "#b4a0ff"
-      },
-      {
-        "label": "Buffered channels",
-        "id": "3BRCdRnRszb",
-        "icon": "BranchCompare",
-        "iconColor": "#b4a0ff"
-      },
-      {
-        "label": "Select",
-        "id": "FzONhs4-tae",
-        "icon": "BranchCompare",
-        "iconColor": "#b4a0ff"
-      },
-      {
-        "label": "Timeouts",
-        "id": "4oOz0j29MJ6",
-        "icon": "BranchCompare",
-        "iconColor": "#b4a0ff"
-      },
-      {
-        "label": "Non-blocking read",
-        "id": "TFv6-7OVNVq",
-        "icon": "BranchCompare",
-        "iconColor": "#b4a0ff"
-      },
-      {
-        "label": "Closing channels",
-        "id": "yQMclmwOYs9",
-        "icon": "BranchCompare",
-        "iconColor": "#b4a0ff"
-      },
-      {
-        "label": "Timers",
-        "id": "gF7VLRz3URM",
-        "icon": "BranchCompare",
-        "iconColor": "#b4a0ff"
-      },
-      {
-        "label": "Tickers",
-        "id": "gs6zoJP-Pl9",
-        "icon": "BranchCompare",
-        "iconColor": "#b4a0ff"
-      },
-      {
-        "label": "Worker pools",
-        "id": "hiSJJsYZJKL",
-        "icon": "BranchCompare",
-        "iconColor": "#b4a0ff"
-      },
-      {
-        "label": "Rate limit",
-        "id": "20c_m1AtOEI",
-        "icon": "BranchCompare",
-        "iconColor": "#b4a0ff"
-      },
-      {
-        "label": "Atomics",
-        "id": "j-14agntvEO",
-        "icon": "BranchLocked",
-        "iconColor": "#ffb900"
-      },
-      {
-        "label": "Mutexes",
-        "id": "0WEmOOjoCjp",
-        "icon": "BranchLocked",
-        "iconColor": "#ffb900"
-      },
-      {
-        "label": "Stateful goroutines",
-        "id": "5mf_P9xqBzk",
-        "icon": "Dataflows",
-        "iconColor": "#106ebe"
-      },
-      {
-        "label": "Context",
-        "id": "0_bu1o8rIBO",
-        "icon": "Dataflows",
-        "iconColor": "#106ebe"
-      }
+    {
+      "label": "Goroutines",
+      "id": "I7scqRijEJt",
+      "icon": "VscSymbolEvent",
+      "iconColor": "#00bcf2"
+    },
+    {
+      "label": "Channels",
+      "id": "MaLY7AiAkHM",
+      "icon": "BranchCompare",
+      "iconColor": "#b4a0ff"
+    },
+    {
+      "label": "Buffered channels",
+      "id": "3BRCdRnRszb",
+      "icon": "BranchCompare",
+      "iconColor": "#b4a0ff"
+    },
+    {
+      "label": "Select",
+      "id": "FzONhs4-tae",
+      "icon": "BranchCompare",
+      "iconColor": "#b4a0ff"
+    },
+    {
+      "label": "Timeouts",
+      "id": "4oOz0j29MJ6",
+      "icon": "BranchCompare",
+      "iconColor": "#b4a0ff"
+    },
+    {
+      "label": "Non-blocking read",
+      "id": "TFv6-7OVNVq",
+      "icon": "BranchCompare",
+      "iconColor": "#b4a0ff"
+    },
+    {
+      "label": "Closing channels",
+      "id": "yQMclmwOYs9",
+      "icon": "BranchCompare",
+      "iconColor": "#b4a0ff"
+    },
+    {
+      "label": "Timers",
+      "id": "gF7VLRz3URM",
+      "icon": "BranchCompare",
+      "iconColor": "#b4a0ff"
+    },
+    {
+      "label": "Tickers",
+      "id": "gs6zoJP-Pl9",
+      "icon": "BranchCompare",
+      "iconColor": "#b4a0ff"
+    },
+    {
+      "label": "Worker pools",
+      "id": "hiSJJsYZJKL",
+      "icon": "BranchCompare",
+      "iconColor": "#b4a0ff"
+    },
+    {
+      "label": "Rate limit",
+      "id": "20c_m1AtOEI",
+      "icon": "BranchCompare",
+      "iconColor": "#b4a0ff"
+    },
+    {
+      "label": "Atomics",
+      "id": "j-14agntvEO",
+      "icon": "BranchLocked",
+      "iconColor": "#ffb900"
+    },
+    {
+      "label": "Mutexes",
+      "id": "0WEmOOjoCjp",
+      "icon": "BranchLocked",
+      "iconColor": "#ffb900"
+    },
+    {
+      "label": "Stateful goroutines",
+      "id": "5mf_P9xqBzk",
+      "icon": "Dataflows",
+      "iconColor": "#106ebe"
+    },
+    {
+      "label": "Context",
+      "id": "0_bu1o8rIBO",
+      "icon": "Dataflows",
+      "iconColor": "#106ebe"
+    }
   ],
   "Standard Library": [
     {
@@ -357,5 +357,4 @@
       "iconColor": "#ff8c00"
     }
   ]
-
 }

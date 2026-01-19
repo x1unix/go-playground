@@ -1,10 +1,11 @@
 import React from 'react'
 import { initializeIcons as initFluentIcons } from '@fluentui/react/lib/Icons'
 import { registerIcons } from '@fluentui/react/lib/Styling'
-import { SiWebassembly, SiAzurefunctions } from 'react-icons/si'
+import { SiWebassembly } from 'react-icons/si'
 import {
   VscSymbolArray,
   VscSymbolClass,
+  VscSymbolEvent,
   VscSymbolMisc,
   VscBracketError,
   VscSymbolParameter,
@@ -20,8 +21,8 @@ export const initializeIcons = () => {
     icons: {
       SiWebassembly: <SiWebassembly />,
       VscSymbolClass: <VscSymbolClass />,
+      VscSymbolEvent: <VscSymbolEvent />,
       VscBracketError: <VscBracketError />,
-      SiAzurefunctions: <SiAzurefunctions />,
       VscSymbolParameter: <VscSymbolParameter />,
       BsFillDice3Fill: <BsFillDice3Fill />,
       VscRegex: <VscRegex />,
