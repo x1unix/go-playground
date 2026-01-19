@@ -13,14 +13,14 @@ Improved Go Playground powered by Monaco Editor and React - [https://goplay.tool
 
 ## Features
 
-* 🌚 Dark theme
-* 💡 Code autocomplete
-* ⌨️ VIM mode support
-* 🌈 Color and image output
-* 💾 Load and save files
-* 📔 Snippets and tutorials
-* ⚙ Customization (fonts, ligatures, etc)
-* 🛠 [WebAssembly](https://github.com/golang/go/wiki/WebAssembly) support
+- 🌚 Dark theme
+- 💡 Code autocomplete
+- ⌨️ VIM mode support
+- 🌈 Color and image output
+- 💾 Load and save files
+- 📔 Snippets and tutorials
+- ⚙ Customization (fonts, ligatures, etc)
+- 🛠 [WebAssembly](https://github.com/golang/go/wiki/WebAssembly) support
 
 And more !
 
@@ -30,24 +30,13 @@ Please check [deployment documentation](./docs/deployment/README.md).
 
 ### Third-party credits
 
-* Default playground run server provided by [play.golang.org](https://play.golang.org)
-* Code for templates and tutorials provided by [gobyexample.com](https://gobyexample.com/)
-* Code completion snippets were inspired by [tj/vscode-snippets](https://github.com/tj/vscode-snippets/blob/master/go.json)
+- Default playground run server provided by [play.golang.org](https://play.golang.org)
+- Code for templates and tutorials provided by [gobyexample.com](https://gobyexample.com/)
+- Code completion snippets were inspired by [tj/vscode-snippets](https://github.com/tj/vscode-snippets/blob/master/go.json)
 
 ## Contributors
 
 Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) and [HACKING.md](HACKING.md) for information on how to contribute to the project.
-
-### Sponsoring
-
-<a href="https://gno.land/?utm_source=sponsor&utm_medium=goplay&utm_campaign=DevAcquisition+&utm_content=Devtool" target="_blank">
-    <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="./docs/img/sponsors/gnoland-dark.svg" width="480">
-        <img alt="Gno.land logo" width="480" src="./docs/img/sponsors/gnoland-light.svg">
-    </picture>
-</a>
-
-This project is sponsored by Gno.land providing cloud environment to host Better Go Playground.
 
 ### Code Contributors
 
