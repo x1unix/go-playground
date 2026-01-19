@@ -102,8 +102,7 @@ func start(logger *zap.Logger, cfg *config.Config) error {
 
 	// Web UI routes
 	tplVars := server.TemplateArguments{
-		GoogleTagID:      cfg.Services.GoogleAnalyticsID,
-		TurnstileSiteKey: cfg.Services.Turnstile.SiteKey,
+		GoogleTagID: cfg.Services.GoogleAnalyticsID,
 	}
 	if tplVars.GoogleTagID != "" {
 		if err := webutil.ValidateGTag(tplVars.GoogleTagID); err != nil {

@@ -8,18 +8,11 @@ import {
   type ShareResponse,
   type VersionsInfo,
   type FilesPayload,
-  CFError,
 } from './models'
 import type { IAPIClient } from './interface'
 
-export interface RequestOpts {
-  turnstileToken?: string
-}
-
 export class Client implements IAPIClient {
-  constructor(private readonly baseUrl: string) {
-    // Empty comment to workaroud prettier formatting issues.
-  }
+  constructor(private readonly baseUrl: string) {}
 
   /**
    * Returns server API version.
@@ -33,8 +26,8 @@ export class Client implements IAPIClient {
    *
    * WASM file can be downloaded using {@link getArtifact} call.
    */
-  async build(files: Record<string, string>, opts?: RequestOpts): Promise<BuildResponse> {
-    return await this.post<BuildResponse>(`/v2/compile`, { files }, opts)
+  async build(files: Record<string, string>): Promise<BuildResponse> {
+    return await this.post<BuildResponse>(`/v2/compile`, { files })
   }
 
   /**
@@ -58,20 +51,15 @@ export class Client implements IAPIClient {
    * @param backend Go server backend to use.
    * @returns
    */
-  async run(
-    files: Record<string, string>,
-    vet: boolean,
-    backend = Backend.Default,
-    opts?: RequestOpts,
-  ): Promise<RunResponse> {
-    return await this.post<RunResponse>(`/v2/run?vet=${Boolean(vet)}&backend=${backend}`, { files }, opts)
+  async run(files: Record<string, string>, vet: boolean, backend = Backend.Default): Promise<RunResponse> {
+    return await this.post<RunResponse>(`/v2/run?vet=${Boolean(vet)}&backend=${backend}`, { files })
   }
 
   /**
    * Formats Go files.
    */
-  async format(files: Record<string, string>, backend = Backend.Default, opts?: RequestOpts): Promise<FilesPayload> {
-    return await this.post<FilesPayload>(`/v2/format?backend=${backend}`, { files }, opts)
+  async format(files: Record<string, string>, backend = Backend.Default): Promise<FilesPayload> {
+    return await this.post<FilesPayload>(`/v2/format?backend=${backend}`, { files })
   }
 
   /**
@@ -84,8 +72,8 @@ export class Client implements IAPIClient {
   /**
    * Uploads a snippet and returns share URL link.
    */
-  async shareSnippet(files: Record<string, string>, opts?: RequestOpts): Promise<ShareResponse> {
-    return await this.post<ShareResponse>('/v2/share', { files }, opts)
+  async shareSnippet(files: Record<string, string>): Promise<ShareResponse> {
+    return await this.post<ShareResponse>('/v2/share', { files })
   }
 
   /**
@@ -111,25 +99,15 @@ export class Client implements IAPIClient {
     })
   }
 
-  private async post<T>(uri: string, data: any, opts?: RequestOpts): Promise<T> {
-    const body: RequestInit = {
+  private async post<T>(uri: string, data: any): Promise<T> {
+    return await this.doRequest(uri, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
-    }
-
-    if (opts?.turnstileToken?.length) {
-      if (!body.headers) {
-        body.headers = {}
-      }
-
-      body.headers['X-Cf-Turnstile-Response'] = opts.turnstileToken
-    }
-
-    return await this.doRequest(uri, body)
+    })
   }
 
   private async doRequest<T>(uri: string, reqInit?: RequestInit): Promise<T> {
@@ -137,11 +115,6 @@ export class Client implements IAPIClient {
     const rsp = await fetch(reqUrl, reqInit)
     if (rsp.ok) {
       return (await rsp.json()) as T
-    }
-
-    const cfMitigated = rsp.headers.get('cf-mitigated')
-    if (cfMitigated && cfMitigated === 'challenge') {
-      throw new CFError(cfMitigated)
     }
 
     const isJson = rsp.headers.get('content-type')
