@@ -9,9 +9,10 @@ import (
 	"syscall"
 	"time"
 
+	"go.uber.org/zap"
+
 	"github.com/x1unix/go-playground/internal/builder/storage"
 	"github.com/x1unix/go-playground/pkg/util/osutil"
-	"go.uber.org/zap"
 )
 
 // defaultGoModName is default module name that will be set if no go.mod provided.

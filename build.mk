@@ -4,7 +4,7 @@ GOROOT ?= $(shell $(GO) env GOROOT)
 TOOLS ?= ./tools
 PUBLIC_DIR ?= $(UI)/public
 
-MIN_GO_VERSION ?= 1.23
+MIN_GO_VERSION ?= 1.25
 WASM_API_VER ?= $(shell cat ./cmd/wasm/api-version.txt)
 
 define build_wasm_worker
