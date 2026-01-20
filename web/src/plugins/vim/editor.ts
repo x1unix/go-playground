@@ -105,7 +105,7 @@ export class StatusBarAdapter {
     //
     // This dirty hack tries to resolve this issue at least partially.
     this.commandResultCallback = null
-    const message = result.textContent!
+    const message = result.textContent
     if (message.startsWith(registryOutputPrefix)) {
       // TODO: implement proper registries display
       this.dispatchFn(
@@ -124,7 +124,7 @@ export class StatusBarAdapter {
     this.dispatchFn(
       newVimConfirmAction({
         type: isError ? 'error' : 'default',
-        message: result.textContent!,
+        message: result.textContent,
       }),
     )
   }

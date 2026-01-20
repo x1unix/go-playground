@@ -1,4 +1,4 @@
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import React, { useMemo } from 'react'
 import { Dropdown, type IDropdownStyles } from '@fluentui/react'
 import { type RunTargetConfig } from '~/services/config'

@@ -1,5 +1,5 @@
 import React from 'react'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { connect } from 'react-redux'
 import { SiVim } from 'react-icons/si'
 import { type State } from '~/store'

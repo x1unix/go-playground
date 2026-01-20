@@ -14,7 +14,6 @@ import { Link } from '@fluentui/react/lib/Link'
 import { ChangeLog } from './ChangeLog'
 import { getContentStyles, getIconButtonStyles } from '~/styles/modal'
 import environment from '~/environment'
-import { SponsorsBlock } from './SponsorsBlock'
 import { FooterButtons } from './FooterButtons'
 import './AboutModal.css'
 
@@ -101,10 +100,6 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose, onTitle
           <div>
             <h3>What&apos;s New</h3>
             <ChangeLog />
-          </div>
-          <div>
-            <h3>Sponsors</h3>
-            <SponsorsBlock isDark={theme.isInverted} />
           </div>
           <FooterButtons />
         </div>
