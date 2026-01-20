@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { useTheme } from '@fluentui/react'
 import { Resizable } from 're-resizable'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { VscChevronDown, VscChevronUp, VscSplitHorizontal, VscSplitVertical } from 'react-icons/vsc'
 
 import { RunOutput } from '../RunOutput'

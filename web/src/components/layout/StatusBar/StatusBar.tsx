@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { type editor, MarkerSeverity } from 'monaco-editor'
 import { VscDebugAlt } from 'react-icons/vsc'
 import environment from '~/environment'
