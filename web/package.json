@@ -34,7 +34,7 @@
     "core-js": "^3.35.1",
     "date-fns": "^3.6.0",
     "dexie": "^4.0.8",
-    "eslint": "^8.56.0",
+    "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-react-app": "^7.0.0",
     "eslint-config-standard-with-typescript": "^43.0.1",
