@@ -23,14 +23,14 @@ export interface NotificationProps extends NotificationModel {
   onDismissed?: (id: string) => void
 }
 
-const iconColorPaletteMap: { [k in NotificationType]: keyof ISemanticColors } = {
+const iconColorPaletteMap: Record<NotificationType, keyof ISemanticColors> = {
   [NotificationType.Warning]: 'warningHighlight',
   [NotificationType.Error]: 'severeWarningIcon',
   [NotificationType.Info]: 'link',
   [NotificationType.None]: 'inputText',
 }
 
-const statusIconMapping: { [k in NotificationType]: string } = {
+const statusIconMapping: Record<NotificationType, string> = {
   [NotificationType.Warning]: 'warning',
   [NotificationType.Error]: 'ErrorBadge',
   [NotificationType.Info]: 'info',

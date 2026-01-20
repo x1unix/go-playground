@@ -3,6 +3,7 @@ import type { Dispatcher } from './dispatchers'
 import { type State } from './state'
 
 export type Reducer<S, T> = (s: S, a: Action<T>) => S
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type ActionReducers<T> = { [k in keyof typeof ActionType | string]: Reducer<T, any> }
 
 export type DispatchFn = <T = any>(a: Action<T> | Dispatcher) => any

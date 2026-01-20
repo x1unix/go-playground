@@ -10,6 +10,7 @@ export interface GoWebAssemblyInstance extends WebAssembly.Instance {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type WebAssemblyInstanceExport = { [k in keyof GoWebAssemblyInstance['exports']]?: (...args) => void }
 
 /**
