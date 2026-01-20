@@ -33,7 +33,7 @@ func evalPayloadFromRequest(r *http.Request) ([]byte, error) {
 		return nil, errors.New(
 			"due to Go Playground bug, unit test snippets can't have multiple files.\n" +
 				"Please remove other Go files or use WebAssembly environment instead.\n\n" +
-				"See: https://github.com/golang/go/issues/32403",
+				"See: https://github.com/golang/go/issues/77234",
 		)
 	}
 
