@@ -9778,7 +9778,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.3.3":
+"typescript@npm:5.9.3":
   version: 5.9.3
   resolution: "typescript@npm:5.9.3"
   bin:
@@ -9788,7 +9788,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.3.3#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>":
   version: 5.9.3
   resolution: "typescript@patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"
   bin:
@@ -9860,7 +9860,7 @@ __metadata:
     react-router-dom: "npm:^5.3.0"
     redux: "npm:^4.1.2"
     redux-thunk: "npm:^2.4.1"
-    typescript: "npm:^5.3.3"
+    typescript: "npm:5.9.3"
     util: "npm:^0.12.4"
     uuid: "npm:^3.4.0"
     vite: "npm:^5.4.21"
