@@ -38,7 +38,7 @@ const stackStyles: IStackStyles = {
   },
 }
 
-const defaultIcons: { [K in PosterType]: string } = {
+const defaultIcons: Record<PosterType, string> = {
   error: 'StatusErrorFull',
   warning: 'WarningSolid',
   info: 'InfoSolid',
