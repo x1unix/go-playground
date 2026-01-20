@@ -7,7 +7,7 @@
 #
 # Use Dockerfile for simple single-arch build process
 
-ARG GO_VERSION=1.21
+ARG GO_VERSION=1.25
 ARG APP_VERSION=1.0.0
 ARG WASM_API_VER=v2
 

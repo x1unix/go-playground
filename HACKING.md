@@ -9,7 +9,7 @@ If you have any suggestions to improve this document, please feel free to submit
 ## Glossary
 
 | Term | Description                 |
-|------|-----------------------------|
+| ---- | --------------------------- |
 | FE   | Front-end web application.  |
 | BE   | Back-end, REST API service. |
 | WASM | WebAssembly.                |
@@ -20,9 +20,9 @@ If you have any suggestions to improve this document, please feel free to submit
 
 REST API service (BE) written in Go which is responsible for:
 
-* Proxying requests to [original Go Playground](https://go.dev/play) to get snippets and run programs.
-* Building WebAssembly executables to run programs in a browser.
-* Provide basic autocomplete for Go standard library symbols in editor.
+- Proxying requests to [original Go Playground](https://go.dev/play) to get snippets and run programs.
+- Building WebAssembly executables to run programs in a browser.
+- Provide basic autocomplete for Go standard library symbols in editor.
 
 > [!NOTE]
 > Server main package is located in [`cmd/playground`](./cmd/playground/) directory.
@@ -33,11 +33,11 @@ Front-end app (FE) provides user interface to write and execute Go programs in b
 
 App is written in TypeScript and uses following libraries and tools:
 
-* React
-* Redux
-* [Monaco editor](https://microsoft.github.io/monaco-editor/)
-* [Fluent UI React](https://developer.microsoft.com/en-us/fluentui#/controls/web) components library.
-* [Vite](https://vitejs.dev/)
+- React
+- Redux
+- [Monaco editor](https://microsoft.github.io/monaco-editor/)
+- [Fluent UI React](https://developer.microsoft.com/en-us/fluentui#/controls/web) components library.
+- [Vite](https://vitejs.dev/)
 
 > [!NOTE]
 > FE app is located in [`web`](./web) directory.
@@ -49,7 +49,7 @@ FE app relies on a set of WASM programs written in Go for language-specific task
 WASM Go programs are located in [`cmd/wasm`](./cmd/wasm/) directory.
 
 | Package    | Description                    |
-|------------|--------------------------------|
+| ---------- | ------------------------------ |
 | `analyzer` | Very simple Go syntax checker. |
 
 ### Tools & Scripts
@@ -57,7 +57,7 @@ WASM Go programs are located in [`cmd/wasm`](./cmd/wasm/) directory.
 Project uses a set of Go programs to prepare assets necessary for a project.
 
 | Name         | Description                                                                      |
-|--------------|----------------------------------------------------------------------------------|
+| ------------ | -------------------------------------------------------------------------------- |
 | `pkgindexer` | Collects list of Go packages and symbols into JSON file for FE app autocomplete. |
 
 > [!NOTE]
@@ -69,21 +69,21 @@ Project uses a set of Go programs to prepare assets necessary for a project.
 
 Please ensure that you have installed:
 
-* GNU or BSD Make
-* Git
-* [Node Version Manager](https://github.com/nvm-sh/nvm) or Node.js 20 (`lts/iron`)
-* [Yarn](https://yarnpkg.com/) package manager.
-* Go 1.24+
-* Protobuf:
-  * [protoc](https://developers.google.com/protocol-buffers)
-  * [Protobuf Go plugins](https://grpc.io/docs/languages/go/quickstart/)
+- GNU or BSD Make
+- Git
+- [Node Version Manager](https://github.com/nvm-sh/nvm) or Node.js 20 (`lts/iron`)
+- [Yarn](https://yarnpkg.com/) package manager.
+- Go 1.25+
+- Protobuf:
+  - [protoc](https://developers.google.com/protocol-buffers)
+  - [Protobuf Go plugins](https://grpc.io/docs/languages/go/quickstart/)
 
 ### First-time setup
 
 Run following commands to configure a just cloned project:
 
 | Command           | Purpose                                                                                                     |
-|-------------------|-------------------------------------------------------------------------------------------------------------|
+| ----------------- | ----------------------------------------------------------------------------------------------------------- |
 | `corepack enable` | Enables [Corepack](https://nodejs.org/api/corepack.html) to use package manager version from `package.json` |
 | `make preinstall` | Installs NPM packages for a web app.                                                                        |
 | `make wasm`       | Builds WebAssembly binaries used by the web app.                                                            |
@@ -98,7 +98,7 @@ Run following commands to configure a just cloned project:
 Front-end web app and Go API server are executed using separate make commands:
 
 | Command    | Purpose                              |
-|------------|--------------------------------------|
+| ---------- | ------------------------------------ |
 | `make run` | Starts Go API web server.            |
 | `make ui`  | Starts Vite dev server with web app. |
 

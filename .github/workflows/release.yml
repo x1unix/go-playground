@@ -14,9 +14,9 @@ on:
       - created
 
 env:
-  GO_VERSION: 1.24
+  GO_VERSION: 1.25
   WASM_API_VER: v2
-  PREV_GO_VERSION: 1.23
+  PREV_GO_VERSION: 1.24
 
 jobs:
   build:
