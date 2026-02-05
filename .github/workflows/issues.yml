@@ -13,7 +13,7 @@ jobs:
       - uses: actions/stale@v10
         with:
           stale-issue-label: "stale"
-          exempt-issue-labels: "override-stale,question,enhancement,bug,in-progress"
+          exempt-issue-labels: "unstale,override-stale,question,enhancement,bug,in-progress"
           exempt-pr-labels: "override-stale,in-progress"
           days-before-issue-stale: 15
           days-before-issue-close: 15
