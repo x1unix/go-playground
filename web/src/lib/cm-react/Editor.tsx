@@ -12,10 +12,11 @@ import { newFormatErrorsRenderer } from './extensions/linter'
 import { newReadOnlyCompartment } from './extensions/readonly'
 import { newSyntaxCompartment } from './extensions/syntax'
 import { defaultThemeStyles, newThemeCompartment } from './extensions/themes'
+import { newHotkeyHandler } from './extensions/hotkeys'
 
 import type { EditorProps } from './props'
 import type { EditorRemote } from './types'
-import { BufferStateStore } from './state'
+import { BufferStateStore } from './buffers/store'
 
 const styles: React.CSSProperties = {
   width: '100%',
@@ -24,8 +25,12 @@ const styles: React.CSSProperties = {
   overflow: 'hidden',
 }
 
+const keyBindings = [indentWithTab, ...vscodeKeymap]
+const corePlugins = [defaultThemeStyles, highlightField, keymap.of(keyBindings)]
+
 interface State {
   isLoading: boolean
+  configSeq: number
 }
 
 export class Editor extends React.Component<EditorProps, State> {
@@ -37,6 +42,7 @@ export class Editor extends React.Component<EditorProps, State> {
 
   state: State = {
     isLoading: false,
+    configSeq: 0,
   }
 
   constructor(props: EditorProps) {
@@ -56,14 +62,25 @@ export class Editor extends React.Component<EditorProps, State> {
         return
       }
 
-      this.props.onChange?.(path, update.state.doc)
+      this.props.onChange?.({
+        path,
+        text: update.state.doc,
+      })
+    })
+
+    // Wrap hotkey listener to always point to current value from props.
+    const hotkeyHandler = newHotkeyHandler({
+      onShare: (s) => this.props.hotkeys?.onShare?.(s),
+      onFormat: (s) => this.props.hotkeys?.onFormat?.(s),
+      onRun: (s) => this.props.hotkeys?.onRun?.(s),
     })
 
     // Initialize extensions for a current buffer.
     // TODO: impl hotkeys and minimap
     this.extensions = [
+      hotkeyHandler, // Should be on top to avoid overlap with builtin keymap.
       newReadOnlyCompartment(),
-      newInputModeCompartment(inputMode),
+      newInputModeCompartment(preferences?.inputMode),
       newStateDataFieldExtension(() => this.props),
       newFormatErrorsRenderer(),
       ...basicSetup({
@@ -81,8 +98,7 @@ export class Editor extends React.Component<EditorProps, State> {
       }),
       ...corePlugins,
       newSyntaxCompartment(value?.path),
-      newThemeCompartment(theme),
-      newLspCompartment(),
+      newThemeCompartment(preferences?.colorScheme),
       changeHandlerExt,
     ]
   }
