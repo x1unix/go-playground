@@ -18,38 +18,47 @@ export interface Document {
   content: string | ((fileName: string) => Promise<string>)
 }
 
+export const defaultEditorPreferences: EditorPreferences = {
+  colorScheme: 'light',
+  inputMode: 'default',
+  fontFamily: 'monospace',
+  fontSize: 14,
+  tabSize: 4,
+  showLineNumbers: true,
+}
+
 export interface EditorPreferences {
   /**
    * Editor color scheme variant (dark or light).
    */
-  colorScheme?: ColorScheme
+  colorScheme: ColorScheme
 
   /**
    * Editor font family.
    */
-  fontFamily?: string
+  fontFamily: string
 
   /**
    * Editor font size.
    */
-  fontSize?: number
+  fontSize: number
 
   /**
    * Tab size.
    */
-  tabSize?: number
+  tabSize: number
 
   /**
    * Controls whether editor should use regular or vim/emacs input mode.
    *
    * Regular is default mode.
    */
-  inputMode?: InputMode
+  inputMode: InputMode
 
   /**
    * Whether to show line numbers.
    */
-  showLineNumbers?: boolean
+  showLineNumbers: boolean
 }
 
 export interface EditorProps {
