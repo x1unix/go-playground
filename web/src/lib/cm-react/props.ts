@@ -1,6 +1,6 @@
-import type { BufferStateStore } from './state'
-import type { InputMode, ColorScheme, FormatResult, EditorRemote, Position } from './types'
-import type { Text } from '@codemirror/state'
+import type { BufferStateStore } from './buffers/store'
+import type { HotkeyHandler } from './extensions/hotkeys'
+import type { DocumentState, InputMode, ColorScheme, EditorRemote, Position } from './types'
 
 export type { Text } from '@codemirror/state'
 
@@ -32,12 +32,24 @@ export interface EditorPreferences {
   /**
    * Editor font size.
    */
-  fontSize: number
+  fontSize?: number
 
   /**
    * Tab size.
    */
-  tabSize: number
+  tabSize?: number
+
+  /**
+   * Controls whether editor should use regular or vim/emacs input mode.
+   *
+   * Regular is default mode.
+   */
+  inputMode?: InputMode
+
+  /**
+   * Whether to show line numbers.
+   */
+  showLineNumbers?: boolean
 }
 
 export interface EditorProps {
@@ -76,26 +88,14 @@ export interface EditorProps {
   value?: Document
 
   /**
-   * Controls whether editor should use regular or vim/emacs input mode.
-   *
-   * Regular is default mode.
+   * Editor hotkeys action handler.
    */
-  inputMode?: InputMode
-
-  /**
-   * Whether to show line numbers.
-   */
-  showLineNumbers?: boolean
-
-  /**
-   * Document format handler.
-   */
-  formatter?: (doc: string) => Promise<FormatResult>
+  hotkeys?: HotkeyHandler
 
   /**
    * Value change handler.
    */
-  onChange?: (path: string, content: Text) => void
+  onChange?: (e: DocumentState) => void
 
   /**
    * Component mount hook.

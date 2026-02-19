@@ -1,3 +1,5 @@
+import type { Text } from '@codemirror/state'
+
 /**
  * Input layout type.
  */
@@ -31,6 +33,11 @@ export interface EmacsInputListener extends BaseInputListener {
 export type InputListener = EmacsInputListener | VimInputListener
 
 export type Callback<T> = (arg: T) => void
+
+export interface DocumentState {
+  path: string
+  text: Text
+}
 
 export interface Position {
   /**
