@@ -18,6 +18,7 @@ import {
   newBufferStateFromSnapshot,
   getBufferState,
   hasBufferState,
+  setBufferStateEffect,
 } from './buffers/state'
 import { BufferStateStore } from './buffers/store'
 
@@ -76,11 +77,7 @@ export class Editor extends React.Component<EditorProps, State> {
     })
 
     // Wrap hotkey listener to always point to current value from props.
-    const hotkeyHandler = newHotkeyHandler({
-      onShare: (s) => this.props.hotkeys?.onShare?.(s),
-      onFormat: (s) => this.props.hotkeys?.onFormat?.(s),
-      onRun: (s) => this.props.hotkeys?.onRun?.(s),
-    })
+    const hotkeyHandler = newHotkeyHandler(this.remote, this.props.hotkeys)
 
     // Initialize extensions for a current buffer.
     // TODO: impl hotkeys and minimap
@@ -160,23 +157,11 @@ export class Editor extends React.Component<EditorProps, State> {
     this.props.onMount?.(ctrl)
     this.remoteCtrl = ctrl
 
-    // If StateData field it not defined in EditorState, state will create
+    // If BufferState field it not defined in EditorState, state will create
     // a new copy with current props every time it was queried instead of doing that just once per state.
     // This breaks change detection and to avoid that, we should explicitly set it every time.
-    const effects: Array<StateEffect<any>> = [setStateDataEffect(this.props)]
-
-    // Initialize LSP client if possible.
-    if (this.lspClient && lsp && value) {
-      effects.push(
-        updateLspExtensionEffect({
-          // TODO: compute from state of props.
-          ...defaultPluginOptions,
-          languageId: 'gno',
-          documentUri: `${lsp.rootUri}/${value.path}`,
-          client: this.lspClient,
-        }),
-      )
-    }
+    // const effects: Array<StateEffect<any>> = [setStateDataEffect(this.props)]
+    const effects: Array<StateEffect<any>> = [setBufferStateEffect(this.state.configSeq, this.props)]
 
     this.editor.dispatch({
       effects,
