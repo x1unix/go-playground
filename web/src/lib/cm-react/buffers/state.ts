@@ -5,7 +5,7 @@ import { updateInputModeEffect } from '../extensions/input'
 import { readOnlyEffect } from '../extensions/readonly'
 import { syntaxFromFileName, updateSyntaxEffect } from '../extensions/syntax'
 import { updateThemeEffect } from '../extensions/themes'
-import type { EditorProps } from '../props'
+import { defaultEditorPreferences, EditorPreferences, type EditorProps } from '../props'
 import { bufferStateField, updateBufferStateEffect } from './field'
 import { defaultBufferState, type BufferState } from './types'
 
@@ -32,8 +32,13 @@ export const bufferStateFromProps = (
  * Props function invoked any time when trying to get BufferState on an empty EditorState.
  * Check the `isInitialized` field to check if `BufferState` is not defaults.
  */
-export const newStateDataFieldExtension = (seq: number, propsFn: () => EditorProps) => {
-  return bufferStateField.init(() => bufferStateFromProps(seq, propsFn()))
+export const newBufferStateFieldExtension = (propsFn: () => { seq: number; props: EditorProps }) => {
+  // return bufferStateField.init(() => bufferStateFromProps(propsFn()))
+  return bufferStateField.init(() => {
+    // TODO: use uninitialized confseq instead?
+    const { seq, props } = propsFn()
+    return bufferStateFromProps(seq, props)
+  })
 }
 
 /**
@@ -83,6 +88,30 @@ interface ExtensionContext {
   // Not used at the moment, reserved for future use.
 }
 
+interface CheckBufferStateChangesArgs {
+  /**
+   * Current editor configuration sequence number.
+   */
+  seq: number
+
+  /**
+   * Current editor props.
+   */
+  props: EditorProps
+
+  /**
+   * Target buffer state.
+   */
+  buffState: BufferState
+
+  /**
+   * Extension-specific data.
+   *
+   * Unused, reserved for future needs.
+   */
+  extensions?: ExtensionContext
+}
+
 /**
  * Compares a BufferState object obtained from EditorState with component props.
  *
@@ -90,70 +119,85 @@ interface ExtensionContext {
  * Used to update editor state according to values in props.
  *
  * Does most of heavy lifting job on change detection instead of `React.componentDidUpdate`.
- *
- * @param props React component props.
- * @param stateData StateData to compare.
  */
-export const checkBufferStateChanges = (ctx: ExtensionContext, props: Props, stateData: StateData): ChangeSet => {
-  const { value, theme = 'light', inputMode = 'classic', readonly = false } = props
+export const checkBufferStateChanges = ({ seq, props, buffState }: CheckBufferStateChangesArgs): ChangeSet => {
+  const { value, preferences, readonly = false } = props
   const effects: StateEffects = []
-  const changes: Partial<StateData> = {
+  const changes: Partial<BufferState> = {
+    seq,
     isInitialised: true,
   }
 
-  // This flag is false if state was just created and doesn't have stateData assigned yet.
+  // This flag is false if state was just created and doesn't have buffState assigned yet.
   // This happens when EditorState was just created for a new file or `getStateData` called on empty state.
   //
-  // Just initialise StateData by setting it to EditorState and initialize all compartments.
+  // Just initialise the BufferState by setting it to EditorState and initialize all compartments.
   // This is necessary because some compartments like themes needs to be initialized for every state.
-  const { isInitialised } = stateData
+  const { isInitialised } = buffState
 
   const fileSyntax = syntaxFromFileName(value?.path)
 
-  if (!isInitialised || stateData.fileName !== value?.path) {
+  if (!isInitialised || buffState.fileName !== value?.path) {
     // Clear highlights on tab switch
     effects.push(clearHighlightsEffect())
     changes.fileName = value?.path
   }
 
-  if (!isInitialised || stateData.theme !== theme) {
-    effects.push(updateThemeEffect(theme))
-    changes.theme = theme
-  }
-
-  if (!isInitialised || stateData.syntax !== fileSyntax) {
+  if (!isInitialised || buffState.syntax !== fileSyntax) {
     effects.push(updateSyntaxEffect(fileSyntax))
     changes.syntax = fileSyntax
   }
 
-  if (!isInitialised || stateData.readOnly !== readonly) {
+  if (!isInitialised || buffState.readOnly !== readonly) {
     effects.push(readOnlyEffect(readonly))
     changes.readOnly = readonly
   }
 
-  if (!isInitialised || stateData.inputMode !== inputMode) {
-    const effect = updateInputModeEffect(inputMode)
-    changes.inputMode = inputMode
-    effects.push(effect)
+  if (isInitialised && seq == buffState.seq) {
+    // Early exit if only current buffer changed
+    return newChangeSet(effects, changes)
+  }
+
+  const buffPrefs = buffState.preferences
+  const currentPrefs = preferences ?? defaultEditorPreferences
+  if (!isInitialised || buffPrefs.inputMode !== currentPrefs.inputMode) {
+    effects.push(updateInputModeEffect(currentPrefs.inputMode))
+    changes.preferences = currentPrefs
+  }
+
+  if (!isInitialised || isThemeChanged(buffPrefs, currentPrefs)) {
+    effects.push(updateThemeEffect(currentPrefs))
+    changes.preferences = currentPrefs
   }
 
   const isChanged = Object.keys(changes).length > 0
   if (isChanged) {
-    effects.unshift(updateStateDataEffect.of(changes))
+    effects.unshift(updateBufferStateEffect.of(changes))
+  }
+
+  return { isChanged, effects, changes }
+}
+
+const isThemeChanged = (prev: EditorPreferences, curr: EditorPreferences) =>
+  prev.colorScheme != curr.colorScheme || prev.fontFamily != curr.fontFamily || prev.fontSize != curr.fontSize
+
+const newChangeSet = (effects: StateEffects, changes: Partial<BufferState>): ChangeSet => {
+  const isChanged = Object.keys(changes).length > 0
+  if (isChanged) {
+    effects.unshift(updateBufferStateEffect.of(changes))
   }
 
   return { isChanged, effects, changes }
 }
 
 /**
- * Returns a new StateData based on a current one in EditorState but for a different document.
+ * Returns a new BufferState based on a current one in EditorState but for a different document.
  */
-export const replaceStateFileName = (state?: EditorState, fileName?: string): StateData => {
-  const stateData = state ? getStateData(state) : defaultStateData
+export const newBufferStateFromSnapshot = (state?: EditorState, fileName?: string): BufferState => {
+  const previous = state ? getBufferState(state) : defaultBufferState
 
-  // Don't update syntax to keep change detection work.
   return {
-    ...stateData,
+    ...previous,
     isInitialised: false,
     fileName,
   }
