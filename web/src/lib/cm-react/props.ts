@@ -1,7 +1,7 @@
 import type { BufferStateStore } from './buffers/store'
-import type { HotkeyHandler } from './extensions/hotkeys'
 import { defaultThemeConfig } from './extensions/themes'
-import type { DocumentState, InputMode, ColorScheme, EditorRemote, Position } from './types'
+import type { DocumentState, InputMode, ColorScheme, EditorRemote, EditorEvent } from './types'
+import { HotkeyCommand } from './types'
 
 export type { Text } from '@codemirror/state'
 
@@ -96,11 +96,6 @@ export interface EditorProps {
   value?: Document
 
   /**
-   * Editor hotkeys action handler.
-   */
-  hotkeys?: HotkeyHandler
-
-  /**
    * Value change handler.
    */
   onChange?: (e: DocumentState) => void
@@ -111,7 +106,12 @@ export interface EditorProps {
   onMount?: (r: EditorRemote) => void
 
   /**
+   * Editor event handler.
+   */
+  onEvent?: (e: EditorEvent) => void
+
+  /**
    * Gutter click event handler.
    */
-  onGutterClick?: (position: Position) => void
+  onHotkeyCommand?: (cmd: HotkeyCommand, doc: DocumentState, rem: EditorRemote) => void
 }

@@ -1,3 +1,4 @@
+import type { Diagnostic } from '@codemirror/lint'
 import type { Text } from '@codemirror/state'
 
 /**
@@ -7,36 +8,20 @@ export type InputMode = 'default' | 'vim' | 'emacs'
 
 export type ColorScheme = 'dark' | 'light'
 
-type CallbackSlot<T> = (callback: T) => void
-
-interface BaseInputListener {
-  /**
-   * Attaches input listener to editor to start intercepting input.
-   */
-  attach?: () => void
-}
-
-export interface VimInputListener extends BaseInputListener {
-  mode: 'vim'
-  onModeChange: CallbackSlot<(mode: string) => void>
-  onKeyPress: CallbackSlot<(key: string) => void>
-  onCommandDone: CallbackSlot<() => void>
-  onDispose: CallbackSlot<() => void>
-}
-
-export interface EmacsInputListener extends BaseInputListener {
-  mode: 'emacs'
-  onDidMarkChange: CallbackSlot<(isMarkSet: boolean) => void>
-  onDidChangeKey: CallbackSlot<(key: string) => void>
-}
-
-export type InputListener = EmacsInputListener | VimInputListener
-
 export type Callback<T> = (arg: T) => void
 
 export interface DocumentState {
   path: string
   text: Text
+}
+
+export type HotkeyHandler = (cmd: HotkeyCommand, doc: DocumentState, rem: EditorRemote) => void
+
+export enum HotkeyCommand {
+  Empty,
+  Run,
+  Format,
+  Share,
 }
 
 export interface Position {
@@ -52,14 +37,37 @@ export interface Range {
   readonly end: Position
 }
 
-export interface Marker extends Position {
-  message: string
-  severity?: 'info' | 'warning' | 'error'
+export enum EventType {
+  CursorPositionChanged,
+  GutterClick,
+  LoadingStateChange,
+  InputModeChanged,
+  VimInputCommandPress,
+  VimInputCommandDone,
+  EmacsMarkChanged,
+  EmacsKeyChanged,
 }
 
-export interface FormatResult {
-  content?: string
-  markers?: Marker[]
+type EventPayloads = {
+  [EventType.CursorPositionChanged]: { position: Position }
+  [EventType.GutterClick]: { position: Position }
+  [EventType.LoadingStateChange]: { isLoading: boolean }
+  [EventType.InputModeChanged]: { mode: InputMode }
+  [EventType.VimInputCommandPress]: { command: string }
+  [EventType.VimInputCommandDone]: { command: string }
+  [EventType.EmacsMarkChanged]: { isMarkSet: boolean }
+  [EventType.EmacsKeyChanged]: { value: string }
+}
+
+export type EditorEvent = {
+  [K in keyof EventPayloads]: { type: K } & EventPayloads[K]
+}[keyof EventPayloads]
+
+export type EventOf<T extends EventType> = Extract<EditorEvent, { type: T }>
+
+export interface DiagnosticsProvider {
+  // TODO: refine interface
+  getDiagnostics: () => Promise<Diagnostic[]>
 }
 
 /**
@@ -67,27 +75,16 @@ export interface FormatResult {
  */
 export interface EditorRemote {
   /**
-   * Cursor position change listener.
-   */
-  onCursorPositionChange?: Callback<Position>
-
-  /**
-   * Input mode change listener.
-   * Fired when mode changed between vim and emacs.
-   *
-   * Null value is passed when mode switched back to regular.
-   */
-  onInputModeChange?: Callback<InputListener | null>
-
-  /**
-   * Event listener to track whether editor is blocked by loading some resources (for example input method extensions).
-   */
-  onLoadingStateChange?: Callback<boolean>
-
-  /**
    * Applies document formatting.
    */
-  formatDocument: () => void
+  formatDocument: (path: string) => void
+
+  /**
+   * Invalidates document contents.
+   *
+   * Triggers editor to explicitly update document contents and diagnostics.
+   */
+  invalidateDocument: (path: string) => void
 
   /**
    * Focuses editor instance.
