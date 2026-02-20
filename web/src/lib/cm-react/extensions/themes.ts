@@ -1,11 +1,21 @@
 import { Compartment } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
-import { vscodeDark, vscodeDarkStyle, vscodeLight } from '@uiw/codemirror-theme-vscode'
+import { vscodeDarkInit, vscodeDarkStyle, vscodeLightInit } from '@uiw/codemirror-theme-vscode'
 
 import type { ColorScheme } from '../types'
 
 // TODO: infer editor popup styles from state theme.
 export const popupHighlightStyles = vscodeDarkStyle
+
+export const defaultFontFamily = [
+  'Menlo',
+  'Monaco',
+  'Consolas',
+  '"Andale Mono"',
+  '"Ubuntu Mono"',
+  '"Courier New"',
+  'monospace',
+].join(', ')
 
 export const highlightClasses = {
   line: 'line--highlighted',
@@ -25,16 +35,39 @@ export const defaultThemeStyles = EditorView.theme({
   },
 })
 
+interface ThemeConfig {
+  colorScheme: ColorScheme
+  fontFamily: string
+  fontSize: number
+}
+
+export const defaultThemeConfig: ThemeConfig = {
+  colorScheme: 'light',
+  fontFamily: defaultFontFamily,
+  fontSize: 14,
+}
+
 export const themeCompartment = new Compartment()
 
-const themeExtensionFromName = (scheme?: ColorScheme) => (scheme === 'dark' ? vscodeDark : vscodeLight)
+const makeExtensionTheme = ({ colorScheme, fontFamily, fontSize }: ThemeConfig) => {
+  const ctor = colorScheme === 'dark' ? vscodeDarkInit : vscodeLightInit
+
+  return ctor({
+    theme: colorScheme,
+    settings: {
+      fontFamily,
+      fontSize,
+    },
+  })
+}
 
 /**
  * Returns theme compartment instance with initial theme.
  */
-export const newThemeCompartment = (scheme?: ColorScheme) => themeCompartment.of(themeExtensionFromName(scheme))
+export const newThemeCompartment = (cfg?: ThemeConfig) =>
+  themeCompartment.of(makeExtensionTheme(cfg ?? defaultThemeConfig))
 
 /**
  * Returns a new state effect to update theme.
  */
-export const updateThemeEffect = (scheme?: ColorScheme) => themeCompartment.reconfigure(themeExtensionFromName(scheme))
+export const updateThemeEffect = (cfg: ThemeConfig) => themeCompartment.reconfigure(makeExtensionTheme(cfg))

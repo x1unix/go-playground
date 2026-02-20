@@ -61,7 +61,7 @@ export interface BufferState {
  * Editor component should replace it right with actual values after EditorState is created.
  */
 export const defaultBufferState: BufferState = {
-  seq: 0,
+  seq: -1,
   syntax: defaultSyntax,
   preferences: defaultEditorPreferences,
 }

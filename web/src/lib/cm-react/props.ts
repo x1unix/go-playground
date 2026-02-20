@@ -1,5 +1,6 @@
 import type { BufferStateStore } from './buffers/store'
 import type { HotkeyHandler } from './extensions/hotkeys'
+import { defaultThemeConfig } from './extensions/themes'
 import type { DocumentState, InputMode, ColorScheme, EditorRemote, Position } from './types'
 
 export type { Text } from '@codemirror/state'
@@ -15,14 +16,12 @@ export interface Document {
    *
    * Used once to populate initial editor contents.
    */
-  content: string | ((fileName: string) => Promise<string>)
+  content: string
 }
 
 export const defaultEditorPreferences: EditorPreferences = {
-  colorScheme: 'light',
+  ...defaultThemeConfig,
   inputMode: 'default',
-  fontFamily: 'monospace',
-  fontSize: 14,
   tabSize: 4,
   showLineNumbers: true,
 }
