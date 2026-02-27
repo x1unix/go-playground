@@ -1,3 +1,4 @@
+import { Diagnostic } from '@codemirror/lint'
 import type { BufferStateStore } from './buffers/store'
 import { defaultThemeConfig } from './extensions/themes'
 import type { DocumentState, InputMode, ColorScheme, EditorRemote, EditorEvent } from './types'
@@ -94,6 +95,16 @@ export interface EditorProps {
    * When file content is async function, content load error events can be observed with `onEvent` handler.
    */
   value?: Document
+
+  /**
+   * Document format function, triggered either by a hotkey or externally via EditorController.
+   */
+  formatter?: (doc: DocumentState) => Promise<string>
+
+  /**
+   * Diagnostics reporter handler.
+   */
+  linter?: (doc: DocumentState) => Promise<Diagnostic[]>
 
   /**
    * Value change handler.

@@ -1,7 +1,7 @@
 import type { Diagnostic } from '@codemirror/lint'
 import { Text, type ChangeSpec, type EditorState } from '@codemirror/state'
 
-import type { Marker } from './types'
+// import type { Marker } from './types'
 
 /**
  * Splits string into lines and returns Text instance for CM.
@@ -23,20 +23,20 @@ export const newDocReplaceChange = (state: EditorState, contents: string): Chang
 /**
  * Converts list of markers from formatter to diagnostics format for '@codemirror/lint'.
  */
-export const mapMarkersToDiagnostics = (doc: Text, markers: Marker[]): Diagnostic[] =>
-  markers.map((marker) => {
-    const line = doc.line(marker.line)
-    let { from, to } = line
-
-    if (marker.column > 0) {
-      from += marker.column - 1
-      to = from + 1
-    }
-
-    return {
-      from,
-      to,
-      severity: marker.severity ?? 'error',
-      message: marker.message,
-    }
-  })
+// export const mapMarkersToDiagnostics = (doc: Text, markers: Marker[]): Diagnostic[] =>
+//   markers.map((marker) => {
+//     const line = doc.line(marker.line)
+//     let { from, to } = line
+//
+//     if (marker.column > 0) {
+//       from += marker.column - 1
+//       to = from + 1
+//     }
+//
+//     return {
+//       from,
+//       to,
+//       severity: marker.severity ?? 'error',
+//       message: marker.message,
+//     }
+//   })

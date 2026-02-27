@@ -42,6 +42,7 @@ export enum EventType {
   GutterClick,
   LoadingStateChange,
   InputModeChanged,
+  VimModeChanged,
   VimInputCommandPress,
   VimInputCommandDone,
   EmacsMarkChanged,
@@ -53,8 +54,9 @@ type EventPayloads = {
   [EventType.GutterClick]: { position: Position }
   [EventType.LoadingStateChange]: { isLoading: boolean }
   [EventType.InputModeChanged]: { mode: InputMode }
-  [EventType.VimInputCommandPress]: { command: string }
-  [EventType.VimInputCommandDone]: { command: string }
+  [EventType.VimModeChanged]: { mode: string; subMode?: string }
+  [EventType.VimInputCommandPress]: { key: string }
+  [EventType.VimInputCommandDone]: {}
   [EventType.EmacsMarkChanged]: { isMarkSet: boolean }
   [EventType.EmacsKeyChanged]: { value: string }
 }
