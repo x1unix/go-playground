@@ -20,13 +20,6 @@ export interface BufferState {
   isInitialised?: boolean
 
   /**
-   * Config sequence number.
-   *
-   * Used for fast state invalidation check.
-   */
-  seq: number
-
-  /**
    * Identifies whether document view is in read-only mode.
    */
   readOnly?: boolean
@@ -61,7 +54,6 @@ export interface BufferState {
  * Editor component should replace it right with actual values after EditorState is created.
  */
 export const defaultBufferState: BufferState = {
-  seq: -1,
   syntax: defaultSyntax,
   preferences: defaultEditorPreferences,
 }

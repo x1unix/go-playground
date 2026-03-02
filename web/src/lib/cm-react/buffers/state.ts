@@ -13,11 +13,9 @@ import { defaultBufferState, type BufferState } from './types'
  * Creates new uninitialized StateData from React component props.
  */
 export const bufferStateFromProps = (
-  seq: number,
   { preferences, readonly: readOnly = false, value }: EditorProps,
   defaults = defaultBufferState,
 ): BufferState => ({
-  seq: seq,
   isInitialised: false,
   preferences: preferences ?? defaults.preferences,
   fileName: value?.path,
@@ -32,12 +30,12 @@ export const bufferStateFromProps = (
  * Props function invoked any time when trying to get BufferState on an empty EditorState.
  * Check the `isInitialized` field to check if `BufferState` is not defaults.
  */
-export const newBufferStateFieldExtension = (propsFn: () => { seq: number; props: EditorProps }) => {
+export const newBufferStateFieldExtension = (propsFn: () => { props: EditorProps }) => {
   // return bufferStateField.init(() => bufferStateFromProps(propsFn()))
   return bufferStateField.init(() => {
     // TODO: use uninitialized confseq instead?
-    const { seq, props } = propsFn()
-    return bufferStateFromProps(seq, props)
+    const { props } = propsFn()
+    return bufferStateFromProps(props)
   })
 }
 
@@ -51,8 +49,8 @@ export const newBufferStateFieldExtension = (propsFn: () => { seq: number; props
  * This behavior breaks change detection and can be fixed by writing
  * BufferState field manually to each new state.
  */
-export const setBufferStateEffect = (seq: number, props: EditorProps) => {
-  const stateData = bufferStateFromProps(seq, props)
+export const setBufferStateEffect = (props: EditorProps) => {
+  const stateData = bufferStateFromProps(props)
   stateData.isInitialised = true
   return updateBufferStateEffect.of(stateData)
 }
@@ -90,11 +88,6 @@ interface ExtensionContext {
 
 interface CheckBufferStateChangesArgs {
   /**
-   * Current editor configuration sequence number.
-   */
-  seq: number
-
-  /**
    * Current editor props.
    */
   props: EditorProps
@@ -120,11 +113,10 @@ interface CheckBufferStateChangesArgs {
  *
  * Does most of heavy lifting job on change detection instead of `React.componentDidUpdate`.
  */
-export const checkBufferStateChanges = ({ seq, props, buffState }: CheckBufferStateChangesArgs): ChangeSet => {
+export const checkBufferStateChanges = ({ props, buffState }: CheckBufferStateChangesArgs): ChangeSet => {
   const { value, preferences, readonly = false } = props
   const effects: StateEffects = []
   const changes: Partial<BufferState> = {
-    seq,
     isInitialised: true,
   }
 
@@ -153,10 +145,10 @@ export const checkBufferStateChanges = ({ seq, props, buffState }: CheckBufferSt
     changes.readOnly = readonly
   }
 
-  if (isInitialised && seq == buffState.seq) {
-    // Early exit if only current buffer changed
-    return newChangeSet(effects, changes)
-  }
+  // if (isInitialised && seq == buffState.seq) {
+  //   // Early exit if only current buffer changed
+  //   return newChangeSet(effects, changes)
+  // }
 
   const buffPrefs = buffState.preferences
   const currentPrefs = preferences ?? defaultEditorPreferences

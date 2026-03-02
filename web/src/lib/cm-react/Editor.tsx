@@ -42,7 +42,6 @@ const corePlugins = [defaultThemeStyles, highlightField, keymap.of(keyBindings)]
 
 interface State {
   isLoading: boolean
-  configSeq: number
 }
 
 export class Editor extends React.Component<EditorProps, State> {
@@ -54,7 +53,6 @@ export class Editor extends React.Component<EditorProps, State> {
 
   state: State = {
     isLoading: false,
-    configSeq: 0,
   }
 
   constructor(props: EditorProps) {
@@ -83,7 +81,6 @@ export class Editor extends React.Component<EditorProps, State> {
       newReadOnlyCompartment(props.readonly),
       newInputModeCompartment(preferences?.inputMode),
       newBufferStateFieldExtension(() => ({
-        seq: this.state.configSeq,
         props: this.props,
       })),
       newFormatErrorsRenderer(),
@@ -160,7 +157,7 @@ export class Editor extends React.Component<EditorProps, State> {
     // If BufferState field it not defined in EditorState, state will create
     // a new copy with current props every time it was queried instead of doing that just once per state.
     // This breaks change detection and to avoid that, we should explicitly set it every time.
-    const effects: Array<StateEffect<any>> = [setBufferStateEffect(this.state.configSeq, this.props)]
+    const effects: Array<StateEffect<any>> = [setBufferStateEffect(this.props)]
 
     this.editor.dispatch({
       effects,
@@ -218,7 +215,6 @@ export class Editor extends React.Component<EditorProps, State> {
     }
 
     const { effects, changes, isChanged } = checkBufferStateChanges({
-      seq: this.state.configSeq,
       props: this.props,
       buffState: currentStateData,
     })
