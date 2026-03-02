@@ -83,7 +83,7 @@ export class Editor extends React.Component<EditorProps, State> {
       newBufferStateFieldExtension(() => ({
         props: this.props,
       })),
-      newFormatErrorsRenderer(),
+      newFormatErrorsRenderer(() => this.props.linter),
       ...basicSetup({
         lineNumbers: {
           domEventHandlers: {

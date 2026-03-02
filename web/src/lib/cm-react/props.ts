@@ -1,6 +1,7 @@
 import { Diagnostic } from '@codemirror/lint'
 import type { BufferStateStore } from './buffers/store'
 import { defaultThemeConfig } from './extensions/themes'
+import type { LinterConfig } from './extensions/linter'
 import type { DocumentState, InputMode, ColorScheme, EditorRemote, EditorEvent } from './types'
 import { HotkeyCommand } from './types'
 
@@ -104,7 +105,7 @@ export interface EditorProps {
   /**
    * Diagnostics reporter handler.
    */
-  linter?: (doc: DocumentState) => Promise<Diagnostic[]>
+  linter?: LinterConfig
 
   /**
    * Value change handler.

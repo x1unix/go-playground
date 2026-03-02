@@ -1,5 +1,6 @@
-import type { Diagnostic } from '@codemirror/lint'
 import { Text, type ChangeSpec, type EditorState } from '@codemirror/state'
+import { getBufferState } from './buffers/state'
+import type { DocumentState } from './types'
 
 // import type { Marker } from './types'
 
@@ -19,6 +20,19 @@ export const newDocReplaceChange = (state: EditorState, contents: string): Chang
   to: state.doc.length,
   insert: docFromString(contents),
 })
+
+export const docStateFromEditor = (state: EditorState): DocumentState | undefined => {
+  const buff = getBufferState(state)
+  if (buff.isInitialised && buff.fileName) {
+    // Skip uninitialized buffers
+    return {
+      path: buff.fileName,
+      text: state.doc,
+    }
+  }
+
+  return undefined
+}
 
 /**
  * Converts list of markers from formatter to diagnostics format for '@codemirror/lint'.

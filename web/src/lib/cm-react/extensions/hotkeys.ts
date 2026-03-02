@@ -1,20 +1,16 @@
 import { Prec } from '@codemirror/state'
 import { type Command, keymap } from '@codemirror/view'
 
-import { type HotkeyHandler, EditorRemote, HotkeyCommand } from '../types'
-import { getBufferState } from '../buffers/state'
+import { type HotkeyHandler, type EditorRemote, HotkeyCommand } from '../types'
+import { docStateFromEditor } from '../utils'
 
 const newCmdHandler = (cmd: HotkeyCommand, remote: EditorRemote, fn?: HotkeyHandler): Command | undefined => {
   if (!fn) return
 
   return (view) => {
-    const buff = getBufferState(view.state)
-    if (buff.isInitialised && buff.fileName) {
+    const doc = docStateFromEditor(view.state)
+    if (doc) {
       // Dispatch command only on initialized buffers.
-      const doc = {
-        path: buff.fileName,
-        text: view.state.doc,
-      }
       fn(cmd, doc, remote)
     }
 
