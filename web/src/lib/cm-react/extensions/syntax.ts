@@ -1,12 +1,8 @@
 import { go } from '@codemirror/lang-go'
 import { Compartment, type Extension } from '@codemirror/state'
+import { Syntax } from '../types'
 
 import { goMod } from './modfile'
-
-export enum Syntax {
-  Go,
-  GoMod,
-}
 
 export const defaultSyntax = Syntax.Go
 

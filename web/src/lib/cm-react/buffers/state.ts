@@ -187,6 +187,7 @@ export const newBufferStateFromSnapshot = (state?: EditorState, fileName?: strin
 
   return {
     ...previous,
+    syntax: syntaxFromFileName(fileName),
     isInitialised: false,
     fileName,
   }

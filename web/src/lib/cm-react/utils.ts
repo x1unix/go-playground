@@ -27,6 +27,7 @@ export const docStateFromEditor = (state: EditorState): DocumentState | undefine
     // Skip uninitialized buffers
     return {
       path: buff.fileName,
+      language: buff.syntax,
       text: state.doc,
     }
   }

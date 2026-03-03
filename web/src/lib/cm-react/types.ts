@@ -10,8 +10,14 @@ export type ColorScheme = 'dark' | 'light'
 
 export type Callback<T> = (arg: T) => void
 
+export enum Syntax {
+  Go,
+  GoMod,
+}
+
 export interface DocumentState {
   path: string
+  language: Syntax
   text: Text
 }
 
