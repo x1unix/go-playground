@@ -64,6 +64,7 @@ export const CodeEditorContainer: React.FC = () => {
         fontFamily: monaco.fontFamily ? getFontFamily(monaco.fontFamily) : getDefaultFontFamily(),
         fontSize: monaco.fontSize ?? defaultEditorPreferences.fontSize,
         tabSize: monaco.tabSize,
+        fontLigatures: monaco.fontLigatures,
       }),
     [settings, monaco],
   )

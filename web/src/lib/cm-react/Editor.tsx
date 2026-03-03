@@ -351,7 +351,15 @@ export class Editor extends React.Component<EditorProps, State> {
   }
 
   render() {
-    const theme = this.props.preferences?.colorScheme ?? 'light'
-    return <div ref={this.containerRef} className={classes['gpg-Editor']} data-theme={theme} />
+    const prefs = this.props.preferences
+    const theme = prefs?.colorScheme ?? 'light'
+    return (
+      <div
+        ref={this.containerRef}
+        className={classes['gpg-Editor']}
+        data-theme={theme}
+        data-font-ligatures={!!prefs?.fontLigatures}
+      />
+    )
   }
 }

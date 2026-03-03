@@ -50,6 +50,11 @@ export interface EditorPreferences {
   tabSize: number
 
   /**
+   * Enable font ligatures
+   */
+  fontLigatures?: boolean
+
+  /**
    * Controls whether editor should use regular or vim/emacs input mode.
    *
    * Regular is default mode.
