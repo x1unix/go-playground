@@ -24,7 +24,7 @@ import {
 import { BufferStateStore } from './buffers/store'
 
 import type { EditorProps, Document } from './props'
-import { EventType, Position } from './types'
+import { EventType, InputMode, Position } from './types'
 import { docFromString } from './utils'
 import { CMEditorRemote } from './remote'
 import type { BufferState } from './buffers/types'
@@ -162,6 +162,11 @@ export class Editor extends React.Component<EditorProps, State> {
     this.editor.dispatch({
       effects,
     })
+
+    // Emit initial events
+    // TODO: broadcast per-document vim mode on document change.
+    this.emitCursorPosChanged(this.editor?.state)
+    this.onInputModeChanged(this.props.preferences?.inputMode ?? 'default')
   }
 
   /**
@@ -223,7 +228,14 @@ export class Editor extends React.Component<EditorProps, State> {
     }
 
     this.editor.dispatch({ effects })
-    this.checkInputModeChanges(currentStateData)
+
+    // Check if input mode has been changed
+    // skip if change triggered when compartment is updated in for a different file.
+    const currentMode = this.props.preferences?.inputMode ?? 'default'
+    const prevMode = currentStateData.preferences?.inputMode
+    if (prevMode && currentMode !== prevMode) {
+      this.onInputModeChanged(currentMode, prevMode)
+    }
 
     if (fileChanged) {
       // Sync state cursor to status bar.
@@ -281,17 +293,11 @@ export class Editor extends React.Component<EditorProps, State> {
     })
   }
 
-  private checkInputModeChanges(previousState: Partial<BufferState>) {
-    const currentMode = this.props.preferences?.inputMode ?? 'default'
-    const prevMode = previousState.preferences?.inputMode
-    if (!prevMode || currentMode === prevMode) {
-      // skip if change triggered when compartment is updated in for a different file.
-      return
-    }
-
+  private onInputModeChanged(currentMode: InputMode, prevMode?: InputMode) {
     this.props.onEvent?.({
       type: EventType.InputModeChanged,
       mode: currentMode,
+      prevMode,
     })
 
     if (!this.editor) return
@@ -306,18 +312,22 @@ export class Editor extends React.Component<EditorProps, State> {
           })
         })
 
-        vimCm?.on('vim-keypress', (key: string) => {
-          this.props.onEvent?.({
-            type: EventType.VimInputCommandPress,
-            key,
-          })
-        })
-
-        vimCm?.on('vim-command-done', () => {
-          this.props.onEvent?.({
-            type: EventType.VimInputCommandDone,
-          })
-        })
+        // FIXME: command events are emitted on editor keypress, not a command key
+        //
+        // vimCm?.on('vim-keypress', (key: string) => {
+        //   console.log('vim-keypress')
+        //   this.props.onEvent?.({
+        //     type: EventType.VimInputCommandPress,
+        //     key,
+        //   })
+        // })
+        //
+        // vimCm?.on('vim-command-done', () => {
+        //   console.log('vim-cmd-done')
+        //   this.props.onEvent?.({
+        //     type: EventType.VimInputCommandDone,
+        //   })
+        // })
         break
       }
       case 'emacs': {

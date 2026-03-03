@@ -53,7 +53,7 @@ type EventPayloads = {
   [EventType.CursorPositionChanged]: { position: Position }
   [EventType.GutterClick]: { position: Position }
   [EventType.LoadingStateChange]: { isLoading: boolean }
-  [EventType.InputModeChanged]: { mode: InputMode }
+  [EventType.InputModeChanged]: { mode: InputMode; prevMode?: InputMode }
   [EventType.VimModeChanged]: { mode: string; subMode?: string }
   [EventType.VimInputCommandPress]: { key: string }
   [EventType.VimInputCommandDone]: {}

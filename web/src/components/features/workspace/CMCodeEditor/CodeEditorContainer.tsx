@@ -1,11 +1,42 @@
 import React, { useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { defaultEditorPreferences, Editor, type EditorPreferences, type Document, EventType } from '~/lib/cm-react'
+import type { AnyAction } from 'redux'
+import {
+  defaultEditorPreferences,
+  Editor,
+  type EditorPreferences,
+  type Document,
+  EventType,
+  type EditorEvent,
+} from '~/lib/cm-react'
 import type { State } from '~/store/state'
+import { VimMode, VimSubMode } from '~/store/vim/state'
+import { newVimDisposeAction, newVimModeChangeAction } from '~/store/vim/actions'
 import { dispatchUpdateFile } from '~/store/workspace'
 
 const preferencesWithDefaults = (src: Partial<EditorPreferences>): EditorPreferences =>
   Object.assign(Object.create(defaultEditorPreferences), src)
+
+const mapEventToAction = (e: EditorEvent): AnyAction | undefined => {
+  switch (e.type) {
+    // TODO: wire vim command events when callbacks will be fixed.
+    case EventType.VimModeChanged:
+      return newVimModeChangeAction({
+        mode: e.mode as VimMode,
+        subMode: e.subMode as VimSubMode,
+      })
+    case EventType.InputModeChanged:
+      switch ('vim') {
+        case e.prevMode:
+          return newVimDisposeAction()
+        case e.mode:
+          return newVimModeChangeAction({ mode: VimMode.Normal })
+      }
+      break
+    default:
+      console.log('got event', e)
+  }
+}
 
 /**
  * Connects CodeMirror code editor to the application store and business logic.
@@ -57,14 +88,10 @@ export const CodeEditorContainer: React.FC = () => {
         console.log('got remote', rem)
       }}
       onEvent={(e) => {
-        switch (e.type) {
-          case EventType.VimModeChanged:
-            console.log('vim.mode', e.mode, e.subMode)
-            break
-          default:
-            console.log('got event', e)
+        const action = mapEventToAction(e)
+        if (action) {
+          dispatch(action)
         }
-        // TODO: handle input events later
       }}
       onHotkeyCommand={(cmd, doc, rem) => {
         // TODO: handle commands later
