@@ -1,6 +1,5 @@
 import { Compartment } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
-import type { StyleSpec } from 'style-mod'
 import { vscodeDarkInit, vscodeDarkStyle, vscodeLightInit } from '@uiw/codemirror-theme-vscode'
 
 import type { ColorScheme } from '../types'

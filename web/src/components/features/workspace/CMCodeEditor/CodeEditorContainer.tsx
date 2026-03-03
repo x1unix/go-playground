@@ -16,6 +16,7 @@ import { newVimDisposeAction, newVimModeChangeAction } from '~/store/vim/actions
 import { dispatchUpdateFile } from '~/store/workspace'
 import { GoSyntaxLinter } from './syntax/linter'
 import { TargetType } from '~/services/config'
+import { getDefaultFontFamily, getFontFamily } from '~/services/fonts'
 
 const preferencesWithDefaults = (src: Partial<EditorPreferences>): EditorPreferences =>
   Object.assign(Object.create(defaultEditorPreferences), src)
@@ -60,7 +61,7 @@ export const CodeEditorContainer: React.FC = () => {
       preferencesWithDefaults({
         colorScheme: settings.darkMode ? 'dark' : 'light',
         inputMode: settings.enableVimMode ? 'vim' : 'default',
-        fontFamily: monaco.fontFamily,
+        fontFamily: monaco.fontFamily ? getFontFamily(monaco.fontFamily) : getDefaultFontFamily(),
         fontSize: monaco.fontSize ?? defaultEditorPreferences.fontSize,
         tabSize: monaco.tabSize,
       }),
