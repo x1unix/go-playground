@@ -1,10 +1,13 @@
 import * as Comlink from 'comlink'
 import type { WorkerHandler } from './analyzer.worker'
-import type { IDisposable } from 'monaco-editor'
 
 export type AnalyzerWorker = Comlink.Remote<WorkerHandler>
 
-export const spawnAnalyzerWorker = (): [AnalyzerWorker, IDisposable] => {
+export interface Disposable {
+  dispose(): void
+}
+
+export const spawnAnalyzerWorker = (): [AnalyzerWorker, Disposable] => {
   const worker = new Worker(new URL('./analyzer.worker.ts', import.meta.url), {
     type: 'module',
   })

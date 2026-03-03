@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import type { AnyAction } from 'redux'
 import {
@@ -9,10 +9,14 @@ import {
   EventType,
   type EditorEvent,
 } from '~/lib/cm-react'
+import { useLazyRef } from '~/hooks/lazy-ref'
 import type { State } from '~/store/state'
 import { VimMode, VimSubMode } from '~/store/vim/state'
 import { newVimDisposeAction, newVimModeChangeAction } from '~/store/vim/actions'
 import { dispatchUpdateFile } from '~/store/workspace'
+import { GoSyntaxLinter } from './linter'
+import { TargetType } from '~/services/config'
+import { linter } from '@codemirror/lint'
 
 const preferencesWithDefaults = (src: Partial<EditorPreferences>): EditorPreferences =>
   Object.assign(Object.create(defaultEditorPreferences), src)
@@ -43,13 +47,14 @@ const mapEventToAction = (e: EditorEvent): AnyAction | undefined => {
  * Connects CodeMirror code editor to the application store and business logic.
  */
 export const CodeEditorContainer: React.FC = () => {
+  const dispatch = useDispatch()
   const [fallbackWorkspaceKey] = useState(() => Date.now().toString())
 
-  const dispatch = useDispatch()
   const monaco = useSelector((state: State) => state.monaco)
   const settings = useSelector((state: State) => state.settings)
   const workspace = useSelector((state: State) => state.workspace)
   const isReadOnly = useSelector(({ status }: State) => status?.loading || status?.running)
+  const isServerRuntime = useSelector(({ runTarget }: State) => runTarget.target === TargetType.Server)
 
   const preferences: EditorPreferences = useMemo(
     () =>
@@ -74,6 +79,12 @@ export const CodeEditorContainer: React.FC = () => {
     }
   }, [workspace])
 
+  const linterRef = useLazyRef(() => new GoSyntaxLinter(dispatch))
+  useEffect(() => {
+    const v = linterRef.current
+    return () => v.dispose()
+  }, [linterRef])
+
   // TODO: I'll map props later myself.
   return (
     <Editor
@@ -81,6 +92,10 @@ export const CodeEditorContainer: React.FC = () => {
       value={doc}
       preferences={preferences}
       readonly={isReadOnly}
+      linter={{
+        delay: 100,
+        handler: (doc) => linterRef.current.check(doc, { warnAboutFakeDateTime: isServerRuntime }),
+      }}
       onChange={({ path, text }) => {
         // TODO: probably debounce that later
         dispatch(dispatchUpdateFile(path, text.toString()))
