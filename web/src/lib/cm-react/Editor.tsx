@@ -260,14 +260,23 @@ export class Editor extends React.Component<EditorProps, State> {
       return
     }
 
-    // TODO: fetch affected file path from state ref.
-    const path = this.props.value?.path
-    if (!path) {
+    const docState = getBufferState(state)
+    if (!docState.isInitialised || !docState.fileName) {
+      // Skip on-change hook for uninitialized buffers.
+      return
+    }
+
+    if (docState.fileName !== this.props.value?.path) {
+      console.warn('onChange was triggered for a file that is different from a selected current one', {
+        current: this.props.value?.path,
+        affected: docState.fileName,
+      })
       return
     }
 
     this.props.onChange?.({
-      path,
+      path: docState.fileName,
+      language: docState.syntax,
       text: state.doc,
     })
   }
