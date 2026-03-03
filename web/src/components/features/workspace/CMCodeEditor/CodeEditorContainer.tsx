@@ -14,9 +14,8 @@ import type { State } from '~/store/state'
 import { VimMode, VimSubMode } from '~/store/vim/state'
 import { newVimDisposeAction, newVimModeChangeAction } from '~/store/vim/actions'
 import { dispatchUpdateFile } from '~/store/workspace'
-import { GoSyntaxLinter } from './linter'
+import { GoSyntaxLinter } from './syntax/linter'
 import { TargetType } from '~/services/config'
-import { linter } from '@codemirror/lint'
 
 const preferencesWithDefaults = (src: Partial<EditorPreferences>): EditorPreferences =>
   Object.assign(Object.create(defaultEditorPreferences), src)
