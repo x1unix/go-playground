@@ -3,7 +3,7 @@ import type { BufferStateStore } from './buffers/store'
 import { defaultThemeConfig } from './extensions/themes'
 import type { LinterConfig } from './extensions/linter'
 import type { DocumentState, InputMode, ColorScheme, EditorRemote, EditorEvent } from './types'
-import { HotkeyCommand } from './types'
+import { EditorCommand } from './types'
 
 export type { Text } from '@codemirror/state'
 
@@ -123,7 +123,9 @@ export interface EditorProps {
   onEvent?: (e: EditorEvent) => void
 
   /**
-   * Gutter click event handler.
+   * Editor command handler.
+   *
+   * Commands emitted by hotkeys and in Vim mode.
    */
-  onHotkeyCommand?: (cmd: HotkeyCommand, doc: DocumentState, rem: EditorRemote) => void
+  onCommand?: (cmd: EditorCommand, doc: DocumentState, rem: EditorRemote) => void
 }

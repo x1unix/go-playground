@@ -82,7 +82,7 @@ export const CodeEditorContainer: React.FC = () => {
       preferences={preferences}
       readonly={isReadOnly}
       onChange={({ path, text }) => {
-        // TODO: probably debounde that
+        // TODO: probably debounce that later
         dispatch(dispatchUpdateFile(path, text.toString()))
       }}
       onMount={(rem) => {
@@ -94,7 +94,7 @@ export const CodeEditorContainer: React.FC = () => {
           dispatch(action)
         }
       }}
-      onHotkeyCommand={(cmd, doc, rem) => {
+      onCommand={(cmd, doc, rem) => {
         // TODO: handle commands later
         console.log('got cmd', { cmd, doc, rem })
       }}

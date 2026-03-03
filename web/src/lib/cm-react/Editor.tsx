@@ -24,7 +24,7 @@ import {
 import { BufferStateStore } from './buffers/store'
 
 import type { EditorProps, Document } from './props'
-import { EventType, type HotkeyHandler, type InputMode, type Position } from './types'
+import { EventType, type CommandHandler, type InputMode, type Position } from './types'
 import { docFromString } from './utils'
 import { CMEditorRemote } from './remote'
 import type { BufferState } from './buffers/types'
@@ -69,9 +69,9 @@ export class Editor extends React.Component<EditorProps, State> {
     this.remote = new CMEditorRemote(this.props.formatter)
 
     // Wrap hotkey listener to always point to current value from props.
-    const h: HotkeyHandler = (...args) => {
+    const h: CommandHandler = (...args) => {
       // always point to current props value.
-      this.props.onHotkeyCommand?.(...args)
+      this.props.onCommand?.(...args)
     }
 
     // Create hotkey handler and register custom commands.

@@ -15,9 +15,9 @@ export interface DocumentState {
   text: Text
 }
 
-export type HotkeyHandler = (cmd: HotkeyCommand, doc: DocumentState, rem: EditorRemote) => void
+export type CommandHandler = (cmd: EditorCommand, doc: DocumentState, rem: EditorRemote) => void
 
-export enum HotkeyCommand {
+export enum EditorCommand {
   Empty,
   Run,
   Format,

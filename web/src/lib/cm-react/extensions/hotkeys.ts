@@ -2,10 +2,10 @@ import { Prec } from '@codemirror/state'
 import { type Command, keymap } from '@codemirror/view'
 import { Vim } from '@replit/codemirror-vim'
 
-import { type HotkeyHandler, type EditorRemote, HotkeyCommand } from '../types'
+import { type CommandHandler, type EditorRemote, EditorCommand } from '../types'
 import { docStateFromEditor } from '../utils'
 
-const newCmdHandler = (cmd: HotkeyCommand, remote: EditorRemote, fn?: HotkeyHandler): Command | undefined => {
+const newCmdHandler = (cmd: EditorCommand, remote: EditorRemote, fn?: CommandHandler): Command | undefined => {
   if (!fn) return
 
   return (view) => {
@@ -22,35 +22,35 @@ const newCmdHandler = (cmd: HotkeyCommand, remote: EditorRemote, fn?: HotkeyHand
 /**
  * Returns a new hotkey plugin that handles editor settings.
  */
-export const newHotkeyHandler = (remote: EditorRemote, handler: HotkeyHandler) =>
+export const newHotkeyHandler = (remote: EditorRemote, handler: CommandHandler) =>
   Prec.highest(
     keymap.of([
       {
         key: 'Mod-s',
         preventDefault: true,
-        run: newCmdHandler(HotkeyCommand.Share, remote, handler),
+        run: newCmdHandler(EditorCommand.Share, remote, handler),
       },
       {
         key: 'Mod-Enter',
         preventDefault: true,
-        run: newCmdHandler(HotkeyCommand.Run, remote, handler),
+        run: newCmdHandler(EditorCommand.Run, remote, handler),
       },
       {
         key: 'Mod-f',
         preventDefault: true,
-        run: newCmdHandler(HotkeyCommand.Format, remote, handler),
+        run: newCmdHandler(EditorCommand.Format, remote, handler),
       },
     ]),
   )
 
 const commands = [
   {
-    cmd: HotkeyCommand.Run,
+    cmd: EditorCommand.Run,
     name: 'write',
     short: 'w',
   },
   {
-    cmd: HotkeyCommand.Share,
+    cmd: EditorCommand.Share,
     name: 'share',
   },
 ]
@@ -60,7 +60,7 @@ const commands = [
  *
  * Note: this is a global operation.
  */
-export const registerVimCommands = (remote: EditorRemote, handler: HotkeyHandler) => {
+export const registerVimCommands = (remote: EditorRemote, handler: CommandHandler) => {
   for (const c of commands) {
     Vim.defineEx(c.name, c.short, (cm, _p) => {
       const doc = docStateFromEditor(cm.cm6.state)
