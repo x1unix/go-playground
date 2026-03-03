@@ -21,7 +21,7 @@ export interface Document {
   content: string
 }
 
-export const defaultEditorPreferences: EditorPreferences = {
+export const defaultEditorPreferences: Readonly<EditorPreferences> = {
   ...defaultThemeConfig,
   inputMode: 'default',
   tabSize: 4,
