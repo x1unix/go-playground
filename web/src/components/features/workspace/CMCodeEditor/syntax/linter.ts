@@ -6,6 +6,7 @@ import { Syntax, type DocumentState } from '~/lib/cm-react'
 import { type Disposable, type AnalyzerWorker, spawnAnalyzerWorker } from '~/workers/analyzer'
 import { newMarkerAction } from '~/store'
 import { stripSlash } from './utils'
+import { getTimeNowUsageMarkers } from './time'
 
 export interface SyntaxCheckOptions {
   warnAboutFakeDateTime?: boolean
@@ -64,7 +65,7 @@ export class GoSyntaxLinter implements Disposable {
       return []
     }
 
-    let markers: monaco.editor.IMarkerData[] = []
+    const markers: monaco.editor.IMarkerData[] = opts?.warnAboutFakeDateTime ? getTimeNowUsageMarkers(doc) : []
 
     try {
       const response = await this.worker.checkSyntaxErrors({
@@ -74,7 +75,7 @@ export class GoSyntaxLinter implements Disposable {
       })
 
       if (response.fileName === doc.path && response.markers) {
-        markers = response.markers
+        markers.push(...response.markers)
       }
     } catch (err) {
       console.error('failed to perform syntax check', err)
