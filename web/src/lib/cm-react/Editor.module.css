@@ -1,0 +1,22 @@
+/* Container styles */
+.gpg-Editor {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Colors for CodeMirror vim theming. */
+/* See: ./extensions/themes.ts */
+
+.gpg-Editor[data-theme='light'] {
+  --vim-cursor-bg: #121111;
+  --vim-cursor-fg: #ffffff;
+  --vim-cursor-border: #121111;
+}
+
+.gpg-Editor[data-theme='dark'] {
+  --vim-cursor-bg: #aeafad;
+  --vim-cursor-fg: #515052;
+  --vim-cursor-border: #aeafad;
+}

@@ -4,6 +4,7 @@ import { indentWithTab } from '@codemirror/commands'
 import { EditorState, type Extension, type StateEffect } from '@codemirror/state'
 import { EditorView, keymap, type ViewUpdate } from '@codemirror/view'
 import { vscodeKeymap } from '@replit/codemirror-vscode-keymap'
+import { getCM } from '@replit/codemirror-vim'
 
 import { basicSetup } from './extensions/basic'
 import { highlightField } from './extensions/highlight'
@@ -28,14 +29,8 @@ import { EventType, type CommandHandler, type InputMode, type Position } from '.
 import { docFromString } from './utils'
 import { CMEditorRemote } from './remote'
 import type { BufferState } from './buffers/types'
-import { getCM } from '@replit/codemirror-vim'
 
-const styles: React.CSSProperties = {
-  width: '100%',
-  height: '100%',
-  position: 'relative',
-  overflow: 'hidden',
-}
+import classes from './Editor.module.css'
 
 const keyBindings = [indentWithTab, ...vscodeKeymap]
 const corePlugins = [defaultThemeStyles, highlightField, keymap.of(keyBindings)]
@@ -356,6 +351,7 @@ export class Editor extends React.Component<EditorProps, State> {
   }
 
   render() {
-    return <div ref={this.containerRef} className="gpg-editor" style={styles} />
+    const theme = this.props.preferences?.colorScheme ?? 'light'
+    return <div ref={this.containerRef} className={classes['gpg-Editor']} data-theme={theme} />
   }
 }

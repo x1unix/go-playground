@@ -1,5 +1,6 @@
 import { Compartment } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
+import type { StyleSpec } from 'style-mod'
 import { vscodeDarkInit, vscodeDarkStyle, vscodeLightInit } from '@uiw/codemirror-theme-vscode'
 
 import type { ColorScheme } from '../types'
@@ -32,6 +33,18 @@ export const defaultThemeStyles = EditorView.theme({
   },
   [`& .${highlightClasses.line}`]: {
     background: 'var(--gutter-highlighted-bg, rgba(255, 255, 0, 0.25))',
+  },
+
+  // Overrides for vim cursor styles.
+  // Colors are defined in ../Editor.module.css
+  ['& .cm-cursorLayer.cm-vimCursorLayer .cm-fat-cursor']: {
+    color: 'var(--vim-cursor-fg, #fff) !important',
+    background: 'var(--vim-cursor-bg, #000)',
+  },
+  ['&:not(.cm-focused) .cm-cursorLayer.cm-vimCursorLayer .cm-fat-cursor']: {
+    color: 'transparent !important',
+    background: 'none',
+    outline: 'solid 1px var(--vim-cursor-border, #000)',
   },
 })
 
