@@ -12,7 +12,7 @@ import { newFormatErrorsRenderer } from './extensions/linter'
 import { newReadOnlyCompartment } from './extensions/readonly'
 import { newSyntaxCompartment } from './extensions/syntax'
 import { defaultThemeStyles, newThemeCompartment } from './extensions/themes'
-import { newHotkeyHandler } from './extensions/hotkeys'
+import { newHotkeyHandler, registerVimCommands } from './extensions/hotkeys'
 import {
   newBufferStateFieldExtension,
   newBufferStateFromSnapshot,
@@ -24,7 +24,7 @@ import {
 import { BufferStateStore } from './buffers/store'
 
 import type { EditorProps, Document } from './props'
-import { EventType, InputMode, Position } from './types'
+import { EventType, type HotkeyHandler, type InputMode, type Position } from './types'
 import { docFromString } from './utils'
 import { CMEditorRemote } from './remote'
 import type { BufferState } from './buffers/types'
@@ -69,13 +69,17 @@ export class Editor extends React.Component<EditorProps, State> {
     this.remote = new CMEditorRemote(this.props.formatter)
 
     // Wrap hotkey listener to always point to current value from props.
-    const hotkeyHandler = newHotkeyHandler(this.remote, (...args) => {
+    const h: HotkeyHandler = (...args) => {
       // always point to current props value.
       this.props.onHotkeyCommand?.(...args)
-    })
+    }
+
+    // Create hotkey handler and register custom commands.
+    const hotkeyHandler = newHotkeyHandler(this.remote, h)
+    registerVimCommands(this.remote, h)
 
     // Initialize extensions for a current buffer.
-    // TODO: impl hotkeys and minimap
+    // TODO: impl minimap
     this.extensions = [
       hotkeyHandler, // Should be on top to avoid overlap with builtin keymap.
       newReadOnlyCompartment(props.readonly),
@@ -167,6 +171,9 @@ export class Editor extends React.Component<EditorProps, State> {
     // TODO: broadcast per-document vim mode on document change.
     this.emitCursorPosChanged(this.editor?.state)
     this.onInputModeChanged(this.props.preferences?.inputMode ?? 'default')
+
+    // Finally, focus.
+    this.editor?.focus()
   }
 
   /**
