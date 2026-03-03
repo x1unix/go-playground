@@ -34,7 +34,8 @@ const mapEventToAction = (e: EditorEvent): AnyAction | undefined => {
       }
       break
     default:
-      console.log('got event', e)
+      // TODO: wire up cursor position events when it will be implemented on UI and store.
+      break
   }
 }
 
