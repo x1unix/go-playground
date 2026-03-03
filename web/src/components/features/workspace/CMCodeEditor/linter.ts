@@ -19,20 +19,26 @@ const mapSeverity: Record<monaco.MarkerSeverity, Severity> = {
   8: 'error',
 }
 
+const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n))
+
+const lineColumnToOffset = (doc: Text, lineNumber: number, column: number): number => {
+  const safeLineNumber = clamp(lineNumber, 1, doc.lines)
+  const line = doc.line(safeLineNumber)
+  const safeColumn = clamp(column, 1, line.length + 1)
+  return line.from + safeColumn - 1
+}
+
 const markersToDiagnostics = (doc: Text, markers: monaco.editor.IMarkerData[]): Diagnostic[] => {
   return markers.map((m): Diagnostic => {
-    const line = doc.line(m.startLineNumber)
-    let { from, to } = line
+    const from = lineColumnToOffset(doc, m.startLineNumber, m.startColumn)
+    const to = lineColumnToOffset(doc, m.endLineNumber, m.endColumn)
 
-    // TODO: respect end range
-    if (m.startColumn > 0) {
-      from += m.startColumn - 1
-      to = from + 1
-    }
+    const sortedFrom = Math.min(from, to)
+    const sortedTo = Math.max(from, to)
 
     return {
-      from,
-      to,
+      from: sortedFrom,
+      to: sortedTo,
       severity: mapSeverity[m.severity] ?? 'error',
       message: m.message,
     }
