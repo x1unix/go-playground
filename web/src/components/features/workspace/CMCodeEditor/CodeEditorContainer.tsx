@@ -93,7 +93,7 @@ export const CodeEditorContainer: React.FC = () => {
       preferences={preferences}
       readonly={isReadOnly}
       linter={{
-        delay: 100,
+        delay: 300,
         handler: (doc) => linterRef.current.check(doc, { warnAboutFakeDateTime: isServerRuntime }),
       }}
       onChange={({ path, text }) => {
