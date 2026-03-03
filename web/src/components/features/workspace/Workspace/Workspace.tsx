@@ -7,7 +7,7 @@ import { dispatchCreateFile, dispatchRemoveFile, dispatchImportFile, newFileSele
 import { TabView } from '~/components/elements/tabs/TabView'
 import type { TabBarAction, TabIconStyles } from '~/components/elements/tabs/types'
 
-import { CodeEditor } from '../CodeEditor'
+import { CodeEditorContainer } from '../CMCodeEditor/CodeEditorContainer'
 import { FlexContainer } from '../FlexContainer'
 import { NewFileModal } from '../NewFileModal'
 import { ContentPlaceholder } from '../ContentPlaceholder'
@@ -110,7 +110,7 @@ const Workspace: React.FC = () => {
     >
       {tabs?.length ? (
         <FlexContainer>
-          <CodeEditor />
+          <CodeEditorContainer />
         </FlexContainer>
       ) : (
         <ContentPlaceholder

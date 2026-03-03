@@ -7,7 +7,7 @@ import { dispatchUpdateFile } from '~/store/workspace'
 const preferencesWithDefaults = (src: Partial<EditorPreferences>): EditorPreferences =>
   Object.assign(Object.create(defaultEditorPreferences), src)
 
-const CodeEditorFacade: React.FC = () => {
+export const CodeEditorContainer: React.FC = () => {
   const [fallbackWorkspaceKey] = useState(() => Date.now().toString())
 
   const dispatch = useDispatch()
