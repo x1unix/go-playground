@@ -73,10 +73,12 @@ export const hasBufferState = (state: EditorState) => !!getBufferState(state).is
 
 type StateEffects = Array<StateEffect<any>>
 
+type BufferStateChanges = Partial<BufferState>
+
 interface ChangeSet {
   effects: StateEffects
   isChanged: boolean
-  changes: Partial<BufferState>
+  changes: BufferStateChanges
 }
 
 /**
@@ -116,7 +118,7 @@ interface CheckBufferStateChangesArgs {
 export const checkBufferStateChanges = ({ props, buffState }: CheckBufferStateChangesArgs): ChangeSet => {
   const { value, preferences, readonly = false } = props
   const effects: StateEffects = []
-  const changes: Partial<BufferState> = {
+  const changes: BufferStateChanges = {
     isInitialised: true,
   }
 
@@ -162,12 +164,7 @@ export const checkBufferStateChanges = ({ props, buffState }: CheckBufferStateCh
     changes.preferences = currentPrefs
   }
 
-  const isChanged = Object.keys(changes).length > 0
-  if (isChanged) {
-    effects.unshift(updateBufferStateEffect.of(changes))
-  }
-
-  return { isChanged, effects, changes }
+  return newChangeSet(effects, changes)
 }
 
 const isThemeChanged = (prev: EditorPreferences, curr: EditorPreferences) =>

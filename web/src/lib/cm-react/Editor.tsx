@@ -214,7 +214,7 @@ export class Editor extends React.Component<EditorProps, State> {
       currentStateData = getBufferState(this.editor.state)
     }
 
-    const { effects, changes, isChanged } = checkBufferStateChanges({
+    const { effects, isChanged } = checkBufferStateChanges({
       props: this.props,
       buffState: currentStateData,
     })
@@ -223,7 +223,7 @@ export class Editor extends React.Component<EditorProps, State> {
     }
 
     this.editor.dispatch({ effects })
-    this.checkInputModeChanges(changes)
+    this.checkInputModeChanges(currentStateData)
 
     if (fileChanged) {
       // Sync state cursor to status bar.
@@ -281,9 +281,9 @@ export class Editor extends React.Component<EditorProps, State> {
     })
   }
 
-  private checkInputModeChanges(changes: Partial<BufferState>) {
+  private checkInputModeChanges(previousState: Partial<BufferState>) {
     const currentMode = this.props.preferences?.inputMode ?? 'default'
-    const prevMode = changes.preferences?.inputMode
+    const prevMode = previousState.preferences?.inputMode
     if (!prevMode || currentMode === prevMode) {
       // skip if change triggered when compartment is updated in for a different file.
       return

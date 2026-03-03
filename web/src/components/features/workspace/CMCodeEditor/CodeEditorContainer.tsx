@@ -1,12 +1,15 @@
 import React, { useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { defaultEditorPreferences, Editor, type EditorPreferences, type Document } from '~/lib/cm-react'
+import { defaultEditorPreferences, Editor, type EditorPreferences, type Document, EventType } from '~/lib/cm-react'
 import type { State } from '~/store/state'
 import { dispatchUpdateFile } from '~/store/workspace'
 
 const preferencesWithDefaults = (src: Partial<EditorPreferences>): EditorPreferences =>
   Object.assign(Object.create(defaultEditorPreferences), src)
 
+/**
+ * Connects CodeMirror code editor to the application store and business logic.
+ */
 export const CodeEditorContainer: React.FC = () => {
   const [fallbackWorkspaceKey] = useState(() => Date.now().toString())
 
@@ -54,8 +57,14 @@ export const CodeEditorContainer: React.FC = () => {
         console.log('got remote', rem)
       }}
       onEvent={(e) => {
+        switch (e.type) {
+          case EventType.VimModeChanged:
+            console.log('vim.mode', e.mode, e.subMode)
+            break
+          default:
+            console.log('got event', e)
+        }
         // TODO: handle input events later
-        console.log('got event', e)
       }}
       onHotkeyCommand={(cmd, doc, rem) => {
         // TODO: handle commands later
