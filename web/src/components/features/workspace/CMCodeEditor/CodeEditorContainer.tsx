@@ -17,12 +17,12 @@ import { dispatchUpdateFile } from '~/store/workspace'
 import { GoSyntaxLinter } from './syntax/linter'
 import { TargetType } from '~/services/config'
 import { getDefaultFontFamily, getFontFamily } from '~/services/fonts'
-import { newMonacoParamsChangeAction } from '~/store'
+import { Dispatcher, newMonacoParamsChangeDispatcher } from '~/store'
 
 const preferencesWithDefaults = (src: Partial<EditorPreferences>): EditorPreferences =>
   Object.assign(Object.create(defaultEditorPreferences), src)
 
-const mapEventToAction = (e: EditorEvent): AnyAction | undefined => {
+const mapEventToAction = (e: EditorEvent): AnyAction | Dispatcher | undefined => {
   switch (e.type) {
     // TODO: wire vim command events when callbacks will be fixed.
     case EventType.VimModeChanged:
@@ -39,7 +39,7 @@ const mapEventToAction = (e: EditorEvent): AnyAction | undefined => {
       }
       break
     case EventType.EditorZoom:
-      return newMonacoParamsChangeAction({
+      return newMonacoParamsChangeDispatcher({
         fontSize: e.newSize,
       })
     default:
