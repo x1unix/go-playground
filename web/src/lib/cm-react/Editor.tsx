@@ -31,7 +31,8 @@ import {
 import { BufferStateStore } from './buffers/store'
 
 import { type EditorProps, type Document, defaultEditorPreferences } from './props'
-import { CommandType, EventType, type CommandHandler, type InputMode, type Position } from './types'
+import { CommandType, EventType } from './types/events'
+import type { InputMode, Position } from './types/common'
 import { docFromString } from './utils'
 import { CMEditorRemote } from './remote'
 import type { BufferState } from './buffers/types'

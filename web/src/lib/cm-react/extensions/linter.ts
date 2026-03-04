@@ -1,5 +1,5 @@
 import { type Diagnostic, linter } from '@codemirror/lint'
-import type { DocumentState } from '../types'
+import type { DocumentState } from '../types/common'
 import { docStateFromEditor } from '../utils'
 
 type Thunk<T> = () => T

@@ -1,8 +1,6 @@
 import { Text, type ChangeSpec, type EditorState } from '@codemirror/state'
 import { getBufferState } from './buffers/state'
-import { Syntax, type DocumentState } from './types'
-
-// import type { Marker } from './types'
+import { Syntax, type DocumentState } from './types/common'
 
 /**
  * Splits string into lines and returns Text instance for CM.

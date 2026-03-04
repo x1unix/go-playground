@@ -1,5 +1,5 @@
 import { EditorView } from '@codemirror/view'
-import type { DocumentState, EditorRemote } from './types'
+import type { DocumentState, EditorRemote } from './types/common'
 
 type FormatFn = (state: DocumentState) => Promise<string>
 

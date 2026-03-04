@@ -2,7 +2,8 @@ import { Prec } from '@codemirror/state'
 import { EditorView, type Command, keymap } from '@codemirror/view'
 import { Vim } from '@replit/codemirror-vim'
 
-import { type DocumentState, CommandType } from '../types'
+import type { DocumentState } from '../types/common'
+import { CommandType } from '../types/events'
 import { docStateFromEditor } from '../utils'
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))

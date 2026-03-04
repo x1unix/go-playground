@@ -1,25 +1,4 @@
-import type { Diagnostic } from '@codemirror/lint'
-import type { Text } from '@codemirror/state'
-
-/**
- * Input layout type.
- */
-export type InputMode = 'default' | 'vim' | 'emacs'
-
-export type ColorScheme = 'dark' | 'light'
-
-export type Callback<T> = (arg: T) => void
-
-export enum Syntax {
-  Go,
-  GoMod,
-}
-
-export interface DocumentState {
-  path: string
-  language: Syntax
-  text: Text
-}
+import type { EditorRemote, DocumentState, InputMode, Position } from './common'
 
 export type CommandHandler = (cmd: EditorCommand, rem: EditorRemote) => void
 
@@ -44,19 +23,6 @@ export type EditorCommand = {
 }[keyof CommandPayloads]
 
 export type CommandOf<T extends CommandType> = Extract<EditorCommand, { type: T }>
-
-export interface Position {
-  /**
-   * Line number. Starts at 1.
-   */
-  readonly line: number
-  readonly column: number
-}
-
-export interface Range {
-  readonly start: Position
-  readonly end: Position
-}
 
 export enum EventType {
   CursorPositionChanged,
@@ -97,35 +63,3 @@ export type EditorEvent = {
 }[keyof EventPayloads]
 
 export type EventOf<T extends EventType> = Extract<EditorEvent, { type: T }>
-
-export interface DiagnosticsProvider {
-  // TODO: refine interface
-  getDiagnostics: () => Promise<Diagnostic[]>
-}
-
-/**
- * EditorRemote interface provides offscreen control over editor instance.
- */
-export interface EditorRemote {
-  /**
-   * Applies document formatting.
-   */
-  formatDocument: (path: string) => void
-
-  /**
-   * Invalidates document contents.
-   *
-   * Triggers editor to explicitly update document contents and diagnostics.
-   */
-  invalidateDocument: (path: string) => void
-
-  /**
-   * Focuses editor instance.
-   */
-  focus: () => void
-
-  /**
-   * Detach from editor instance and free resources.
-   */
-  dispose: () => void
-}

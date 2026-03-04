@@ -4,7 +4,7 @@ import { emacs } from '@replit/codemirror-emacs'
 import { vim } from '@replit/codemirror-vim'
 import { vscodeKeymap } from '@replit/codemirror-vscode-keymap'
 
-import type { InputMode } from '../types'
+import type { InputMode } from '../types/common'
 
 const vscode = () => keymap.of(vscodeKeymap)
 

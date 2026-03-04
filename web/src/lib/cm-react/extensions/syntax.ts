@@ -1,6 +1,6 @@
 import { go } from '@codemirror/lang-go'
 import { Compartment, type Extension } from '@codemirror/state'
-import { Syntax } from '../types'
+import { Syntax } from '../types/common'
 
 import { goMod } from './modfile'
 

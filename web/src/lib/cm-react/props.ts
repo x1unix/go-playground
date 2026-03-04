@@ -1,7 +1,8 @@
 import type { BufferStateStore } from './buffers/store'
 import { defaultThemeConfig } from './extensions/themes'
 import type { LinterConfig } from './extensions/linter'
-import type { DocumentState, InputMode, ColorScheme, EditorRemote, EditorEvent, EditorCommand } from './types'
+import type { DocumentState, InputMode, ColorScheme, EditorRemote } from './types/common'
+import type { EditorEvent, EditorCommand } from './types/events'
 
 export type { Text } from '@codemirror/state'
 

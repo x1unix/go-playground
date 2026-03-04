@@ -2,7 +2,7 @@ import { Compartment } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
 import { vscodeDarkInit, vscodeDarkStyle, vscodeLightInit } from '@uiw/codemirror-theme-vscode'
 
-import type { ColorScheme } from '../types'
+import type { ColorScheme } from '../types/common'
 
 // TODO: infer editor popup styles from state theme.
 export const popupHighlightStyles = vscodeDarkStyle
