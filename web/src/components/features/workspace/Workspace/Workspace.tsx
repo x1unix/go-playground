@@ -109,9 +109,7 @@ const Workspace: React.FC = () => {
       disabled={(snippet?.loading ?? false) || !!snippet?.error}
     >
       {tabs?.length ? (
-        <FlexContainer>
-          <CodeEditorContainer />
-        </FlexContainer>
+        <CodeEditorContainer />
       ) : (
         <ContentPlaceholder
           isLoading={snippet?.loading}

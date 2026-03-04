@@ -13,7 +13,7 @@ import { newBufferDiagnosticsRenderer } from './extensions/linter'
 import { newReadOnlyCompartment } from './extensions/readonly'
 import { newSyntaxCompartment } from './extensions/syntax'
 import { defaultThemeStyles, newThemeCompartment } from './extensions/themes'
-import { arithmeticFontScale, newEditorZoomListener, newHotkeyHandler, registerVimCommands } from './extensions/hotkeys'
+import { newEditorZoomListener, newHotkeyHandler, registerVimCommands } from './extensions/hotkeys'
 import {
   newBufferStateFieldExtension,
   newBufferStateFromSnapshot,
