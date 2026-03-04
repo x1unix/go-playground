@@ -38,7 +38,7 @@ export const defaultThemeStyles = EditorView.theme({
     background: 'var(--gutter-highlighted-bg, rgba(255, 255, 0, 0.25))',
   },
 
-  // Overrides for vim cursor styles.
+  // Vim: Overrides for cursor styles.
   // Colors are defined in ../Editor.module.css
   ['& .cm-cursorLayer.cm-vimCursorLayer .cm-fat-cursor']: {
     color: 'var(--vim-cursor-fg, #fff) !important',
@@ -48,6 +48,16 @@ export const defaultThemeStyles = EditorView.theme({
     color: 'transparent !important',
     background: 'none',
     outline: 'solid 1px var(--vim-cursor-border, #000)',
+  },
+
+  // Vim: command bar styles
+  ['& .cm-panels-bottom .cm-vim-panel']: {
+    padding: '4px 10px',
+  },
+  ['& .cm-panels-bottom .cm-vim-panel input']: {
+    // Input bar has wrong text color and font.
+    color: 'currentColor',
+    font: 'inherit',
   },
 })
 
