@@ -23,12 +23,16 @@ export const highlightClasses = {
 }
 
 export const defaultThemeStyles = EditorView.theme({
+  // CSS magic to keep editor and scrollbar contained within parent boundaries.
   '&': {
     height: '100%',
-    flex: '1 1 auto',
+    flex: '1 1 0',
+    'min-width': '0',
+    'min-height': '0',
   },
   '& .cm-scroller': {
-    height: '100% !important',
+    'min-width': '0',
+    'min-height': '0',
   },
   [`& .${highlightClasses.line}`]: {
     background: 'var(--gutter-highlighted-bg, rgba(255, 255, 0, 0.25))',
