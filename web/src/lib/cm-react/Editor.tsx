@@ -183,6 +183,7 @@ export class Editor extends React.Component<EditorProps, State> {
       return
     }
 
+    // const [langWorker, workerDisposer] = spawnLanguageWorker()
     const { value } = this.props
     this.editor = new EditorView({
       parent: this.containerRef.current,
@@ -230,6 +231,7 @@ export class Editor extends React.Component<EditorProps, State> {
 
     this.remote.setFormatter(formatter)
     const workspaceChanged = prevProps.workspaceKey !== this.props.workspaceKey
+    // Cache invalidation on workspace change.
     if (workspaceChanged) {
       this.buffMgr.clear()
       prevFile = undefined

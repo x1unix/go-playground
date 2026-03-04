@@ -11,6 +11,7 @@ import {
   type EditorCommand,
   CommandType,
   type EditorRemote,
+  LoadState,
 } from '~/lib/cm-react'
 import { useLazyRef } from '~/hooks/lazy-ref'
 import type { State } from '~/store/state'
@@ -22,6 +23,9 @@ import { TargetType } from '~/services/config'
 import { getDefaultFontFamily, getFontFamily } from '~/services/fonts'
 import { Dispatcher, newMonacoParamsChangeDispatcher, runFileDispatcher } from '~/store'
 import { useDebouncer } from '~/hooks/debounce'
+import { newAddNotificationAction, newRemoveNotificationAction, NotificationType } from '~/store/notifications'
+
+const goImportsLoadNotification = 'GoImportsListLoad'
 
 const preferencesWithDefaults = (src: Partial<EditorPreferences>): EditorPreferences =>
   Object.assign(Object.create(defaultEditorPreferences), src)
@@ -42,6 +46,33 @@ const mapEventToAction = (e: EditorEvent): AnyAction | Dispatcher | undefined =>
           return newVimModeChangeAction({ mode: VimMode.Normal })
       }
       break
+    case EventType.CompletionSourceStatus: {
+      switch (e.status) {
+        case LoadState.Error:
+          return newAddNotificationAction({
+            id: goImportsLoadNotification,
+            type: NotificationType.Error,
+            title: 'Failed to download Go package index',
+            description: e.error,
+            canDismiss: true,
+          })
+        case LoadState.Loading:
+          return newAddNotificationAction({
+            id: goImportsLoadNotification,
+            type: NotificationType.None,
+            title: 'Go Packages Index',
+            description: 'Downloading Go packages index...',
+            canDismiss: false,
+            progress: {
+              indeterminate: true,
+            },
+          })
+        case LoadState.Loaded:
+          return newRemoveNotificationAction(goImportsLoadNotification)
+        default:
+          return
+      }
+    }
     default:
       // TODO: wire up cursor position events when it will be implemented on UI and store.
       break

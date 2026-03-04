@@ -68,7 +68,16 @@ export enum EventType {
   VimInputCommandDone,
   EmacsMarkChanged,
   EmacsKeyChanged,
+  CompletionSourceStatus,
 }
+
+export enum LoadState {
+  Loading,
+  Loaded,
+  Error,
+}
+
+type LoadProgress = { status: LoadState.Loaded | LoadState.Loading } | { status: LoadState.Error; error: string }
 
 type EventPayloads = {
   [EventType.CursorPositionChanged]: { position: Position }
@@ -80,6 +89,7 @@ type EventPayloads = {
   [EventType.VimInputCommandDone]: {}
   [EventType.EmacsMarkChanged]: { isMarkSet: boolean }
   [EventType.EmacsKeyChanged]: { value: string }
+  [EventType.CompletionSourceStatus]: LoadProgress
 }
 
 export type EditorEvent = {
