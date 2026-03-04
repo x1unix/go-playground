@@ -218,20 +218,6 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
               }
             />
             <SettingsProperty
-              key="vimUseSystemClipboard"
-              title="Vim: Use System Clipboard"
-              control={
-                <Checkbox
-                  label="Use system clipboard for unnamed register"
-                  defaultChecked={this.props.monaco?.vimUseSystemClipboard}
-                  disabled={this.state.hideVimSettings}
-                  onChange={(_, val) => {
-                    this.touchMonacoProperty('vimUseSystemClipboard', val)
-                  }}
-                />
-              }
-            />
-            <SettingsProperty
               key="vimUseRelativeLineNumbers"
               title="Vim: Use Relative Line Numbers"
               control={
