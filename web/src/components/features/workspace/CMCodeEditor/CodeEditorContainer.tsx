@@ -17,11 +17,11 @@ import { useLazyRef } from '~/hooks/lazy-ref'
 import type { State } from '~/store/state'
 import { VimMode, VimSubMode } from '~/store/vim/state'
 import { newVimDisposeAction, newVimModeChangeAction } from '~/store/vim/actions'
-import { dispatchUpdateFile } from '~/store/workspace'
+import { dispatchFormatFile, dispatchShareSnippet, dispatchUpdateFile } from '~/store/workspace'
 import { GoSyntaxLinter } from './syntax/linter'
 import { TargetType } from '~/services/config'
 import { getDefaultFontFamily, getFontFamily } from '~/services/fonts'
-import { Dispatcher, newMonacoParamsChangeDispatcher } from '~/store'
+import { Dispatcher, newMonacoParamsChangeDispatcher, runFileDispatcher } from '~/store'
 
 const preferencesWithDefaults = (src: Partial<EditorPreferences>): EditorPreferences =>
   Object.assign(Object.create(defaultEditorPreferences), src)
@@ -49,11 +49,18 @@ const mapEventToAction = (e: EditorEvent): AnyAction | Dispatcher | undefined =>
 }
 
 const mapCommandToAction = (e: EditorCommand, rem: EditorRemote): AnyAction | Dispatcher | undefined => {
+  // TODO: invalidate document states via CMEditorRemote to update editor contents.
   switch (e.type) {
     case CommandType.EditorZoom:
       return newMonacoParamsChangeDispatcher({
         fontSize: e.newSize,
       })
+    case CommandType.Run:
+      return runFileDispatcher
+    case CommandType.Format:
+      return dispatchFormatFile()
+    case CommandType.Share:
+      return dispatchShareSnippet()
     default:
   }
 }

@@ -50,7 +50,7 @@ export const newHotkeyHandler = (handler: DocumentCommandHandler) =>
         run: newCmdHandler(CommandType.Run, handler),
       },
       {
-        key: 'Mod-f',
+        key: 'Alt-f',
         preventDefault: true,
         run: newCmdHandler(CommandType.Format, handler),
       },
