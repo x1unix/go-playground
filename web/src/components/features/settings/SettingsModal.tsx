@@ -49,6 +49,7 @@ type Props = StateProps &
 interface SettingsModalState {
   isOpen?: boolean
   hideTerminalSettings: boolean
+  hideVimSettings: boolean
 }
 
 const modalStyles = {
@@ -72,6 +73,7 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
     this.state = {
       isOpen: props.isOpen,
       hideTerminalSettings: !!this.props.terminal?.disableTerminalEmulation,
+      hideVimSettings: !this.props.settings?.enableVimMode,
     }
   }
 
@@ -89,6 +91,10 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
   }
 
   private touchSettingsProperty(changes: Partial<SettingsState>) {
+    if ('enableVimMode' in changes) {
+      this.setState({ hideVimSettings: !changes.enableVimMode })
+    }
+
     if (!this.changes.settings) {
       this.changes.settings = changes
       return
@@ -123,7 +129,7 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
     return (
       <Dialog label="Settings" onDismiss={() => this.onClose()} isOpen={isOpen} styles={modalStyles}>
         <AnimatedPivot aria-label="Settings" styles={pivotStyles}>
-          <PivotItem itemKey="0" headerText="General">
+          <PivotItem itemKey="0" headerText="Editor">
             <SettingsProperty
               key="fontFamily"
               title="Font Family"
@@ -139,14 +145,33 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
               }
             />
             <SettingsProperty
-              key="enableVimMode"
-              title="Enable Vim Mode"
+              key="fontLigatures"
+              title="Font Ligatures"
               control={
                 <Checkbox
-                  label="Enables Vim motions in code editor"
-                  defaultChecked={this.props.settings?.enableVimMode}
+                  label="Enable programming font ligatures in supported fonts"
+                  defaultChecked={this.props.monaco?.fontLigatures}
                   onChange={(_, val) => {
-                    this.touchSettingsProperty({ enableVimMode: val })
+                    this.touchMonacoProperty('fontLigatures', val)
+                  }}
+                />
+              }
+            />
+            <SettingsProperty
+              key="tabSize"
+              title="Tab Size"
+              description="The number of spaces a tab is equal to."
+              control={
+                <TextField
+                  type="number"
+                  min={1}
+                  max={12}
+                  defaultValue={`${this.props.monaco?.tabSize ?? 4}`}
+                  onChange={(_, val) => {
+                    const tabSize = Number(val)
+                    if (!isNaN(tabSize)) {
+                      this.touchMonacoProperty('tabSize', tabSize)
+                    }
                   }}
                 />
               }
@@ -180,132 +205,42 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
               }
             />
             <SettingsProperty
-              key="fontLigatures"
-              title="Font Ligatures"
+              key="enableVimMode"
+              title="Enable Vim Mode"
               control={
                 <Checkbox
-                  label="Enable programming font ligatures in supported fonts"
-                  defaultChecked={this.props.monaco?.fontLigatures}
+                  label="Enables Vim motions in code editor"
+                  defaultChecked={this.props.settings?.enableVimMode}
                   onChange={(_, val) => {
-                    this.touchMonacoProperty('fontLigatures', val)
+                    this.touchSettingsProperty({ enableVimMode: val })
                   }}
                 />
               }
             />
             <SettingsProperty
-              key="mouseWheelZoom"
-              title="Mouse Wheel Zoom"
+              key="vimUseSystemClipboard"
+              title="Vim: Use System Clipboard"
               control={
                 <Checkbox
-                  defaultChecked={this.props.monaco?.mouseWheelZoom}
-                  onRenderLabel={() => (
-                    <Text className="ms-Checkbox-text" style={{ marginLeft: spacing.s2 }}>
-                      Zoom the editor font when using mouse wheel and holding <Kbd>{controlKeyLabel()}</Kbd> key
-                    </Text>
-                  )}
+                  label="Use system clipboard for unnamed register"
+                  defaultChecked={this.props.monaco?.vimUseSystemClipboard}
+                  disabled={this.state.hideVimSettings}
                   onChange={(_, val) => {
-                    this.touchMonacoProperty('mouseWheelZoom', val)
-                  }}
-                />
-              }
-            />
-          </PivotItem>
-          <PivotItem itemKey="1" headerText="Editor">
-            <SettingsProperty
-              key="cursorBlinking"
-              title="Cursor Blinking"
-              description="Set cursor animation style"
-              control={
-                <Dropdown
-                  options={cursorBlinkOptions}
-                  defaultSelectedKey={this.props.monaco?.cursorBlinking}
-                  onChange={(_, num) => {
-                    this.touchMonacoProperty('cursorBlinking', num?.key)
+                    this.touchMonacoProperty('vimUseSystemClipboard', val)
                   }}
                 />
               }
             />
             <SettingsProperty
-              key="cursorStyle"
-              title="Cursor Style"
-              description="Controls the cursor style"
-              control={
-                <Dropdown
-                  options={cursorLineOptions}
-                  defaultSelectedKey={this.props.monaco?.cursorStyle}
-                  onChange={(_, num) => {
-                    this.touchMonacoProperty('cursorStyle', num?.key)
-                  }}
-                />
-              }
-            />
-            <SettingsProperty
-              key="tabSize"
-              title="Tab Size"
-              description="The number of spaces a tab is equal to."
-              control={
-                <TextField
-                  type="number"
-                  min={1}
-                  max={12}
-                  defaultValue={`${this.props.monaco?.tabSize ?? 4}`}
-                  onChange={(_, val) => {
-                    const tabSize = Number(val)
-                    if (!isNaN(tabSize)) {
-                      this.touchMonacoProperty('tabSize', tabSize)
-                    }
-                  }}
-                />
-              }
-            />
-            <SettingsProperty
-              key="smoothScroll"
-              title="Smooth Scrolling"
+              key="vimUseRelativeLineNumbers"
+              title="Vim: Use Relative Line Numbers"
               control={
                 <Checkbox
-                  label="Controls whether the editor will scroll using an animation"
-                  defaultChecked={this.props.monaco?.smoothScrolling}
+                  label="Render line numbers as distance in lines to cursor position."
+                  defaultChecked={this.props.monaco?.vimUseSystemClipboard}
+                  disabled={this.state.hideVimSettings}
                   onChange={(_, val) => {
-                    this.touchMonacoProperty('smoothScrolling', val)
-                  }}
-                />
-              }
-            />
-            <SettingsProperty
-              key="minimap"
-              title="Mini Map"
-              control={
-                <Checkbox
-                  label="Controls whether the minimap is shown"
-                  defaultChecked={this.props.monaco?.minimap}
-                  onChange={(_, val) => {
-                    this.touchMonacoProperty('minimap', val)
-                  }}
-                />
-              }
-            />
-            <SettingsProperty
-              key="selectOnGutterClick"
-              title="Select On Gutter Click"
-              control={
-                <Checkbox
-                  label="Select corresponding line on line number click"
-                  defaultChecked={this.props.monaco?.selectOnLineNumbers}
-                  onChange={(_, val) => {
-                    this.touchMonacoProperty('cursorStyle', val)
-                  }}
-                />
-              }
-            />
-            <SettingsProperty
-              key="contextMenu"
-              title="Context Menu"
-              control={
-                <Checkbox
-                  label="Enable editor context menu (on right click)"
-                  defaultChecked={this.props.monaco?.contextMenu}
-                  onChange={(_, val) => {
-                    this.touchMonacoProperty('contextMenu', val)
+                    this.touchMonacoProperty('vimUseRelativeLineNumbers', val)
                   }}
                 />
               }

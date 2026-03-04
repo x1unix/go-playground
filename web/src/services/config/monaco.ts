@@ -12,6 +12,8 @@ export interface MonacoSettings {
   contextMenu: boolean
   smoothScrolling: boolean
   mouseWheelZoom: boolean
+  vimUseSystemClipboard: boolean
+  vimUseRelativeLineNumbers: boolean
 }
 
 export const defaultMonacoSettings: MonacoSettings = {
@@ -26,4 +28,6 @@ export const defaultMonacoSettings: MonacoSettings = {
   smoothScrolling: true,
   mouseWheelZoom: true,
   tabSize: 4,
+  vimUseRelativeLineNumbers: false,
+  vimUseSystemClipboard: false,
 }

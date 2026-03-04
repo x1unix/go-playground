@@ -86,6 +86,8 @@ export const CodeEditorContainer: React.FC = () => {
         fontSize: monaco.fontSize ?? defaultEditorPreferences.fontSize,
         tabSize: monaco.tabSize,
         fontLigatures: monaco.fontLigatures,
+        vimUseSystemClipboard: monaco.vimUseSystemClipboard,
+        vimUseRelativeLineNumbers: monaco.vimUseRelativeLineNumbers,
       }),
     [settings, monaco],
   )

@@ -60,6 +60,16 @@ export interface EditorPreferences {
   inputMode: InputMode
 
   /**
+   * Use system clipboard for vim yank and paste.
+   */
+  vimUseSystemClipboard?: boolean
+
+  /**
+   * Use relative line numbers for Vim mode.
+   */
+  vimUseRelativeLineNumbers?: boolean
+
+  /**
    * Whether to show line numbers.
    */
   showLineNumbers: boolean
