@@ -57,7 +57,6 @@ export const basicSetup = (opts?: SetupOpts) => {
     crosshairCursor(),
     highlightActiveLine(),
     highlightSelectionMatches(),
-    // indentUnit.of(' '.repeat(options.tabSize)),
     keymap.of(keymaps),
   ]
 }

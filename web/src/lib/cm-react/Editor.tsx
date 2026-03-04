@@ -9,6 +9,7 @@ import { getCM } from '@replit/codemirror-vim'
 import { basicSetup } from './extensions/basic'
 import { highlightField } from './extensions/highlight'
 import { newInputModeCompartment } from './extensions/input'
+import { newIndentationCompartment } from './extensions/indentation'
 import { newBufferDiagnosticsRenderer } from './extensions/linter'
 import { newReadOnlyCompartment } from './extensions/readonly'
 import { newSyntaxCompartment } from './extensions/syntax'
@@ -79,6 +80,7 @@ export class Editor extends React.Component<EditorProps, State> {
       hotkeyHandler, // Should be on top to avoid overlap with builtin keymap.
       newReadOnlyCompartment(props.readonly),
       newInputModeCompartment(preferences?.inputMode),
+      newIndentationCompartment(preferences?.tabSize),
       newBufferStateFieldExtension(() => ({
         props: this.props,
       })),

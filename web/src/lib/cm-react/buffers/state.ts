@@ -1,6 +1,7 @@
 import type { EditorState, StateEffect } from '@codemirror/state'
 
 import { clearHighlightsEffect } from '../extensions/highlight'
+import { updateIndentationEffect } from '../extensions/indentation'
 import { updateInputModeEffect } from '../extensions/input'
 import { readOnlyEffect } from '../extensions/readonly'
 import { syntaxFromFileName, updateSyntaxEffect } from '../extensions/syntax'
@@ -156,6 +157,11 @@ export const checkBufferStateChanges = ({ props, buffState }: CheckBufferStateCh
   const currentPrefs = preferences ?? defaultEditorPreferences
   if (!isInitialised || buffPrefs.inputMode !== currentPrefs.inputMode) {
     effects.push(updateInputModeEffect(currentPrefs.inputMode))
+    changes.preferences = currentPrefs
+  }
+
+  if (!isInitialised || buffPrefs.tabSize !== currentPrefs.tabSize) {
+    effects.push(updateIndentationEffect(currentPrefs.tabSize))
     changes.preferences = currentPrefs
   }
 
