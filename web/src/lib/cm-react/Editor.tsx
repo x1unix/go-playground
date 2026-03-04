@@ -14,7 +14,12 @@ import { newBufferDiagnosticsRenderer } from './extensions/linter'
 import { newReadOnlyCompartment } from './extensions/readonly'
 import { newSyntaxCompartment } from './extensions/syntax'
 import { defaultThemeStyles, newThemeCompartment } from './extensions/themes'
-import { newEditorZoomListener, newHotkeyHandler, registerVimCommands } from './extensions/hotkeys'
+import {
+  type DocumentCommandHandler,
+  newEditorZoomListener,
+  newHotkeyHandler,
+  registerVimCommands,
+} from './extensions/hotkeys'
 import {
   newBufferStateFieldExtension,
   newBufferStateFromSnapshot,
@@ -26,7 +31,7 @@ import {
 import { BufferStateStore } from './buffers/store'
 
 import { type EditorProps, type Document, defaultEditorPreferences } from './props'
-import { EventType, type CommandHandler, type InputMode, type Position } from './types'
+import { CommandType, EventType, type CommandHandler, type InputMode, type Position } from './types'
 import { docFromString } from './utils'
 import { CMEditorRemote } from './remote'
 import type { BufferState } from './buffers/types'
@@ -64,15 +69,19 @@ export class Editor extends React.Component<EditorProps, State> {
     // Preinit remote as it is a dependency for extensions.
     this.remote = new CMEditorRemote(this.props.formatter)
 
-    // Wrap hotkey listener to always point to current value from props.
-    const h: CommandHandler = (...args) => {
-      // always point to current props value.
-      this.props.onCommand?.(...args)
+    // Create hotkey handler and register custom commands.
+    const docCmdHandler: DocumentCommandHandler = (cmd, doc) => {
+      this.props.onCommand?.(
+        {
+          type: cmd,
+          doc,
+        },
+        this.remote,
+      )
     }
 
-    // Create hotkey handler and register custom commands.
-    const hotkeyHandler = newHotkeyHandler(this.remote, h)
-    registerVimCommands(this.remote, h)
+    const hotkeyHandler = newHotkeyHandler(docCmdHandler)
+    registerVimCommands(docCmdHandler)
 
     // Initialize extensions for a current buffer.
     // TODO: impl minimap
@@ -104,10 +113,13 @@ export class Editor extends React.Component<EditorProps, State> {
       newEditorZoomListener({
         currentSize: () => this.props.preferences?.fontSize ?? defaultEditorPreferences.fontSize,
         handler: (newSize) => {
-          this.props.onEvent?.({
-            type: EventType.EditorZoom,
-            newSize: newSize,
-          })
+          this.props.onCommand?.(
+            {
+              type: CommandType.EditorZoom,
+              newSize,
+            },
+            this.remote,
+          )
         },
       }),
       ...corePlugins,

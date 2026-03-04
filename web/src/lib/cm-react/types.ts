@@ -21,14 +21,29 @@ export interface DocumentState {
   text: Text
 }
 
-export type CommandHandler = (cmd: EditorCommand, doc: DocumentState, rem: EditorRemote) => void
+export type CommandHandler = (cmd: EditorCommand, rem: EditorRemote) => void
 
-export enum EditorCommand {
+export enum CommandType {
   Empty,
   Run,
   Format,
   Share,
+  EditorZoom,
 }
+
+type CommandPayloads = {
+  [CommandType.Empty]: {}
+  [CommandType.Run]: { doc: DocumentState }
+  [CommandType.Format]: { doc: DocumentState }
+  [CommandType.Share]: { doc: DocumentState }
+  [CommandType.EditorZoom]: { newSize: number }
+}
+
+export type EditorCommand = {
+  [K in keyof CommandPayloads]: { type: K } & CommandPayloads[K]
+}[keyof CommandPayloads]
+
+export type CommandOf<T extends CommandType> = Extract<EditorCommand, { type: T }>
 
 export interface Position {
   /**
@@ -53,7 +68,6 @@ export enum EventType {
   VimInputCommandDone,
   EmacsMarkChanged,
   EmacsKeyChanged,
-  EditorZoom,
 }
 
 type EventPayloads = {
@@ -66,7 +80,6 @@ type EventPayloads = {
   [EventType.VimInputCommandDone]: {}
   [EventType.EmacsMarkChanged]: { isMarkSet: boolean }
   [EventType.EmacsKeyChanged]: { value: string }
-  [EventType.EditorZoom]: { newSize: number }
 }
 
 export type EditorEvent = {

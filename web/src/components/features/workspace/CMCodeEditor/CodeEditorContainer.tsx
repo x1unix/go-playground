@@ -8,6 +8,10 @@ import {
   type Document,
   EventType,
   type EditorEvent,
+  type EditorCommand,
+  CommandType,
+  type DocumentState,
+  type EditorRemote,
 } from '~/lib/cm-react'
 import { useLazyRef } from '~/hooks/lazy-ref'
 import type { State } from '~/store/state'
@@ -38,13 +42,19 @@ const mapEventToAction = (e: EditorEvent): AnyAction | Dispatcher | undefined =>
           return newVimModeChangeAction({ mode: VimMode.Normal })
       }
       break
-    case EventType.EditorZoom:
+    default:
+      // TODO: wire up cursor position events when it will be implemented on UI and store.
+      break
+  }
+}
+
+const mapCommandToAction = (e: EditorCommand, rem: EditorRemote): AnyAction | Dispatcher | undefined => {
+  switch (e.type) {
+    case CommandType.EditorZoom:
       return newMonacoParamsChangeDispatcher({
         fontSize: e.newSize,
       })
     default:
-      // TODO: wire up cursor position events when it will be implemented on UI and store.
-      break
   }
 }
 
@@ -115,9 +125,11 @@ export const CodeEditorContainer: React.FC = () => {
           dispatch(action)
         }
       }}
-      onCommand={(cmd, doc, rem) => {
-        // TODO: handle commands later
-        console.log('got cmd', { cmd, doc, rem })
+      onCommand={(cmd, rem) => {
+        const action = mapCommandToAction(cmd, rem)
+        if (action) {
+          dispatch(action)
+        }
       }}
     />
   )

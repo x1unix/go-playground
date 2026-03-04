@@ -2,7 +2,7 @@ import { Prec } from '@codemirror/state'
 import { EditorView, type Command, keymap } from '@codemirror/view'
 import { Vim } from '@replit/codemirror-vim'
 
-import { type CommandHandler, type EditorRemote, EditorCommand } from '../types'
+import { type DocumentState, CommandType } from '../types'
 import { docStateFromEditor } from '../utils'
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
@@ -18,14 +18,15 @@ const arithmeticFontScale = (current: number, direction: number) => {
   return roundToTenth(bounded)
 }
 
-const newCmdHandler = (cmd: EditorCommand, remote: EditorRemote, fn?: CommandHandler): Command | undefined => {
-  if (!fn) return
+type DocumentCommand = CommandType.Run | CommandType.Format | CommandType.Share
+export type DocumentCommandHandler = (cmd: DocumentCommand, doc: DocumentState) => void
 
+const newCmdHandler = (cmd: DocumentCommand, cb: DocumentCommandHandler): Command | undefined => {
   return (view) => {
     const doc = docStateFromEditor(view.state)
     if (doc) {
       // Dispatch command only on initialized buffers.
-      fn(cmd, doc, remote)
+      cb(cmd, doc)
     }
 
     return true
@@ -35,23 +36,23 @@ const newCmdHandler = (cmd: EditorCommand, remote: EditorRemote, fn?: CommandHan
 /**
  * Returns a new hotkey plugin that handles editor settings.
  */
-export const newHotkeyHandler = (remote: EditorRemote, handler: CommandHandler) =>
+export const newHotkeyHandler = (handler: DocumentCommandHandler) =>
   Prec.highest(
     keymap.of([
       {
         key: 'Mod-s',
         preventDefault: true,
-        run: newCmdHandler(EditorCommand.Share, remote, handler),
+        run: newCmdHandler(CommandType.Share, handler),
       },
       {
         key: 'Mod-Enter',
         preventDefault: true,
-        run: newCmdHandler(EditorCommand.Run, remote, handler),
+        run: newCmdHandler(CommandType.Run, handler),
       },
       {
         key: 'Mod-f',
         preventDefault: true,
-        run: newCmdHandler(EditorCommand.Format, remote, handler),
+        run: newCmdHandler(CommandType.Format, handler),
       },
     ]),
   )
@@ -90,14 +91,14 @@ export const newEditorZoomListener = ({ currentSize, handler }: ZoomListenParams
   })
 }
 
-const commands = [
+const commands: { cmd: DocumentCommand; name: string; short?: string }[] = [
   {
-    cmd: EditorCommand.Run,
+    cmd: CommandType.Run,
     name: 'write',
     short: 'w',
   },
   {
-    cmd: EditorCommand.Share,
+    cmd: CommandType.Share,
     name: 'share',
   },
 ]
@@ -107,12 +108,12 @@ const commands = [
  *
  * Note: this is a global operation.
  */
-export const registerVimCommands = (remote: EditorRemote, handler: CommandHandler) => {
+export const registerVimCommands = (handler: DocumentCommandHandler) => {
   for (const c of commands) {
     Vim.defineEx(c.name, c.short, (cm, _p) => {
       const doc = docStateFromEditor(cm.cm6.state)
       if (doc) {
-        handler(c.cmd, doc, remote)
+        handler(c.cmd, doc)
       }
     })
   }

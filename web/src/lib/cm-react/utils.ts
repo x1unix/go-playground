@@ -1,6 +1,6 @@
 import { Text, type ChangeSpec, type EditorState } from '@codemirror/state'
 import { getBufferState } from './buffers/state'
-import type { DocumentState } from './types'
+import { Syntax, type DocumentState } from './types'
 
 // import type { Marker } from './types'
 
@@ -20,6 +20,8 @@ export const newDocReplaceChange = (state: EditorState, contents: string): Chang
   to: state.doc.length,
   insert: docFromString(contents),
 })
+
+export const emptyDocumentState: DocumentState = { path: '', language: Syntax.Go, text: Text.empty }
 
 export const docStateFromEditor = (state: EditorState): DocumentState | undefined => {
   const buff = getBufferState(state)
