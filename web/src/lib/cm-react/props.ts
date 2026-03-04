@@ -88,7 +88,7 @@ export interface EditorProps {
    *
    * Changing the workspace key will trigger document contents re-read.
    */
-  workspaceKey?: string | null
+  workspaceKey?: string | number | null
 
   /**
    * Sets currently open document.

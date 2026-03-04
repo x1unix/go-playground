@@ -2,7 +2,7 @@ import { mapByAction } from '../helpers'
 import type { Action } from '../actions'
 
 import { WorkspaceAction, type FileUpdatePayload, type FilePayload, type SnippetLoadPayload } from './actions'
-import { initialWorkspaceState, type WorkspaceState } from './state'
+import { newGenerationKey, initialWorkspaceState, type WorkspaceState } from './state'
 
 export const reducers = mapByAction<WorkspaceState>(
   {
@@ -34,10 +34,12 @@ export const reducers = mapByAction<WorkspaceState>(
       }
     },
     [WorkspaceAction.UPDATE_FILES]: (s: WorkspaceState, { payload: newFiles }: Action<Record<string, string>>) => {
+      const generation = newGenerationKey()
       const { files: originalFiles, ...rest } = s
       if (!originalFiles) {
         return {
           ...rest,
+          generation: generation,
           files: newFiles,
         }
       }
@@ -45,6 +47,7 @@ export const reducers = mapByAction<WorkspaceState>(
       // Preserve files order.
       return {
         ...rest,
+        generation: generation,
         files: Object.entries(originalFiles)
           .map(([name, originalContent]) => ({
             [name]: newFiles[name] ?? originalContent,
@@ -84,6 +87,7 @@ export const reducers = mapByAction<WorkspaceState>(
     },
     [WorkspaceAction.SNIPPET_LOAD_START]: (_: WorkspaceState, { payload: id }: Action<string>) => {
       return {
+        generation: newGenerationKey(),
         selectedFile: null,
         snippet: {
           id,
@@ -97,6 +101,7 @@ export const reducers = mapByAction<WorkspaceState>(
     ) => {
       if (error || !files) {
         return {
+          generation: 0,
           selectedFile: null,
           snippet: {
             id,
@@ -107,6 +112,7 @@ export const reducers = mapByAction<WorkspaceState>(
       }
 
       return {
+        generation: newGenerationKey(),
         snippet: {
           id,
         },
@@ -116,6 +122,7 @@ export const reducers = mapByAction<WorkspaceState>(
     },
     [WorkspaceAction.WORKSPACE_IMPORT]: (_: WorkspaceState, { payload }: Action<WorkspaceState>) => ({
       ...payload,
+      generation: newGenerationKey(),
     }),
   },
   initialWorkspaceState,

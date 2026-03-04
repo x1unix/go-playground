@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import type { AnyAction } from 'redux'
 import {
@@ -49,7 +49,6 @@ const mapEventToAction = (e: EditorEvent): AnyAction | Dispatcher | undefined =>
 }
 
 const mapCommandToAction = (e: EditorCommand, rem: EditorRemote): AnyAction | Dispatcher | undefined => {
-  // TODO: invalidate document states via CMEditorRemote to update editor contents.
   switch (e.type) {
     case CommandType.EditorZoom:
       return newMonacoParamsChangeDispatcher({
@@ -71,7 +70,6 @@ const mapCommandToAction = (e: EditorCommand, rem: EditorRemote): AnyAction | Di
 export const CodeEditorContainer: React.FC = () => {
   const dispatch = useDispatch()
   const saveDebouncer = useDebouncer(150)
-  const [fallbackWorkspaceKey] = useState(() => Date.now().toString())
 
   const monaco = useSelector((state: State) => state.monaco)
   const settings = useSelector((state: State) => state.settings)
@@ -109,10 +107,9 @@ export const CodeEditorContainer: React.FC = () => {
     return () => v.dispose()
   }, [linterRef])
 
-  // TODO: I'll map props later myself.
   return (
     <Editor
-      workspaceKey={workspace.snippet?.id ?? fallbackWorkspaceKey}
+      workspaceKey={workspace.generation}
       value={doc}
       preferences={preferences}
       readonly={isReadOnly}
