@@ -96,6 +96,23 @@ export class Editor extends React.Component<EditorProps, State> {
       newBufferDiagnosticsRenderer(() => this.props.linter),
       ...basicSetup({
         lineNumbers: {
+          formatNumber: (lineNo, state) => {
+            const prefs = this.props.preferences
+            if (prefs?.inputMode !== 'vim' || !prefs?.vimUseRelativeLineNumbers) {
+              // Use classic format
+              return lineNo.toString()
+            }
+
+            if (lineNo > state.doc.lines) {
+              return '0'
+            }
+            const cursorLine = state.doc.lineAt(state.selection.asSingle().ranges[0].to).number
+            if (lineNo === cursorLine) {
+              return '0'
+            }
+
+            return Math.abs(cursorLine - lineNo).toString()
+          },
           domEventHandlers: {
             click: (view, line) => {
               this.props.onEvent?.({

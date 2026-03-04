@@ -237,7 +237,7 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
               control={
                 <Checkbox
                   label="Render line numbers as distance in lines to cursor position."
-                  defaultChecked={this.props.monaco?.vimUseSystemClipboard}
+                  defaultChecked={this.props.monaco?.vimUseRelativeLineNumbers}
                   disabled={this.state.hideVimSettings}
                   onChange={(_, val) => {
                     this.touchMonacoProperty('vimUseRelativeLineNumbers', val)

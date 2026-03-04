@@ -176,7 +176,7 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
       {
         key: 'format',
         text: 'Format Code',
-        ariaLabel: 'Format Code (Ctrl+Shift+F)',
+        ariaLabel: 'Format Code (Alt+F)',
         iconOnly: true,
         disabled: this.isDisabled,
         iconProps: { iconName: 'Code' },
@@ -201,6 +201,7 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
   private onSettingsClose(changes: SettingsChanges) {
     if (changes.monaco) {
       // Update monaco state if some of its settings were changed
+      console.log(changes.monaco)
       this.props.dispatch(newMonacoParamsChangeDispatcher(changes.monaco))
     }
 
