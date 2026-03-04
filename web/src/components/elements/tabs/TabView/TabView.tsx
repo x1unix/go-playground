@@ -17,6 +17,7 @@ interface Props {
   allowEmpty?: boolean
   responsive?: boolean
   placeholder?: string
+  disableContentShrink?: boolean
   onSelected?: (key: string, i: number) => void
   onClosed?: (key: string, i: number) => void
 }
@@ -24,7 +25,7 @@ interface Props {
 const MAX_COMPACT_WIDTH = 480
 const RESIZE_DEBOUNCE_INTERVAL = 100
 
-export const TabView: React.FC<Props> = ({ children, responsive, ...props }) => {
+export const TabView: React.FC<Props> = ({ children, responsive, disableContentShrink, ...props }) => {
   const theme = useTheme()
   const containerRef = useRef<HTMLDivElement>(null)
   const [isCompact, setIsCompact] = useState(false)
@@ -60,7 +61,7 @@ export const TabView: React.FC<Props> = ({ children, responsive, ...props }) => 
           <TabHeader compact={isCompact} {...props} />
         </FlexContainer>
       </Stack.Item>
-      <Stack.Item grow disableShrink styles={tabContentStyles}>
+      <Stack.Item grow disableShrink={disableContentShrink} styles={tabContentStyles}>
         {children}
       </Stack.Item>
     </Stack>

@@ -1,9 +1,10 @@
 import config from '~/services/config'
-import { type WorkspaceState, defaultFiles, defaultFileName } from './state'
+import { type WorkspaceState, defaultFiles, defaultFileName, newGenerationKey } from './state'
 
 const CONFIG_KEY = 'workspace.state'
 
 const defaultWorkspace: WorkspaceState = {
+  generation: -1,
   selectedFile: defaultFileName,
   files: defaultFiles,
 }
@@ -17,7 +18,11 @@ const sanitizeState = (state: WorkspaceState) => {
     return defaultWorkspace
   }
 
-  return { selectedFile, files }
+  return {
+    generation: newGenerationKey(),
+    selectedFile,
+    files,
+  }
 }
 
 export const truncateWorkspaceState = () => config.delete(CONFIG_KEY)

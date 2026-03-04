@@ -252,6 +252,7 @@ function fontToStyle(decl: FontDeclaration): string {
     .map(
       (f) => `@font-face {
         font-family: "${family}";
+        font-display: swap;
         src: ${f.src.map((src) => fontSourceToCSS(src.url, src.format)).join(', ')};
         ${fontStyleToCSS(f.weight, f.style)}
     }`,

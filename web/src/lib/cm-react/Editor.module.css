@@ -1,0 +1,32 @@
+/* Container styles */
+.gpg-Editor {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Colors for CodeMirror vim theming. */
+/* See: ./extensions/themes.ts */
+
+.gpg-Editor[data-theme='light'] {
+  --vim-cursor-bg: #121111;
+  --vim-cursor-fg: #ffffff;
+  --vim-cursor-border: #121111;
+}
+
+.gpg-Editor[data-theme='dark'] {
+  --vim-cursor-bg: #aeafad;
+  --vim-cursor-fg: #515052;
+  --vim-cursor-border: #aeafad;
+}
+
+/* TODO: move ligatures control to CM theme compartment */
+.gpg-Editor[data-font-ligatures='true'] {
+  font-variant-ligatures: normal;
+}
+
+.gpg-Editor[data-font-ligatures='false'] {
+  font-variant-ligatures: none;
+}

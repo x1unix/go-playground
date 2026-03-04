@@ -7,7 +7,7 @@ import { dispatchCreateFile, dispatchRemoveFile, dispatchImportFile, newFileSele
 import { TabView } from '~/components/elements/tabs/TabView'
 import type { TabBarAction, TabIconStyles } from '~/components/elements/tabs/types'
 
-import { CodeEditor } from '../CodeEditor'
+import { CodeEditorContainer } from '../CMCodeEditor/CodeEditorContainer'
 import { FlexContainer } from '../FlexContainer'
 import { NewFileModal } from '../NewFileModal'
 import { ContentPlaceholder } from '../ContentPlaceholder'
@@ -109,9 +109,7 @@ const Workspace: React.FC = () => {
       disabled={(snippet?.loading ?? false) || !!snippet?.error}
     >
       {tabs?.length ? (
-        <FlexContainer>
-          <CodeEditor />
-        </FlexContainer>
+        <CodeEditorContainer />
       ) : (
         <ContentPlaceholder
           isLoading={snippet?.loading}
