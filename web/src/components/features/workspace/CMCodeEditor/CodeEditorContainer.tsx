@@ -10,7 +10,6 @@ import {
   type EditorEvent,
   type EditorCommand,
   CommandType,
-  type DocumentState,
   type EditorRemote,
 } from '~/lib/cm-react'
 import { useLazyRef } from '~/hooks/lazy-ref'
@@ -22,6 +21,7 @@ import { GoSyntaxLinter } from './syntax/linter'
 import { TargetType } from '~/services/config'
 import { getDefaultFontFamily, getFontFamily } from '~/services/fonts'
 import { Dispatcher, newMonacoParamsChangeDispatcher, runFileDispatcher } from '~/store'
+import { useDebouncer } from '~/hooks/debounce'
 
 const preferencesWithDefaults = (src: Partial<EditorPreferences>): EditorPreferences =>
   Object.assign(Object.create(defaultEditorPreferences), src)
@@ -70,6 +70,7 @@ const mapCommandToAction = (e: EditorCommand, rem: EditorRemote): AnyAction | Di
  */
 export const CodeEditorContainer: React.FC = () => {
   const dispatch = useDispatch()
+  const saveDebouncer = useDebouncer(150)
   const [fallbackWorkspaceKey] = useState(() => Date.now().toString())
 
   const monaco = useSelector((state: State) => state.monaco)
@@ -120,8 +121,9 @@ export const CodeEditorContainer: React.FC = () => {
         handler: (doc) => linterRef.current.check(doc, { warnAboutFakeDateTime: isServerRuntime }),
       }}
       onChange={({ path, text }) => {
-        // TODO: probably debounce that later
-        dispatch(dispatchUpdateFile(path, text.toString()))
+        saveDebouncer(() => {
+          dispatch(dispatchUpdateFile(path, text.toString()))
+        })
       }}
       onMount={(rem) => {
         console.log('got remote', rem)
