@@ -53,6 +53,7 @@ export enum EventType {
   VimInputCommandDone,
   EmacsMarkChanged,
   EmacsKeyChanged,
+  EditorZoom,
 }
 
 type EventPayloads = {
@@ -65,6 +66,7 @@ type EventPayloads = {
   [EventType.VimInputCommandDone]: {}
   [EventType.EmacsMarkChanged]: { isMarkSet: boolean }
   [EventType.EmacsKeyChanged]: { value: string }
+  [EventType.EditorZoom]: { newSize: number }
 }
 
 export type EditorEvent = {

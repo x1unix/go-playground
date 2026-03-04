@@ -17,6 +17,7 @@ import { dispatchUpdateFile } from '~/store/workspace'
 import { GoSyntaxLinter } from './syntax/linter'
 import { TargetType } from '~/services/config'
 import { getDefaultFontFamily, getFontFamily } from '~/services/fonts'
+import { newMonacoParamsChangeAction } from '~/store'
 
 const preferencesWithDefaults = (src: Partial<EditorPreferences>): EditorPreferences =>
   Object.assign(Object.create(defaultEditorPreferences), src)
@@ -37,6 +38,10 @@ const mapEventToAction = (e: EditorEvent): AnyAction | undefined => {
           return newVimModeChangeAction({ mode: VimMode.Normal })
       }
       break
+    case EventType.EditorZoom:
+      return newMonacoParamsChangeAction({
+        fontSize: e.newSize,
+      })
     default:
       // TODO: wire up cursor position events when it will be implemented on UI and store.
       break

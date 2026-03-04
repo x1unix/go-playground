@@ -9,11 +9,11 @@ import { getCM } from '@replit/codemirror-vim'
 import { basicSetup } from './extensions/basic'
 import { highlightField } from './extensions/highlight'
 import { newInputModeCompartment } from './extensions/input'
-import { newFormatErrorsRenderer } from './extensions/linter'
+import { newBufferDiagnosticsRenderer } from './extensions/linter'
 import { newReadOnlyCompartment } from './extensions/readonly'
 import { newSyntaxCompartment } from './extensions/syntax'
 import { defaultThemeStyles, newThemeCompartment } from './extensions/themes'
-import { newHotkeyHandler, registerVimCommands } from './extensions/hotkeys'
+import { arithmeticFontScale, newEditorZoomListener, newHotkeyHandler, registerVimCommands } from './extensions/hotkeys'
 import {
   newBufferStateFieldExtension,
   newBufferStateFromSnapshot,
@@ -24,7 +24,7 @@ import {
 } from './buffers/state'
 import { BufferStateStore } from './buffers/store'
 
-import type { EditorProps, Document } from './props'
+import { type EditorProps, type Document, defaultEditorPreferences } from './props'
 import { EventType, type CommandHandler, type InputMode, type Position } from './types'
 import { docFromString } from './utils'
 import { CMEditorRemote } from './remote'
@@ -82,7 +82,7 @@ export class Editor extends React.Component<EditorProps, State> {
       newBufferStateFieldExtension(() => ({
         props: this.props,
       })),
-      newFormatErrorsRenderer(() => this.props.linter),
+      newBufferDiagnosticsRenderer(() => this.props.linter),
       ...basicSetup({
         lineNumbers: {
           domEventHandlers: {
@@ -97,6 +97,15 @@ export class Editor extends React.Component<EditorProps, State> {
               return true
             },
           },
+        },
+      }),
+      newEditorZoomListener({
+        currentSize: () => this.props.preferences?.fontSize ?? defaultEditorPreferences.fontSize,
+        handler: (newSize) => {
+          this.props.onEvent?.({
+            type: EventType.EditorZoom,
+            newSize: newSize,
+          })
         },
       }),
       ...corePlugins,

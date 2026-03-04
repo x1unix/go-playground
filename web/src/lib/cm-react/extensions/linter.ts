@@ -22,7 +22,7 @@ const EMPTY_DIAGS = []
 /**
  * Returns extension based on CM linter that renders format errors from document state.
  */
-export const newFormatErrorsRenderer = (src: Thunk<LinterConfig | undefined>) => {
+export const newBufferDiagnosticsRenderer = (src: Thunk<LinterConfig | undefined>) => {
   const lintCfg = {
     delay: src()?.delay ?? DEFAULT_LINT_INTERVAL,
   }

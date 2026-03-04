@@ -68,7 +68,7 @@ const makeExtensionTheme = ({ colorScheme, fontFamily, fontSize }: ThemeConfig) 
     theme: colorScheme,
     settings: {
       fontFamily,
-      fontSize,
+      fontSize: `${fontSize}px`, // Needs to be as string to handle floats.
     },
   })
 }

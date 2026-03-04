@@ -1,9 +1,22 @@
 import { Prec } from '@codemirror/state'
-import { type Command, keymap } from '@codemirror/view'
+import { EditorView, type Command, keymap } from '@codemirror/view'
 import { Vim } from '@replit/codemirror-vim'
 
 import { type CommandHandler, type EditorRemote, EditorCommand } from '../types'
 import { docStateFromEditor } from '../utils'
+
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
+const roundToTenth = (value: number) => Math.round(value * 10) / 10
+
+const FONT_MAX = 42
+const FONT_MIN = 7
+const FONT_SCALE_STEP = 1.4
+
+const arithmeticFontScale = (current: number, direction: number) => {
+  const stepped = current + direction * FONT_SCALE_STEP
+  const bounded = clamp(stepped, FONT_MIN, FONT_MAX)
+  return roundToTenth(bounded)
+}
 
 const newCmdHandler = (cmd: EditorCommand, remote: EditorRemote, fn?: CommandHandler): Command | undefined => {
   if (!fn) return
@@ -42,6 +55,40 @@ export const newHotkeyHandler = (remote: EditorRemote, handler: CommandHandler) 
       },
     ]),
   )
+
+interface ZoomListenParams {
+  currentSize: () => number
+  handler: (newSize: number) => void
+}
+
+/**
+ * Registers a handler to capture Ctrl|Meta+MouseWheel commands to increase or decrease font size.
+ *
+ * Note: font update logic should be implemented on editor consumer side, as handler only performs event report logic.
+ */
+export const newEditorZoomListener = ({ currentSize, handler }: ZoomListenParams) => {
+  return EditorView.domEventHandlers({
+    wheel: (event) => {
+      if (!event.ctrlKey && !event.metaKey) {
+        return false
+      }
+
+      if (event.deltaY === 0) {
+        return false
+      }
+
+      event.preventDefault()
+      const direction = event.deltaY < 0 ? 1 : -1
+      const current = currentSize()
+      const nextSize = arithmeticFontScale(current, direction)
+      if (nextSize != current) {
+        handler(nextSize)
+      }
+
+      return true
+    },
+  })
+}
 
 const commands = [
   {
