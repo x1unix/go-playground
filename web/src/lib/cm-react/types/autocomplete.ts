@@ -1,5 +1,14 @@
 import type { DocumentState } from './common'
 
+// Ported from monaco.IMarkdownString
+export interface IMarkdownString {
+  readonly value: string
+  readonly language?: string
+}
+
+export type MarkedString = string | IMarkdownString
+export type DocContent = IMarkdownString | MarkedString | MarkedString[]
+
 export interface CursorPosition {
   lineNumber: number
   column: number
@@ -15,7 +24,7 @@ export interface CompletionTextEdit {
 export interface CompletionItem {
   label: string
   detail?: string
-  documentation?: string
+  documentation?: DocContent
   type?: string
   sortText?: string
   filterText?: string
@@ -32,19 +41,10 @@ export interface CompletionResult {
   options: CompletionItem[]
 }
 
-// Ported from monaco.IMarkdownString
-export interface IMarkdownString {
-  readonly value: string
-  readonly language?: string
-}
-
-type MarkedString = string | IMarkdownString
-export type HoverContent = IMarkdownString | MarkedString | MarkedString[]
-
 export interface HoverResult {
   from: number
   to: number
-  contents: HoverContent
+  contents: DocContent
 }
 
 export interface CompletionRequest {

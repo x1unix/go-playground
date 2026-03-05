@@ -43,30 +43,6 @@ const isCompletionRangePair = (
   return typeof range === 'object' && range !== null && 'insert' in range && 'replace' in range
 }
 
-const markdownToString = (value?: string | monaco.IMarkdownString): string | undefined => {
-  if (!value) {
-    return undefined
-  }
-
-  if (typeof value === 'string') {
-    return value
-  }
-
-  return value.value
-}
-
-const markedStringToString = (item: string | monaco.IMarkdownString): string => {
-  if (typeof item === 'string') {
-    return item
-  }
-
-  if ('value' in item) {
-    return item.value
-  }
-
-  return ''
-}
-
 const labelToString = (label: MonacoCompletionItem['label']) => {
   if (typeof label === 'string') {
     return label
@@ -115,7 +91,7 @@ export const completionFromMonacoItem = (
   return {
     label: labelToString(item.label),
     detail: item.detail,
-    documentation: markdownToString(item.documentation),
+    documentation: item.documentation,
     type: completionTypeByKind[item.kind],
     sortText: item.sortText,
     filterText: item.filterText,

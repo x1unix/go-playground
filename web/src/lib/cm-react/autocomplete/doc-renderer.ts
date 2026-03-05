@@ -2,16 +2,9 @@ import { go } from '@codemirror/lang-go'
 import { highlightTree, type Highlighter } from '@lezer/highlight'
 import markdownit from 'markdown-it'
 import * as monaco from 'monaco-editor'
+import type { DocContent, MarkedString } from '../types/autocomplete'
 
 import { classNames } from './styles'
-
-interface LegacyMarkedString {
-  language: string
-  value: string
-}
-
-type MarkedString = string | monaco.IMarkdownString | LegacyMarkedString
-type Content = monaco.IMarkdownString | MarkedString | MarkedString[]
 
 interface NormalizedContent {
   isMarkdown: boolean
@@ -57,7 +50,7 @@ const normalizeMarkupEntry = (entry: MarkedString): NormalizedContent => {
   }
 }
 
-const normalizeMarkupContent = (content: Content): NormalizedContent => {
+const normalizeMarkupContent = (content: DocContent): NormalizedContent => {
   if (Array.isArray(content)) {
     return content.reduce(
       (acc: NormalizedContent, item: MarkedString): NormalizedContent => {
@@ -112,7 +105,7 @@ export class MarkupRenderer {
     return `<div class="code-highlighted">${buff}</div>`
   }
 
-  renderContents(dst: HTMLElement, contents: Content) {
+  renderContents(dst: HTMLElement, contents: DocContent) {
     const { isMarkdown, value } = normalizeMarkupContent(contents)
     if (isMarkdown) {
       dst.innerHTML = this.printer.render(value)
@@ -126,7 +119,7 @@ export class MarkupRenderer {
   }
 }
 
-export const renderCompletionDoc = (renderer: MarkupRenderer, doc?: Content) => {
+export const renderCompletionDoc = (renderer: MarkupRenderer, doc?: DocContent) => {
   if (!doc) {
     return null
   }

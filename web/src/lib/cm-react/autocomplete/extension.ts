@@ -14,7 +14,7 @@ import { LoadState } from '../types/events'
 import { docStateFromEditor } from '../utils'
 import { cursorFromOffset } from './utils'
 import { classNames } from './styles'
-import { MarkupRenderer } from './doc-renderer'
+import { MarkupRenderer, renderCompletionDoc } from './doc-renderer'
 
 interface SourceExtensionArgs {
   source: () => EditorAutocompleteSource | undefined
@@ -33,7 +33,7 @@ const normalizeError = (err: unknown) => {
 const toCompletionOption = (item: CompletionItem): Completion => ({
   label: item.label,
   detail: item.detail,
-  info: item.documentation,
+  info: () => renderCompletionDoc(renderer, item.documentation),
   type: item.type,
   apply: (view, completion, from, to) => {
     const replaceFrom = item.replaceFrom ?? from
@@ -68,6 +68,7 @@ const toCompletionResult = (result: CompletionResult | null): CMCompletionResult
   }
 }
 
+// TODO: replace MarkupRenderer with provided by user
 const renderer = new MarkupRenderer()
 const toTooltip = ({ from, to, contents }: HoverResult): Tooltip => ({
   pos: from,
@@ -77,9 +78,6 @@ const toTooltip = ({ from, to, contents }: HoverResult): Tooltip => ({
     const dom = document.createElement('div')
     dom.className = classNames.tooltip
     renderer.renderContents(dom, contents)
-    // dom.style.whiteSpace = 'pre-wrap'
-    // dom.textContent = contents.join('\n\n')
-
     return { dom }
   },
 })
