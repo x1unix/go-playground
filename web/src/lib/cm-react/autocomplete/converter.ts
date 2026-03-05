@@ -1,7 +1,7 @@
 import type * as monaco from 'monaco-editor'
 import type { Text } from '@codemirror/state'
 
-import type { CompletionItem, CompletionTextEdit, HoverResult } from './types'
+import type { CompletionItem, CompletionTextEdit, HoverResult } from '../types/autocomplete'
 import { offsetFromLineColumn } from './utils'
 
 const SNIPPET_RULE = 4

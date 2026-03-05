@@ -9,9 +9,9 @@ import {
 import { type Extension } from '@codemirror/state'
 import { hoverTooltip, type Tooltip } from '@codemirror/view'
 
+import type { CompletionItem, CompletionResult, EditorAutocompleteSource, HoverResult } from '../types/autocomplete'
 import { LoadState } from '../types/events'
 import { docStateFromEditor } from '../utils'
-import type { CompletionItem, CompletionResult, EditorAutocompleteSource, HoverResult } from './types'
 import { cursorFromOffset } from './utils'
 
 interface SourceExtensionArgs {

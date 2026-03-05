@@ -78,4 +78,5 @@ Port hover and completion providers from Monaco-based editor to CodeMirror edito
 - [x] Fixed literal query behavior (`os` now resolves package suggestions like Monaco flow).
 - [x] Restored auto-import edits for package member completions when package is not imported.
 - [x] Added source-level regression tests for `os` literal completion and missing import edit insertion.
+- [x] Moved public autocomplete source types to `web/src/lib/cm-react/types/autocomplete.ts`.
 - [ ] Add conversion-focused tests for Monaco `additionalTextEdits` + snippet mapping.

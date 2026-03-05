@@ -1,9 +1,9 @@
 import type { BufferStateStore } from './buffers/store'
 import { defaultThemeConfig } from './extensions/themes'
 import type { LinterConfig } from './extensions/linter'
+import type { EditorAutocompleteSource } from './types/autocomplete'
 import type { DocumentState, InputMode, ColorScheme, EditorRemote } from './types/common'
 import type { EditorEvent, EditorCommand } from './types/events'
-import type { EditorAutocompleteSource } from './autocomplete'
 
 export type { Text } from '@codemirror/state'
 

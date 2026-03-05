@@ -1,6 +1,6 @@
 import type { Text } from '@codemirror/state'
 
-import type { CursorPosition } from './types'
+import type { CursorPosition } from '../types/autocomplete'
 
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n))
 

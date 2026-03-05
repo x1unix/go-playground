@@ -1,8 +1,8 @@
 import type { ImportsContext } from '~/workers/language/types'
 import type { DocumentState } from '../types/common'
+import type { DocumentUpdate } from '../types/autocomplete'
 
 import { buildImportContext } from './imports'
-import type { DocumentUpdate } from './types'
 
 export class DocumentMetadataCache {
   private readonly cache = new Map<string, ImportsContext>()

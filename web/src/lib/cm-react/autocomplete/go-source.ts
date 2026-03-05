@@ -24,7 +24,7 @@ import type {
   EditorAutocompleteSource,
   HoverRequest,
   HoverResult,
-} from './types'
+} from '../types/autocomplete'
 import { wordRangeAtOffset } from './utils'
 
 const SUGGESTIONS_DEBOUNCE_DELAY = 500

@@ -1,6 +1,4 @@
-import type { Text } from '@codemirror/state'
-
-import type { DocumentState } from '../types/common'
+import type { DocumentState } from './common'
 
 export interface CursorPosition {
   lineNumber: number
@@ -69,42 +67,4 @@ export interface EditorAutocompleteSource {
   handleDocumentUpdate: (update: DocumentUpdate) => void
   clear: (path?: string) => void
   dispose?: () => void
-}
-
-export interface ImportedRange {
-  startLineNumber: number
-  endLineNumber: number
-  startColumn: number
-  endColumn: number
-}
-
-export interface ImportsContext {
-  hasError?: boolean
-  allPaths?: Set<string>
-  totalRange?: Pick<ImportedRange, 'startLineNumber' | 'endLineNumber'>
-  blockPaths?: string[]
-  blockType: number
-  range?: ImportedRange
-  prependNewLine?: boolean
-}
-
-export interface TextLine {
-  number: number
-  from: number
-  to: number
-  text: string
-  length: number
-}
-
-export interface TextReader {
-  doc: Text
-  toString: () => string
-  lineAt: (pos: number) => TextLine
-  line: (lineNumber: number) => TextLine
-  lines: number
-}
-
-export interface QueryContext {
-  document: DocumentState
-  cursor: CursorPosition
 }
