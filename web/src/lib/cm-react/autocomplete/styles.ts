@@ -8,14 +8,12 @@ export const classNames = {
   lezerTagPrefix: 'cm-lsp-tag',
 }
 
-// Root codelens doc blocks for styling, based on VSCode styles.
+type StyleSpec = Parameters<typeof EditorView.theme>[0]
+
+// Root tooltip style doc blocks
 const rootBlocks = ['.code', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'ul']
 const rootBlocksSelector = (mod = ''): string =>
   rootBlocks.map((sel) => `& .${classNames.tooltip} ${sel}${mod}`).join(', ')
-
-// Internally, StyleSpec refers to a different library.
-// Infer the type to avoid explicit import + extra dependency.
-type StyleSpec = Parameters<typeof EditorView.theme>[0]
 
 export const coreStyles: StyleSpec = {
   '& .cm-tooltip': {
@@ -98,7 +96,7 @@ export interface PluginTheme {
   highlighter?: Highlighter
 }
 
-export interface PluginThemeOptions {
+export interface SourceExtensionStyles {
   /**
    * Additional editor styles.
    */
@@ -112,17 +110,10 @@ export interface PluginThemeOptions {
   highlightStyles?: TagStyle[]
 }
 
-export interface AutocompletePluginOptions {
-  /**
-   * Plugin styles and syntax highlighter.
-   */
-  theme?: PluginTheme
-}
-
 /**
  * Creates plugin theme.
  */
-export const createPluginTheme = (opts?: PluginThemeOptions) => {
+export const createPluginTheme = (opts?: SourceExtensionStyles): PluginTheme => {
   if (!opts?.highlightStyles) {
     return {
       styleSpec: opts?.styles ? { ...coreStyles, ...opts.styles } : coreStyles,

@@ -13,7 +13,7 @@ import { newIndentationCompartment } from './extensions/indentation'
 import { newBufferDiagnosticsRenderer } from './extensions/linter'
 import { newReadOnlyCompartment } from './extensions/readonly'
 import { newSyntaxCompartment } from './extensions/syntax'
-import { defaultThemeStyles, newThemeCompartment } from './extensions/themes'
+import { defaultThemeStyles, getAutocompletePluginTheme, newThemeCompartment } from './extensions/themes'
 import {
   type DocumentCommandHandler,
   newEditorZoomListener,
@@ -132,6 +132,7 @@ export class Editor extends React.Component<EditorProps, State> {
         },
       }),
       ...newAutocompleteExtensions({
+        theme: getAutocompletePluginTheme(),
         source: () => this.props.autocomplete,
         isCurrentPath: (path) => this.isCurrentPath(path),
         onStatus: (status, error) => this.emitCompletionSourceStatus(status, error),

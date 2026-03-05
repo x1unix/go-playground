@@ -3,7 +3,7 @@ import { EditorView } from '@codemirror/view'
 import { vscodeDarkInit, vscodeDarkStyle, vscodeLightInit } from '@uiw/codemirror-theme-vscode'
 
 import type { ColorScheme } from '../types/common'
-import type { PluginThemeOptions } from '../autocomplete/styles'
+import { createPluginTheme, type SourceExtensionStyles } from '../autocomplete/styles'
 
 // TODO: infer editor popup styles from state theme.
 export const popupHighlightStyles = vscodeDarkStyle
@@ -24,11 +24,12 @@ export const highlightClasses = {
 }
 
 /**
- * Theming settings for the autocomplete plugin
+ * Returns a theme for the autocomplete plugin.
  */
-export const autocompletePluginOptions: PluginThemeOptions = {
-  highlightStyles: vscodeDarkStyle,
-}
+export const getAutocompletePluginTheme = () =>
+  createPluginTheme({
+    highlightStyles: vscodeDarkStyle,
+  })
 
 export const defaultThemeStyles = EditorView.theme({
   // CSS magic to keep editor and scrollbar contained within parent boundaries.
