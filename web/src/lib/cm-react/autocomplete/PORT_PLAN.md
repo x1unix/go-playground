@@ -69,8 +69,9 @@ Port hover and completion providers from Monaco-based editor to CodeMirror edito
 - [x] Audited old Monaco providers and worker contracts.
 - [x] Audited CM editor integration points and event model.
 - [x] Confirmed architecture decision for status events (`Editor` emits, container handles Redux).
-- [ ] Implement `web/src/lib/cm-react/autocomplete` source interfaces and base utilities.
-- [ ] Implement Lezer import parser and metadata cache.
-- [ ] Implement completion + hover provider logic.
-- [ ] Integrate provider source into `Editor` and `CodeEditorContainer`.
-- [ ] Add/port tests and run targeted checks.
+- [x] Implemented `web/src/lib/cm-react/autocomplete` source interfaces and base utilities.
+- [x] Implemented Lezer import parser and metadata cache.
+- [x] Implemented completion + hover provider logic.
+- [x] Integrated provider source into `Editor` and `CodeEditorContainer`.
+- [x] Ported parser tests and ran targeted checks.
+- [ ] Add conversion-focused tests for Monaco `additionalTextEdits` + snippet mapping.

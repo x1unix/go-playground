@@ -1,0 +1,12 @@
+package main
+
+import (
+	"fmt"
+	"bar"
+)
+
+import alias "baz"
+
+func main() {
+	fmt.Println("Hello, World!")
+}
