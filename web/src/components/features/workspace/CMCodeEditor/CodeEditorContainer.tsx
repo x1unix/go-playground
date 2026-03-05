@@ -12,6 +12,7 @@ import {
   CommandType,
   type EditorRemote,
   LoadState,
+  newGoAutocompleteSource,
 } from '~/lib/cm-react'
 import { useLazyRef } from '~/hooks/lazy-ref'
 import type { State } from '~/store/state'
@@ -24,6 +25,7 @@ import { getDefaultFontFamily, getFontFamily } from '~/services/fonts'
 import { Dispatcher, newMonacoParamsChangeDispatcher, runFileDispatcher } from '~/store'
 import { useDebouncer } from '~/hooks/debounce'
 import { newAddNotificationAction, newRemoveNotificationAction, NotificationType } from '~/store/notifications'
+import { spawnLanguageWorker } from '~/workers/language'
 
 const goImportsLoadNotification = 'GoImportsListLoad'
 
@@ -135,10 +137,28 @@ export const CodeEditorContainer: React.FC = () => {
   }, [workspace])
 
   const linterRef = useLazyRef(() => new GoSyntaxLinter(dispatch))
+  const autocompleteRef = useLazyRef(() => {
+    const [worker, disposer] = spawnLanguageWorker()
+    const source = newGoAutocompleteSource(worker)
+
+    return {
+      source,
+      dispose: () => {
+        source.dispose?.()
+        disposer.dispose()
+      },
+    }
+  })
+
   useEffect(() => {
     const v = linterRef.current
     return () => v.dispose()
   }, [linterRef])
+
+  useEffect(() => {
+    const v = autocompleteRef.current
+    return () => v.dispose()
+  }, [autocompleteRef])
 
   return (
     <Editor
@@ -150,13 +170,11 @@ export const CodeEditorContainer: React.FC = () => {
         delay: 300,
         handler: (doc) => linterRef.current.check(doc, { warnAboutFakeDateTime: isServerRuntime }),
       }}
+      autocomplete={autocompleteRef.current.source}
       onChange={({ path, text }) => {
         saveDebouncer(() => {
           dispatch(dispatchUpdateFile(path, text.toString()))
         })
-      }}
-      onMount={(rem) => {
-        console.log('got remote', rem)
       }}
       onEvent={(e) => {
         const action = mapEventToAction(e)

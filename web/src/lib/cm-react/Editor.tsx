@@ -31,11 +31,12 @@ import {
 import { BufferStateStore } from './buffers/store'
 
 import { type EditorProps, type Document, defaultEditorPreferences } from './props'
-import { CommandType, EventType } from './types/events'
+import { CommandType, EventType, LoadState } from './types/events'
 import type { InputMode, Position } from './types/common'
 import { docFromString } from './utils'
 import { CMEditorRemote } from './remote'
 import type { BufferState } from './buffers/types'
+import { newAutocompleteExtensions } from './autocomplete'
 
 import classes from './Editor.module.css'
 
@@ -52,6 +53,7 @@ export class Editor extends React.Component<EditorProps, State> {
   private readonly buffMgr: BufferStateStore
   private remote: CMEditorRemote
   private editor?: EditorView
+  private completionSourceStatus?: LoadState
 
   state: State = {
     isLoading: false,
@@ -96,6 +98,7 @@ export class Editor extends React.Component<EditorProps, State> {
       })),
       newBufferDiagnosticsRenderer(() => this.props.linter),
       ...basicSetup({
+        completion: false,
         lineNumbers: {
           formatNumber: (lineNo, state) => {
             const prefs = this.props.preferences
@@ -127,6 +130,11 @@ export class Editor extends React.Component<EditorProps, State> {
             },
           },
         },
+      }),
+      ...newAutocompleteExtensions({
+        source: () => this.props.autocomplete,
+        isCurrentPath: (path) => this.isCurrentPath(path),
+        onStatus: (status, error) => this.emitCompletionSourceStatus(status, error),
       }),
       newEditorZoomListener({
         currentSize: () => this.props.preferences?.fontSize ?? defaultEditorPreferences.fontSize,
@@ -235,6 +243,7 @@ export class Editor extends React.Component<EditorProps, State> {
     // Cache invalidation on workspace change.
     if (workspaceChanged) {
       this.buffMgr.clear()
+      this.props.autocomplete?.clear()
       prevFile = undefined
     }
 
@@ -289,7 +298,7 @@ export class Editor extends React.Component<EditorProps, State> {
     }
   }
 
-  private handleViewUpdate({ docChanged, selectionSet, state }: ViewUpdate) {
+  private handleViewUpdate({ docChanged, selectionSet, state, startState, changes }: ViewUpdate) {
     if (selectionSet) {
       this.emitCursorPosChanged(state)
     }
@@ -312,10 +321,68 @@ export class Editor extends React.Component<EditorProps, State> {
       return
     }
 
+    const lineChanges: Array<{ startLineNumber: number; endLineNumber: number }> = []
+    let changesCount = 0
+    let isFullReplace = false
+    const prevDoc = startState.doc
+    changes.iterChangedRanges((fromA, toA) => {
+      changesCount++
+      if (changesCount === 1 && fromA === 0 && toA === prevDoc.length) {
+        isFullReplace = true
+      }
+
+      const safeTo = Math.min(Math.max(fromA, toA), prevDoc.length)
+      lineChanges.push({
+        startLineNumber: prevDoc.lineAt(fromA).number,
+        endLineNumber: prevDoc.lineAt(safeTo).number,
+      })
+    })
+
+    this.props.autocomplete?.handleDocumentUpdate({
+      path: docState.fileName,
+      changes: lineChanges,
+      isFlush: isFullReplace && changesCount === 1,
+    })
+
     this.props.onChange?.({
       path: docState.fileName,
       language: docState.syntax,
       text: state.doc,
+    })
+  }
+
+  private isCurrentPath(path: string) {
+    if (this.props.value?.path !== path) {
+      return false
+    }
+
+    if (!this.editor) {
+      return true
+    }
+
+    const fileName = getBufferState(this.editor.state).fileName
+    return !fileName || fileName === path
+  }
+
+  private emitCompletionSourceStatus(status: LoadState, error?: string) {
+    const repeated = this.completionSourceStatus === status
+    if (repeated && status !== LoadState.Error) {
+      return
+    }
+
+    this.completionSourceStatus = status
+    if (status === LoadState.Error) {
+      this.props.onEvent?.({
+        type: EventType.CompletionSourceStatus,
+        status,
+        error: error ?? 'Unknown completion source error',
+      })
+      return
+    }
+
+    this.props.onEvent?.({
+      type: EventType.CompletionSourceStatus,
+      status,
     })
   }
 

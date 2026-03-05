@@ -1,0 +1,10 @@
+package main
+
+import "fmt"
+
+import (
+	"bar"
+
+func main() {
+	fmt.Println("Hello, World!")
+}

@@ -30,3 +30,13 @@
 .gpg-Editor[data-font-ligatures='false'] {
   font-variant-ligatures: none;
 }
+
+.gpg-Editor :global(.cm-tooltip) {
+  max-width: min(70ch, 80vw);
+}
+
+.gpg-Editor :global(.cm-tooltip .cm-gpg-hover) {
+  white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  font-size: 12px;
+}

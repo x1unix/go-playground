@@ -26,6 +26,7 @@ import {
 export interface SetupOpts {
   lineNumbers?: Parameters<typeof lineNumbers>[0]
   foldGutter?: Parameters<typeof foldGutter>[0]
+  completion?: Parameters<typeof autocompletion>[0] | false
 }
 
 export const basicSetup = (opts?: SetupOpts) => {
@@ -38,6 +39,8 @@ export const basicSetup = (opts?: SetupOpts) => {
     completionKeymap,
     lintKeymap,
   ].flat()
+
+  const completion = opts?.completion === false ? [] : [autocompletion(opts?.completion)]
 
   return [
     lineNumbers(opts?.lineNumbers),
@@ -52,7 +55,7 @@ export const basicSetup = (opts?: SetupOpts) => {
     syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
     bracketMatching(),
     closeBrackets(),
-    autocompletion(),
+    ...completion,
     rectangularSelection(),
     crosshairCursor(),
     highlightActiveLine(),
