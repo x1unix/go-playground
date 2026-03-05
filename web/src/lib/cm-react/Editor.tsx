@@ -13,7 +13,12 @@ import { newIndentationCompartment } from './extensions/indentation'
 import { newBufferDiagnosticsRenderer } from './extensions/linter'
 import { newReadOnlyCompartment } from './extensions/readonly'
 import { newSyntaxCompartment } from './extensions/syntax'
-import { defaultThemeStyles, getAutocompletePluginTheme, newThemeCompartment } from './extensions/themes'
+import {
+  defaultFontFamily,
+  defaultThemeStyles,
+  getAutocompletePluginTheme,
+  newThemeCompartment,
+} from './extensions/themes'
 import {
   type DocumentCommandHandler,
   newEditorZoomListener,
@@ -32,7 +37,7 @@ import { BufferStateStore } from './buffers/store'
 
 import { type EditorProps, type Document, defaultEditorPreferences } from './props'
 import { CommandType, EventType, LoadState } from './types/events'
-import type { InputMode, Position } from './types/common'
+import type { ColorScheme, InputMode, Position } from './types/common'
 import { docFromString } from './utils'
 import { CMEditorRemote } from './remote'
 import type { BufferState } from './buffers/types'
@@ -57,6 +62,14 @@ export class Editor extends React.Component<EditorProps, State> {
 
   state: State = {
     isLoading: false,
+  }
+
+  currentFont(): string {
+    return this.props.preferences?.fontFamily ?? defaultFontFamily
+  }
+
+  currentColorScheme(): ColorScheme {
+    return this.props.preferences?.colorScheme ?? 'light'
   }
 
   constructor(props: EditorProps) {
@@ -132,7 +145,7 @@ export class Editor extends React.Component<EditorProps, State> {
         },
       }),
       ...newAutocompleteExtensions({
-        theme: getAutocompletePluginTheme(),
+        theme: getAutocompletePluginTheme(this.currentFont(), this.currentColorScheme()),
         source: () => this.props.autocomplete,
         isCurrentPath: (path) => this.isCurrentPath(path),
         onStatus: (status, error) => this.emitCompletionSourceStatus(status, error),
@@ -463,12 +476,11 @@ export class Editor extends React.Component<EditorProps, State> {
 
   render() {
     const prefs = this.props.preferences
-    const theme = prefs?.colorScheme ?? 'light'
     return (
       <div
         ref={this.containerRef}
         className={classes['gpg-Editor']}
-        data-theme={theme}
+        data-theme={this.currentColorScheme()}
         data-font-ligatures={!!prefs?.fontLigatures}
       />
     )

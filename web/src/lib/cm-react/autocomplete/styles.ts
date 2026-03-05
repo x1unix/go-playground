@@ -19,10 +19,14 @@ export const coreStyles: StyleSpec = {
   '& .cm-tooltip': {
     'max-width': '65%',
   },
+  [`& .${classNames.completionDoc} code`]: {
+    'font-family': 'var(--cm-tooltip-code-font)',
+  },
   [`& .${classNames.completionDoc} pre`]: {
     'white-space': 'pre-wrap',
-    'font-size': '0.9em',
+    // 'font-size': '0.9em',
     padding: '0.5em 0',
+    'font-family': 'var(--cm-tooltip-code-font)',
   },
   [rootBlocksSelector()]: {
     margin: '8px 0',
@@ -30,19 +34,54 @@ export const coreStyles: StyleSpec = {
   [rootBlocksSelector(':last-child')]: {
     'margin-bottom': '0',
   },
+
+  // Split hover sections with a border
+  [`& .${classNames.tooltip}`]: {
+    padding: '0',
+  },
+  [`& .${classNames.tooltip} > *`]: {
+    'border-top': '1px solid var(--cm-tooltip-border-color, #ccc)',
+    margin: '0 !important',
+    padding: '4px 8px',
+  },
+  [`& .${classNames.tooltip} > *:first-child`]: {
+    'border-top': 'none',
+  },
+
+  [`& .${classNames.tooltip} a`]: {
+    'text-decoration': 'none',
+    color: 'var(--cm-tooltip-link-color, initial)',
+  },
   [`& .${classNames.tooltip} a code`]: {
-    background: '#000000',
     padding: '1px 3px',
     'border-radius': '4px',
+    background: 'var(--cm-tooltip-link-code-color, none)',
   },
-  [`& .${classNames.tooltip}`]: {
-    padding: '0.5em',
+  [`& .${classNames.tooltip} code`]: {
+    'font-family': 'var(--cm-tooltip-code-font, inherit)',
   },
   [`& .${classNames.tooltip} pre`]: {
     'white-space': 'pre-wrap',
-    'font-size': '0.9em',
+    // 'font-size': '0.9em',
+    'font-family': 'var(--cm-tooltip-code-font, inherit)',
   },
 }
+
+export interface PluginStyleVariables {
+  codeFont: string
+  linkColor: string
+  linkCodeColor: string
+  borderColor: string
+}
+
+const newVariableStyles = (vars: PluginStyleVariables): StyleSpec => ({
+  [`&`]: {
+    '--cm-tooltip-code-font': vars.codeFont,
+    '--cm-tooltip-border-color': vars.borderColor,
+    '--cm-tooltip-link-color': vars.linkColor,
+    '--cm-tooltip-link-code-color': vars.linkCodeColor,
+  },
+})
 
 // Infer type as it isn't exported.
 type Mutable<T> = {
@@ -108,6 +147,11 @@ export interface SourceExtensionStyles {
    * Used to highlight code snippets in CodeLens and suggestion documentation.
    */
   highlightStyles?: TagStyle[]
+
+  /**
+   * Popup style variables
+   */
+  variables: PluginStyleVariables
 }
 
 /**
@@ -120,8 +164,9 @@ export const createPluginTheme = (opts?: SourceExtensionStyles): PluginTheme => 
     }
   }
 
+  const varStyles = newVariableStyles(opts.variables)
   const { styleSpec: highlightStyles, tagClasses } = buildHighlightClasses(opts.highlightStyles)
-  let styleSpec = { ...coreStyles, ...highlightStyles }
+  let styleSpec = { ...varStyles, ...coreStyles, ...highlightStyles }
   if (opts.styles) {
     styleSpec = { ...styleSpec, ...opts.styles }
   }
