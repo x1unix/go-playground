@@ -137,13 +137,50 @@ const packageNodeIndex = (nodes: SyntaxNode[]) => {
   return -1
 }
 
+const topLevelNodes = (source: string) => {
+  const tree = parser.parse(source)
+  const nodes: SyntaxNode[] = []
+  for (let node = tree.topNode.firstChild; node; node = node.nextSibling) {
+    nodes.push(node)
+  }
+
+  return {
+    tree,
+    nodes,
+  }
+}
+
+export const isWithinImportClause = (document: DocumentState, lineNumber: number) => {
+  const source = document.text.toString()
+  const { nodes } = topLevelNodes(source)
+  const pkgIndex = packageNodeIndex(nodes)
+  if (pkgIndex === -1) {
+    return false
+  }
+
+  for (let i = pkgIndex + 1; i < nodes.length; i++) {
+    const node = nodes[i]
+    if (commentNodes.has(node.type.name)) {
+      continue
+    }
+
+    if (node.type.name !== 'ImportDecl') {
+      break
+    }
+
+    const startLine = document.text.lineAt(node.from).number
+    const endLine = document.text.lineAt(node.to).number
+    if (lineNumber >= startLine && lineNumber <= endLine) {
+      return true
+    }
+  }
+
+  return false
+}
+
 export const buildImportContext = (document: DocumentState): ImportsContext => {
   const source = document.text.toString()
-  const tree = parser.parse(source)
-  const topNodes: SyntaxNode[] = []
-  for (let node = tree.topNode.firstChild; node; node = node.nextSibling) {
-    topNodes.push(node)
-  }
+  const { tree, nodes: topNodes } = topLevelNodes(source)
 
   const pkgIndex = packageNodeIndex(topNodes)
   if (pkgIndex === -1) {

@@ -1,5 +1,6 @@
 import {
   autocompletion,
+  completeAnyWord,
   snippet,
   type Completion,
   type CompletionContext,
@@ -123,7 +124,7 @@ const completionSource =
 
 export const newAutocompleteExtensions = ({ source, isCurrentPath, onStatus }: SourceExtensionArgs): Extension[] => {
   const completion = autocompletion({
-    override: [completionSource({ source, isCurrentPath, onStatus })],
+    override: [completionSource({ source, isCurrentPath, onStatus }), completeAnyWord],
   })
 
   const hover = hoverTooltip(async (view, pos) => {

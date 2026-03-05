@@ -74,4 +74,8 @@ Port hover and completion providers from Monaco-based editor to CodeMirror edito
 - [x] Implemented completion + hover provider logic.
 - [x] Integrated provider source into `Editor` and `CodeEditorContainer`.
 - [x] Ported parser tests and ran targeted checks.
+- [x] Mixed custom source with editor word completion fallback (`completeAnyWord`).
+- [x] Fixed literal query behavior (`os` now resolves package suggestions like Monaco flow).
+- [x] Restored auto-import edits for package member completions when package is not imported.
+- [x] Added source-level regression tests for `os` literal completion and missing import edit insertion.
 - [ ] Add conversion-focused tests for Monaco `additionalTextEdits` + snippet mapping.

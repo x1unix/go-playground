@@ -2,11 +2,18 @@ import type * as monaco from 'monaco-editor'
 
 import { Syntax, type DocumentState } from '../types/common'
 import type { LanguageWorker } from '~/workers/language'
-import type { HoverQuery, SuggestionContext, SuggestionQuery } from '~/workers/language/types'
+import {
+  ImportClauseType,
+  type HoverQuery,
+  type ImportsContext,
+  type SuggestionContext,
+  type SuggestionQuery,
+} from '~/workers/language/types'
 
 import { completionFromMonacoItem, hoverFromMonaco } from './converter'
 import { DocumentMetadataCache } from './cache'
 import { queryFromPosition } from './hover'
+import { isWithinImportClause } from './imports'
 import snippets from './snippets'
 import { parseExpression, type PackageQuery } from './symbols'
 import type {
@@ -20,10 +27,6 @@ import type {
 } from './types'
 import { wordRangeAtOffset } from './utils'
 
-const inlineImportRegex = /^import\s+([\w_|.]+\s)?"((\S+)?")?$/
-const importPackageRegex = /^\s+?([\w_|.]+\s)?"\S+"$/
-const importGroupRegex = /^import\s?\(\s?$/
-const emptyLineOrCommentRegex = /^\s+$|^\s?\/\//
 const SUGGESTIONS_DEBOUNCE_DELAY = 500
 
 const asyncDebounce = <TArgs extends unknown[], TResult>(fn: (...args: TArgs) => Promise<TResult>, delay: number) => {
@@ -66,6 +69,44 @@ const normalizeError = (err: unknown) => {
   }
 
   return new Error(String(err))
+}
+
+const importPackageTextEdit = (
+  importPath: string,
+  imports: ImportsContext,
+): monaco.editor.ISingleEditOperation[] | undefined => {
+  if (!imports.range || imports.allPaths?.has(importPath)) {
+    return undefined
+  }
+
+  switch (imports.blockType) {
+    case ImportClauseType.None: {
+      const text = `import "${importPath}"\n`
+      return [
+        {
+          text: imports.prependNewLine ? `\n${text}` : text,
+          range: imports.range,
+          forceMoveMarkers: true,
+        },
+      ]
+    }
+    case ImportClauseType.Single:
+    case ImportClauseType.Block: {
+      const importLines = (imports.blockPaths ?? [])
+        .concat(importPath)
+        .sort()
+        .map((value) => `\t"${value}"`)
+        .join('\n')
+
+      return [
+        {
+          text: `import (\n${importLines}\n)`,
+          range: imports.range,
+          forceMoveMarkers: true,
+        },
+      ]
+    }
+  }
 }
 
 export class GoAutocompleteSource implements EditorAutocompleteSource {
@@ -211,18 +252,19 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
       imports,
     }
 
+    const typedLiteral = 'value' in query ? (query.value ?? '') : ''
     const suggestionQuery: SuggestionQuery = isPackageQuery(query)
       ? {
           packageName: query.packageName,
-          value: query.value,
+          value: typedLiteral || undefined,
           context,
         }
       : {
-          value: query.value,
+          value: typedLiteral.charAt(0),
           context,
         }
 
-    const fallbackSuggestions = this.getFallbackSuggestions(suggestionQuery)
+    const fallbackSuggestions = this.getFallbackSuggestions(query)
 
     let results: monaco.languages.CompletionItem[]
     try {
@@ -234,18 +276,38 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
     }
 
     const suggestions = fallbackSuggestions.length ? fallbackSuggestions.concat(results) : results
-    if (!suggestions.length) {
+    const completionItems = suggestions.map((item) => {
+      const enriched = this.addMissingImportTextEdits(item, suggestionQuery, imports)
+      return completionFromMonacoItem(req.document.text, enriched, fallbackRange)
+    })
+
+    const filteredOptions = isPackageQuery(query)
+      ? completionItems
+      : completionItems.filter((item) => {
+          if (!query.value) {
+            return true
+          }
+
+          const label = item.filterText ?? item.label
+          return label.toLowerCase().startsWith(query.value.toLowerCase())
+        })
+
+    if (!filteredOptions.length) {
       return null
     }
 
     return {
       from: fallbackRange.from,
       to: fallbackRange.to,
-      options: suggestions.map((item) => completionFromMonacoItem(req.document.text, item, fallbackRange)),
+      options: filteredOptions,
     }
   }
 
-  private getFallbackSuggestions(query: SuggestionQuery): monaco.languages.CompletionItem[] {
+  private getFallbackSuggestions(query: ReturnType<typeof parseExpression>): monaco.languages.CompletionItem[] {
+    if (!query) {
+      return []
+    }
+
     if ('packageName' in query) {
       return []
     }
@@ -256,31 +318,41 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
 
   private isImportStatementRange(doc: DocumentState, pos: CursorPosition) {
     const meta = this.metadataCache.getMetadata(doc)
-    if (!meta.hasError && meta.totalRange) {
+    if (meta.totalRange) {
       const { startLineNumber: minLine, endLineNumber: maxLine } = meta.totalRange
       return pos.lineNumber >= minLine && pos.lineNumber <= maxLine
     }
 
-    const line = doc.text.line(pos.lineNumber).text
-    if (inlineImportRegex.test(line)) {
-      return true
+    return isWithinImportClause(doc, pos.lineNumber)
+  }
+
+  private addMissingImportTextEdits(
+    item: monaco.languages.CompletionItem,
+    query: SuggestionQuery,
+    imports: ImportsContext,
+  ): monaco.languages.CompletionItem {
+    if (!('packageName' in query)) {
+      return item
     }
 
-    for (let i = pos.lineNumber - 1; i > 0; i--) {
-      const row = doc.text.line(i).text
-
-      if (importPackageRegex.test(row) || importGroupRegex.test(row)) {
-        return true
-      }
-
-      if (emptyLineOrCommentRegex.test(row)) {
-        continue
-      }
-
-      return false
+    if (item.additionalTextEdits?.length) {
+      return item
     }
 
-    return false
+    const packagePath = (item as monaco.languages.CompletionItem & { packagePath?: string }).packagePath
+    if (!packagePath) {
+      return item
+    }
+
+    const edits = importPackageTextEdit(packagePath, imports)
+    if (!edits?.length) {
+      return item
+    }
+
+    return {
+      ...item,
+      additionalTextEdits: edits,
+    }
   }
 }
 
