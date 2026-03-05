@@ -176,9 +176,6 @@ export const CodeEditorContainer: React.FC = () => {
           dispatch(dispatchUpdateFile(path, text.toString()))
         })
       }}
-      onMount={(rem) => {
-        console.log('got remote', rem)
-      }}
       onEvent={(e) => {
         const action = mapEventToAction(e)
         if (action) {
