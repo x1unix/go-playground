@@ -128,8 +128,7 @@ export const completionFromMonacoItem = (
 }
 
 export const hoverFromMonaco = (hover: monaco.languages.Hover, doc: Text): HoverResult | null => {
-  const content = hover.contents.map(markedStringToString).filter((item) => item.length > 0)
-  if (!content.length || !hover.range) {
+  if (!hover.contents.length || !hover.range) {
     return null
   }
 
@@ -137,6 +136,6 @@ export const hoverFromMonaco = (hover: monaco.languages.Hover, doc: Text): Hover
   return {
     from,
     to,
-    contents: content,
+    contents: hover.contents,
   }
 }

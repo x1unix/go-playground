@@ -13,6 +13,8 @@ import type { CompletionItem, CompletionResult, EditorAutocompleteSource, HoverR
 import { LoadState } from '../types/events'
 import { docStateFromEditor } from '../utils'
 import { cursorFromOffset } from './utils'
+import { classNames } from './styles'
+import { MarkupRenderer } from './doc-renderer'
 
 interface SourceExtensionArgs {
   source: () => EditorAutocompleteSource | undefined
@@ -66,15 +68,17 @@ const toCompletionResult = (result: CompletionResult | null): CMCompletionResult
   }
 }
 
+const renderer = new MarkupRenderer()
 const toTooltip = ({ from, to, contents }: HoverResult): Tooltip => ({
   pos: from,
   end: to,
   above: true,
   create: () => {
     const dom = document.createElement('div')
-    dom.className = 'cm-gpg-hover'
-    dom.style.whiteSpace = 'pre-wrap'
-    dom.textContent = contents.join('\n\n')
+    dom.className = classNames.tooltip
+    renderer.renderContents(dom, contents)
+    // dom.style.whiteSpace = 'pre-wrap'
+    // dom.textContent = contents.join('\n\n')
 
     return { dom }
   },

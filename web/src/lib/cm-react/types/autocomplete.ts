@@ -32,10 +32,19 @@ export interface CompletionResult {
   options: CompletionItem[]
 }
 
+// Ported from monaco.IMarkdownString
+export interface IMarkdownString {
+  readonly value: string
+  readonly language?: string
+}
+
+type MarkedString = string | IMarkdownString
+export type HoverContent = IMarkdownString | MarkedString | MarkedString[]
+
 export interface HoverResult {
   from: number
   to: number
-  contents: string[]
+  contents: HoverContent
 }
 
 export interface CompletionRequest {
