@@ -139,9 +139,7 @@ describe('completionFromMonacoItem', () => {
         insertText: 'Baz',
         kind: 4,
         range: makeRange(1, 1, 1, 1),
-        additionalTextEdits: [
-          { range: makeRange(1, 1, 1, 4), text: null as any },
-        ],
+        additionalTextEdits: [{ range: makeRange(1, 1, 1, 4), text: null as any }],
       }
       const result = completionFromMonacoItem(doc, item, fallback)
       assert.equal(result.additionalTextEdits![0].insert, '')
@@ -153,9 +151,7 @@ describe('completionFromMonacoItem', () => {
         insertText: 'Qux',
         kind: 4,
         range: makeRange(1, 1, 1, 1),
-        additionalTextEdits: [
-          { range: undefined as any, text: 'dropped' },
-        ],
+        additionalTextEdits: [{ range: undefined as any, text: 'dropped' }],
       }
       const result = completionFromMonacoItem(doc, item, fallback)
       assert.isUndefined(result.additionalTextEdits)
