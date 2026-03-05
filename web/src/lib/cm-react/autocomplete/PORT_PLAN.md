@@ -10,6 +10,8 @@ Port hover and completion providers from Monaco-based editor to CodeMirror edito
 - `CodeEditorContainer` owns worker lifecycle and Redux notifications.
 - New provider logic lives in `web/src/lib/cm-react/autocomplete`.
 - Source interface should be editor-agnostic and based on `DocumentState` + cursor/offset context.
+- Monaco-to-CodeMirror completion conversion is done in the autocomplete source/provider layer, not in `Editor`.
+- `Editor` stays generic and consumes normalized CodeMirror-native completion/hover data.
 - Documentation rendering remains plain (no markdown rendering work in this step).
 
 ## Implementation Plan
