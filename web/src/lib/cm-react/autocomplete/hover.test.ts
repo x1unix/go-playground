@@ -38,4 +38,18 @@ describe('hover queryFromPosition', () => {
       to: source.indexOf('testing.T') + 'testing.T'.length,
     })
   })
+
+  test('resolves package member query in binary expression', () => {
+    const source = 'package main\nimport "math"\nfunc f(c circle) float64 {\n\treturn 2 * math.Pi * c.radius\n}'
+    const doc = newDoc(source)
+    const pos = source.indexOf('math.Pi') + 'math.P'.length
+
+    const query = queryFromPosition(doc, pos)
+    assert.deepEqual(query, {
+      packageName: 'math',
+      value: 'Pi',
+      from: source.indexOf('math.Pi'),
+      to: source.indexOf('math.Pi') + 'math.Pi'.length,
+    })
+  })
 })

@@ -1,4 +1,5 @@
 import { parser } from '@lezer/go'
+import type { SyntaxNode } from '@lezer/common'
 
 import type { DocumentState } from '../types/common'
 
@@ -12,6 +13,27 @@ export interface HoverQuery {
 const identifierNodes = new Set(['VariableName', 'FieldName', 'TypeName', 'Bool', 'Nil'])
 
 const isExported = (name: string) => name[0] === name[0]?.toUpperCase()
+
+const isIdentifierNode = (node: SyntaxNode) => node.type.name === 'VariableName' || node.type.name === 'TypeName'
+
+const rightMostIdentifier = (node: SyntaxNode | null): SyntaxNode | null => {
+  if (!node) {
+    return null
+  }
+
+  if (isIdentifierNode(node)) {
+    return node
+  }
+
+  for (let child = node.lastChild; child; child = child.prevSibling) {
+    const found = rightMostIdentifier(child)
+    if (found) {
+      return found
+    }
+  }
+
+  return null
+}
 
 const getNodeAtOffset = (source: string, offset: number) => {
   const tree = parser.parse(source)
@@ -61,7 +83,9 @@ export const queryFromPosition = (doc: DocumentState, offset: number): HoverQuer
     const isSelectorMember = node.type.name === 'FieldName' && selectorParent.type.name === 'SelectorExpr'
     const isQualifiedTypeMember = node.type.name === 'TypeName' && selectorParent.type.name === 'QualifiedType'
     if (isSelectorMember || isQualifiedTypeMember) {
-      const packageNode = selectorParent.getChild('VariableName')
+      const packageNode = isSelectorMember
+        ? rightMostIdentifier(selectorParent.getChild('.')?.prevSibling ?? null)
+        : selectorParent.getChild('VariableName')
       if (!packageNode) {
         return null
       }
