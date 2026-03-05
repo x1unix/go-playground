@@ -112,6 +112,13 @@ export interface PluginThemeOptions {
   highlightStyles?: TagStyle[]
 }
 
+export interface AutocompletePluginOptions {
+  /**
+   * Plugin styles and syntax highlighter.
+   */
+  theme?: PluginTheme
+}
+
 /**
  * Creates plugin theme.
  */

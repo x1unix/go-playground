@@ -3,6 +3,7 @@ import { EditorView } from '@codemirror/view'
 import { vscodeDarkInit, vscodeDarkStyle, vscodeLightInit } from '@uiw/codemirror-theme-vscode'
 
 import type { ColorScheme } from '../types/common'
+import type { PluginThemeOptions } from '../autocomplete/styles'
 
 // TODO: infer editor popup styles from state theme.
 export const popupHighlightStyles = vscodeDarkStyle
@@ -20,6 +21,13 @@ export const defaultFontFamily = [
 export const highlightClasses = {
   line: 'line--highlighted',
   gutter: 'gutter--highlighted', // unused atm, reserved when gutter highlight will be implemented.
+}
+
+/**
+ * Theming settings for the autocomplete plugin
+ */
+export const autocompletePluginOptions: PluginThemeOptions = {
+  highlightStyles: vscodeDarkStyle,
 }
 
 export const defaultThemeStyles = EditorView.theme({
