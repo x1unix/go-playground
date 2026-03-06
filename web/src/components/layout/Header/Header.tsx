@@ -201,7 +201,6 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
   private onSettingsClose(changes: SettingsChanges) {
     if (changes.monaco) {
       // Update monaco state if some of its settings were changed
-      console.log(changes.monaco)
       this.props.dispatch(newMonacoParamsChangeDispatcher(changes.monaco))
     }
 

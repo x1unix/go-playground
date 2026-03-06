@@ -19,6 +19,29 @@ export const coreStyles: StyleSpec = {
   '& .cm-tooltip': {
     'max-width': '65%',
   },
+  // Completion doc
+  [`& .${classNames.completionDoc} code`]: {
+    'font-family': 'var(--cm-tooltip-code-font)',
+  },
+  [`& .cm-tooltip.cm-completionInfo`]: {
+    border: '1px solid var(--cm-tooltip-border-color)',
+    padding: '0',
+  },
+  [`& .${classNames.completionDoc}`]: {
+    // Reset styles
+    'white-space': 'normal',
+    'max-height': '300px',
+    overflow: 'auto',
+    padding: '4px 5px',
+  },
+  [`& .${classNames.completionDoc} p:first-child`]: {
+    // Fix margin on first children
+    'margin-top': '0',
+  },
+  [`& .${classNames.completionDoc} p:last-child`]: {
+    // Fix margin on last children
+    'margin-bottom': '0',
+  },
   [`& .${classNames.completionDoc} code`]: {
     'font-family': 'var(--cm-tooltip-code-font)',
   },
@@ -27,6 +50,15 @@ export const coreStyles: StyleSpec = {
     // 'font-size': '0.9em',
     padding: '0.5em 0',
     'font-family': 'var(--cm-tooltip-code-font)',
+  },
+  [`& .${classNames.completionDoc} a`]: {
+    'text-decoration': 'none',
+    color: 'var(--cm-tooltip-link-color, initial)',
+  },
+  [`& .${classNames.completionDoc} a code`]: {
+    padding: '1px 3px',
+    'border-radius': '4px',
+    background: 'var(--cm-tooltip-link-code-color, none)',
   },
   [rootBlocksSelector()]: {
     margin: '8px 0',
