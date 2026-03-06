@@ -7,8 +7,12 @@
   overflow: hidden;
 }
 
-/* Colors for CodeMirror vim theming. */
+/* Colors for CodeMirror plugin theming. */
 /* See: ./extensions/themes.ts */
+
+.gpg-Editor {
+  --cm-comp-item-fg-active: #fff;
+}
 
 .gpg-Editor[data-theme='light'] {
   --vim-cursor-bg: #121111;
@@ -63,6 +67,26 @@
   --cm-tooltip-symbol-function: #b180d7;
   --cm-tooltip-symbol-interface: #75beff;
   --cm-tooltip-symbol-method: #b180d7;
+}
+
+/* Gutter base styles */
+.gpg-Editor :global(.cm-foldGutter .cm-gutterElement > span) {
+  font-family: codicon;
+  font-size: 110%;
+}
+
+@media (min-width: 481px) {
+  .gpg-Editor :global(.cm-gutter.cm-lineNumbers) {
+    /* Mimick vscode wide gutter, but only for tablets and desktops */
+    min-width: 3em;
+  }
+}
+
+/* Folds */
+.gpg-Editor :global(.cm-line .cm-foldPlaceholder) {
+  background: none;
+  border: none;
+  margin: .1em .2em 0;
 }
 
 /* TODO: move ligatures control to CM theme compartment */
@@ -229,6 +253,7 @@
   padding-right: 0.651em;
 }
 
+/* Completion item row - active */
 .gpg-Editor :global(.cm-tooltip-autocomplete.cm-tooltip > ul > li[aria-selected]) {
   background: var(--cm-comp-item-bg-active);
 }
@@ -237,7 +262,11 @@
 .gpg-Editor :global(.cm-tooltip-autocomplete.cm-tooltip .cm-completionIcon) {
   display: flex;
   align-items: center;
-  font-size: 1em;
+  font-size: 1.17em;
+}
+
+.gpg-Editor :global(.cm-tooltip-autocomplete.cm-tooltip li[aria-selected] .cm-completionIcon:after) {
+  color: var(--cm-comp-item-fg-active) !important;
 }
 
 /* Completion label (left) */
