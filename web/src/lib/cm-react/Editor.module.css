@@ -69,8 +69,22 @@
   --cm-tooltip-symbol-method: #b180d7;
 }
 
-.gpg-Editor :global(.cm-foldGutter .cm-gutterElement) {
+/* Gutter base styles */
+.gpg-Editor :global(.cm-foldGutter .cm-gutterElement > span) {
   font-family: codicon;
+  font-size: 110%;
+}
+
+.gpg-Editor :global(.cm-gutter.cm-lineNumbers) {
+  /* Mimick vscode wide gutter */
+  min-width: 3em;
+}
+
+/* Folds */
+.gpg-Editor :global(.cm-line .cm-foldPlaceholder) {
+  background: none;
+  border: none;
+  margin: .1em .2em 0;
 }
 
 /* TODO: move ligatures control to CM theme compartment */
