@@ -1,9 +1,14 @@
 {
-  "Go - WebAssembly": [
+  "Interface - Editor": [
     {
-      "issueId": 534,
-      "url": "pull/534",
-      "description": "Upgrade to Go 1.25"
+      "issueId": 547,
+      "url": "pull/547",
+      "description": "Migrate from Monaco editor to Codemirror"
+    },
+    {
+      "issueId": 551,
+      "url": "pull/551",
+      "description": "Support relative line numbers in Vim mode"
     }
   ]
 }
