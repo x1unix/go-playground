@@ -1,0 +1,136 @@
+import { go } from '@codemirror/lang-go'
+import { highlightTree, type Highlighter } from '@lezer/highlight'
+import markdownit from 'markdown-it'
+import * as monaco from 'monaco-editor'
+import type { DocContent, MarkedString } from '../types/autocomplete'
+
+import { classNames } from './styles'
+
+interface NormalizedContent {
+  isMarkdown: boolean
+  value: string
+}
+
+const CompletionItemKindMap = Object.fromEntries(
+  Object.entries(monaco.languages.CompletionItemKind)
+    .filter(([, value]) => typeof value === 'number')
+    .map(([key, value]) => [value, key]),
+) as Record<number, string>
+
+/**
+ * Maps CM completion type from LSP kind.
+ */
+export const getCompletionItemType = (k: monaco.languages.CompletionItemKind) => {
+  // Edge case - CM use 'namespace' instead of 'module'
+  if (k === monaco.languages.CompletionItemKind.Module) {
+    return 'namespace'
+  }
+
+  return CompletionItemKindMap[k]?.toLowerCase() ?? 'text'
+}
+
+const normalizeMarkupEntry = (entry: MarkedString): NormalizedContent => {
+  if (typeof entry === 'string') {
+    return {
+      isMarkdown: false,
+      value: entry,
+    }
+  }
+
+  if ('language' in entry) {
+    return {
+      isMarkdown: true,
+      value: '```' + entry.language + '\n' + entry.value + '\n```',
+    }
+  }
+
+  return {
+    isMarkdown: true,
+    value: entry.value,
+  }
+}
+
+const normalizeMarkupContent = (content: DocContent): NormalizedContent => {
+  if (Array.isArray(content)) {
+    return content.reduce(
+      (acc: NormalizedContent, item: MarkedString): NormalizedContent => {
+        const normalizedItem = normalizeMarkupEntry(item)
+        return {
+          isMarkdown: acc.isMarkdown || normalizedItem.isMarkdown,
+          value: acc.value ? acc.value + '\n\n' + normalizedItem.value : normalizedItem.value,
+        }
+      },
+      { isMarkdown: false, value: '' },
+    )
+  }
+
+  return normalizeMarkupEntry(content)
+}
+
+export class MarkupRenderer {
+  private readonly langGo = go().language
+  private readonly printer: markdownit
+  constructor(private readonly highlighter?: Highlighter) {
+    this.printer = markdownit({
+      html: false,
+      breaks: true,
+      highlight: (str: string, lang: string, _attrs: string) => {
+        return this.highlightSource(str, lang)
+      },
+    })
+  }
+
+  private highlightSource(src: string, lang: string) {
+    if (lang !== 'go' || !this.highlighter) {
+      return `<pre class="code">${src}</pre>`
+    }
+
+    const tree = this.langGo.parser.parse(src)
+
+    let buff = ''
+    let prevEnd = 0
+    highlightTree(tree, this.highlighter, (from, to, classes) => {
+      // Preserve untokenized spaces
+      if (prevEnd > 0) {
+        const spaces = src.slice(prevEnd, from)
+        if (spaces.length > 0) {
+          buff += `<span>${spaces}</span>`
+        }
+      }
+
+      prevEnd = to
+      buff += `<span class="${classes}">${src.slice(from, to)}</span>`
+    })
+
+    return `<div class="code-highlighted">${buff}</div>`
+  }
+
+  renderContents(dst: HTMLElement, contents: DocContent) {
+    const { isMarkdown, value } = normalizeMarkupContent(contents)
+    if (isMarkdown) {
+      dst.innerHTML = this.printer.render(value)
+      return
+    }
+
+    const pre = document.createElement('pre')
+    pre.innerText = value
+    pre.style.whiteSpace = 'pre-wrap'
+    dst.appendChild(pre)
+  }
+}
+
+export const renderCompletionDoc = (renderer: MarkupRenderer, doc?: DocContent) => {
+  if (!doc) {
+    return null
+  }
+
+  const node = document.createElement('div')
+  node.classList.add(classNames.completionDoc)
+  if (typeof doc === 'string') {
+    node.innerText = doc
+  } else {
+    renderer.renderContents(node, doc)
+  }
+
+  return node
+}

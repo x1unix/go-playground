@@ -1,12 +1,12 @@
 import type * as monaco from 'monaco-editor'
 import type { Text } from '@codemirror/state'
 
-import type { CompletionItem, CompletionTextEdit, HoverResult } from '../types/autocomplete'
+import type { CompletionItem, CompletionItemKind, CompletionTextEdit, HoverResult } from '../types/autocomplete'
 import { offsetFromLineColumn } from './utils'
 
 const SNIPPET_RULE = 4
 
-const completionTypeByKind: Record<number, string | undefined> = {
+const completionTypeByKind: Record<number, CompletionItemKind | undefined> = {
   0: 'method',
   1: 'function',
   2: 'constructor',
@@ -41,30 +41,6 @@ const isCompletionRangePair = (
   range: MonacoCompletionItem['range'],
 ): range is monaco.languages.CompletionItemRanges => {
   return typeof range === 'object' && range !== null && 'insert' in range && 'replace' in range
-}
-
-const markdownToString = (value?: string | monaco.IMarkdownString): string | undefined => {
-  if (!value) {
-    return undefined
-  }
-
-  if (typeof value === 'string') {
-    return value
-  }
-
-  return value.value
-}
-
-const markedStringToString = (item: string | monaco.IMarkdownString): string => {
-  if (typeof item === 'string') {
-    return item
-  }
-
-  if ('value' in item) {
-    return item.value
-  }
-
-  return ''
 }
 
 const labelToString = (label: MonacoCompletionItem['label']) => {
@@ -115,7 +91,7 @@ export const completionFromMonacoItem = (
   return {
     label: labelToString(item.label),
     detail: item.detail,
-    documentation: markdownToString(item.documentation),
+    documentation: item.documentation,
     type: completionTypeByKind[item.kind],
     sortText: item.sortText,
     filterText: item.filterText,
@@ -128,8 +104,7 @@ export const completionFromMonacoItem = (
 }
 
 export const hoverFromMonaco = (hover: monaco.languages.Hover, doc: Text): HoverResult | null => {
-  const content = hover.contents.map(markedStringToString).filter((item) => item.length > 0)
-  if (!content.length || !hover.range) {
+  if (!hover.contents.length || !hover.range) {
     return null
   }
 
@@ -137,6 +112,6 @@ export const hoverFromMonaco = (hover: monaco.languages.Hover, doc: Text): Hover
   return {
     from,
     to,
-    contents: content,
+    contents: hover.contents,
   }
 }

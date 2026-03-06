@@ -1,11 +1,9 @@
 import { Compartment } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
-import { vscodeDarkInit, vscodeDarkStyle, vscodeLightInit } from '@uiw/codemirror-theme-vscode'
+import { vscodeDarkInit, vscodeDarkStyle, vscodeLightInit, vscodeLightStyle } from '@uiw/codemirror-theme-vscode'
 
 import type { ColorScheme } from '../types/common'
-
-// TODO: infer editor popup styles from state theme.
-export const popupHighlightStyles = vscodeDarkStyle
+import { createPluginTheme, type PluginTheme } from '../autocomplete/styles'
 
 export const defaultFontFamily = [
   'Menlo',
@@ -21,6 +19,14 @@ export const highlightClasses = {
   line: 'line--highlighted',
   gutter: 'gutter--highlighted', // unused atm, reserved when gutter highlight will be implemented.
 }
+
+/**
+ * Returns a syntax highlighter theme for the autocomplete plugin.
+ *
+ * Colors and layout variables are defined in Editor.module.css via data-theme attribute.
+ */
+export const getAutocompletePluginTheme = (scheme: ColorScheme): PluginTheme =>
+  createPluginTheme(scheme === 'light' ? vscodeLightStyle : vscodeDarkStyle)
 
 export const defaultThemeStyles = EditorView.theme({
   // CSS magic to keep editor and scrollbar contained within parent boundaries.

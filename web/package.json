@@ -19,6 +19,7 @@
     "@eslint/js": "^9.0.0",
     "@fluentui/react": "^8.122.8",
     "@fluentui/react-icons": "^2.0.271",
+    "@lezer/highlight": "^1.2.3",
     "@monaco-editor/loader": "^1.4.0",
     "@monaco-editor/react": "^4.6.0",
     "@replit/codemirror-emacs": "^6.1.0",
@@ -67,6 +68,7 @@
     "file-saver": "^2.0.5",
     "globals": "^15.0.0",
     "jsdom": "^25.0.1",
+    "markdown-it": "^14.1.1",
     "monaco-editor": "^0.45.0",
     "monaco-vim": "^0.3.4",
     "prettier": "^3.2.4",
@@ -121,5 +123,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14"
   }
 }
