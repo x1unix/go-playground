@@ -112,6 +112,10 @@ export class Editor extends React.Component<EditorProps, State> {
       newBufferDiagnosticsRenderer(() => this.props.linter),
       ...basicSetup({
         completion: false,
+        foldGutter: {
+          openText: '\ueab4',
+          closedText: '\ueab6',
+        },
         lineNumbers: {
           formatNumber: (lineNo, state) => {
             const prefs = this.props.preferences

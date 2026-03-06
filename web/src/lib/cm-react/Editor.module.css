@@ -7,7 +7,7 @@
   overflow: hidden;
 }
 
-/* Colors for CodeMirror vim theming. */
+/* Colors for CodeMirror plugin theming. */
 /* See: ./extensions/themes.ts */
 
 .gpg-Editor[data-theme='light'] {
@@ -63,6 +63,10 @@
   --cm-tooltip-symbol-function: #b180d7;
   --cm-tooltip-symbol-interface: #75beff;
   --cm-tooltip-symbol-method: #b180d7;
+}
+
+.gpg-Editor :global(.cm-foldGutter .cm-gutterElement) {
+  font-family: codicon;
 }
 
 /* TODO: move ligatures control to CM theme compartment */
