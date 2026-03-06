@@ -75,9 +75,11 @@
   font-size: 110%;
 }
 
-.gpg-Editor :global(.cm-gutter.cm-lineNumbers) {
-  /* Mimick vscode wide gutter */
-  min-width: 3em;
+@media (min-width: 481px) {
+  .gpg-Editor :global(.cm-gutter.cm-lineNumbers) {
+    /* Mimick vscode wide gutter, but only for tablets and desktops */
+    min-width: 3em;
+  }
 }
 
 /* Folds */
