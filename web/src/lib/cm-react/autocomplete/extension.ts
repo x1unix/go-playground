@@ -13,7 +13,7 @@ import type { CompletionItem, CompletionResult, EditorAutocompleteSource, HoverR
 import { LoadState } from '../types/events'
 import { docStateFromEditor } from '../utils'
 import { cursorFromOffset } from './utils'
-import { classNames, coreStyles, type PluginTheme } from './styles'
+import { classNames, type PluginTheme } from './styles'
 import { MarkupRenderer, renderCompletionDoc } from './doc-renderer'
 
 export interface AutocompletePluginOptions {
@@ -30,8 +30,8 @@ const rendererFacet = Facet.define<MarkupRenderer, MarkupRenderer>({
 const autocompleteThemeCompartment = new Compartment()
 
 const makeAutocompleteThemeBundle = (theme?: PluginTheme): Extension[] => [
-  EditorView.theme(theme?.styleSpec ?? coreStyles),
   rendererFacet.of(new MarkupRenderer(theme?.highlighter)),
+  ...(theme?.styleSpec ? [EditorView.theme(theme.styleSpec)] : []),
 ]
 
 export const newAutocompleteThemeCompartment = (theme?: PluginTheme): Extension =>

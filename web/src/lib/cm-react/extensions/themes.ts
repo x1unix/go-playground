@@ -3,9 +3,7 @@ import { EditorView } from '@codemirror/view'
 import { vscodeDarkInit, vscodeDarkStyle, vscodeLightInit, vscodeLightStyle } from '@uiw/codemirror-theme-vscode'
 
 import type { ColorScheme } from '../types/common'
-import { createPluginTheme } from '../autocomplete/styles'
-
-export const popupHighlightStyles = vscodeDarkStyle
+import { createPluginTheme, type PluginTheme } from '../autocomplete/styles'
 
 export const defaultFontFamily = [
   'Menlo',
@@ -23,64 +21,12 @@ export const highlightClasses = {
 }
 
 /**
- * Returns a theme for the autocomplete plugin.
+ * Returns a syntax highlighter theme for the autocomplete plugin.
+ *
+ * Colors and layout variables are defined in Editor.module.css via data-theme attribute.
  */
-export const getAutocompletePluginTheme = (font: string, scheme: ColorScheme) => {
-  if (scheme === 'light') {
-    return createPluginTheme({
-      highlightStyles: vscodeLightStyle,
-      variables: {
-        codeFont: font,
-        hoverBorderRadius: '3px',
-        linkColor: '#006ab1',
-        linkCodeColor: 'rgba(220, 220, 220, 0.4)',
-        hoverBorderColor: 'rgba(200, 200, 200, 0.5)',
-        completionListBorderColor: '#c8c8c8',
-        completionListBackground: '#f3f3f3',
-        completionActiveBackground: '#0060c0',
-        symbolColors: {
-          default: '#616161',
-          class: '#d67e00',
-          constructor: '#652d90',
-          enum: '#d67e00',
-          enumMember: '#007acc',
-          event: '#d67e00',
-          field: '#007acc',
-          function: '#652d90',
-          interface: '#007acc',
-          method: '#652d90',
-          variable: '#007acc',
-        },
-      },
-    })
-  }
-
-  return createPluginTheme({
-    highlightStyles: vscodeDarkStyle,
-    variables: {
-      codeFont: font,
-      hoverBorderRadius: '3px',
-      linkColor: '#3794ff',
-      linkCodeColor: 'rgba(10, 10, 10, 0.4)',
-      hoverBorderColor: 'rgba(69, 69, 69, 0.5)',
-      completionListBorderColor: '#454545',
-      completionListBackground: '#252526',
-      completionActiveBackground: '#04395e',
-      symbolColors: {
-        default: '#ccc',
-        class: '#ee9d28',
-        constructor: '#b180d7',
-        enum: '#ee9d28',
-        enumMember: '#75beff',
-        field: '#75beff',
-        event: '#ee9d28',
-        function: '#b180d7',
-        interface: '#75beff',
-        method: '#b180d7',
-      },
-    },
-  })
-}
+export const getAutocompletePluginTheme = (scheme: ColorScheme): PluginTheme =>
+  createPluginTheme(scheme === 'light' ? vscodeLightStyle : vscodeDarkStyle)
 
 export const defaultThemeStyles = EditorView.theme({
   // CSS magic to keep editor and scrollbar contained within parent boundaries.

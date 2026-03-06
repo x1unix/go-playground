@@ -168,7 +168,7 @@ export const checkBufferStateChanges = ({ props, buffState }: CheckBufferStateCh
 
   if (!isInitialised || isThemeChanged(buffPrefs, currentPrefs)) {
     effects.push(updateThemeEffect(currentPrefs))
-    effects.push(updateAutocompleteThemeEffect(getAutocompletePluginTheme(currentPrefs.fontFamily, currentPrefs.colorScheme)))
+    effects.push(updateAutocompleteThemeEffect(getAutocompletePluginTheme(currentPrefs.colorScheme)))
     changes.preferences = currentPrefs
   }
 

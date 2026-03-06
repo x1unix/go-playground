@@ -14,12 +14,55 @@
   --vim-cursor-bg: #121111;
   --vim-cursor-fg: #ffffff;
   --vim-cursor-border: #121111;
+
+  /* Autocomplete / hover popup */
+  --cm-hover-border-color: rgba(200, 200, 200, 0.5);
+  --cm-hover-border-radius: 3px;
+  --cm-tooltip-link-color: #006ab1;
+  --cm-tooltip-link-code-color: rgba(220, 220, 220, 0.4);
+  --cm-comp-list-border-color: #c8c8c8;
+  --cm-comp-list-background: #f3f3f3;
+  --cm-comp-item-bg-active: #0060c0;
+
+  /* Completion icon colors */
+  --cm-tooltip-symbol-default: #616161;
+  --cm-tooltip-symbol-class: #d67e00;
+  --cm-tooltip-symbol-constructor: #652d90;
+  --cm-tooltip-symbol-enum: #d67e00;
+  --cm-tooltip-symbol-enumMember: #007acc;
+  --cm-tooltip-symbol-event: #d67e00;
+  --cm-tooltip-symbol-field: #007acc;
+  --cm-tooltip-symbol-function: #652d90;
+  --cm-tooltip-symbol-interface: #007acc;
+  --cm-tooltip-symbol-method: #652d90;
+  --cm-tooltip-symbol-variable: #007acc;
 }
 
 .gpg-Editor[data-theme='dark'] {
   --vim-cursor-bg: #aeafad;
   --vim-cursor-fg: #515052;
   --vim-cursor-border: #aeafad;
+
+  /* Autocomplete / hover popup */
+  --cm-hover-border-color: rgba(69, 69, 69, 0.5);
+  --cm-hover-border-radius: 3px;
+  --cm-tooltip-link-color: #3794ff;
+  --cm-tooltip-link-code-color: rgba(10, 10, 10, 0.4);
+  --cm-comp-list-border-color: #454545;
+  --cm-comp-list-background: #252526;
+  --cm-comp-item-bg-active: #04395e;
+
+  /* Completion icon colors */
+  --cm-tooltip-symbol-default: #ccc;
+  --cm-tooltip-symbol-class: #ee9d28;
+  --cm-tooltip-symbol-constructor: #b180d7;
+  --cm-tooltip-symbol-enum: #ee9d28;
+  --cm-tooltip-symbol-enumMember: #75beff;
+  --cm-tooltip-symbol-event: #ee9d28;
+  --cm-tooltip-symbol-field: #75beff;
+  --cm-tooltip-symbol-function: #b180d7;
+  --cm-tooltip-symbol-interface: #75beff;
+  --cm-tooltip-symbol-method: #b180d7;
 }
 
 /* TODO: move ligatures control to CM theme compartment */
@@ -31,12 +74,263 @@
   font-variant-ligatures: none;
 }
 
+/* Tooltip max width */
 .gpg-Editor :global(.cm-tooltip) {
   max-width: min(70ch, 80vw);
 }
 
-.gpg-Editor :global(.cm-tooltip .cm-gpg-hover) {
+/* Completion icons */
+.gpg-Editor :global(.cm-completionIcon:after) {
+  font-family: codicon;
+  color: var(--cm-tooltip-symbol-default);
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-method:after) {
+  content: '\ea8c';
+  color: var(--cm-tooltip-symbol-method, var(--cm-tooltip-symbol-default));
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-function:after) {
+  content: '\ea8c';
+  color: var(--cm-tooltip-symbol-function, var(--cm-tooltip-symbol-default));
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-field:after) {
+  content: '\eb5f';
+  color: var(--cm-tooltip-symbol-field, var(--cm-tooltip-symbol-default));
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-variable:after) {
+  content: '\ea88';
+  color: var(--cm-tooltip-symbol-variable, var(--cm-tooltip-symbol-default));
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-class:after) {
+  content: '\eb5b';
+  color: var(--cm-tooltip-symbol-class, var(--cm-tooltip-symbol-default));
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-struct:after) {
+  content: '\ea91';
+  color: var(--cm-tooltip-symbol-struct, var(--cm-tooltip-symbol-default));
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-interface:after) {
+  content: '\eb61';
+  color: var(--cm-tooltip-symbol-interface, var(--cm-tooltip-symbol-default));
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-module:after) {
+  content: '\ea8b';
+  color: var(--cm-tooltip-symbol-module, var(--cm-tooltip-symbol-default));
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-constant:after) {
+  content: '\eb5d';
+  color: var(--cm-tooltip-symbol-constant, var(--cm-tooltip-symbol-default));
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-snippet:after) {
+  content: '\eb66';
+  color: var(--cm-tooltip-symbol-snippet, var(--cm-tooltip-symbol-default));
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-property:after) {
+  content: '\eb65';
+  color: var(--cm-tooltip-symbol-property, var(--cm-tooltip-symbol-default));
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-event:after) {
+  content: '\ea86';
+  color: var(--cm-tooltip-symbol-event, var(--cm-tooltip-symbol-default));
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-operator:after) {
+  content: '\eb64';
+  color: var(--cm-tooltip-symbol-operator, var(--cm-tooltip-symbol-default));
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-enum:after) {
+  content: '\ea95';
+  color: var(--cm-tooltip-symbol-enum, var(--cm-tooltip-symbol-default));
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-enumMember:after) {
+  content: '\eb5e';
+  color: var(--cm-tooltip-symbol-enumMember, var(--cm-tooltip-symbol-default));
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-keyword:after) {
+  content: '\eb62';
+  color: var(--cm-tooltip-symbol-keyword, var(--cm-tooltip-symbol-default));
+}
+
+.gpg-Editor :global(.cm-completionIcon.cm-completionIcon-text:after) {
+  content: '\eb62';
+  font-size: inherit;
+  color: var(--cm-tooltip-symbol-text, var(--cm-tooltip-symbol-default));
+}
+
+/* Completion info panel (doc popup next to the list) */
+.gpg-Editor :global(.cm-tooltip.cm-completionInfo) {
+  border: 1px solid var(--cm-hover-border-color);
+  background: var(--cm-comp-list-background);
+  padding: 0;
+}
+
+/* Completion doc content */
+.gpg-Editor :global(.cm-lsp-completion-doc) {
+  white-space: normal;
+  max-height: 300px;
+  overflow: auto;
+  padding: 4px 5px;
+}
+
+.gpg-Editor :global(.cm-lsp-completion-doc p:first-child) {
+  margin-top: 0;
+}
+
+.gpg-Editor :global(.cm-lsp-completion-doc p:last-child) {
+  margin-bottom: 0;
+}
+
+.gpg-Editor :global(.cm-lsp-completion-doc code) {
+  font-family: var(--cm-tooltip-code-font);
+}
+
+.gpg-Editor :global(.cm-lsp-completion-doc pre) {
   white-space: pre-wrap;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
-  font-size: 12px;
+  padding: 0.5em 0;
+  font-family: var(--cm-tooltip-code-font);
+}
+
+.gpg-Editor :global(.cm-lsp-completion-doc a) {
+  text-decoration: none;
+  color: var(--cm-tooltip-link-color, initial);
+}
+
+.gpg-Editor :global(.cm-lsp-completion-doc a code) {
+  padding: 1px 3px;
+  border-radius: 4px;
+  background: var(--cm-tooltip-link-code-color, none);
+}
+
+/* Completion list */
+.gpg-Editor :global(.cm-tooltip-autocomplete.cm-tooltip) {
+  border: 1px solid var(--cm-comp-list-border-color);
+  background: var(--cm-comp-list-background);
+}
+
+/* Completion item row */
+.gpg-Editor :global(.cm-tooltip-autocomplete.cm-tooltip > ul > li) {
+  display: flex;
+  text-overflow: ellipsis;
+  justify-content: space-between;
+  padding-right: 0.651em;
+}
+
+.gpg-Editor :global(.cm-tooltip-autocomplete.cm-tooltip > ul > li[aria-selected]) {
+  background: var(--cm-comp-item-bg-active);
+}
+
+/* Completion icon cell */
+.gpg-Editor :global(.cm-tooltip-autocomplete.cm-tooltip .cm-completionIcon) {
+  display: flex;
+  align-items: center;
+  font-size: 1em;
+}
+
+/* Completion label (left) */
+.gpg-Editor :global(.cm-tooltip-autocomplete.cm-tooltip > ul > li > .cm-completionLabel) {
+  display: flex;
+  overflow: hidden;
+  font-family: var(--cm-tooltip-code-font);
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+/* Completion detail (right) */
+.gpg-Editor :global(.cm-tooltip-autocomplete.cm-tooltip > ul > li > .cm-completionDetail) {
+  display: flex;
+  overflow: hidden;
+  font-family: var(--cm-tooltip-code-font);
+  flex-shrink: 4;
+  max-width: 70%;
+  margin-left: 1.1em;
+  font-size: 0.85em;
+  font-style: normal;
+  align-items: center;
+  opacity: 0.7;
+  visibility: hidden;
+}
+
+.gpg-Editor :global(.cm-tooltip-autocomplete.cm-tooltip > ul > li[aria-selected] > .cm-completionDetail) {
+  visibility: visible;
+}
+
+/* Hover tooltip */
+.gpg-Editor :global(.cm-tooltip.cm-tooltip-hover) {
+  border-radius: var(--cm-hover-border-radius);
+  border: 1px solid var(--cm-hover-border-color);
+  background: var(--cm-comp-list-background);
+}
+
+/* Hover content sections */
+.gpg-Editor :global(.cm-lsp-tooltip) {
+  padding: 0;
+}
+
+.gpg-Editor :global(.cm-lsp-tooltip > *) {
+  border-top: 1px solid var(--cm-hover-border-color, #ccc);
+  margin: 0 !important;
+  padding: 4px 8px;
+}
+
+.gpg-Editor :global(.cm-lsp-tooltip > *:first-child) {
+  border-top: none;
+}
+
+/* Blocks inside hover/completion doc */
+.gpg-Editor :global(.cm-lsp-tooltip .code),
+.gpg-Editor :global(.cm-lsp-tooltip h1),
+.gpg-Editor :global(.cm-lsp-tooltip h2),
+.gpg-Editor :global(.cm-lsp-tooltip h3),
+.gpg-Editor :global(.cm-lsp-tooltip h4),
+.gpg-Editor :global(.cm-lsp-tooltip h5),
+.gpg-Editor :global(.cm-lsp-tooltip h6),
+.gpg-Editor :global(.cm-lsp-tooltip p),
+.gpg-Editor :global(.cm-lsp-tooltip ul) {
+  margin: 8px 0;
+}
+
+.gpg-Editor :global(.cm-lsp-tooltip .code:last-child),
+.gpg-Editor :global(.cm-lsp-tooltip h1:last-child),
+.gpg-Editor :global(.cm-lsp-tooltip h2:last-child),
+.gpg-Editor :global(.cm-lsp-tooltip h3:last-child),
+.gpg-Editor :global(.cm-lsp-tooltip h4:last-child),
+.gpg-Editor :global(.cm-lsp-tooltip h5:last-child),
+.gpg-Editor :global(.cm-lsp-tooltip h6:last-child),
+.gpg-Editor :global(.cm-lsp-tooltip p:last-child),
+.gpg-Editor :global(.cm-lsp-tooltip ul:last-child) {
+  margin-bottom: 0;
+}
+
+.gpg-Editor :global(.cm-lsp-tooltip a) {
+  text-decoration: none;
+  color: var(--cm-tooltip-link-color, initial);
+}
+
+.gpg-Editor :global(.cm-lsp-tooltip a code) {
+  padding: 1px 3px;
+  border-radius: 4px;
+  background: var(--cm-tooltip-link-code-color, none);
+}
+
+.gpg-Editor :global(.cm-lsp-tooltip code) {
+  font-family: var(--cm-tooltip-code-font, inherit);
+}
+
+.gpg-Editor :global(.cm-lsp-tooltip pre) {
+  white-space: pre-wrap;
+  font-family: var(--cm-tooltip-code-font, inherit);
 }

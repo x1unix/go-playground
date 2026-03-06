@@ -145,7 +145,7 @@ export class Editor extends React.Component<EditorProps, State> {
         },
       }),
       ...newAutocompleteExtensions({
-        theme: getAutocompletePluginTheme(this.currentFont(), this.currentColorScheme()),
+        theme: getAutocompletePluginTheme(this.currentColorScheme()),
         source: () => this.props.autocomplete,
         isCurrentPath: (path) => this.isCurrentPath(path),
         onStatus: (status, error) => this.emitCompletionSourceStatus(status, error),
@@ -482,6 +482,7 @@ export class Editor extends React.Component<EditorProps, State> {
         className={classes['gpg-Editor']}
         data-theme={this.currentColorScheme()}
         data-font-ligatures={!!prefs?.fontLigatures}
+        style={{ '--cm-tooltip-code-font': this.currentFont() } as React.CSSProperties}
       />
     )
   }
