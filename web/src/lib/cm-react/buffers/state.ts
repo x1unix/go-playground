@@ -5,7 +5,8 @@ import { updateIndentationEffect } from '../extensions/indentation'
 import { updateInputModeEffect } from '../extensions/input'
 import { readOnlyEffect } from '../extensions/readonly'
 import { syntaxFromFileName, updateSyntaxEffect } from '../extensions/syntax'
-import { updateThemeEffect } from '../extensions/themes'
+import { getAutocompletePluginTheme, updateThemeEffect } from '../extensions/themes'
+import { updateAutocompleteThemeEffect } from '../autocomplete/extension'
 import { defaultEditorPreferences, EditorPreferences, type EditorProps } from '../props'
 import { bufferStateField, updateBufferStateEffect } from './field'
 import { defaultBufferState, type BufferState } from './types'
@@ -167,6 +168,7 @@ export const checkBufferStateChanges = ({ props, buffState }: CheckBufferStateCh
 
   if (!isInitialised || isThemeChanged(buffPrefs, currentPrefs)) {
     effects.push(updateThemeEffect(currentPrefs))
+    effects.push(updateAutocompleteThemeEffect(getAutocompletePluginTheme(currentPrefs.fontFamily, currentPrefs.colorScheme)))
     changes.preferences = currentPrefs
   }
 

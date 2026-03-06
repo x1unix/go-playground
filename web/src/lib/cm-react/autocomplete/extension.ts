@@ -6,7 +6,7 @@ import {
   type CompletionContext,
   type CompletionResult as CMCompletionResult,
 } from '@codemirror/autocomplete'
-import { type Extension } from '@codemirror/state'
+import { Compartment, Facet, type Extension } from '@codemirror/state'
 import { EditorView, hoverTooltip, type Tooltip } from '@codemirror/view'
 
 import type { CompletionItem, CompletionResult, EditorAutocompleteSource, HoverResult } from '../types/autocomplete'
@@ -23,6 +23,23 @@ export interface AutocompletePluginOptions {
   theme?: PluginTheme
 }
 
+const rendererFacet = Facet.define<MarkupRenderer, MarkupRenderer>({
+  combine: (values) => values[0] ?? new MarkupRenderer(),
+})
+
+const autocompleteThemeCompartment = new Compartment()
+
+const makeAutocompleteThemeBundle = (theme?: PluginTheme): Extension[] => [
+  EditorView.theme(theme?.styleSpec ?? coreStyles),
+  rendererFacet.of(new MarkupRenderer(theme?.highlighter)),
+]
+
+export const newAutocompleteThemeCompartment = (theme?: PluginTheme): Extension =>
+  autocompleteThemeCompartment.of(makeAutocompleteThemeBundle(theme))
+
+export const updateAutocompleteThemeEffect = (theme: PluginTheme) =>
+  autocompleteThemeCompartment.reconfigure(makeAutocompleteThemeBundle(theme))
+
 const normalizeError = (err: unknown) => {
   if (err instanceof Error) {
     return err.message
@@ -32,17 +49,13 @@ const normalizeError = (err: unknown) => {
 }
 
 class AutocompletePlugin {
-  private readonly renderer: MarkupRenderer
+  constructor(private readonly opts: AutocompletePluginOptions) {}
 
-  constructor(private readonly opts: AutocompletePluginOptions) {
-    this.renderer = new MarkupRenderer(opts.theme?.highlighter)
-  }
-
-  private toCompletionOption(item: CompletionItem): Completion {
+  private toCompletionOption(item: CompletionItem, renderer: MarkupRenderer): Completion {
     return {
       label: item.label,
       detail: item.detail,
-      info: () => renderCompletionDoc(this.renderer, item.documentation),
+      info: () => renderCompletionDoc(renderer, item.documentation),
       type: item.type,
       apply: (view, completion, from, to) => {
         const replaceFrom = item.replaceFrom ?? from
@@ -66,7 +79,7 @@ class AutocompletePlugin {
     }
   }
 
-  private toCompletionResult(result: CompletionResult | null): CMCompletionResult | null {
+  private toCompletionResult(result: CompletionResult | null, renderer: MarkupRenderer): CMCompletionResult | null {
     if (!result || result.options.length === 0) {
       return null
     }
@@ -74,11 +87,11 @@ class AutocompletePlugin {
     return {
       from: result.from,
       to: result.to,
-      options: result.options.map((item) => this.toCompletionOption(item)),
+      options: result.options.map((item) => this.toCompletionOption(item, renderer)),
     }
   }
 
-  private toTooltip({ from, to, contents }: HoverResult): Tooltip {
+  private toTooltip({ from, to, contents }: HoverResult, renderer: MarkupRenderer): Tooltip {
     return {
       pos: from,
       end: to,
@@ -86,7 +99,7 @@ class AutocompletePlugin {
       create: () => {
         const dom = document.createElement('div')
         dom.className = classNames.tooltip
-        this.renderer.renderContents(dom, contents)
+        renderer.renderContents(dom, contents)
         return { dom }
       },
     }
@@ -123,7 +136,7 @@ class AutocompletePlugin {
           onStatus?.(LoadState.Loaded)
         }
 
-        return this.toCompletionResult(result)
+        return this.toCompletionResult(result, context.state.facet(rendererFacet))
       } catch (err) {
         if (!isCurrentPath(requestPath)) {
           return null
@@ -160,13 +173,13 @@ class AutocompletePlugin {
           return null
         }
 
-        return this.toTooltip(result)
+        return this.toTooltip(result, view.state.facet(rendererFacet))
       } catch (_) {
         return null
       }
     })
 
-    return [EditorView.theme(this.opts.theme?.styleSpec ?? coreStyles), completion, hover]
+    return [newAutocompleteThemeCompartment(this.opts.theme), completion, hover]
   }
 }
 
