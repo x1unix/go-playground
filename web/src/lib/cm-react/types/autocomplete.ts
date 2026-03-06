@@ -21,11 +21,38 @@ export interface CompletionTextEdit {
   insert: string
 }
 
+export type CompletionItemKind =
+  | 'method'
+  | 'function'
+  | 'constructor'
+  | 'field'
+  | 'variable'
+  | 'class'
+  | 'struct'
+  | 'interface'
+  | 'module'
+  | 'property'
+  | 'event'
+  | 'operator'
+  | 'unit'
+  | 'value'
+  | 'constant'
+  | 'enum'
+  | 'enumMember'
+  | 'keyword'
+  | 'text'
+  | 'color'
+  | 'file'
+  | 'reference'
+  | 'folder'
+  | 'typeParameter'
+  | 'snippet'
+
 export interface CompletionItem {
   label: string
   detail?: string
   documentation?: DocContent
-  type?: string
+  type?: CompletionItemKind
   sortText?: string
   filterText?: string
   insertText: string

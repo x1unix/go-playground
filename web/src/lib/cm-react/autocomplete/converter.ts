@@ -1,12 +1,12 @@
 import type * as monaco from 'monaco-editor'
 import type { Text } from '@codemirror/state'
 
-import type { CompletionItem, CompletionTextEdit, HoverResult } from '../types/autocomplete'
+import type { CompletionItem, CompletionItemKind, CompletionTextEdit, HoverResult } from '../types/autocomplete'
 import { offsetFromLineColumn } from './utils'
 
 const SNIPPET_RULE = 4
 
-const completionTypeByKind: Record<number, string | undefined> = {
+const completionTypeByKind: Record<number, CompletionItemKind | undefined> = {
   0: 'method',
   1: 'function',
   2: 'constructor',

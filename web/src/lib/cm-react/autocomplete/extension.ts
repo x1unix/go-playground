@@ -55,8 +55,8 @@ class AutocompletePlugin {
     return {
       label: item.label,
       detail: item.detail,
-      info: () => renderCompletionDoc(renderer, item.documentation),
       type: item.type,
+      info: () => renderCompletionDoc(renderer, item.documentation),
       apply: (view, completion, from, to) => {
         const replaceFrom = item.replaceFrom ?? from
         const replaceTo = item.replaceTo ?? to
