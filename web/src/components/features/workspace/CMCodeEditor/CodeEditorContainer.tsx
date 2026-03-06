@@ -191,3 +191,5 @@ export const CodeEditorContainer: React.FC = () => {
     />
   )
 }
+
+export default CodeEditorContainer

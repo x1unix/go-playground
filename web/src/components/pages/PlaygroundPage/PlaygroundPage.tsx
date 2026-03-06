@@ -10,7 +10,7 @@ import styles from './PlaygroundPage.module.css'
 import { SuspenseBoundary } from '~/components/elements/misc/SuspenseBoundary'
 import { LazyAnnouncementBanner } from '~/components/layout/AnnouncementBanner'
 
-const LazyPlaygroundContent = lazy(async () => await import('./PlaygroundContainer.tsx'))
+const LazyPlaygroundContent = lazy(async () => await import('./PlaygroundContainer'))
 
 interface PageParams {
   snippetID: string
