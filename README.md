@@ -7,7 +7,7 @@
 [![Goreportcard](https://goreportcard.com/badge/github.com/x1unix/go-playground)](https://goreportcard.com/report/github.com/x1unix/go-playground)
 [![StandWithUkraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
 
-Improved Go Playground powered by Monaco Editor and React - [https://goplay.tools/](https://goplay.tools)
+Improved Go Playground with syntax highlighting and autocompletion support - [https://goplay.tools/](https://goplay.tools)
 
 ![alt text](docs/img/demo.gif)
 
