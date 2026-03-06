@@ -7,8 +7,8 @@ const styles = {
   flex: '1 1 0%',
   overflow: 'hidden',
   display: 'flex',
-  'align-items': 'center',
-  'justify-content': 'center',
+  alignitems: 'center',
+  justifyContent: 'center',
 }
 
 const CodeEditorContainer = React.lazy(() => import('./CodeEditorContainer'))
