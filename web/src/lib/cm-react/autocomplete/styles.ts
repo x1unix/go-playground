@@ -35,6 +35,12 @@ export const coreStyles: StyleSpec = {
     'margin-bottom': '0',
   },
 
+  // Hover tooltip
+  ['& .cm-tooltip.cm-tooltip-hover']: {
+    borderRadius: 'var(--cm-tooltip-border-radius)',
+    border: '1px solid var(--cm-tooltip-border-color)',
+  },
+
   // Split hover sections with a border
   [`& .${classNames.tooltip}`]: {
     padding: '0',
@@ -72,12 +78,14 @@ export interface PluginStyleVariables {
   linkColor: string
   linkCodeColor: string
   borderColor: string
+  borderRadius: string
 }
 
 const newVariableStyles = (vars: PluginStyleVariables): StyleSpec => ({
   [`&`]: {
     '--cm-tooltip-code-font': vars.codeFont,
     '--cm-tooltip-border-color': vars.borderColor,
+    '--cm-tooltip-border-radius': vars.borderRadius,
     '--cm-tooltip-link-color': vars.linkColor,
     '--cm-tooltip-link-code-color': vars.linkCodeColor,
   },

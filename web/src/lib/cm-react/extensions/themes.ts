@@ -5,7 +5,6 @@ import { vscodeDarkInit, vscodeDarkStyle, vscodeLightInit, vscodeLightStyle } fr
 import type { ColorScheme } from '../types/common'
 import { createPluginTheme } from '../autocomplete/styles'
 
-// TODO: infer editor popup styles from state theme.
 export const popupHighlightStyles = vscodeDarkStyle
 
 export const defaultFontFamily = [
@@ -32,6 +31,7 @@ export const getAutocompletePluginTheme = (font: string, scheme: ColorScheme) =>
       highlightStyles: vscodeLightStyle,
       variables: {
         codeFont: font,
+        borderRadius: '3px',
         linkColor: '#006ab1',
         linkCodeColor: 'rgba(220, 220, 220, 0.4)',
         borderColor: 'rgba(200, 200, 200, 0.5)',
@@ -43,9 +43,10 @@ export const getAutocompletePluginTheme = (font: string, scheme: ColorScheme) =>
     highlightStyles: vscodeDarkStyle,
     variables: {
       codeFont: font,
-      linkColor: '#006ab1',
-      linkCodeColor: 'rgba(220, 220, 220, 0.4)',
-      borderColor: 'rgba(200, 200, 200, 0.5)',
+      borderRadius: '3px',
+      linkColor: '#3794ff',
+      linkCodeColor: 'rgba(10, 10, 10, 0.4)',
+      borderColor: 'rgba(69, 69, 69, 0.5)',
     },
   })
 }
