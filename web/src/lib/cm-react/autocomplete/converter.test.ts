@@ -278,16 +278,16 @@ describe('hoverFromMonaco', () => {
     assert.isNotNull(result)
     assert.equal(result!.from, 0)
     assert.equal(result!.to, 3)
-    assert.deepEqual(result!.contents, ['func Println(a ...any) (n int, err error)'])
+    assert.deepEqual(result!.contents, [{ value: 'func Println(a ...any) (n int, err error)' }])
   })
 
-  test('joins multiple non-empty markdown strings', () => {
+  test('passes through all markdown string contents including empty ones', () => {
     const hover: monaco.languages.Hover = {
       contents: [{ value: 'signature' }, { value: 'documentation' }, { value: '' }],
       range: makeRange(1, 1, 1, 4),
     }
     const result = hoverFromMonaco(hover, doc)
-    assert.deepEqual(result!.contents, ['signature', 'documentation'])
+    assert.deepEqual(result!.contents, [{ value: 'signature' }, { value: 'documentation' }, { value: '' }])
   })
 
   test('accepts plain string contents', () => {
@@ -299,12 +299,12 @@ describe('hoverFromMonaco', () => {
     assert.deepEqual(result!.contents, ['plain string'])
   })
 
-  test('returns null when all contents are empty', () => {
+  test('returns non-null when contents have empty values', () => {
     const hover: monaco.languages.Hover = {
       contents: [{ value: '' }, { value: '' }],
       range: makeRange(1, 1, 1, 4),
     }
-    assert.isNull(hoverFromMonaco(hover, doc))
+    assert.isNotNull(hoverFromMonaco(hover, doc))
   })
 
   test('returns null when range is absent', () => {
