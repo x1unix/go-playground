@@ -1,7 +1,6 @@
 import { go } from '@codemirror/lang-go'
 import { highlightTree, type Highlighter } from '@lezer/highlight'
 import markdownit from 'markdown-it'
-import * as monaco from 'monaco-editor'
 import type { DocContent, MarkedString } from '../types/autocomplete'
 
 import { classNames } from './styles'
@@ -9,24 +8,6 @@ import { classNames } from './styles'
 interface NormalizedContent {
   isMarkdown: boolean
   value: string
-}
-
-const CompletionItemKindMap = Object.fromEntries(
-  Object.entries(monaco.languages.CompletionItemKind)
-    .filter(([, value]) => typeof value === 'number')
-    .map(([key, value]) => [value, key]),
-) as Record<number, string>
-
-/**
- * Maps CM completion type from LSP kind.
- */
-export const getCompletionItemType = (k: monaco.languages.CompletionItemKind) => {
-  // Edge case - CM use 'namespace' instead of 'module'
-  if (k === monaco.languages.CompletionItemKind.Module) {
-    return 'namespace'
-  }
-
-  return CompletionItemKindMap[k]?.toLowerCase() ?? 'text'
 }
 
 const normalizeMarkupEntry = (entry: MarkedString): NormalizedContent => {
