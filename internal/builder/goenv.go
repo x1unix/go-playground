@@ -22,6 +22,7 @@ func GOROOT() (string, error) {
 }
 
 func newGoToolCommand(ctx context.Context, args ...string) *exec.Cmd {
+	fmt.Println("-----args ", args)
 	cmd := exec.CommandContext(ctx, "go", args...)
 	cmd.Env = os.Environ()
 	return cmd

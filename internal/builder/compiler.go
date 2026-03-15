@@ -87,16 +87,29 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Resu
 	if err != nil {
 		return nil, err
 	}
+	s.log.Debug("detected project info", zap.Any("projInfo", projInfo))
+	s.log.Debug("projectType", zap.String("projectType", func() string {
+		switch projInfo.projectType {
+		case projectTypeProgram:
+			return "program"
+		case projectTypeTest:
+			return "test"
+		default:
+			return "unknown"
+		}
+	}()))
 
 	// Go module is required to build project
 	if _, ok := files["go.mod"]; !ok {
 		files["go.mod"] = generateGoMod(defaultGoModName)
 	}
+	s.log.Debug("building source", zap.Any("files", files))
 
 	aid, err := storage.GetArtifactID(files)
 	if err != nil {
 		return nil, err
 	}
+	s.log.Debug("calculated artifact id", zap.Stringer("artifactID", aid))
 
 	result := &Result{
 		FileName:     aid.Ext(storage.ExtWasm),
@@ -104,20 +117,22 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Resu
 		HasBenchmark: projInfo.hasBenchmark,
 		HasFuzz:      projInfo.hasFuzz,
 	}
+	s.log.Debug("result for artifact", zap.Any("result", result))
 
-	isCached, err := s.storage.HasItem(aid)
-	if err != nil {
-		s.log.Error("failed to check cache", zap.Stringer("artifact", aid), zap.Error(err))
-		return nil, err
-	}
+	// isCached, err := s.storage.HasItem(aid)
+	// if err != nil {
+	// 	s.log.Error("failed to check cache", zap.Stringer("artifact", aid), zap.Error(err))
+	// 	return nil, err
+	// }
 
-	if isCached {
-		// Just return precompiled result if data is cached already
-		s.log.Debug("build cached, returning cached file", zap.Stringer("artifact", aid))
-		return result, nil
-	}
+	// if isCached {
+	// 	// Just return precompiled result if data is cached already
+	// 	s.log.Debug("build cached, returning cached file", zap.Stringer("artifact", aid))
+	// 	return result, nil
+	// }
 
 	workspace, err := s.storage.CreateWorkspace(aid, files)
+	s.log.Debug("created workspace", zap.Any("workspace", workspace))
 	if err != nil {
 		if errors.Is(err, syscall.ENOSPC) {
 			// Immediately schedule cleanup job!
@@ -137,7 +152,7 @@ func (s BuildService) buildSource(ctx context.Context, projInfo projectInfo, wor
 	}
 
 	if projInfo.projectType == projectTypeProgram {
-		return s.runGoTool(ctx, workspace.WorkDir, "build", "-o", workspace.BinaryPath, ".")
+		return s.runGoTool(ctx, workspace.WorkDir, "build", "-o", workspace.BinaryPath, "-gcflags=-m -+", ".")
 	}
 
 	args := []string{"test"}
@@ -166,15 +181,14 @@ func (s BuildService) handleNoSpaceLeft() {
 }
 
 func (s BuildService) runGoTool(ctx context.Context, workDir string, args ...string) error {
+	s.log.Debug("running go tool", zap.Strings("args", args))
 	cmd := newGoToolCommand(ctx, args...)
 	cmd.Dir = workDir
 	cmd.Env = s.getEnvironmentVariables()
 	buff := &bytes.Buffer{}
 	cmd.Stderr = buff
 
-	s.log.Debug(
-		"starting go command", zap.Strings("command", cmd.Args), zap.Strings("env", cmd.Env),
-	)
+	s.log.Debug("starting go command", zap.Any("command", cmd))
 
 	if err := s.cmdRunner.RunCommand(cmd); err != nil {
 		s.log.Debug(
@@ -184,6 +198,7 @@ func (s BuildService) runGoTool(ctx context.Context, workDir string, args ...str
 
 		return formatBuildError(ctx, err, buff)
 	}
+	s.log.Debug("cmd.Stderr", zap.Stringer("stderr", buff))
 
 	return nil
 }

@@ -148,6 +148,8 @@ func (h *APIv2Handler) HandleFormat(w http.ResponseWriter, r *http.Request) erro
 func (h *APIv2Handler) HandleRun(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 
+	h.logger.Debug("handling run request")
+	h.logger.Debug("parsing run parameters from query", zap.String("query", r.URL.RawQuery))
 	params, err := RunParamsFromQuery(r.URL.Query())
 	if err != nil {
 		return NewBadRequestError(err)
@@ -158,6 +160,7 @@ func (h *APIv2Handler) HandleRun(w http.ResponseWriter, r *http.Request) error {
 		return NewBadRequestError(err)
 	}
 
+	h.logger.Debug("evaluating snippet", zap.String("snippet", string(snippet)))
 	res, err := h.cfg.Client.Evaluate(ctx, goplay.CompileRequest{
 		Version: goplay.DefaultVersion,
 		WithVet: params.Vet,
@@ -190,11 +193,14 @@ func (h *APIv2Handler) HandleCompile(w http.ResponseWriter, r *http.Request) err
 		return NewHTTPError(http.StatusTooManyRequests, err)
 	}
 
+	h.logger.Debug("handling compile request")
+	h.logger.Debug("parsing compile parameters from query", zap.Any("query", r))
 	files, err := buildFilesFromRequest(r)
 	if err != nil {
 		return err
 	}
 
+	h.logger.Debug("built files", zap.Any("files", files))
 	result, err := h.cfg.Builder.Build(ctx, files)
 	if err != nil {
 		if builder.IsBuildError(err) || errors.Is(err, context.Canceled) {
@@ -203,6 +209,7 @@ func (h *APIv2Handler) HandleCompile(w http.ResponseWriter, r *http.Request) err
 
 		return err
 	}
+	h.logger.Debug("build result", zap.Any("result", result))
 
 	WriteJSON(w, BuildResponseV2{
 		FileName:     result.FileName,

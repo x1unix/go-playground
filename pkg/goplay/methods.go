@@ -60,6 +60,7 @@ func (c *Client) GoImports(ctx context.Context, src []byte, backend Backend) (*F
 
 // Evaluate runs code in goplayground and returns response
 func (c *Client) Evaluate(ctx context.Context, req CompileRequest, backend string) (*CompileResponse, error) {
+	print("evaluating snippet with backend ", backend)
 	dest := new(CompileResponse)
 
 	form := req.URLValues()
