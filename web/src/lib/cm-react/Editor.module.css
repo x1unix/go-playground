@@ -107,13 +107,14 @@
 }
 
 /* Completion icons */
+.gpg-Editor :global(.cm-completionIcon) {
+  padding-right: var(--cm-comp-item-icon-spacing);
+  opacity: 1;
+}
+
 .gpg-Editor :global(.cm-completionIcon:after) {
   font-family: codicon;
   color: var(--cm-tooltip-symbol-default);
-}
-
-.gpg-Editor :global(.cm-completionIcon) {
-  padding-right: var(--cm-comp-item-icon-spacing);
 }
 
 .gpg-Editor :global(.cm-completionIcon.cm-completionIcon-method:after) {
@@ -257,7 +258,7 @@
   display: flex;
   text-overflow: ellipsis;
   justify-content: space-between;
-  padding: 0 0.651em 0 0.3em;
+  padding: 0 0.651em 0 0.2em;
 }
 
 /* Completion item row - active */
