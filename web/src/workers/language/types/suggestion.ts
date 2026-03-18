@@ -29,6 +29,11 @@ export interface ImportsContext {
   allPaths?: Set<string>
 
   /**
+   * Map of named import aliases to destination import paths.
+   */
+  importAliases?: Map<string, string>
+
+  /**
    * Start and end line of area containing all imports.
    *
    * This area will be monitored for changes to update document imports cache.

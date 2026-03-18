@@ -52,4 +52,9 @@ export class DocumentMetadataCache {
     this.cache.set(doc.path, context)
     return context
   }
+
+  resolveImportAlias(doc: DocumentState, value: string): string {
+    const metadata = this.getMetadata(doc)
+    return metadata.importAliases?.get(value) ?? value
+  }
 }

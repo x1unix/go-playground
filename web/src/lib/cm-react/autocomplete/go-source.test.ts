@@ -33,6 +33,13 @@ const completeAtOffset = async (
   })
 }
 
+const hoverAtOffset = async (source: GoAutocompleteSource, doc: DocumentState, offset: number) => {
+  return await source.hover({
+    document: doc,
+    cursor: cursorFromOffset(doc.text, offset),
+  })
+}
+
 describe('GoAutocompleteSource', () => {
   test('keeps package suggestion for full literal prefix', async () => {
     const worker = {
@@ -101,5 +108,80 @@ describe('GoAutocompleteSource', () => {
     assert.equal(result?.options[0]?.label, 'Environ')
     assert.isDefined(result?.options[0]?.additionalTextEdits)
     assert.match(result?.options[0]?.additionalTextEdits?.[0]?.insert ?? '', /import\s+"os"/)
+  })
+
+  test('resolves import aliases for member completion query', async () => {
+    let capturedQuery: any
+
+    const worker = {
+      isWarmUp: async () => true,
+      getSymbolSuggestions: async (query: any) => {
+        capturedQuery = query
+        return [
+          {
+            label: 'StdEncoding',
+            kind: 1,
+            insertText: 'StdEncoding',
+            detail: 'var StdEncoding *Encoding',
+            range: stubRange,
+          },
+        ] as monaco.languages.CompletionItem[]
+      },
+      getImportSuggestions: async () => [] as monaco.languages.CompletionItem[],
+      getBuiltinNames: async () => [] as string[],
+      getHoverValue: async () => null,
+    } as any
+
+    const source = new GoAutocompleteSource(worker)
+    const doc = newDocument(
+      ['package main', 'import (', '\tb64 "encoding/base64"', ')', '', 'func main() {', '\tb64.St', '}', ''].join('\n'),
+    )
+    const offset = doc.text.toString().indexOf('b64.St') + 'b64.St'.length
+
+    await completeAtOffset(source, doc, offset)
+
+    assert.isNotNull(capturedQuery)
+    assert.equal(capturedQuery.packageName, 'encoding/base64')
+  })
+
+  test('resolves import aliases for hover query', async () => {
+    let capturedQuery: any
+
+    const worker = {
+      isWarmUp: async () => true,
+      getSymbolSuggestions: async () => [] as monaco.languages.CompletionItem[],
+      getImportSuggestions: async () => [] as monaco.languages.CompletionItem[],
+      getBuiltinNames: async () => [] as string[],
+      getHoverValue: async (query: any) => {
+        capturedQuery = query
+        return {
+          contents: [],
+          range: stubRange,
+        }
+      },
+    } as any
+
+    const source = new GoAutocompleteSource(worker)
+    const doc = newDocument(
+      [
+        'package main',
+        'import (',
+        '\tb64 "encoding/base64"',
+        ')',
+        '',
+        'func main() {',
+        '\tsEnc := b64.StdEncoding.EncodeToString([]byte("abc"))',
+        '\t_ = sEnc',
+        '}',
+        '',
+      ].join('\n'),
+    )
+    const offset = doc.text.toString().indexOf('StdEncoding') + 1
+
+    await hoverAtOffset(source, doc, offset)
+
+    assert.isNotNull(capturedQuery)
+    assert.equal(capturedQuery.packageName, 'encoding/base64')
+    assert.equal(capturedQuery.value, 'StdEncoding')
   })
 })
