@@ -224,7 +224,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/autocomplete@npm:^6.0.0, @codemirror/autocomplete@npm:^6.20.0, @codemirror/autocomplete@npm:^6.7.1":
+"@codemirror/autocomplete@npm:^6.0.0, @codemirror/autocomplete@npm:^6.7.1":
   version: 6.20.0
   resolution: "@codemirror/autocomplete@npm:6.20.0"
   dependencies:
@@ -236,15 +236,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/commands@npm:^6.10.2":
-  version: 6.10.2
-  resolution: "@codemirror/commands@npm:6.10.2"
+"@codemirror/autocomplete@npm:^6.20.1":
+  version: 6.20.1
+  resolution: "@codemirror/autocomplete@npm:6.20.1"
   dependencies:
     "@codemirror/language": "npm:^6.0.0"
-    "@codemirror/state": "npm:^6.4.0"
+    "@codemirror/state": "npm:^6.0.0"
+    "@codemirror/view": "npm:^6.17.0"
+    "@lezer/common": "npm:^1.0.0"
+  checksum: 10c0/ec3ecdd8098778c0764827ffcb6252edc763de3500314ad6b36d77bd09f73c03cb9a95b952b2b928354e1c83f2ae1bfef92b406eae40f94b47104b51bd508b35
+  languageName: node
+  linkType: hard
+
+"@codemirror/commands@npm:^6.10.3":
+  version: 6.10.3
+  resolution: "@codemirror/commands@npm:6.10.3"
+  dependencies:
+    "@codemirror/language": "npm:^6.0.0"
+    "@codemirror/state": "npm:^6.6.0"
     "@codemirror/view": "npm:^6.27.0"
     "@lezer/common": "npm:^1.1.0"
-  checksum: 10c0/b7b99083f518f022f2a27095f240c2caae1d456852b58a7e33d35061418f18aeb5cc2ff2f888bda19d4dca78d89809c7d25614924e158f40208e22deef854f07
+  checksum: 10c0/43db9eb5a2aeb09c9714e107a3a4960d16b56879b5dbdbd382a2b0a12bb79cd46c70ff933cea763aeb9b9d218d21e8faa6989d9bd247dfd949f6c373f6847261
   languageName: node
   linkType: hard
 
@@ -331,7 +343,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/language@npm:^6.0.0, @codemirror/language@npm:^6.12.1, @codemirror/language@npm:^6.3.0, @codemirror/language@npm:^6.4.0, @codemirror/language@npm:^6.6.0":
+"@codemirror/language@npm:^6.0.0, @codemirror/language@npm:^6.3.0, @codemirror/language@npm:^6.4.0, @codemirror/language@npm:^6.6.0":
   version: 6.12.1
   resolution: "@codemirror/language@npm:6.12.1"
   dependencies:
@@ -345,7 +357,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lint@npm:^6.0.0, @codemirror/lint@npm:^6.9.4":
+"@codemirror/language@npm:^6.12.2":
+  version: 6.12.2
+  resolution: "@codemirror/language@npm:6.12.2"
+  dependencies:
+    "@codemirror/state": "npm:^6.0.0"
+    "@codemirror/view": "npm:^6.23.0"
+    "@lezer/common": "npm:^1.5.0"
+    "@lezer/highlight": "npm:^1.0.0"
+    "@lezer/lr": "npm:^1.0.0"
+    style-mod: "npm:^4.0.0"
+  checksum: 10c0/7a167eca996970f08a58b864b3ec37246c152c37cb4a31dcf13d6154232b968c45e0e17296050784ecc279100c2b40313f26681164d6628f6a6e9b8927ae58a7
+  languageName: node
+  linkType: hard
+
+"@codemirror/lint@npm:^6.0.0":
   version: 6.9.4
   resolution: "@codemirror/lint@npm:6.9.4"
   dependencies:
@@ -353,6 +379,17 @@ __metadata:
     "@codemirror/view": "npm:^6.35.0"
     crelt: "npm:^1.0.5"
   checksum: 10c0/ae11d4d61250010732b10e4d392bd987c78afbc06ea4ccc351b57050bb5ffc74a866e5efdd7b05684d899330d4913c81b88fb7b4a0ff9762f689722ec889c7aa
+  languageName: node
+  linkType: hard
+
+"@codemirror/lint@npm:^6.9.5":
+  version: 6.9.5
+  resolution: "@codemirror/lint@npm:6.9.5"
+  dependencies:
+    "@codemirror/state": "npm:^6.0.0"
+    "@codemirror/view": "npm:^6.35.0"
+    crelt: "npm:^1.0.5"
+  checksum: 10c0/74fb810ffe491cfb4f1d30cd97560f4d4c5e598e34d4e3814989750ba82de9c921df6afb2b25a9972364e9beb38512a80db940d98d648cd136e991ffa21b85fd
   languageName: node
   linkType: hard
 
@@ -367,7 +404,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/state@npm:^6.0.0, @codemirror/state@npm:^6.4.0, @codemirror/state@npm:^6.5.0, @codemirror/state@npm:^6.5.4":
+"@codemirror/state@npm:^6.0.0, @codemirror/state@npm:^6.5.0":
   version: 6.5.4
   resolution: "@codemirror/state@npm:6.5.4"
   dependencies:
@@ -376,7 +413,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/view@npm:^6.0.0, @codemirror/view@npm:^6.17.0, @codemirror/view@npm:^6.23.0, @codemirror/view@npm:^6.27.0, @codemirror/view@npm:^6.35.0, @codemirror/view@npm:^6.37.0, @codemirror/view@npm:^6.39.14":
+"@codemirror/state@npm:^6.6.0":
+  version: 6.6.0
+  resolution: "@codemirror/state@npm:6.6.0"
+  dependencies:
+    "@marijn/find-cluster-break": "npm:^1.0.0"
+  checksum: 10c0/4e5d6ddd28fc642e8d749fe80a7dd278afd547e4d93c562eaab6f23bdf25bb12a94226db3efab6321d458c531eb6d357184809f3704aee419fe3230d53f16e24
+  languageName: node
+  linkType: hard
+
+"@codemirror/view@npm:^6.0.0, @codemirror/view@npm:^6.17.0, @codemirror/view@npm:^6.23.0, @codemirror/view@npm:^6.27.0, @codemirror/view@npm:^6.35.0, @codemirror/view@npm:^6.37.0":
   version: 6.39.14
   resolution: "@codemirror/view@npm:6.39.14"
   dependencies:
@@ -385,6 +431,18 @@ __metadata:
     style-mod: "npm:^4.1.0"
     w3c-keyname: "npm:^2.2.4"
   checksum: 10c0/03aaa025f9c70ce4b7a65365a84f19801a171b71391019a5d91604d3a42c8942791d3b66ebeb256d1d0aabb876f5365617d1eac9e1b3204c3686eb7408a0aa67
+  languageName: node
+  linkType: hard
+
+"@codemirror/view@npm:^6.40.0":
+  version: 6.40.0
+  resolution: "@codemirror/view@npm:6.40.0"
+  dependencies:
+    "@codemirror/state": "npm:^6.6.0"
+    crelt: "npm:^1.0.6"
+    style-mod: "npm:^4.1.0"
+    w3c-keyname: "npm:^2.2.4"
+  checksum: 10c0/2e73812f1d961f967d7863871e83345b398546a370da5cebadb4bc8c9522e7fd150a84e99e90e1133b3f294f8e20b5c92751bbf976e165a7b45077aafa4edcdd
   languageName: node
   linkType: hard
 
@@ -738,31 +796,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fluentui/font-icons-mdl2@npm:^8.5.70":
-  version: 8.5.70
-  resolution: "@fluentui/font-icons-mdl2@npm:8.5.70"
+"@fluentui/font-icons-mdl2@npm:^8.5.72":
+  version: 8.5.72
+  resolution: "@fluentui/font-icons-mdl2@npm:8.5.72"
   dependencies:
     "@fluentui/set-version": "npm:^8.2.24"
-    "@fluentui/style-utilities": "npm:^8.13.6"
+    "@fluentui/style-utilities": "npm:^8.15.0"
     "@fluentui/utilities": "npm:^8.17.2"
     tslib: "npm:^2.1.0"
-  checksum: 10c0/71ef169fab22a9a14051e7570544942b19c94dfe85ae881659e7939e1fcf0180f87e52ad68f06c62547a894466fe2f9136d526d5e2138434f56f4731909e2c26
+  checksum: 10c0/56a8e45660d96dde6179ed55941d626873a42f3814a1935cac0710bececd14b4ba16da12588d0626e76584b39ce4f7318a304497cf3ed3296e0aba0e29401e4e
   languageName: node
   linkType: hard
 
-"@fluentui/foundation-legacy@npm:^8.6.3":
-  version: 8.6.3
-  resolution: "@fluentui/foundation-legacy@npm:8.6.3"
+"@fluentui/foundation-legacy@npm:^8.6.5":
+  version: 8.6.5
+  resolution: "@fluentui/foundation-legacy@npm:8.6.5"
   dependencies:
     "@fluentui/merge-styles": "npm:^8.6.14"
     "@fluentui/set-version": "npm:^8.2.24"
-    "@fluentui/style-utilities": "npm:^8.13.6"
+    "@fluentui/style-utilities": "npm:^8.15.0"
     "@fluentui/utilities": "npm:^8.17.2"
     tslib: "npm:^2.1.0"
   peerDependencies:
     "@types/react": ">=16.8.0 <20.0.0"
     react: ">=16.8.0 <20.0.0"
-  checksum: 10c0/a86d52d6df37e86588596cdaded90e162adcc004a97c171a8667641d5b71f23174b3cd8156ef998ecbdf15ea0403fa0129fe84c6fa7173c06dbe80966a076efe
+  checksum: 10c0/718803e397d2a75ff2137b8312661185fbed4eab07bdc98f8b1f9f2739fd2629318c7d98599f43148cb3d7b6445cf9629482b3adcd0bebb285a62166814ff475
   languageName: node
   linkType: hard
 
@@ -785,20 +843,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fluentui/react-focus@npm:^8.10.3":
-  version: 8.10.3
-  resolution: "@fluentui/react-focus@npm:8.10.3"
+"@fluentui/react-focus@npm:^8.10.5":
+  version: 8.10.5
+  resolution: "@fluentui/react-focus@npm:8.10.5"
   dependencies:
     "@fluentui/keyboard-key": "npm:^0.4.23"
     "@fluentui/merge-styles": "npm:^8.6.14"
     "@fluentui/set-version": "npm:^8.2.24"
-    "@fluentui/style-utilities": "npm:^8.13.6"
+    "@fluentui/style-utilities": "npm:^8.15.0"
     "@fluentui/utilities": "npm:^8.17.2"
     tslib: "npm:^2.1.0"
   peerDependencies:
     "@types/react": ">=16.8.0 <20.0.0"
     react: ">=16.8.0 <20.0.0"
-  checksum: 10c0/16d3f21c8db8a2344819c14c9b3edfb146c65891f113a7fbdfcba36ea6737f38e1777be5fd5f2362b131df1dc135e7775ad7f301a4bf3ffcf6dbd0da6245e387
+  checksum: 10c0/aaab989e8ca93e6b856ea170176d71822310a14e0c9cd6e4c366955806677fde3fa0a2b9ff5b9415add36e318a9ef98e6246f1a0bd577477b36d5feabd3e2bdf
   languageName: node
   linkType: hard
 
@@ -817,15 +875,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fluentui/react-icons@npm:^2.0.271":
-  version: 2.0.316
-  resolution: "@fluentui/react-icons@npm:2.0.316"
+"@fluentui/react-icons@npm:^2.0.321":
+  version: 2.0.321
+  resolution: "@fluentui/react-icons@npm:2.0.321"
   dependencies:
-    "@griffel/react": "npm:^1.0.0"
+    "@griffel/react": "npm:^1.6.1"
     tslib: "npm:^2.1.0"
   peerDependencies:
     react: ">=16.8.0 <20.0.0"
-  checksum: 10c0/f7fed372e3bb6ae7df03957699434b631c984424c03897b7d350db6204cc0b9baae081d232a225f768adf3d817837bd5c006f2ad8a51eb7f37833fba80dc14ba
+  checksum: 10c0/2d9457c48bdbcf4f4f6ed6272e1d857d679d8922b4678f4adc7265f65cfba3b35df2e188e3423d13d7f843bdc8e904b9a1df921f0b336d2b2d8494f68ee3d0fd
   languageName: node
   linkType: hard
 
@@ -854,20 +912,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fluentui/react@npm:^8.122.8":
-  version: 8.125.3
-  resolution: "@fluentui/react@npm:8.125.3"
+"@fluentui/react@npm:^8.125.5":
+  version: 8.125.5
+  resolution: "@fluentui/react@npm:8.125.5"
   dependencies:
     "@fluentui/date-time-utilities": "npm:^8.6.11"
-    "@fluentui/font-icons-mdl2": "npm:^8.5.70"
-    "@fluentui/foundation-legacy": "npm:^8.6.3"
+    "@fluentui/font-icons-mdl2": "npm:^8.5.72"
+    "@fluentui/foundation-legacy": "npm:^8.6.5"
     "@fluentui/merge-styles": "npm:^8.6.14"
-    "@fluentui/react-focus": "npm:^8.10.3"
+    "@fluentui/react-focus": "npm:^8.10.5"
     "@fluentui/react-hooks": "npm:^8.10.2"
     "@fluentui/react-portal-compat-context": "npm:^9.0.15"
     "@fluentui/react-window-provider": "npm:^2.3.2"
     "@fluentui/set-version": "npm:^8.2.24"
-    "@fluentui/style-utilities": "npm:^8.13.6"
+    "@fluentui/style-utilities": "npm:^8.15.0"
     "@fluentui/theme": "npm:^2.7.2"
     "@fluentui/utilities": "npm:^8.17.2"
     "@microsoft/load-themed-styles": "npm:^1.10.26"
@@ -877,7 +935,7 @@ __metadata:
     "@types/react-dom": ">=16.8.0 <20.0.0"
     react: ">=16.8.0 <20.0.0"
     react-dom: ">=16.8.0 <20.0.0"
-  checksum: 10c0/09a47f8cdf73271ef965580c6f1db5943b0173e98ed48dc68546e44b11d9fadcc2e49664b1b6ccc99f69d40e394e6c93da7cb0f47a5b3181df01e9f616f4719b
+  checksum: 10c0/45bc44987bd53e55826784035a480eaeddb74856d43eb9b843587d80d0d024a9e55b775a5e589209472ec7a0ec405c1d90c3b96feb77ee8e1ee7a62a6f757d20
   languageName: node
   linkType: hard
 
@@ -890,9 +948,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fluentui/style-utilities@npm:^8.13.6":
-  version: 8.13.6
-  resolution: "@fluentui/style-utilities@npm:8.13.6"
+"@fluentui/style-utilities@npm:^8.15.0":
+  version: 8.15.0
+  resolution: "@fluentui/style-utilities@npm:8.15.0"
   dependencies:
     "@fluentui/merge-styles": "npm:^8.6.14"
     "@fluentui/set-version": "npm:^8.2.24"
@@ -900,7 +958,7 @@ __metadata:
     "@fluentui/utilities": "npm:^8.17.2"
     "@microsoft/load-themed-styles": "npm:^1.10.26"
     tslib: "npm:^2.1.0"
-  checksum: 10c0/73de21ae92bb47f6f6d1bbd5bef746105f8cd83b08c5446fe4099241bbfcb63048b00879b1255cc7bda34642b02a3f0ab14ebcc0e15a3b2e0e9733dce81e484e
+  checksum: 10c0/c416b8dcf9f01d41b70780ca2f84765273ed06f49cc70ba31803a2e34017aa83863fef225affd0bdeeb948de3f6e2a740ff83dbaf1908140dd0061adada9ac62
   languageName: node
   linkType: hard
 
@@ -935,38 +993,38 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@griffel/core@npm:^1.19.2":
-  version: 1.19.2
-  resolution: "@griffel/core@npm:1.19.2"
+"@griffel/core@npm:^1.20.1":
+  version: 1.20.1
+  resolution: "@griffel/core@npm:1.20.1"
   dependencies:
     "@emotion/hash": "npm:^0.9.0"
-    "@griffel/style-types": "npm:^1.3.0"
+    "@griffel/style-types": "npm:^1.4.0"
     csstype: "npm:^3.1.3"
     rtl-css-js: "npm:^1.16.1"
     stylis: "npm:^4.2.0"
     tslib: "npm:^2.1.0"
-  checksum: 10c0/6e086ba2132e130360e14d1ab0493f6b7e34e3dba82c928a0a438ac7f48628555845ba5366a8dfaaf163ee67b3bca1776906347d02dc0ab32c03ef85bd113ba2
+  checksum: 10c0/0e0149ab5bb5f3ee0b4e81eafa24e1c7c02104d84cfa75827b96f19d084e3d45d773927673fa9bf51c97178eb00bfbd4f98eeee4d9b417858799922b624db2ba
   languageName: node
   linkType: hard
 
-"@griffel/react@npm:^1.0.0":
-  version: 1.5.32
-  resolution: "@griffel/react@npm:1.5.32"
+"@griffel/react@npm:^1.6.1":
+  version: 1.6.1
+  resolution: "@griffel/react@npm:1.6.1"
   dependencies:
-    "@griffel/core": "npm:^1.19.2"
+    "@griffel/core": "npm:^1.20.1"
     tslib: "npm:^2.1.0"
   peerDependencies:
     react: ">=16.8.0 <20.0.0"
-  checksum: 10c0/ae451721830808dc9868d496869d38096905554f13c8a3cbc7bbbe6c235fc23b6ef39a294ee005b77a5af687634672899eb8855c302aa1dd6f08bc24e1072c60
+  checksum: 10c0/953ab19add128f118d2c4995b93a806c8f015ebc9433b78cdabec0ab79f8d056664bf839115138eec513f89a03e54e9bd5c1af013c045b16d08e74b05e267b74
   languageName: node
   linkType: hard
 
-"@griffel/style-types@npm:^1.3.0":
-  version: 1.3.0
-  resolution: "@griffel/style-types@npm:1.3.0"
+"@griffel/style-types@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "@griffel/style-types@npm:1.4.0"
   dependencies:
     csstype: "npm:^3.1.3"
-  checksum: 10c0/94c63ed89398e154f5ced769b25ff7e14471c991672f32f69ac27daa463f880650cb2d7d5ef7e00811e3cd3a6cd2694b9ef861d9bc294cf72838e31761d72ef8
+  checksum: 10c0/1e77939450fc868423caf041815519d3c3a973297e6d5617237d4ee05249a2aa191027be2870ca268012c7a94860db475c14b8ac0884b66c84e2fdb48599b7d5
   languageName: node
   linkType: hard
 
@@ -2008,7 +2066,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:<18.0.0, @types/react-dom@npm:^17.0.11":
+"@types/react-dom@npm:<18.0.0, @types/react-dom@npm:^17.0.26":
   version: 17.0.26
   resolution: "@types/react-dom@npm:17.0.26"
   peerDependencies:
@@ -2059,14 +2117,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^17.0.39":
-  version: 17.0.90
-  resolution: "@types/react@npm:17.0.90"
+"@types/react@npm:^17.0.91":
+  version: 17.0.91
+  resolution: "@types/react@npm:17.0.91"
   dependencies:
     "@types/prop-types": "npm:*"
     "@types/scheduler": "npm:^0.16"
     csstype: "npm:^3.2.2"
-  checksum: 10c0/ae2bb8c87fe94b1ce7bfd501586b6135ba36987ae52d5b97bfc8a85988b6fb69593bcd9854ff98b1a6e8ed7472b9be1ead02cd04385c22f9f1adccac69a411bd
+  checksum: 10c0/f1a5f77dbe6d62c04bfa2692d1204fd537e5fb15461a10673fa116a4b211f8ebaf426a4b1b95da04d38cea47dfc77c4d403f0850db7d9853298248a54478cc60
   languageName: node
   linkType: hard
 
@@ -3332,7 +3390,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"comlink@npm:^4.4.1":
+"comlink@npm:^4.4.2":
   version: 4.4.2
   resolution: "comlink@npm:4.4.2"
   checksum: 10c0/38aa1f455cf08e94aaa8fc494fd203cc0ef02ece6c21404b7931ce17567e8a72deacddab98aa5650cfd78332ff24c34610586f6fb27fd19dc77e753ed1980deb
@@ -3367,7 +3425,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"connected-react-router@npm:^6.9.2":
+"connected-react-router@npm:^6.9.3":
   version: 6.9.3
   resolution: "connected-react-router@npm:6.9.3"
   dependencies:
@@ -3418,7 +3476,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"copy-to-clipboard@npm:^3.3.1":
+"copy-to-clipboard@npm:^3.3.3":
   version: 3.3.3
   resolution: "copy-to-clipboard@npm:3.3.3"
   dependencies:
@@ -3427,10 +3485,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js@npm:^3.35.1":
-  version: 3.47.0
-  resolution: "core-js@npm:3.47.0"
-  checksum: 10c0/9b1a7088b7c660c7b8f1d4c90bb1816a8d5352ebdcb7bc742e3a0e4eb803316b5aa17bacb8769522342196351a5430178f46914644f2bfdb94ce0ced3c7fd523
+"core-js@npm:^3.49.0":
+  version: 3.49.0
+  resolution: "core-js@npm:3.49.0"
+  checksum: 10c0/2e42edb47eda38fd5368380131623c8aa5d4a6b42164125b17744bdc08fa5ebbbdd06b4b4aa6ca3663470a560b0f2fba48e18f142dfe264b0039df85bc625694
   languageName: node
   linkType: hard
 
@@ -3748,10 +3806,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dexie@npm:^4.0.8":
-  version: 4.2.1
-  resolution: "dexie@npm:4.2.1"
-  checksum: 10c0/2e96bb21fc559290e545b740d943cdaa0cad4281f89e7355c332a8bc83870fc05ae9460be586fdb4b55f3860489070b17234a41a78cf469ed6464f6e0616125b
+"dexie@npm:^4.4.0":
+  version: 4.4.0
+  resolution: "dexie@npm:4.4.0"
+  checksum: 10c0/42a29d103aaf13565dbe05be85f0c9bfbb097d56100a318e4d139d378dd88c898a53fe12df2bb1d00c969873712026902b365a0d0ded42f7ed18849e93aa02e4
   languageName: node
   linkType: hard
 
@@ -8460,20 +8518,20 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ui@workspace:."
   dependencies:
-    "@codemirror/autocomplete": "npm:^6.20.0"
-    "@codemirror/commands": "npm:^6.10.2"
+    "@codemirror/autocomplete": "npm:^6.20.1"
+    "@codemirror/commands": "npm:^6.10.3"
     "@codemirror/lang-go": "npm:^6.0.1"
     "@codemirror/lang-json": "npm:^6.0.2"
     "@codemirror/lang-markdown": "npm:^6.5.0"
-    "@codemirror/language": "npm:^6.12.1"
-    "@codemirror/lint": "npm:^6.9.4"
+    "@codemirror/language": "npm:^6.12.2"
+    "@codemirror/lint": "npm:^6.9.5"
     "@codemirror/search": "npm:^6.6.0"
-    "@codemirror/state": "npm:^6.5.4"
-    "@codemirror/view": "npm:^6.39.14"
+    "@codemirror/state": "npm:^6.6.0"
+    "@codemirror/view": "npm:^6.40.0"
     "@eslint/eslintrc": "npm:^3.0.0"
     "@eslint/js": "npm:^9.0.0"
-    "@fluentui/react": "npm:^8.122.8"
-    "@fluentui/react-icons": "npm:^2.0.271"
+    "@fluentui/react": "npm:^8.125.5"
+    "@fluentui/react-icons": "npm:^2.0.321"
     "@lezer/highlight": "npm:^1.2.3"
     "@monaco-editor/loader": "npm:^1.4.0"
     "@monaco-editor/react": "npm:^4.6.0"
@@ -8487,8 +8545,8 @@ __metadata:
     "@types/jest": "npm:^27.4.0"
     "@types/markdown-it": "npm:^14"
     "@types/node": "npm:^25.2.3"
-    "@types/react": "npm:^17.0.39"
-    "@types/react-dom": "npm:^17.0.11"
+    "@types/react": "npm:^17.0.91"
+    "@types/react-dom": "npm:^17.0.26"
     "@types/react-router-dom": "npm:^5.3.3"
     "@typescript-eslint/eslint-plugin": "npm:^8.43.0"
     "@typescript-eslint/parser": "npm:^8.43.0"
@@ -8502,12 +8560,12 @@ __metadata:
     "@xterm/addon-webgl": "npm:^0.17.0-beta.1"
     "@xterm/xterm": "npm:^5.4.0-beta.1"
     clsx: "npm:^1.1.1"
-    comlink: "npm:^4.4.1"
-    connected-react-router: "npm:^6.9.2"
-    copy-to-clipboard: "npm:^3.3.1"
-    core-js: "npm:^3.35.1"
+    comlink: "npm:^4.4.2"
+    connected-react-router: "npm:^6.9.3"
+    copy-to-clipboard: "npm:^3.3.3"
+    core-js: "npm:^3.49.0"
     date-fns: "npm:^3.6.0"
-    dexie: "npm:^4.0.8"
+    dexie: "npm:^4.4.0"
     eslint: "npm:^9.0.0"
     eslint-config-prettier: "npm:^10.1.8"
     eslint-import-resolver-typescript: "npm:^4.4.4"
