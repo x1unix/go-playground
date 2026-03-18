@@ -20,7 +20,8 @@
   --vim-cursor-border: #121111;
 
   /* Autocomplete / hover popup */
-  --cm-hover-border-color: rgba(200, 200, 200, 0.5);
+  --cm-hover-border-color: #c8c8c8;
+  --cm-hover-separator-color: rgba(200, 200, 200, 0.5);
   --cm-hover-border-radius: 3px;
   --cm-tooltip-link-color: #006ab1;
   --cm-tooltip-link-code-color: rgba(220, 220, 220, 0.4);
@@ -48,7 +49,8 @@
   --vim-cursor-border: #aeafad;
 
   /* Autocomplete / hover popup */
-  --cm-hover-border-color: rgba(69, 69, 69, 0.5);
+  --cm-hover-border-color: #454545;
+  --cm-hover-separator-color: rgba(69, 69, 69, 0.5);
   --cm-hover-border-radius: 3px;
   --cm-tooltip-link-color: #3794ff;
   --cm-tooltip-link-code-color: rgba(10, 10, 10, 0.4);
@@ -319,12 +321,12 @@
 
 /* Separate Go code header, description and footer in hover contents */
 .gpg-Editor :global(.cm-lsp-tooltip > *:first-child) {
-  border-bottom: 1px solid var(--cm-hover-border-color, #ccc);
+  border-bottom: 1px solid var(--cm-hover-separator-color, #ccc);
   border-top: none;
 }
 
 .gpg-Editor :global(.cm-lsp-tooltip > *:last-child) {
-  border-top: 1px solid var(--cm-hover-border-color, #ccc);
+  border-top: 1px solid var(--cm-hover-separator-color, #ccc);
   border-bottom: none;
 }
 
