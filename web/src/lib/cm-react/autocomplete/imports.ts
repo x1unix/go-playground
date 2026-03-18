@@ -6,8 +6,13 @@ import type { DocumentState } from '../types/common'
 
 interface ImportBlock {
   range: NonNullable<ImportsContext['range']>
-  imports: string[]
+  imports: ImportSpec[]
   isMultiline: boolean
+}
+
+interface ImportSpec {
+  path: string
+  alias?: string
 }
 
 const commentNodes = new Set(['LineComment', 'BlockComment'])
@@ -62,7 +67,7 @@ const parseImportDecl = (
     return null
   }
 
-  const imports: string[] = []
+  const imports: ImportSpec[] = []
   let invalidSpec = false
   tree.iterate({
     from: node.from,
@@ -80,7 +85,12 @@ const parseImportDecl = (
 
       const importPath = unquote(source.slice(pathNode.from, pathNode.to).trim())
       if (importPath.length > 0) {
-        imports.push(importPath)
+        const aliasNode = cursor.node.getChild('DefName')
+        const alias = aliasNode ? source.slice(aliasNode.from, aliasNode.to).trim() : undefined
+        imports.push({
+          path: importPath,
+          alias,
+        })
       }
 
       return false
@@ -199,6 +209,7 @@ export const buildImportContext = (document: DocumentState): ImportsContext => {
   }
 
   const allImports: string[] = []
+  const importAliases = new Map<string, string>()
   let hasError = false
   let lastImportBlock: ImportBlock | null = null
 
@@ -219,14 +230,23 @@ export const buildImportContext = (document: DocumentState): ImportsContext => {
     }
 
     lastImportBlock = importBlock
-    allImports.push(...importBlock.imports)
+    allImports.push(...importBlock.imports.map(({ path }) => path))
+
+    for (const { alias, path } of importBlock.imports) {
+      if (!alias || alias === '_') {
+        continue
+      }
+
+      importAliases.set(alias, path)
+    }
   }
 
   if (lastImportBlock) {
     return {
       hasError,
       allPaths: new Set(allImports),
-      blockPaths: lastImportBlock.imports,
+      ...(importAliases.size ? { importAliases } : {}),
+      blockPaths: lastImportBlock.imports.map(({ path }) => path),
       blockType: lastImportBlock.isMultiline ? ImportClauseType.Block : ImportClauseType.Single,
       range: lastImportBlock.range,
       totalRange: {

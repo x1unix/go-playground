@@ -104,6 +104,7 @@ describe('buildImportContext', () => {
       want: {
         hasError: false,
         allPaths: new Set(['fmt', 'bar', 'baz']),
+        importAliases: new Map([['alias', 'baz']]),
         blockPaths: ['baz'],
         blockType: ImportClauseType.Single,
         range: {

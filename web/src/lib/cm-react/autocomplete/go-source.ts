@@ -186,8 +186,12 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
 
     const imports = this.metadataCache.getMetadata(req.document)
     const hoverRange = rangeFromOffsets(req.document.text, query.from, query.to)
+    const packageName = query.packageName
+      ? this.metadataCache.resolveImportAlias(req.document, query.packageName)
+      : undefined
     const workerQuery: HoverQuery = {
       ...query,
+      ...(packageName ? { packageName } : {}),
       context: {
         imports,
         range: hoverRange,
@@ -242,6 +246,9 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
     }
 
     const imports = this.metadataCache.getMetadata(req.document)
+    const packageName = isPackageQuery(query)
+      ? this.metadataCache.resolveImportAlias(req.document, query.packageName)
+      : undefined
     const context: SuggestionContext = {
       range: {
         startLineNumber: req.cursor.lineNumber,
@@ -255,7 +262,7 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
     const typedLiteral = 'value' in query ? (query.value ?? '') : ''
     const suggestionQuery: SuggestionQuery = isPackageQuery(query)
       ? {
-          packageName: query.packageName,
+          packageName: packageName ?? query.packageName,
           value: typedLiteral || undefined,
           context,
         }
