@@ -302,6 +302,9 @@
   border-radius: var(--cm-hover-border-radius);
   border: 1px solid var(--cm-hover-border-color);
   background: var(--cm-comp-list-background);
+
+  /* By default, hover contents aren't capped */
+  overflow: auto;
 }
 
 /* Hover content sections */
