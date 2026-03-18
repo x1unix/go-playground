@@ -12,6 +12,7 @@
 
 .gpg-Editor {
   --cm-comp-item-fg-active: #fff;
+  --cm-comp-item-icon-spacing: .4em;
 }
 
 .gpg-Editor[data-theme='light'] {
@@ -109,6 +110,10 @@
 .gpg-Editor :global(.cm-completionIcon:after) {
   font-family: codicon;
   color: var(--cm-tooltip-symbol-default);
+}
+
+.gpg-Editor :global(.cm-completionIcon) {
+  padding-right: var(--cm-comp-item-icon-spacing);
 }
 
 .gpg-Editor :global(.cm-completionIcon.cm-completionIcon-method:after) {
@@ -252,7 +257,7 @@
   display: flex;
   text-overflow: ellipsis;
   justify-content: space-between;
-  padding-right: 0.651em;
+  padding: 0 0.651em 0 0.3em;
 }
 
 /* Completion item row - active */
@@ -278,6 +283,7 @@
   font-family: var(--cm-tooltip-code-font);
   flex-grow: 1;
   flex-shrink: 1;
+  align-items: center;
 }
 
 /* Completion detail (right) */
