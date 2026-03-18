@@ -4,6 +4,10 @@
   "version": "0.1.0",
   "private": true,
   "packageManager": "yarn@4.12.0",
+  "resolutions": {
+    "@codemirror/state": "6.6.0",
+    "@codemirror/view": "6.40.0"
+  },
   "dependencies": {
     "@codemirror/autocomplete": "^6.20.1",
     "@codemirror/commands": "^6.10.3",
