@@ -302,6 +302,9 @@
   border-radius: var(--cm-hover-border-radius);
   border: 1px solid var(--cm-hover-border-color);
   background: var(--cm-comp-list-background);
+
+  /* By default, hover contents aren't capped */
+  overflow: auto;
 }
 
 /* Hover content sections */
@@ -310,13 +313,19 @@
 }
 
 .gpg-Editor :global(.cm-lsp-tooltip > *) {
-  border-top: 1px solid var(--cm-hover-border-color, #ccc);
   margin: 0 !important;
   padding: 4px 8px;
 }
 
+/* Separate Go code header, description and footer in hover contents */
 .gpg-Editor :global(.cm-lsp-tooltip > *:first-child) {
+  border-bottom: 1px solid var(--cm-hover-border-color, #ccc);
   border-top: none;
+}
+
+.gpg-Editor :global(.cm-lsp-tooltip > *:last-child) {
+  border-top: 1px solid var(--cm-hover-border-color, #ccc);
+  border-bottom: none;
 }
 
 /* Blocks inside hover/completion doc */
