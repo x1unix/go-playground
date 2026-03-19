@@ -1,14 +1,31 @@
 {
+  "Interface - General": [
+    {
+      "issueId": 567,
+      "url": "pull/567",
+      "description": "Render cursor position in the status bar"
+    }
+  ],
   "Interface - Editor": [
     {
       "issueId": 547,
       "url": "pull/547",
-      "description": "Migrate from Monaco editor to Codemirror"
+      "description": "Migrate from Monaco editor to CodeMirror"
     },
     {
       "issueId": 551,
       "url": "pull/551",
       "description": "Support relative line numbers in Vim mode"
+    },
+    {
+      "issueId": 566,
+      "url": "pull/566",
+      "description": "Improve completion list appearance on small screens"
+    },
+    {
+      "issueId": 565,
+      "url": "pull/565",
+      "description": "Handle import aliases for package symbols autocomplete"
     }
   ]
 }
