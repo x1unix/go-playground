@@ -95,6 +95,9 @@ export const StatusBar: React.FC = () => {
   const running = status?.running
   const lastError = status?.lastError
   const markers = status?.markers
+  const cursorPosition = status?.cursorPosition
+  const line = cursorPosition?.line ?? 1
+  const column = cursorPosition?.column ?? 1
 
   const { warnings, errors } = useMemo(() => countMarkers(markers), [markers])
   return (
@@ -117,7 +120,9 @@ export const StatusBar: React.FC = () => {
           })}
         </div>
         <div className={styles['StatusBar__side-right']}>
-          <StatusBarItem>Ln 999, Col 999</StatusBarItem>
+          <StatusBarItem>
+            Ln ${line}, Col ${column}
+          </StatusBarItem>
           <StatusBarItem mobileHidden>Tab Size: 4</StatusBarItem>
           <StatusBarItem icon="Feedback" title="Send feedback" href={environment.urls.issue} iconOnly mobileHidden />
           <StatusBarItem icon="VscGithubInverted" title="GitHub" href={environment.urls.github} iconOnly mobileHidden />

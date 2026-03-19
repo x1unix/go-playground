@@ -13,6 +13,11 @@ export interface UIState {
   snippetId?: string | null
 }
 
+export interface Position {
+  line: number
+  column: number
+}
+
 export interface StatusState {
   loading: boolean
   running?: boolean
@@ -20,6 +25,7 @@ export interface StatusState {
   lastError?: string | null
   events?: EvalEvent[]
   markers?: Record<string, editor.IMarkerData[] | null>
+  cursorPosition?: Position
 }
 
 export interface SettingsState {

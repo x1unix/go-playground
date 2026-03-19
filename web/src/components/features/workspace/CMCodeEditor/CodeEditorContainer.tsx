@@ -22,7 +22,12 @@ import { dispatchFormatFile, dispatchShareSnippet, dispatchUpdateFile } from '~/
 import { GoSyntaxLinter } from './syntax/linter'
 import { TargetType } from '~/services/config'
 import { getDefaultFontFamily, getFontFamily } from '~/services/fonts'
-import { Dispatcher, newMonacoParamsChangeDispatcher, runFileDispatcher } from '~/store'
+import {
+  Dispatcher,
+  newCursorPositionChangeDispatcher,
+  newMonacoParamsChangeDispatcher,
+  runFileDispatcher,
+} from '~/store'
 import { useDebouncer } from '~/hooks/debounce'
 import { newAddNotificationAction, newRemoveNotificationAction, NotificationType } from '~/store/notifications'
 import { spawnLanguageWorker } from '~/workers/language'
@@ -75,8 +80,10 @@ const mapEventToAction = (e: EditorEvent): AnyAction | Dispatcher | undefined =>
           return
       }
     }
+    case EventType.CursorPositionChanged: {
+      return newCursorPositionChangeDispatcher(e.position)
+    }
     default:
-      // TODO: wire up cursor position events when it will be implemented on UI and store.
       break
   }
 }

@@ -19,6 +19,7 @@ import {
   ActionType,
   type LoadingStateChanges,
   type MonacoParamsChanges,
+  type CursorPositionChangePayload,
   type MarkerChangePayload,
 } from './actions'
 import { mapByAction } from './helpers'
@@ -118,6 +119,10 @@ const reducers = {
           ...s.markers,
           [payload.fileName]: payload.markers?.length ? payload.markers : null,
         },
+      }),
+      [ActionType.CURSOR_POSITION_CHANGE]: (s: StatusState, { payload }: Action<CursorPositionChangePayload>) => ({
+        ...s,
+        cursorPosition: payload.position,
       }),
     },
     { loading: false },
