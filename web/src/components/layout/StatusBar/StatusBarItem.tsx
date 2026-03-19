@@ -11,7 +11,7 @@ export interface StatusBarItemProps {
   button?: boolean
   disabled?: boolean
   hidden?: boolean
-  mobileHidden?: boolean | 'icononly'
+  mobileHidden?: boolean | 'icononly' | 'textonly'
   href?: string
   title?: string
   onClick?: MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>
@@ -57,6 +57,7 @@ export const StatusBarItem: React.FC<StatusBarItemProps> = ({
     styles.StatusBarItem,
     mobileHidden === true && styles['StatusBarItem--mobileHidden'],
     mobileHidden === 'icononly' && styles['StatusBarItem--mobileIconOnly'],
+    mobileHidden === 'textonly' && styles['StatusBarItem--mobileTextOnly'],
   )
   if (button) {
     return (
@@ -86,5 +87,21 @@ export const StatusBarItem: React.FC<StatusBarItemProps> = ({
     <div className={clsx(classValue, styles['StatusBarItem--text'], className)} title={title} style={style}>
       {content}
     </div>
+  )
+}
+
+interface StatusBarItemCounterProps {
+  label: string
+  value: number
+}
+
+const pluralize = (count: number, label: string) => (count === 1 ? label : `${label}s`)
+
+export const StatusBarItemCounter: React.FC<StatusBarItemCounterProps> = ({ label, value }) => {
+  return (
+    <>
+      <span>{value}</span>
+      <span className={styles['StatusBarItem__counter__label']}>{pluralize(value, label)}</span>
+    </>
   )
 }

@@ -57,12 +57,29 @@
   opacity: 0.3;
 }
 
-@media (max-width: 479px) {
+.StatusBarItem__counter__label {
+  margin-left: 0.2em;
+}
+
+@media (max-width: 639px) {
   .StatusBarItem--mobileIconOnly .StatusBarItem__label {
     display: none;
   }
 
+  .StatusBarItem--mobileTextOnly .StatusBarItem__label {
+    margin-left: 0;
+  }
+
+  .StatusBarItem--mobileTextOnly .StatusBarItem__icon--image,
+  .StatusBarItem--mobileTextOnly .StatusBarItem__icon {
+    display: none;
+  }
+
   .StatusBarItem--mobileHidden {
+    display: none;
+  }
+
+  .StatusBarItem__counter__label {
     display: none;
   }
 }

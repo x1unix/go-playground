@@ -6,7 +6,7 @@ import environment from '~/environment'
 import { type StateDispatch, connect } from '~/store'
 
 import { EllipsisText } from '~/components/utils/EllipsisText'
-import { StatusBarItem } from '~/components/layout/StatusBar/StatusBarItem'
+import { StatusBarItem, StatusBarItemCounter } from '~/components/layout/StatusBar/StatusBarItem'
 import { VimStatusBarItem } from '~/plugins/vim/VimStatusBarItem'
 
 import styles from './StatusBar.module.css'
@@ -22,7 +22,7 @@ interface Props extends StateProps {
   dispatch: StateDispatch
 }
 
-const pluralize = (count: number, label: string) => (count === 1 ? `${count} ${label}` : `${count} ${label}s`)
+const pluralize = (count: number, label: string) => (count === 1 ? label : `${label}s`)
 
 const countMarkers = (markers?: StateProps['markers']) => {
   if (!markers) {
@@ -86,7 +86,7 @@ const getStatusItem = ({ loading, running, lastError }: StateProps) => {
 
   if (lastError) {
     return (
-      <StatusBarItem icon="NotExecuted" mobileHidden="icononly" disabled>
+      <StatusBarItem icon="NotExecuted" disabled>
         Build failed
       </StatusBarItem>
     )
@@ -105,13 +105,9 @@ const StatusBar: React.FC<Props> = ({ loading, running, lastError, markers }) =>
       >
         <div className={styles['StatusBar__side-left']}>
           <StatusBarItem icon="ErrorBadge" button>
-            {pluralize(errors, 'Error')}
+            <StatusBarItemCounter label="Error" value={errors} />
           </StatusBarItem>
-          {warnings > 0 ? (
-            <StatusBarItem icon="Warning" button mobileHidden>
-              {pluralize(warnings, 'Warning')}
-            </StatusBarItem>
-          ) : null}
+          {warnings > 0 ? <StatusBarItemCounter label="Warning" value={warnings} /> : null}
           <VimStatusBarItem />
           {getStatusItem({
             loading,
@@ -121,7 +117,7 @@ const StatusBar: React.FC<Props> = ({ loading, running, lastError, markers }) =>
         </div>
         <div className={styles['StatusBar__side-right']}>
           <StatusBarItem>Ln 999, Col 999</StatusBarItem>
-          <StatusBarItem>Tab Size: 4</StatusBarItem>
+          <StatusBarItem mobileHidden>Tab Size: 4</StatusBarItem>
           <StatusBarItem icon="Feedback" title="Send feedback" href={environment.urls.issue} iconOnly mobileHidden />
           <StatusBarItem icon="VscGithubInverted" title="GitHub" href={environment.urls.github} iconOnly mobileHidden />
         </div>

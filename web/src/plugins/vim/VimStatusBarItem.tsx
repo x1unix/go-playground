@@ -47,6 +47,7 @@ const VimStatusBarItemBase: React.FC<Props> = ({ vimState }) => {
     <StatusBarItem
       title="Vim Status"
       icon={SiVim}
+      mobileHidden="textonly"
       className={clsx({
         'VimStatusBarItem--error': isError,
       })}
