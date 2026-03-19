@@ -9,7 +9,7 @@ import { EllipsisText } from '~/components/utils/EllipsisText'
 import { StatusBarItem } from '~/components/layout/StatusBar/StatusBarItem'
 import { VimStatusBarItem } from '~/plugins/vim/VimStatusBarItem'
 
-import './StatusBar.css'
+import styles from './StatusBar.module.css'
 
 interface StateProps {
   loading?: boolean
@@ -99,11 +99,11 @@ const StatusBar: React.FC<Props> = ({ loading, running, lastError, markers }) =>
   return (
     <>
       <div
-        className={clsx('StatusBar', {
-          'StatusBar--busy': loading || running,
+        className={clsx(styles.StatusBar, {
+          [styles['StatusBar--busy']]: loading || running,
         })}
       >
-        <div className="StatusBar__side-left">
+        <div className={styles['StatusBar__side-left']}>
           <StatusBarItem icon="ErrorBadge" button>
             {pluralize(errors, 'Error')}
           </StatusBarItem>
@@ -119,7 +119,7 @@ const StatusBar: React.FC<Props> = ({ loading, running, lastError, markers }) =>
             lastError,
           })}
         </div>
-        <div className="StatusBar__side-right">
+        <div className={styles['StatusBar__side-right']}>
           <StatusBarItem icon="Feedback" title="Send feedback" href={environment.urls.issue} iconOnly />
           <StatusBarItem icon="VscGithubInverted" title="GitHub" href={environment.urls.github} iconOnly />
         </div>

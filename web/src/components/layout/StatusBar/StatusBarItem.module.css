@@ -17,11 +17,11 @@
   text-decoration: none;
 }
 
-.StatusBarItem.StatusBarItem--action {
+.StatusBarItem--action {
   cursor: pointer;
 }
 
-.StatusBarItem.StatusBarItem--text {
+.StatusBarItem--text {
   user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
@@ -40,22 +40,21 @@
   height: 12px;
 }
 
-.StatusBarItem.StatusBarItem--action:not([disabled]):hover {
+.StatusBarItem--action:not([disabled]):hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
-.StatusBarItem.StatusBarItem--action:not([disabled]):active {
+.StatusBarItem--action:not([disabled]):active {
   background: rgba(255, 255, 255, 0.2);
 }
 
-.StatusBarItem.StatusBarItem--action[disabled] {
+.StatusBarItem--action[disabled] {
   cursor: not-allowed;
   opacity: 0.3;
 }
 
 @media (max-width: 640px) {
-  .StatusBarItem.StatusBarItem--hideOnMobile
-  .StatusBarItem__label {
+  .StatusBarItem--hideOnMobile .StatusBarItem__label {
     display: none;
   }
 }

@@ -1,9 +1,6 @@
-:root {
+.StatusBar {
   --color-idle: #007fd4;
   --color-busy: #cc6633;
-}
-
-.StatusBar {
   display: flex;
   flex-direction: row;
   color: #fff;
@@ -13,7 +10,7 @@
   height: 22px;
 }
 
-.StatusBar.StatusBar--busy {
+.StatusBar--busy {
   background-color: var(--color-busy);
 }
 
@@ -21,7 +18,4 @@
 .StatusBar__side-right {
   display: flex;
   flex-direction: row;
-}
-
-.StatusBar__side-right {
 }
