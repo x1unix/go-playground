@@ -112,7 +112,11 @@ export const StatusBar: React.FC = () => {
           <StatusBarItem icon="ErrorBadge" button>
             <StatusBarItemCounter label="Error" value={errors} />
           </StatusBarItem>
-          {warnings > 0 ? <StatusBarItemCounter label="Warning" value={warnings} /> : null}
+          {warnings > 0 ? (
+            <StatusBarItem icon="Warning" button>
+              <StatusBarItemCounter label="Warning" value={warnings} />
+            </StatusBarItem>
+          ) : null}
           <VimStatusBarItem />
           {getStatusItem({
             loading,
