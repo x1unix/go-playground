@@ -70,7 +70,7 @@ const Workspace: React.FC = () => {
       },
       {
         label: 'Upload',
-        icon: { iconName: 'Upload' },
+        icon: { iconName: 'OpenFile' },
         onClick: () => uploadRef.current?.click(),
       },
     ],
