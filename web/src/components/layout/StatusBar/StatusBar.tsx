@@ -86,7 +86,7 @@ const getStatusItem = ({ loading, running, lastError }: StateProps) => {
 
   if (lastError) {
     return (
-      <StatusBarItem icon="NotExecuted" hideTextOnMobile disabled>
+      <StatusBarItem icon="NotExecuted" mobileHidden="icononly" disabled>
         Build failed
       </StatusBarItem>
     )
@@ -108,7 +108,7 @@ const StatusBar: React.FC<Props> = ({ loading, running, lastError, markers }) =>
             {pluralize(errors, 'Error')}
           </StatusBarItem>
           {warnings > 0 ? (
-            <StatusBarItem icon="Warning" button>
+            <StatusBarItem icon="Warning" button mobileHidden>
               {pluralize(warnings, 'Warning')}
             </StatusBarItem>
           ) : null}
@@ -120,8 +120,10 @@ const StatusBar: React.FC<Props> = ({ loading, running, lastError, markers }) =>
           })}
         </div>
         <div className={styles['StatusBar__side-right']}>
-          <StatusBarItem icon="Feedback" title="Send feedback" href={environment.urls.issue} iconOnly />
-          <StatusBarItem icon="VscGithubInverted" title="GitHub" href={environment.urls.github} iconOnly />
+          <StatusBarItem>Ln 999, Col 999</StatusBarItem>
+          <StatusBarItem>Tab Size: 4</StatusBarItem>
+          <StatusBarItem icon="Feedback" title="Send feedback" href={environment.urls.issue} iconOnly mobileHidden />
+          <StatusBarItem icon="VscGithubInverted" title="GitHub" href={environment.urls.github} iconOnly mobileHidden />
         </div>
       </div>
     </>
