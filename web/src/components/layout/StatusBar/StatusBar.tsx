@@ -91,6 +91,7 @@ const getStatusItem = ({ loading, running, lastError }: StateProps) => {
 
 export const StatusBar: React.FC = () => {
   const status = useSelector(({ status }: State) => status)
+  const tabSize = useSelector(({ monaco }: State) => monaco.tabSize)
   const loading = status?.loading
   const running = status?.running
   const lastError = status?.lastError
@@ -121,9 +122,9 @@ export const StatusBar: React.FC = () => {
         </div>
         <div className={styles['StatusBar__side-right']}>
           <StatusBarItem>
-            Ln ${line}, Col ${column}
+            Ln {line}, Col {column}
           </StatusBarItem>
-          <StatusBarItem mobileHidden>Tab Size: 4</StatusBarItem>
+          <StatusBarItem mobileHidden>Tab Size: {tabSize}</StatusBarItem>
           <StatusBarItem icon="Feedback" title="Send feedback" href={environment.urls.issue} iconOnly mobileHidden />
           <StatusBarItem icon="VscGithubInverted" title="GitHub" href={environment.urls.github} iconOnly mobileHidden />
         </div>
