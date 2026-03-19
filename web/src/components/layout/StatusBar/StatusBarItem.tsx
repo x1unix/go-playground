@@ -11,7 +11,7 @@ export interface StatusBarItemProps {
   button?: boolean
   disabled?: boolean
   hidden?: boolean
-  hideTextOnMobile?: boolean
+  mobileHidden?: boolean | 'icononly'
   href?: string
   title?: string
   onClick?: MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>
@@ -41,7 +41,7 @@ export const StatusBarItem: React.FC<StatusBarItemProps> = ({
   icon,
   iconOnly,
   imageSrc,
-  hideTextOnMobile,
+  mobileHidden,
   href,
   button,
   children,
@@ -53,7 +53,11 @@ export const StatusBarItem: React.FC<StatusBarItemProps> = ({
   }
 
   const content = getItemContents({ icon, iconOnly, children, imageSrc, title })
-  const classValue = clsx(styles.StatusBarItem, hideTextOnMobile && styles['StatusBarItem--hideOnMobile'])
+  const classValue = clsx(
+    styles.StatusBarItem,
+    mobileHidden === true && styles['StatusBarItem--mobileHidden'],
+    mobileHidden === 'icononly' && styles['StatusBarItem--mobileIconOnly'],
+  )
   if (button) {
     return (
       <button className={clsx(classValue, styles['StatusBarItem--action'], className)} title={title} {...props}>

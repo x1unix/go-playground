@@ -28,7 +28,6 @@
 }
 
 .StatusBarItem__label {
-  margin-left: 0.4em;
   font-size: 12px;
 }
 
@@ -38,6 +37,11 @@
 
 .StatusBarItem__icon--image {
   height: 12px;
+}
+
+.StatusBarItem__icon--image+.StatusBarItem__label,
+.StatusBarItem__icon+.StatusBarItem__label {
+  margin-left: 0.4em;
 }
 
 .StatusBarItem--action:not([disabled]):hover {
@@ -53,8 +57,12 @@
   opacity: 0.3;
 }
 
-@media (max-width: 640px) {
-  .StatusBarItem--hideOnMobile .StatusBarItem__label {
+@media (max-width: 479px) {
+  .StatusBarItem--mobileIconOnly .StatusBarItem__label {
+    display: none;
+  }
+
+  .StatusBarItem--mobileHidden {
     display: none;
   }
 }
