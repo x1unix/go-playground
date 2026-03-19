@@ -2,8 +2,9 @@ import React, { useMemo } from 'react'
 import { clsx } from 'clsx'
 import { type editor, MarkerSeverity } from 'monaco-editor'
 import { VscDebugAlt } from 'react-icons/vsc'
+import { useSelector } from 'react-redux'
 import environment from '~/environment'
-import { type StateDispatch, connect } from '~/store'
+import type { State } from '~/store'
 
 import { EllipsisText } from '~/components/utils/EllipsisText'
 import { StatusBarItem, StatusBarItemCounter } from '~/components/layout/StatusBar/StatusBarItem'
@@ -17,12 +18,6 @@ interface StateProps {
   lastError?: string | null
   markers?: Record<string, editor.IMarkerData[] | null>
 }
-
-interface Props extends StateProps {
-  dispatch: StateDispatch
-}
-
-const pluralize = (count: number, label: string) => (count === 1 ? label : `${label}s`)
 
 const countMarkers = (markers?: StateProps['markers']) => {
   if (!markers) {
@@ -94,7 +89,13 @@ const getStatusItem = ({ loading, running, lastError }: StateProps) => {
   return null
 }
 
-const StatusBar: React.FC<Props> = ({ loading, running, lastError, markers }) => {
+export const StatusBar: React.FC = () => {
+  const status = useSelector(({ status }: State) => status)
+  const loading = status?.loading
+  const running = status?.running
+  const lastError = status?.lastError
+  const markers = status?.markers
+
   const { warnings, errors } = useMemo(() => countMarkers(markers), [markers])
   return (
     <>
@@ -125,8 +126,3 @@ const StatusBar: React.FC<Props> = ({ loading, running, lastError, markers }) =>
     </>
   )
 }
-
-export const ConnectedStatusBar = connect<StateProps, {}>(({ status }) => {
-  const { loading, lastError, running, markers } = status!
-  return { loading, lastError, running, markers }
-})(StatusBar)
