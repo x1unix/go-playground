@@ -13,6 +13,17 @@
 .gpg-Editor {
   --cm-comp-item-fg-active: #fff;
   --cm-comp-item-icon-spacing: .4em;
+  --cm-comp-item-padding: 0 0.651em 0 0.2em;
+  --cm-comp-list-max-height: 17em;
+}
+
+@media (max-width: 480px) {
+  .gpg-Editor {
+    --cm-comp-item-padding: 0.4em 0.6em;
+
+    /* Uneven value to keep half of last element visible */
+    --cm-comp-list-max-height: 21em;
+  }
 }
 
 .gpg-Editor[data-theme='light'] {
@@ -253,12 +264,16 @@
   background: var(--cm-comp-list-background);
 }
 
+.gpg-Editor :global(.cm-tooltip-autocomplete.cm-tooltip > ul) {
+  max-height: var(--cm-comp-list-max-height);
+}
+
 /* Completion item row */
 .gpg-Editor :global(.cm-tooltip-autocomplete.cm-tooltip > ul > li) {
   display: flex;
   text-overflow: ellipsis;
   justify-content: space-between;
-  padding: 0 0.651em 0 0.2em;
+  padding: var(--cm-comp-item-padding);
 }
 
 /* Completion item row - active */
@@ -304,6 +319,19 @@
 
 .gpg-Editor :global(.cm-tooltip-autocomplete.cm-tooltip > ul > li[aria-selected] > .cm-completionDetail) {
   visibility: visible;
+}
+
+@media (max-width: 480px) {
+
+  /* Hide completion info on small screens */
+  .gpg-Editor :global(.cm-tooltip.cm-completionInfo) {
+    display: none;
+  }
+
+  /* Hide completion text */
+  .gpg-Editor :global(.cm-tooltip-autocomplete.cm-tooltip > ul > li > .cm-completionDetail) {
+    display: none !important;
+  }
 }
 
 /* Hover tooltip */
