@@ -87,9 +87,9 @@ export const TabSelector: React.FC<Props> = ({
         return <span>{label}</span>
       }
 
-      const {
-        active: { icon: iconName, color },
-      } = icon
+      const selectedTabStyle = tabs?.find((tab) => tab.key === selectedTab)?.style
+      const iconName = selectedTabStyle?.icon ?? icon.active.icon
+      const color = selectedTabStyle?.color ?? icon.active.color
       return (
         <Stack grow horizontal verticalAlign="center" horizontalAlign="stretch">
           <Stack.Item>
@@ -103,7 +103,7 @@ export const TabSelector: React.FC<Props> = ({
         </Stack>
       )
     },
-    [icon],
+    [icon, selectedTab, tabs],
   )
 
   const options = useMemo(() => {

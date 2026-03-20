@@ -11,7 +11,7 @@ import {
   type IStackStyles,
   type IButtonStyles,
 } from '@fluentui/react'
-import type { TabIconStyles } from '../types'
+import type { TabIconStyle, TabIconStyles } from '../types'
 
 const BUTTON_PRIMARY = 0
 const BUTTON_WHEEL = 1
@@ -27,6 +27,7 @@ const labelCellStyles: IStackStyles = {
 interface Props {
   label: string
   icon?: TabIconStyles
+  iconStyleOverride?: Partial<TabIconStyle>
   active?: boolean
   canClose?: boolean
   disabled?: boolean
@@ -34,7 +35,16 @@ interface Props {
   onClose?: () => void
 }
 
-export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, onClose, canClose, icon }) => {
+export const TabLabel: React.FC<Props> = ({
+  label,
+  active,
+  disabled,
+  onClick,
+  onClose,
+  canClose,
+  icon,
+  iconStyleOverride,
+}) => {
   const theme = useTheme()
   const isTouchDevice = navigator.maxTouchPoints > 0
 
@@ -100,7 +110,18 @@ export const TabLabel: React.FC<Props> = ({ label, active, disabled, onClick, on
     }
   }, [active, isTouchDevice])
 
-  const iconStyle = active ? icon?.active : icon?.inactive
+  const iconStyle = useMemo(() => {
+    const baseStyle = active ? icon?.active : icon?.inactive
+    if (!baseStyle) {
+      return undefined
+    }
+
+    return {
+      ...baseStyle,
+      ...(iconStyleOverride?.icon ? { icon: iconStyleOverride.icon } : {}),
+      ...(active && iconStyleOverride?.color ? { color: iconStyleOverride.color } : {}),
+    }
+  }, [active, icon, iconStyleOverride])
 
   // onAuxClick doesn't work in Chrome, so only way to capture it is onMouseUp/Down.
   const handleClick: React.MouseEventHandler<HTMLElement> = (e) => {

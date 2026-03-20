@@ -5,13 +5,34 @@ import { type State } from '~/store'
 import { dispatchCreateFile, dispatchRemoveFile, dispatchImportFile, newFileSelectAction } from '~/store/workspace'
 
 import { TabView } from '~/components/elements/tabs/TabView'
-import type { TabBarAction, TabIconStyles } from '~/components/elements/tabs/types'
+import type { TabBarAction, TabIconStyle, TabIconStyles, TabInfo } from '~/components/elements/tabs/types'
 
 import { LazyCodeEditorContainer } from '../CMCodeEditor/LazyCodeEditorContainer'
 import { NewFileModal } from '../NewFileModal'
 import { ContentPlaceholder } from '../ContentPlaceholder'
 import { newEmptyFileContent } from './utils'
 import { useConfirmModal } from '~/components/modals/ConfirmModal'
+
+const customFileTypeIcons: Record<string, Partial<TabIconStyle>> = {
+  '.json': {
+    icon: 'Code',
+    color: '#d29200',
+  },
+  '.txt': {
+    icon: 'TextDocument',
+    color: 'currentColor',
+  },
+}
+
+const getFileTypeIconStyle = (fileName: string): Partial<TabIconStyle> | undefined => {
+  const lower = fileName.toLowerCase()
+  const dot = lower.lastIndexOf('.')
+  if (dot === -1) {
+    return undefined
+  }
+
+  return customFileTypeIcons[lower.slice(dot)]
+}
 
 const Workspace: React.FC = () => {
   const dispatch = useDispatch()
@@ -32,13 +53,18 @@ const Workspace: React.FC = () => {
     },
   }
 
-  const tabs = useMemo(
+  const tabs: TabInfo[] | null = useMemo(
     () =>
       files
-        ? Object.keys(files).map((key) => ({
-            key,
-            label: key,
-          }))
+        ? Object.keys(files).map((fileName) => {
+            const style = getFileTypeIconStyle(fileName)
+
+            return {
+              key: fileName,
+              label: fileName,
+              ...(style ? { style } : {}),
+            }
+          })
         : null,
     [files],
   )

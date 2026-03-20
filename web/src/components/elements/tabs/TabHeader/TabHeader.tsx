@@ -83,11 +83,12 @@ export const TabHeader: React.FC<Props> = ({
             onClosed={onClosed}
           />
         ) : tabs?.length ? (
-          tabs?.map(({ key, label }, i) => (
+          tabs?.map(({ key, label, style }, i) => (
             <Stack.Item key={key} styles={tabContainerStyles}>
               <TabLabel
                 label={label}
                 icon={icon}
+                iconStyleOverride={style}
                 active={key === selectedTab}
                 canClose={allowEmpty || tabs?.length > 1}
                 disabled={disabled}
