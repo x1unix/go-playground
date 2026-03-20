@@ -106,8 +106,13 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
         text: 'Run',
         ariaLabel: 'Run program (Ctrl+Enter)',
         title: 'Run program (Ctrl+Enter)',
-        iconProps: { iconName: 'Play' },
+        iconProps: { iconName: 'IoMdPlay' },
         disabled: this.isDisabled,
+        buttonStyles: {
+          icon: {
+            color: this.theme.palette.green,
+          },
+        },
         onClick: () => {
           this.props.dispatch(runFileDispatcher)
         },
