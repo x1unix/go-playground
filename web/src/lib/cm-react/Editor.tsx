@@ -140,7 +140,7 @@ export class Editor extends React.Component<EditorProps, State> {
                 type: EventType.GutterClick,
                 position: {
                   line: view.state.doc.lineAt(line.from).number,
-                  column: 0,
+                  column: 1,
                 },
               })
               return true
@@ -422,7 +422,7 @@ export class Editor extends React.Component<EditorProps, State> {
 
       position = {
         line: cursor.number,
-        column: selection.main.head - cursor.from,
+        column: selection.main.head - cursor.from + 1, // Column should start at line 1
       }
     }
 

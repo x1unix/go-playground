@@ -8,6 +8,7 @@
   padding: 0 7px;
   justify-content: space-between;
   height: 22px;
+  flex-shrink: 0;
 }
 
 .StatusBar--busy {
