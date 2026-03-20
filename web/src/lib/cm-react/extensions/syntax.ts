@@ -36,9 +36,10 @@ const getSyntaxExtension = (lang: Syntax): Extension => {
       return goMod()
     case Syntax.JSON:
       return json()
+    case Syntax.PlainText:
+      return []
     default:
-      // TODO: handle plaintext
-      return null
+      return []
   }
 }
 
