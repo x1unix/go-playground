@@ -129,7 +129,8 @@ export class Editor extends React.Component<EditorProps, State> {
             }
             const cursorLine = state.doc.lineAt(state.selection.asSingle().ranges[0].to).number
             if (lineNo === cursorLine) {
-              return '0'
+              // Vim shows real line number for a current line.
+              return lineNo
             }
 
             return Math.abs(cursorLine - lineNo).toString()
