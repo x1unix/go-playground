@@ -100,7 +100,8 @@ func detectGoFileType(fpath string, src []byte) (pInfo projectInfo, err error) {
 // Also, if file is located at root, returns its Go file type - test or regular file.
 func checkFilePath(fpath string) (projectType, error) {
 	projType := projectTypeProgram
-	if err := goplay.ValidateFilePath(fpath, true); err != nil {
+	_, err := goplay.ValidateFilePath(fpath, true)
+	if err != nil {
 		return projType, newBuildError(err.Error())
 	}
 

@@ -17,7 +17,7 @@ func evalPayloadFromRequest(r *http.Request) ([]byte, error) {
 
 	switch len(body.Files) {
 	case 0:
-		return nil, nil
+		return nil, errNoGoFiles
 	case 1:
 		// Go playground might behave inadequately with unit-tests when multi-file snippet has only one file.
 		// See: https://github.com/x1unix/go-playground/issues/324
@@ -47,10 +47,14 @@ func evalPayloadFromRequest(r *http.Request) ([]byte, error) {
 	return fileSet.Bytes(), nil
 }
 
-func fileSetFromRequest(r *http.Request) (goplay.FileSet, []string, error) {
+var errNoGoFiles = NewBadRequestError(
+	errors.New("no Go files"),
+)
+
+func fileSetFromRequest(r *http.Request) (*goplay.FileSet, []string, error) {
 	body, err := filesPayloadFromRequest(r)
 	if err != nil {
-		return goplay.FileSet{}, nil, err
+		return nil, nil, err
 	}
 
 	payload := goplay.NewFileSet(goplay.MaxSnippetSize)
@@ -60,6 +64,10 @@ func fileSetFromRequest(r *http.Request) (goplay.FileSet, []string, error) {
 		if err := payload.Add(name, []byte(contents)); err != nil {
 			return payload, fileNames, NewBadRequestError(err)
 		}
+	}
+
+	if !payload.HasGoFiles() {
+		return nil, nil, errNoGoFiles
 	}
 
 	return payload, fileNames, nil

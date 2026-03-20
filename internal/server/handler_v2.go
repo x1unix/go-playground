@@ -10,9 +10,10 @@ import (
 	"golang.org/x/time/rate"
 
 	"github.com/gorilla/mux"
+	"go.uber.org/zap"
+
 	"github.com/x1unix/go-playground/internal/builder"
 	"github.com/x1unix/go-playground/pkg/goplay"
-	"go.uber.org/zap"
 )
 
 var ErrEmptyRequest = errors.New("empty request")

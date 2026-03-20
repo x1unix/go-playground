@@ -4,68 +4,100 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"path/filepath"
 	"strings"
 )
 
 // FileSet is a helper to construct a Go playground request from multiple Go files.
 type FileSet struct {
-	duplicates map[string]struct{}
-	buf        *bytes.Buffer
+	goSourceFiles map[string][]byte
+	otherFiles    map[string][]byte
+	buf           *bytes.Buffer
+	dirty         bool
 }
 
-func NewFileSet(bufSize int) FileSet {
-	buff := new(bytes.Buffer)
-	buff.Grow(bufSize)
-	return FileSet{
-		buf:        buff,
-		duplicates: make(map[string]struct{}),
+func NewFileSet(bufSize int) *FileSet {
+	buf := new(bytes.Buffer)
+	buf.Grow(bufSize)
+
+	return &FileSet{
+		buf:           buf,
+		goSourceFiles: make(map[string][]byte),
+		otherFiles:    make(map[string][]byte),
 	}
 }
 
+// HasGoFiles returns whether a set contains at-least one ".go" file.
+func (f *FileSet) HasGoFiles() bool {
+	return len(f.goSourceFiles) > 0
+}
+
 // Add adds a file to the buffer.
-func (f FileSet) Add(name string, src []byte) error {
+func (f *FileSet) Add(name string, src []byte) error {
 	if len(src) == 0 {
 		return fmt.Errorf("file %q is empty", name)
 	}
 
 	name = strings.TrimSpace(name)
-	if _, ok := f.duplicates[name]; ok {
+	isGoFile, err := ValidateFilePath(name, true)
+	if err != nil {
+		return err
+	}
+
+	var dstMap map[string][]byte
+	if isGoFile {
+		dstMap = f.goSourceFiles
+	} else {
+		dstMap = f.otherFiles
+	}
+
+	if _, ok := dstMap[name]; ok {
 		return fmt.Errorf("duplicate file name %q", name)
 	}
 
-	switch ext := filepath.Ext(name); ext {
-	case ".go", ".mod":
-		break
-	default:
-		return fmt.Errorf("unsupported file type: %q", name)
-	}
-
-	f.duplicates[name] = struct{}{}
-	f.buf.WriteString("-- ")
-	f.buf.WriteString(name)
-	f.buf.WriteString(" --\n")
-	f.buf.Write(src)
-
-	if !f.hasTrailingNewline() {
-		f.buf.WriteByte('\n')
-	}
+	dstMap[name] = src
+	f.buf.Reset()
+	f.dirty = true
 	return nil
 }
 
-func (f FileSet) Bytes() []byte {
-	return f.buf.Bytes()
+func txtarAppendFile(buf *bytes.Buffer, fname string, data []byte) {
+	buf.WriteString("-- ")
+	buf.WriteString(fname)
+	buf.WriteString(" --\n")
+	buf.Write(data)
+
+	// If contents doesn't end with line break - add it.
+	// Required, as line break is txtar file separator.
+	hasTrailingNewline := len(data) == 0 || data[len(data)-1] == '\n'
+	if !hasTrailingNewline {
+		buf.WriteByte('\n')
+	}
 }
 
-func (f FileSet) Reader() io.Reader {
+func (f *FileSet) buildBuf() *bytes.Buffer {
+	if !f.dirty {
+		// Skip if buffer is populated.
+		return f.buf
+	}
+
+	// First, write Go source files and then other files.
+	// Upstream might misbehave if non-Go files come first.
+	for fname, src := range f.goSourceFiles {
+		txtarAppendFile(f.buf, fname, src)
+	}
+
+	for fname, src := range f.otherFiles {
+		txtarAppendFile(f.buf, fname, src)
+	}
+
+	f.dirty = false
 	return f.buf
 }
 
-func (f FileSet) hasTrailingNewline() bool {
-	buff := f.buf.Bytes()
-	if len(buff) == 0 {
-		return false
-	}
+func (f *FileSet) Bytes() []byte {
+	return f.buildBuf().Bytes()
+}
 
-	return buff[len(buff)-1] == '\n'
+func (f *FileSet) Reader() io.Reader {
+	return f.buildBuf()
 }
