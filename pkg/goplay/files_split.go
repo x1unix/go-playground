@@ -25,7 +25,7 @@ func cleanPath(pathname string) string {
 
 // ValidateFilePath validates a given file path contains a supported file.
 //
-// Filters out files that are not go.mod, *.go or *.txt files.
+// Filters out files that are not go.mod, *.go, *.txt or *.json files.
 func ValidateFilePath(name string, strict bool) (isGoFile bool, err error) {
 	name = strings.TrimSpace(name)
 	if name == "" {

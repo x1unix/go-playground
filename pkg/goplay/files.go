@@ -9,10 +9,12 @@ import (
 
 // FileSet is a helper to construct a Go playground request from multiple Go files.
 type FileSet struct {
-	goSourceFiles map[string][]byte
-	otherFiles    map[string][]byte
-	buf           *bytes.Buffer
-	dirty         bool
+	goSourceFiles  map[string][]byte
+	otherFiles     map[string][]byte
+	goFileOrder    []string
+	otherFileOrder []string
+	buf            *bytes.Buffer
+	dirty          bool
 }
 
 func NewFileSet(bufSize int) *FileSet {
@@ -20,9 +22,11 @@ func NewFileSet(bufSize int) *FileSet {
 	buf.Grow(bufSize)
 
 	return &FileSet{
-		buf:           buf,
-		goSourceFiles: make(map[string][]byte),
-		otherFiles:    make(map[string][]byte),
+		buf:            buf,
+		goSourceFiles:  make(map[string][]byte),
+		otherFiles:     make(map[string][]byte),
+		goFileOrder:    make([]string, 0),
+		otherFileOrder: make([]string, 0),
 	}
 }
 
@@ -44,10 +48,13 @@ func (f *FileSet) Add(name string, src []byte) error {
 	}
 
 	var dstMap map[string][]byte
+	var dstOrder *[]string
 	if isGoFile {
 		dstMap = f.goSourceFiles
+		dstOrder = &f.goFileOrder
 	} else {
 		dstMap = f.otherFiles
+		dstOrder = &f.otherFileOrder
 	}
 
 	if _, ok := dstMap[name]; ok {
@@ -55,6 +62,7 @@ func (f *FileSet) Add(name string, src []byte) error {
 	}
 
 	dstMap[name] = src
+	*dstOrder = append(*dstOrder, name)
 	f.buf.Reset()
 	f.dirty = true
 	return nil
@@ -82,11 +90,13 @@ func (f *FileSet) buildBuf() *bytes.Buffer {
 
 	// First, write Go source files and then other files.
 	// Upstream might misbehave if non-Go files come first.
-	for fname, src := range f.goSourceFiles {
+	for _, fname := range f.goFileOrder {
+		src := f.goSourceFiles[fname]
 		txtarAppendFile(f.buf, fname, src)
 	}
 
-	for fname, src := range f.otherFiles {
+	for _, fname := range f.otherFileOrder {
+		src := f.otherFiles[fname]
 		txtarAppendFile(f.buf, fname, src)
 	}
 
