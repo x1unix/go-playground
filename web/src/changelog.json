@@ -26,6 +26,11 @@
       "issueId": 565,
       "url": "pull/565",
       "description": "Handle import aliases for package symbols autocomplete"
+    },
+    {
+      "issueId": 572,
+      "url": "pull/572",
+      "description": "Support JSON and text files"
     }
   ]
 }
