@@ -10,8 +10,10 @@ export type ColorScheme = 'dark' | 'light'
 export type Callback<T> = (arg: T) => void
 
 export enum Syntax {
+  PlainText,
   Go,
   GoMod,
+  JSON,
 }
 
 export interface DocumentState {

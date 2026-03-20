@@ -1,4 +1,5 @@
 import { go } from '@codemirror/lang-go'
+import { json } from '@codemirror/lang-json'
 import { Compartment, type Extension } from '@codemirror/state'
 import { Syntax } from '../types/common'
 
@@ -18,10 +19,12 @@ export const syntaxFromFileName = (fName?: string): Syntax => {
   switch (getFileExtension(fName)) {
     case '.mod':
       return Syntax.GoMod
-
     case '.go':
-    default:
       return Syntax.Go
+    case '.json':
+      return Syntax.JSON
+    default:
+      return Syntax.PlainText
   }
 }
 
@@ -31,6 +34,11 @@ const getSyntaxExtension = (lang: Syntax): Extension => {
       return go()
     case Syntax.GoMod:
       return goMod()
+    case Syntax.JSON:
+      return json()
+    default:
+      // TODO: handle plaintext
+      return null
   }
 }
 
