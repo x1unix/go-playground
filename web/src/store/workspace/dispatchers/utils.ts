@@ -66,7 +66,7 @@ const dedupFileName = (filename: string, files: Set<string>): string | null => {
  * @param currentValues - Initial list of existing names.
  * @param onError - callback to call when deduplication fails.
  */
-export function* dedupFiles(files: FileList, currentValues: Set<string>, onError?: () => void): Generator<File> {
+export function* dedupFiles(files: Iterable<File>, currentValues: Set<string>, onError?: () => void): Generator<File> {
   for (const f of files) {
     const uniqName = dedupFileName(f.name, currentValues)
     if (!uniqName) {

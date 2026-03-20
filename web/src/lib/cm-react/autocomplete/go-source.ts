@@ -120,6 +120,10 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
 
   constructor(private readonly langWorker: LanguageWorker) {}
 
+  supportsSyntax(syntax: Syntax) {
+    return syntax === Syntax.Go
+  }
+
   async isWarmUp() {
     if (this.isCacheReady) {
       return true

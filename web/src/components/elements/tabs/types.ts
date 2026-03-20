@@ -11,6 +11,7 @@ export type TabKey = string
 export interface TabInfo {
   key: TabKey
   label: string
+  style?: Partial<TabIconStyle>
 }
 
 export interface TabIconStyle {

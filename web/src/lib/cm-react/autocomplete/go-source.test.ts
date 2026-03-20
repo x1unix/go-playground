@@ -41,6 +41,16 @@ const hoverAtOffset = async (source: GoAutocompleteSource, doc: DocumentState, o
 }
 
 describe('GoAutocompleteSource', () => {
+  test('supports only Go syntax', () => {
+    const worker = {} as any
+    const source = new GoAutocompleteSource(worker)
+
+    assert.isTrue(source.supportsSyntax(Syntax.Go))
+    assert.isFalse(source.supportsSyntax(Syntax.GoMod))
+    assert.isFalse(source.supportsSyntax(Syntax.JSON))
+    assert.isFalse(source.supportsSyntax(Syntax.PlainText))
+  })
+
   test('keeps package suggestion for full literal prefix', async () => {
     const worker = {
       isWarmUp: async () => true,

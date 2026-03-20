@@ -184,7 +184,7 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
         ariaLabel: 'Format Code (Alt+F)',
         iconOnly: true,
         disabled: this.isDisabled,
-        iconProps: { iconName: 'Code' },
+        iconProps: { iconName: 'code' },
         onClick: () => {
           this.props.dispatch(dispatchFormatFile())
         },

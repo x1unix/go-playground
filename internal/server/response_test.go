@@ -65,11 +65,20 @@ func TestFilesPayload_Validate(t *testing.T) {
 			err: "empty file list",
 		},
 		"unknown file": {
-			err: `invalid file type: "main.txt"`,
+			err: `invalid file name "main.md"`,
 			input: FilesPayload{
 				Files: map[string]string{
-					"main.txt":     "asdasd",
+					"main.md":      "asdasd",
 					"main_test.go": "xxxxx",
+				},
+			},
+		},
+		"with extra txt and json files": {
+			input: FilesPayload{
+				Files: map[string]string{
+					"main.go":     "package main",
+					"README.txt":  "hello",
+					"config.json": `{"foo": "bar"}`,
 				},
 			},
 		},

@@ -11,6 +11,7 @@ import { EditorView, hoverTooltip, type Tooltip } from '@codemirror/view'
 
 import type { CompletionItem, CompletionResult, EditorAutocompleteSource, HoverResult } from '../types/autocomplete'
 import { LoadState } from '../types/events'
+import { getBufferState } from '../buffers/state'
 import { docStateFromEditor } from '../utils'
 import { cursorFromOffset } from './utils'
 import { classNames, type PluginTheme } from './styles'
@@ -109,8 +110,13 @@ class AutocompletePlugin {
     const { source, isCurrentPath, onStatus } = this.opts
     return async (context: CompletionContext): Promise<CMCompletionResult | null> => {
       const currentSource = source()
+      const syntax = getBufferState(context.state).syntax
+      if (!currentSource?.supportsSyntax(syntax)) {
+        return null
+      }
+
       const doc = docStateFromEditor(context.state)
-      if (!doc || !currentSource) {
+      if (!doc) {
         return null
       }
 
@@ -157,8 +163,13 @@ class AutocompletePlugin {
 
     const hover = hoverTooltip(async (view, pos) => {
       const currentSource = source()
+      const syntax = getBufferState(view.state).syntax
+      if (!currentSource?.supportsSyntax(syntax)) {
+        return null
+      }
+
       const doc = docStateFromEditor(view.state)
-      if (!doc || !currentSource) {
+      if (!doc) {
         return null
       }
 
