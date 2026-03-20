@@ -1,4 +1,4 @@
-import type { DocumentState } from './common'
+import type { DocumentState, Syntax } from './common'
 
 // Ported from monaco.IMarkdownString
 export interface IMarkdownString {
@@ -97,6 +97,7 @@ export interface DocumentUpdate {
 }
 
 export interface EditorAutocompleteSource {
+  supportsSyntax: (syntax: Syntax) => boolean
   isWarmUp: () => Promise<boolean>
   complete: (req: CompletionRequest) => Promise<CompletionResult | null>
   hover: (req: HoverRequest) => Promise<HoverResult | null>
