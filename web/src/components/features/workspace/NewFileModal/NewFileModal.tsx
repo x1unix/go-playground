@@ -11,7 +11,7 @@ interface Props {
 }
 
 const fileNameRegex =
-  /^(?!.*(\.\.|\/\.|\.\/|\/$))([a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/)?(go\.mod|go\.sum|[a-zA-Z0-9_-]+\.go)$/i
+  /^(?!.*(\.\.|\/\.|\.\/|\/$))([a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/)?(go\.mod|go\.sum|[a-zA-Z0-9_-]+\.(go|txt|.json))$/i
 const maxFileNameLength = 255
 
 const verticalStackTokens: IStackTokens = {

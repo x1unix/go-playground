@@ -13,7 +13,7 @@ import { WorkspaceAction, type FileUpdatePayload, type FilePayload } from '../ac
 import { readFile, dedupFiles } from './utils'
 import { type WorkspaceState, defaultFiles } from '../state'
 
-const IMPORTABLE_EXTENSIONS = new Set(['.go'])
+const IMPORTABLE_EXTENSIONS = new Set(['.go', '.txt', '.json'])
 
 export const isImportableWorkspaceFile = (name: string): boolean => {
   const lower = name.toLowerCase()
