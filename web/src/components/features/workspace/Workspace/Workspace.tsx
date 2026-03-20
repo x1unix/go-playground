@@ -134,7 +134,7 @@ const Workspace: React.FC = () => {
         type="file"
         hidden
         multiple
-        accept=".go"
+        accept=".go,.txt,go.mod"
         style={{ display: 'none' }}
         onChange={onFilePick}
       />
