@@ -6,6 +6,7 @@ import { dispatchCreateFile, dispatchRemoveFile, dispatchImportFile, newFileSele
 
 import { TabView } from '~/components/elements/tabs/TabView'
 import type { TabBarAction, TabIconStyle, TabIconStyles, TabInfo } from '~/components/elements/tabs/types'
+import type { EditorRemote } from '~/lib/cm-react/types/common'
 
 import { LazyCodeEditorContainer } from '../CMCodeEditor/LazyCodeEditorContainer'
 import { NewFileModal } from '../NewFileModal'
@@ -45,6 +46,7 @@ const Workspace: React.FC = () => {
   const uploadRef = useRef<HTMLInputElement>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const { showConfirm } = useConfirmModal()
+  const editorRemoteRef = useRef<EditorRemote | null>(null)
 
   const tabIconStyles: TabIconStyles = {
     active: {
@@ -80,6 +82,8 @@ const Workspace: React.FC = () => {
       confirmText: 'Delete',
     }).then((result) => {
       if (result) {
+        // Evict document from editor buffer cache.
+        editorRemoteRef.current?.forgetDocument(key)
         dispatch(dispatchRemoveFile(key))
       }
     })
@@ -140,7 +144,14 @@ const Workspace: React.FC = () => {
       disabled={(snippet?.loading ?? false) || !!snippet?.error}
     >
       {tabs?.length ? (
-        <LazyCodeEditorContainer />
+        <LazyCodeEditorContainer
+          onMount={(remote) => {
+            editorRemoteRef.current = remote
+          }}
+          onUnmount={() => {
+            editorRemoteRef.current = null
+          }}
+        />
       ) : (
         <ContentPlaceholder
           isLoading={snippet?.loading}

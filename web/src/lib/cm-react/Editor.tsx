@@ -83,7 +83,7 @@ export class Editor extends React.Component<EditorProps, State> {
     })
 
     // Preinit remote as it is a dependency for extensions.
-    this.remote = new CMEditorRemote(this.props.formatter)
+    this.remote = new CMEditorRemote(this.buffMgr, this.props.formatter)
 
     // Create hotkey handler and register custom commands.
     const docCmdHandler: DocumentCommandHandler = (cmd, doc) => {
@@ -240,6 +240,12 @@ export class Editor extends React.Component<EditorProps, State> {
     this.editor?.focus()
   }
 
+  componentWillUnmount() {
+    this.editor?.destroy()
+    this.buffMgr.clear()
+    this.props.onUnmount?.()
+  }
+
   /**
    * Applies updates on EditorState based on prop changes.
    */
@@ -273,7 +279,11 @@ export class Editor extends React.Component<EditorProps, State> {
       // Ignore persist of previous state, if it's a default editor state (not from a file).
       // E.g. when made using getInitialEditorState().
       if (hasBufferState(this.editor.state)) {
-        this.buffMgr.setState(prevFile.path, state)
+        // Skip persist previous document was marked for cache eviction.
+        // Happens during delete of current file and switch to a new one.
+        if (!this.buffMgr.unevict(prevFile.path)) {
+          this.buffMgr.setState(prevFile.path, state)
+        }
       }
     }
 

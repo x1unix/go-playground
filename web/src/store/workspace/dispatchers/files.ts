@@ -11,7 +11,7 @@ import {
 import { saveWorkspaceState } from '../config'
 import { WorkspaceAction, type FileUpdatePayload, type FilePayload } from '../actions'
 import { readFile, dedupFiles } from './utils'
-import { type WorkspaceState, defaultFiles } from '../state'
+import { type WorkspaceState, defaultFiles, newGenerationKey } from '../state'
 
 const IMPORTABLE_EXTENSIONS = new Set(['.go', '.txt', '.json'])
 
@@ -186,6 +186,7 @@ export const dispatchImportSource = (files: Record<string, string>) => (dispatch
   dispatch<WorkspaceState>({
     type: WorkspaceAction.WORKSPACE_IMPORT,
     payload: {
+      generation: newGenerationKey(),
       selectedFile,
       files,
     },

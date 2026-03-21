@@ -104,10 +104,15 @@ const mapCommandToAction = (e: EditorCommand, rem: EditorRemote): AnyAction | Di
   }
 }
 
+export interface CodeEditorContainerProps {
+  onMount: (remote: EditorRemote) => void
+  onUnmount: () => void
+}
+
 /**
  * Connects CodeMirror code editor to the application store and business logic.
  */
-export const CodeEditorContainer: React.FC = () => {
+export const CodeEditorContainer: React.FC<CodeEditorContainerProps> = ({ onMount, onUnmount }) => {
   const dispatch = useDispatch()
   const saveDebouncer = useDebouncer(150)
 
@@ -178,6 +183,8 @@ export const CodeEditorContainer: React.FC = () => {
         handler: (doc) => linterRef.current.check(doc, { warnAboutFakeDateTime: isServerRuntime }),
       }}
       autocomplete={autocompleteRef.current.source}
+      onMount={onMount}
+      onUnmount={onUnmount}
       onChange={({ path, text }) => {
         saveDebouncer(() => {
           dispatch(dispatchUpdateFile(path, text.toString()))
