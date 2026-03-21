@@ -112,12 +112,14 @@ const Workspace: React.FC = () => {
     dispatch(dispatchCreateFile(fileName, newEmptyFileContent(fileName)))
   }
 
-  const onFilePick = ({ target: { files } }: React.ChangeEvent<HTMLInputElement>) => {
+  const onFilePick = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = target
     if (!files?.length) {
       return
     }
 
     dispatch(dispatchImportFile(files))
+    target.value = ''
   }
 
   return (
