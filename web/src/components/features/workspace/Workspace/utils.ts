@@ -14,12 +14,15 @@ const fileExtension = (fileName: string) => {
 
 export const newEmptyFileContent = (fileName: string) => {
   const [baseName, dirName] = splitPath(fileName)
-  const fileExt = fileExtension(baseName!)
-
-  if (fileExt === 'mod') {
+  if (baseName === 'go.mod') {
     return goModTemplate
   }
 
-  const pkg = dirName ?? 'main'
-  return `package ${pkg}\n\n`
+  const fileExt = fileExtension(baseName!)
+  if (fileExt === 'go') {
+    const pkg = dirName ?? 'main'
+    return `package ${pkg}\n\n`
+  }
+
+  return ''
 }
