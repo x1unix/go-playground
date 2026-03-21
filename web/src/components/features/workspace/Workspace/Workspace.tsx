@@ -18,6 +18,10 @@ const customFileTypeIcons: Record<string, Partial<TabIconStyle>> = {
     icon: 'Code',
     color: '#d29200',
   },
+  '.mod': {
+    icon: 'Package',
+    color: '#d29200',
+  },
   '.txt': {
     icon: 'TextDocument',
     color: 'currentColor',
@@ -112,12 +116,14 @@ const Workspace: React.FC = () => {
     dispatch(dispatchCreateFile(fileName, newEmptyFileContent(fileName)))
   }
 
-  const onFilePick = ({ target: { files } }: React.ChangeEvent<HTMLInputElement>) => {
+  const onFilePick = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = target
     if (!files?.length) {
       return
     }
 
     dispatch(dispatchImportFile(files))
+    target.value = ''
   }
 
   return (
@@ -160,7 +166,7 @@ const Workspace: React.FC = () => {
         type="file"
         hidden
         multiple
-        accept=".go,go.mod,.txt,.json"
+        accept=".go,.mod,.txt,.json"
         style={{ display: 'none' }}
         onChange={onFilePick}
       />
