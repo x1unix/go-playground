@@ -52,6 +52,11 @@ export interface EditorRemote {
   invalidateDocument: (path: string) => void
 
   /**
+   * Remove document from editor state.
+   */
+  forgetDocument: (path: string) => void
+
+  /**
    * Focuses editor instance.
    */
   focus: () => void

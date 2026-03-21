@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Spinner, SpinnerSize } from '@fluentui/react'
-import { FlexContainer } from '../FlexContainer'
+import type { CodeEditorContainerProps } from './CodeEditorContainer'
 
 const styles = {
   flex: '1 1 0%',
@@ -22,10 +22,10 @@ const CodeEditorPreloader: React.FC = () => (
 /**
  * Lazy-loading wrapper for code editor container
  */
-export const LazyCodeEditorContainer: React.FC = () => {
+export const LazyCodeEditorContainer: React.FC<CodeEditorContainerProps> = (props) => {
   return (
     <React.Suspense fallback={<CodeEditorPreloader />}>
-      <CodeEditorContainer />
+      <CodeEditorContainer {...props} />
     </React.Suspense>
   )
 }
