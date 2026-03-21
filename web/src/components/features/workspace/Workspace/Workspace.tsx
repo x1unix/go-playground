@@ -160,7 +160,7 @@ const Workspace: React.FC = () => {
         type="file"
         hidden
         multiple
-        accept=".go,go.mod,.txt,.json"
+        accept=".go,.mod,.txt,.json"
         style={{ display: 'none' }}
         onChange={onFilePick}
       />
