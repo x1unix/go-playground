@@ -18,6 +18,10 @@ const customFileTypeIcons: Record<string, Partial<TabIconStyle>> = {
     icon: 'Code',
     color: '#d29200',
   },
+  '.mod': {
+    icon: 'Package',
+    color: '#d29200',
+  },
   '.txt': {
     icon: 'TextDocument',
     color: 'currentColor',
