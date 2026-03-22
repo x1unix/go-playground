@@ -18,7 +18,7 @@ const BuiltinPackage = "builtin"
 
 var (
 	astDocFields     = []string{"Doc", "Comment"}
-	commentBlockType = reflect.TypeOf((*ast.CommentGroup)(nil))
+	commentBlockType = reflect.TypeFor[*ast.CommentGroup]()
 
 	token2KindMapping = map[token.Token]monaco.CompletionItemKind{
 		token.VAR:   monaco.Variable,
