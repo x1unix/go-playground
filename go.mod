@@ -1,8 +1,6 @@
 module github.com/x1unix/go-playground
 
-go 1.23
-
-toolchain go1.23.1
+go 1.26.0
 
 require (
 	github.com/TheZeroSlave/zapsentry v1.10.0
@@ -35,6 +33,10 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
+	golang.org/x/exp/event v0.0.0-20260112195511-716be5621a96 // indirect
+	golang.org/x/exp/jsonrpc2 v0.0.0-20260212183809-81e46e3db34a // indirect
+	golang.org/x/sys v0.40.0 // indirect
+	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	typefox.dev/lsp v0.0.3 // indirect
 )
