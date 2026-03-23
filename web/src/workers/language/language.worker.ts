@@ -14,7 +14,7 @@ import {
 } from './utils'
 import type { SymbolIndexItem } from '~/services/storage/types'
 
-const completionVersionKey = 'completionItems.v2'
+const completionVersionKey = 'completionItems.v3'
 
 const TTL_DAYS = 7
 
