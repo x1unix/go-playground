@@ -16,13 +16,11 @@ export interface CursorPosition {
   offset: number
 }
 
-export type CompletionTextEdit = TextEdit
-
 export interface CompletionItem extends Omit<LSPCompletionItem, 'additionalTextEdits'> {
   insertText: string
   replaceFrom: number
   replaceTo: number
-  additionalTextEdits?: CompletionTextEdit[]
+  additionalTextEdits?: TextEdit[]
 }
 
 export interface CompletionResult {
@@ -48,11 +46,9 @@ export interface HoverRequest {
   cursor: CursorPosition
 }
 
-export type DocumentEditChange = Range
-
 export interface DocumentUpdate {
   path: string
-  changes: DocumentEditChange[]
+  changes: Range[]
   isFlush?: boolean
 }
 
