@@ -6,16 +6,19 @@ import {
   type CompletionContext,
   type CompletionResult as CMCompletionResult,
 } from '@codemirror/autocomplete'
+import type { Text } from '@codemirror/state'
 import { Compartment, Facet, type Extension } from '@codemirror/state'
 import { EditorView, hoverTooltip, type Tooltip } from '@codemirror/view'
+import { InsertTextFormat, type TextEdit } from 'vscode-languageserver-protocol'
 
 import type { CompletionItem, CompletionResult, EditorAutocompleteSource, HoverResult } from '../types/autocomplete'
 import { LoadState } from '../types/events'
 import { getBufferState } from '../buffers/state'
 import { docStateFromEditor } from '../utils'
-import { cursorFromOffset } from './utils'
+import { cursorFromOffset, offsetFromLineColumn } from './utils'
 import { classNames, type PluginTheme } from './styles'
 import { MarkupRenderer, renderCompletionDoc } from './doc-renderer'
+import { completionTypeFromKind } from './converter'
 
 export interface AutocompletePluginOptions {
   source: () => EditorAutocompleteSource | undefined
@@ -49,6 +52,12 @@ const normalizeError = (err: unknown) => {
   return String(err)
 }
 
+const toCMChange = (doc: Text, { range, newText }: TextEdit) => ({
+  from: offsetFromLineColumn(doc, range.start.line + 1, range.start.character + 1),
+  to: offsetFromLineColumn(doc, range.end.line + 1, range.end.character + 1),
+  insert: newText,
+})
+
 class AutocompletePlugin {
   constructor(private readonly opts: AutocompletePluginOptions) {}
 
@@ -56,19 +65,19 @@ class AutocompletePlugin {
     return {
       label: item.label,
       detail: item.detail,
-      type: item.type,
+      type: completionTypeFromKind(item.kind),
       info: () => renderCompletionDoc(renderer, item.documentation),
       apply: (view, completion, from, to) => {
         const replaceFrom = item.replaceFrom ?? from
         const replaceTo = item.replaceTo ?? to
 
-        if (item.isSnippet && !item.additionalTextEdits?.length) {
+        if (item.insertTextFormat === InsertTextFormat.Snippet && !item.additionalTextEdits?.length) {
           snippet(item.insertText)(view, completion, replaceFrom, replaceTo)
           return
         }
 
         const changes = [
-          ...(item.additionalTextEdits ?? []),
+          ...(item.additionalTextEdits ?? []).map((edit) => toCMChange(view.state.doc, edit)),
           { from: replaceFrom, to: replaceTo, insert: item.insertText },
         ].sort((a, b) => a.from - b.from)
 

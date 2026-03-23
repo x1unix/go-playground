@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/x1unix/go-playground/pkg/monaco"
+	"typefox.dev/lsp"
 )
 
 func TestTypeToCompletionItem(t *testing.T) {
@@ -46,7 +46,7 @@ func TestTypeToCompletionItem(t *testing.T) {
 
 			opts := TraverseOpts{
 				FileSet:       fset,
-				SnippetFormat: monaco.InsertAsSnippet,
+				SnippetFormat: lsp.SnippetTextFormat,
 			}
 			if len(c.ignore) > 0 {
 				opts.Filter = NewIgnoreList(c.ignore...)

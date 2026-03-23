@@ -1,16 +1,21 @@
 import { go } from '@codemirror/lang-go'
 import { highlightTree, type Highlighter } from '@lezer/highlight'
 import markdownit from 'markdown-it'
-import type { DocContent, MarkedString } from '../types/autocomplete'
+import type { MarkedString, MarkupContent } from 'vscode-languageserver-protocol'
+import type { DocContent } from '../types/autocomplete'
 
 import { classNames } from './styles'
+
+const MD_CODE_BLOCK = '```'
 
 interface NormalizedContent {
   isMarkdown: boolean
   value: string
 }
 
-const normalizeMarkupEntry = (entry: MarkedString): NormalizedContent => {
+type MarkupEntry = MarkedString | MarkupContent
+
+const normalizeMarkupEntry = (entry: MarkupEntry): NormalizedContent => {
   if (typeof entry === 'string') {
     return {
       isMarkdown: false,
@@ -18,30 +23,37 @@ const normalizeMarkupEntry = (entry: MarkedString): NormalizedContent => {
     }
   }
 
-  if ('language' in entry) {
-    return {
-      isMarkdown: true,
-      value: '```' + entry.language + '\n' + entry.value + '\n```',
-    }
+  if ('kind' in entry) {
+    return normalizeMarkupContentValue(entry)
   }
+
+  const lang = entry.language ?? ''
+  const value = `${MD_CODE_BLOCK}${lang}\n${entry.value}\n${MD_CODE_BLOCK}`
 
   return {
     isMarkdown: true,
-    value: entry.value,
+    value,
+  }
+}
+
+const normalizeMarkupContentValue = (content: MarkupContent): NormalizedContent => {
+  return {
+    isMarkdown: content.kind === 'markdown',
+    value: content.value,
   }
 }
 
 const normalizeMarkupContent = (content: DocContent): NormalizedContent => {
   if (Array.isArray(content)) {
     return content.reduce(
-      (acc: NormalizedContent, item: MarkedString): NormalizedContent => {
+      (acc: NormalizedContent, item: MarkupEntry): NormalizedContent => {
         const normalizedItem = normalizeMarkupEntry(item)
         return {
           isMarkdown: acc.isMarkdown || normalizedItem.isMarkdown,
           value: acc.value ? acc.value + '\n\n' + normalizedItem.value : normalizedItem.value,
         }
       },
-      { isMarkdown: false, value: '' },
+      { isMarkdown: true, value: '' },
     )
   }
 

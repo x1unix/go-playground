@@ -3,37 +3,37 @@
     "label": "ErrInvalidUnreadByte",
     "documentation": "ErrInvalidUnreadByte occurs when invalid use of UnreadByte is done.",
     "insertText": "ErrInvalidUnreadByte",
-    "kind": 4,
-    "insertTextRules": 0
+    "kind": 6,
+    "insertTextRules": 1
   },
   {
     "label": "Bar",
     "insertText": "Bar",
     "signature": "var Bar = 32",
-    "kind": 4,
-    "insertTextRules": 0
+    "kind": 6,
+    "insertTextRules": 1
   },
   {
     "label": "Foo",
     "insertText": "Foo",
     "signature": "var Foo int32",
-    "kind": 4,
-    "insertTextRules": 0
+    "kind": 6,
+    "insertTextRules": 1
   },
   {
     "label": "Baz",
     "documentation": "Baz is a sample value.",
     "insertText": "Baz",
     "signature": "var Baz bool",
-    "kind": 4,
-    "insertTextRules": 0
+    "kind": 6,
+    "insertTextRules": 1
   },
   {
     "label": "MyPublicFunc",
     "detail": "func(foo int) (int, error)",
     "insertText": "MyPublicFunc(${1:foo})",
     "signature": "func MyPublicFunc(foo int) (int, error)",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   }
 ]

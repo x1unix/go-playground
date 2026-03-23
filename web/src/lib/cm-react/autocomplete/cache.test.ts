@@ -37,8 +37,14 @@ describe('DocumentMetadataCache.resolveImportAlias', () => {
       path: docV1.path,
       changes: [
         {
-          startLineNumber: 3,
-          endLineNumber: 3,
+          start: {
+            line: 2,
+            character: 0,
+          },
+          end: {
+            line: 2,
+            character: 20,
+          },
         },
       ],
     })

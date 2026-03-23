@@ -2,10 +2,10 @@ package index
 
 import (
 	"github.com/x1unix/go-playground/internal/pkgindex/docutil"
-	"github.com/x1unix/go-playground/pkg/monaco"
+	"typefox.dev/lsp"
 )
 
-const GoIndexFileVersion = 1
+const GoIndexFileVersion = 2
 
 type FlatSymbolSource [2]string
 
@@ -60,10 +60,10 @@ type Symbols struct {
 	InsertTexts []string `json:"insertTexts"`
 
 	// InsertTextRules contains snippet insertion rules for InsertTexts.
-	InsertTextRules []monaco.CompletionItemInsertTextRule `json:"insertTextRules,omitempty"`
+	InsertTextRules []lsp.InsertTextFormat `json:"insertTextRules,omitempty"`
 
 	// Kinds contains symbol type for suggestion icon.
-	Kinds []monaco.CompletionItemKind `json:"kinds"`
+	Kinds []lsp.CompletionItemKind `json:"kinds"`
 
 	// Packages contains information where particular symbol belongs (to what package).
 	Packages []FlatSymbolSource `json:"packages"`
@@ -76,8 +76,8 @@ func NewSymbols(capacity int) Symbols {
 		Details:         make([]string, 0, capacity),
 		Signatures:      make([]string, 0, capacity),
 		InsertTexts:     make([]string, 0, capacity),
-		InsertTextRules: make([]monaco.CompletionItemInsertTextRule, 0, capacity),
-		Kinds:           make([]monaco.CompletionItemKind, 0, capacity),
+		InsertTextRules: make([]lsp.InsertTextFormat, 0, capacity),
+		Kinds:           make([]lsp.CompletionItemKind, 0, capacity),
 		Packages:        make([]FlatSymbolSource, 0, capacity),
 	}
 }

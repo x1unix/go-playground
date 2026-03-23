@@ -8,7 +8,7 @@ import type { State } from '~/store'
 
 import { EllipsisText } from '~/components/utils/EllipsisText'
 import { StatusBarItem, StatusBarItemCounter } from '~/components/layout/StatusBar/StatusBarItem'
-import { VimStatusBarItem } from '~/plugins/vim/VimStatusBarItem'
+import { VimStatusBarItem } from './VimStatusBarItem'
 
 import styles from './StatusBar.module.css'
 

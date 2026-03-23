@@ -126,8 +126,7 @@ func enqueueRootEntries(rootDir string, parentImportPath string, queue *imports.
 
 func isDirIgnored(basename string) bool {
 	switch basename {
-	// Arena experiment was rejected and removed
-	case "cmd", "internal", "testdata":
+	case "cmd", "internal", "testdata", "_asm":
 		return true
 	}
 

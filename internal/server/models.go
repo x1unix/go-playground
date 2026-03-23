@@ -2,11 +2,9 @@ package server
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/x1unix/go-playground/internal/announcements"
 	"github.com/x1unix/go-playground/pkg/goplay"
-	"github.com/x1unix/go-playground/pkg/monaco"
 )
 
 const (
@@ -48,20 +46,6 @@ type ShareResponse struct {
 	SnippetID string `json:"snippetID"`
 }
 
-// SuggestionRequest is code completion suggestion request
-type SuggestionRequest struct {
-	PackageName string `json:"packageName"`
-	Value       string `json:"value"`
-}
-
-// Trim trims request payload
-func (sr SuggestionRequest) Trim() SuggestionRequest {
-	return SuggestionRequest{
-		PackageName: strings.TrimSpace(sr.PackageName),
-		Value:       strings.TrimSpace(sr.Value),
-	}
-}
-
 // VersionResponse is version response
 type VersionResponse struct {
 	// Version is server version
@@ -73,19 +57,6 @@ type VersionResponse struct {
 
 // Write writes data to response
 func (r VersionResponse) Write(w http.ResponseWriter) {
-	WriteJSON(w, r)
-}
-
-// SuggestionsResponse is code completion response
-type SuggestionsResponse struct {
-	DeprecatedHeader
-
-	// Suggestions are list of suggestions for monaco
-	Suggestions []monaco.CompletionItem `json:"suggestions"`
-}
-
-// Write writes data to response
-func (r SuggestionsResponse) Write(w http.ResponseWriter) {
 	WriteJSON(w, r)
 }
 

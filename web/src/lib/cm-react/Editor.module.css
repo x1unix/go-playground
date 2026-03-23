@@ -354,6 +354,10 @@
   padding: 4px 8px;
 }
 
+.gpg-Editor :global(.cm-lsp-tooltip > ul) {
+  padding: 4px 15px;
+}
+
 /* Separate Go code header, description and footer in hover contents */
 .gpg-Editor :global(.cm-lsp-tooltip > *:first-child) {
   border-bottom: 1px solid var(--cm-hover-separator-color, #ccc);

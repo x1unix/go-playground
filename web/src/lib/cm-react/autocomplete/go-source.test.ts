@@ -1,6 +1,11 @@
 import { Text } from '@codemirror/state'
 import { assert, describe, test } from 'vitest'
-import type * as monaco from 'monaco-editor'
+import {
+  CompletionItemKind,
+  type CompletionItem as LSPCompletionItem,
+  type Hover,
+  type Range,
+} from 'vscode-languageserver-protocol'
 
 import { Syntax, type DocumentState } from '../types/common'
 import { GoAutocompleteSource } from './go-source'
@@ -8,11 +13,15 @@ import { cursorFromOffset } from './utils'
 
 type WorkerQuery = Awaited<ReturnType<InstanceType<typeof GoAutocompleteSource>['complete']>>
 
-const stubRange: monaco.IRange = {
-  startLineNumber: 1,
-  endLineNumber: 1,
-  startColumn: 1,
-  endColumn: 1,
+const stubRange: Range = {
+  start: {
+    line: 0,
+    character: 0,
+  },
+  end: {
+    line: 0,
+    character: 0,
+  },
 }
 
 const newDocument = (content: string): DocumentState => ({
@@ -58,21 +67,19 @@ describe('GoAutocompleteSource', () => {
         return [
           {
             label: 'os',
-            kind: 8,
+            kind: CompletionItemKind.Module,
             insertText: 'os',
             detail: 'os',
-            range: stubRange,
           },
           {
             label: 'close',
-            kind: 1,
+            kind: CompletionItemKind.Function,
             insertText: 'close',
             detail: 'close',
-            range: stubRange,
           },
-        ] as monaco.languages.CompletionItem[]
+        ] as LSPCompletionItem[]
       },
-      getImportSuggestions: async () => [] as monaco.languages.CompletionItem[],
+      getImportSuggestions: async () => [] as LSPCompletionItem[],
       getBuiltinNames: async () => [] as string[],
       getHoverValue: async () => null,
     } as any
@@ -96,15 +103,16 @@ describe('GoAutocompleteSource', () => {
         return [
           {
             label: 'Environ',
-            kind: 1,
+            kind: CompletionItemKind.Function,
             insertText: 'Environ',
             detail: 'func Environ() []string',
-            range: stubRange,
-            packagePath: 'os',
+            data: {
+              packagePath: 'os',
+            },
           },
-        ] as unknown as monaco.languages.CompletionItem[]
+        ] as LSPCompletionItem[]
       },
-      getImportSuggestions: async () => [] as monaco.languages.CompletionItem[],
+      getImportSuggestions: async () => [] as LSPCompletionItem[],
       getBuiltinNames: async () => [] as string[],
       getHoverValue: async () => null,
     } as any
@@ -117,7 +125,7 @@ describe('GoAutocompleteSource', () => {
     assert.isNotNull(result)
     assert.equal(result?.options[0]?.label, 'Environ')
     assert.isDefined(result?.options[0]?.additionalTextEdits)
-    assert.match(result?.options[0]?.additionalTextEdits?.[0]?.insert ?? '', /import\s+"os"/)
+    assert.match(result?.options[0]?.additionalTextEdits?.[0]?.newText ?? '', /import\s+"os"/)
   })
 
   test('resolves import aliases for member completion query', async () => {
@@ -130,14 +138,13 @@ describe('GoAutocompleteSource', () => {
         return [
           {
             label: 'StdEncoding',
-            kind: 1,
+            kind: CompletionItemKind.Variable,
             insertText: 'StdEncoding',
             detail: 'var StdEncoding *Encoding',
-            range: stubRange,
           },
-        ] as monaco.languages.CompletionItem[]
+        ] as LSPCompletionItem[]
       },
-      getImportSuggestions: async () => [] as monaco.languages.CompletionItem[],
+      getImportSuggestions: async () => [] as LSPCompletionItem[],
       getBuiltinNames: async () => [] as string[],
       getHoverValue: async () => null,
     } as any
@@ -159,15 +166,15 @@ describe('GoAutocompleteSource', () => {
 
     const worker = {
       isWarmUp: async () => true,
-      getSymbolSuggestions: async () => [] as monaco.languages.CompletionItem[],
-      getImportSuggestions: async () => [] as monaco.languages.CompletionItem[],
+      getSymbolSuggestions: async () => [] as LSPCompletionItem[],
+      getImportSuggestions: async () => [] as LSPCompletionItem[],
       getBuiltinNames: async () => [] as string[],
       getHoverValue: async (query: any) => {
         capturedQuery = query
         return {
           contents: [],
           range: stubRange,
-        }
+        } as Hover
       },
     } as any
 

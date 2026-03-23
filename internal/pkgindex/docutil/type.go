@@ -5,14 +5,14 @@ import (
 	"go/ast"
 	"go/token"
 
-	"github.com/x1unix/go-playground/pkg/monaco"
+	"typefox.dev/lsp"
 )
 
 // BlockData contains information about declaration group.
 type BlockData struct {
 	IsGroup bool
 	Decl    *ast.GenDecl
-	Kind    monaco.CompletionItemKind
+	Kind    lsp.CompletionItemKind
 }
 
 // NewBlockData parses block data from AST block declaration node.
@@ -45,22 +45,23 @@ func NewBlockData(specGroup *ast.GenDecl) (BlockData, error) {
 func TypeToSymbol(fset *token.FileSet, block BlockData, spec *ast.TypeSpec) (Symbol, error) {
 	// Block declarations contain doc inside each child.
 	item := Symbol{
-		Label:         spec.Name.Name,
-		Kind:          block.Kind,
-		InsertText:    spec.Name.Name,
-		Documentation: getTypeDoc(block, spec),
+		Label:           spec.Name.Name,
+		Kind:            block.Kind,
+		InsertTextRules: lsp.PlainTextTextFormat,
+		InsertText:      spec.Name.Name,
+		Documentation:   getTypeDoc(block, spec),
 	}
 
 	isPrimitive := false
 	switch spec.Type.(type) {
 	case *ast.InterfaceType:
 		item.Detail = "interface{...}"
-		item.Kind = monaco.Interface
+		item.Kind = lsp.InterfaceCompletion
 	case *ast.StructType:
 		// TODO: prefill struct members
 		item.Detail = "struct{...}"
 		item.InsertText = item.InsertText + "{}"
-		item.Kind = monaco.Struct
+		item.Kind = lsp.StructCompletion
 	case *ast.Ident:
 		isPrimitive = true
 	}
