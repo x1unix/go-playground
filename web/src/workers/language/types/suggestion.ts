@@ -1,4 +1,4 @@
-import type * as monaco from 'monaco-editor'
+import type { Range } from 'vscode-languageserver-protocol'
 
 export enum ImportClauseType {
   /**
@@ -38,7 +38,7 @@ export interface ImportsContext {
    *
    * This area will be monitored for changes to update document imports cache.
    */
-  totalRange?: Pick<monaco.IRange, 'startLineNumber' | 'endLineNumber'>
+  totalRange?: Range
 
   /**
    * Imports in a last block related to `range`.
@@ -63,7 +63,7 @@ export interface ImportsContext {
    *
    * @see prependNewLine
    */
-  range?: monaco.IRange
+  range?: Range
 
   /**
    * Indicates whether extra new line should be appended before `import` clause.
@@ -77,7 +77,7 @@ export interface SuggestionContext {
   /**
    * Current edit range
    */
-  range: monaco.IRange
+  range: Range
 
   /**
    * Controls how auto import suggestions will be added.

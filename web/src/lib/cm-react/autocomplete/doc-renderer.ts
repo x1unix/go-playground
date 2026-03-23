@@ -1,7 +1,8 @@
 import { go } from '@codemirror/lang-go'
 import { highlightTree, type Highlighter } from '@lezer/highlight'
 import markdownit from 'markdown-it'
-import type { DocContent, MarkedString } from '../types/autocomplete'
+import type { MarkedString, MarkupContent } from 'vscode-languageserver-protocol'
+import type { DocContent } from '../types/autocomplete'
 
 import { classNames } from './styles'
 
@@ -10,7 +11,9 @@ interface NormalizedContent {
   value: string
 }
 
-const normalizeMarkupEntry = (entry: MarkedString): NormalizedContent => {
+type MarkupEntry = MarkedString | MarkupContent
+
+const normalizeMarkupEntry = (entry: MarkupEntry): NormalizedContent => {
   if (typeof entry === 'string') {
     return {
       isMarkdown: false,
@@ -18,11 +21,8 @@ const normalizeMarkupEntry = (entry: MarkedString): NormalizedContent => {
     }
   }
 
-  if ('language' in entry) {
-    return {
-      isMarkdown: true,
-      value: '```' + entry.language + '\n' + entry.value + '\n```',
-    }
+  if ('kind' in entry) {
+    return normalizeMarkupContentValue(entry)
   }
 
   return {
@@ -31,10 +31,17 @@ const normalizeMarkupEntry = (entry: MarkedString): NormalizedContent => {
   }
 }
 
+const normalizeMarkupContentValue = (content: MarkupContent): NormalizedContent => {
+  return {
+    isMarkdown: content.kind === 'markdown',
+    value: content.value,
+  }
+}
+
 const normalizeMarkupContent = (content: DocContent): NormalizedContent => {
   if (Array.isArray(content)) {
     return content.reduce(
-      (acc: NormalizedContent, item: MarkedString): NormalizedContent => {
+      (acc: NormalizedContent, item: MarkupEntry): NormalizedContent => {
         const normalizedItem = normalizeMarkupEntry(item)
         return {
           isMarkdown: acc.isMarkdown || normalizedItem.isMarkdown,

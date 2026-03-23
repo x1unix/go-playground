@@ -29,11 +29,11 @@ export class DocumentMetadataCache {
 
     const { totalRange } = entry
     for (const change of changes) {
-      if (change.endLineNumber < totalRange.startLineNumber) {
+      if (change.end.line < totalRange.start.line) {
         continue
       }
 
-      if (change.startLineNumber > totalRange.endLineNumber) {
+      if (change.start.line > totalRange.end.line) {
         continue
       }
 

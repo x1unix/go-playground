@@ -1,15 +1,14 @@
+import type {
+  CompletionItem as LSPCompletionItem,
+  Hover as LSPHover,
+  Range,
+  TextEdit,
+} from 'vscode-languageserver-protocol'
 import type { DocumentState, Syntax } from './common'
 
-// Ported from monaco.IMarkdownString
-export interface IMarkdownString {
-  readonly value: string
-  readonly language?: string
-}
-
-// Types that represent either a plain-text string or markdown string.
-// Similar to Monaco and LSP types for completion and hover docs.
-export type MarkedString = string | IMarkdownString
-export type DocContent = IMarkdownString | MarkedString | MarkedString[]
+export type CompletionDoc = NonNullable<LSPCompletionItem['documentation']>
+export type HoverContent = LSPHover['contents']
+export type DocContent = CompletionDoc | HoverContent
 
 export interface CursorPosition {
   lineNumber: number
@@ -17,48 +16,10 @@ export interface CursorPosition {
   offset: number
 }
 
-export interface CompletionTextEdit {
-  from: number
-  to: number
-  insert: string
-}
+export type CompletionTextEdit = TextEdit
 
-export type CompletionItemKind =
-  | 'method'
-  | 'function'
-  | 'constructor'
-  | 'field'
-  | 'variable'
-  | 'class'
-  | 'struct'
-  | 'interface'
-  | 'module'
-  | 'property'
-  | 'event'
-  | 'operator'
-  | 'unit'
-  | 'value'
-  | 'constant'
-  | 'enum'
-  | 'enumMember'
-  | 'keyword'
-  | 'text'
-  | 'color'
-  | 'file'
-  | 'reference'
-  | 'folder'
-  | 'typeParameter'
-  | 'snippet'
-
-export interface CompletionItem {
-  label: string
-  detail?: string
-  documentation?: DocContent
-  type?: CompletionItemKind
-  sortText?: string
-  filterText?: string
+export interface CompletionItem extends Omit<LSPCompletionItem, 'additionalTextEdits'> {
   insertText: string
-  isSnippet?: boolean
   replaceFrom: number
   replaceTo: number
   additionalTextEdits?: CompletionTextEdit[]
@@ -87,10 +48,7 @@ export interface HoverRequest {
   cursor: CursorPosition
 }
 
-export interface DocumentEditChange {
-  startLineNumber: number
-  endLineNumber: number
-}
+export type DocumentEditChange = Range
 
 export interface DocumentUpdate {
   path: string

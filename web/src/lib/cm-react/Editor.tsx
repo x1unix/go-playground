@@ -5,6 +5,7 @@ import { EditorState, type Extension, type StateEffect } from '@codemirror/state
 import { EditorView, keymap, type ViewUpdate } from '@codemirror/view'
 import { vscodeKeymap } from '@replit/codemirror-vscode-keymap'
 import { getCM } from '@replit/codemirror-vim'
+import type { Range } from 'vscode-languageserver-protocol'
 
 import { basicSetup } from './extensions/basic'
 import { highlightField } from './extensions/highlight'
@@ -350,7 +351,7 @@ export class Editor extends React.Component<EditorProps, State> {
       return
     }
 
-    const lineChanges: Array<{ startLineNumber: number; endLineNumber: number }> = []
+    const lineChanges: Range[] = []
     let changesCount = 0
     let isFullReplace = false
     const prevDoc = startState.doc
@@ -361,9 +362,17 @@ export class Editor extends React.Component<EditorProps, State> {
       }
 
       const safeTo = Math.min(Math.max(fromA, toA), prevDoc.length)
+      const startLine = prevDoc.lineAt(fromA)
+      const endLine = prevDoc.lineAt(safeTo)
       lineChanges.push({
-        startLineNumber: prevDoc.lineAt(fromA).number,
-        endLineNumber: prevDoc.lineAt(safeTo).number,
+        start: {
+          line: startLine.number - 1,
+          character: fromA - startLine.from,
+        },
+        end: {
+          line: endLine.number - 1,
+          character: safeTo - endLine.from,
+        },
       })
     })
 
