@@ -114,8 +114,7 @@
     "build": "npx vite build",
     "serve": "npx vite preview",
     "lint": "npx eslint .",
-    "test": "npx vitest",
-    "gen:suggestions": "node ./src/editor/internal/genpkgcache.js"
+    "test": "npx vitest"
   },
   "browserslist": {
     "production": [

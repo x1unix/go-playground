@@ -1,68 +1,40 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Web UI
 
-## Available Scripts
+Frontend for the Go Playground application.
 
-In the project directory, you can run:
+## Run in development
 
-### `yarn start`
+Start the frontend from the repository root:
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```bash
+make ui
+```
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+Use `make ui` instead of `yarn start` in `web/`. The Makefile injects required environment variables (for example
+`VITE_VERSION`, `VITE_GITHUB_URL`, and WASM settings) and wires the expected API proxy settings.
 
-### `yarn test`
+By default, Vite serves the app on `http://localhost:3000`.
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Tech stack
 
-### `yarn build`
+- React 18 (`react`, `react-dom`)
+- TypeScript 5
+- Vite 5 with SWC (`@vitejs/plugin-react-swc`)
+- Fluent UI (`@fluentui/react`, `@fluentui/react-icons`)
+- CodeMirror 6 ecosystem (`@codemirror/*`, Replit keymaps, VS Code theme)
+- State and routing: Redux + React Redux, `connected-react-router`, React Router v5
+- Terminal integration: xterm.js (`@xterm/xterm` + addons)
+- Testing: Vitest + Testing Library + JSDOM
+- Linting/formatting: ESLint 9 + `typescript-eslint` + Prettier
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Environment variables
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+Frontend values are exposed through `VITE_*` variables:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- `VITE_VERSION` - application version string shown in the UI/build metadata.
+- `VITE_GITHUB_URL` - repository URL used for source/issues links in the UI.
+- `VITE_WASM_API_VER` - WebAssembly API version used when resolving WASM endpoints.
+- `VITE_WASM_BASE_URL` - base URL where WASM assets and API routes are served.
+- `VITE_BASE_URL` - optional frontend base path when app is hosted under a subpath.
 
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+Most of these are injected by the root `Makefile` when you run `make ui`.
