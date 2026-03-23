@@ -53,7 +53,7 @@ const normalizeMarkupContent = (content: DocContent): NormalizedContent => {
           value: acc.value ? acc.value + '\n\n' + normalizedItem.value : normalizedItem.value,
         }
       },
-      { isMarkdown: false, value: '' },
+      { isMarkdown: true, value: '' },
     )
   }
 
