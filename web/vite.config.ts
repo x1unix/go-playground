@@ -7,14 +7,9 @@ import tsConfigPaths from 'vite-tsconfig-paths'
 import { createHtmlPlugin } from 'vite-plugin-html'
 import 'vitest/config'
 
-const {
-  NODE_ENV = 'dev',
-  VITE_WASM_BASE_URL = '/wasm/',
-  VITE_WASM_API_VER = 'v3',
-  VITE_BASE_URL = '',
-} = process.env
+const { NODE_ENV = 'dev', VITE_WASM_BASE_URL = '/wasm/', VITE_WASM_API_VER = 'v3', VITE_BASE_URL = '' } = process.env
 
-const PROXY_HOST = process.env.LISTEN_ADDR || '127.0.0.1:8000';
+const PROXY_HOST = process.env.LISTEN_ADDR || '127.0.0.1:8000'
 
 export default defineConfig({
   resolve: {
@@ -26,20 +21,13 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: join(__dirname, 'src/setupTests.ts'),
-    alias: [
-      {
-        find: /^monaco-editor$/,
-        replacement:
-          join(__dirname, 'node_modules/monaco-editor/esm/vs/editor/editor.api'),
-      },
-    ],
   },
   server: {
     port: 3000,
     host: '0.0.0.0',
     proxy: {
       '/api': `http://${PROXY_HOST}`,
-    }
+    },
   },
   build: {
     outDir: 'build',

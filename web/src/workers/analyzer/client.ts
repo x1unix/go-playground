@@ -1,11 +1,8 @@
 import * as Comlink from 'comlink'
 import type { WorkerHandler } from './analyzer.worker'
+import type { Disposable } from '../types'
 
 export type AnalyzerWorker = Comlink.Remote<WorkerHandler>
-
-export interface Disposable {
-  dispose(): void
-}
 
 export const spawnAnalyzerWorker = (): [AnalyzerWorker, Disposable] => {
   const worker = new Worker(new URL('./analyzer.worker.ts', import.meta.url), {
@@ -22,3 +19,5 @@ export const spawnAnalyzerWorker = (): [AnalyzerWorker, Disposable] => {
 
   return [proxy, dispose]
 }
+
+export type { Disposable }
