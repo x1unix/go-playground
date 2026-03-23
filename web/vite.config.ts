@@ -10,7 +10,7 @@ import 'vitest/config'
 const {
   NODE_ENV = 'dev',
   VITE_WASM_BASE_URL = '/wasm/',
-  VITE_WASM_API_VER = 'v2',
+  VITE_WASM_API_VER = 'v3',
   VITE_BASE_URL = '',
 } = process.env
 
@@ -30,7 +30,7 @@ export default defineConfig({
       {
         find: /^monaco-editor$/,
         replacement:
-          join(__dirname,'node_modules/monaco-editor/esm/vs/editor/editor.api'),
+          join(__dirname, 'node_modules/monaco-editor/esm/vs/editor/editor.api'),
       },
     ],
   },
