@@ -1,6 +1,8 @@
 # LSP Types Migration Plan
 
-## Go code changes (pkg indexer)
+## pkgindexer
+
+### Go code changes (pkg indexer)
 
 - Replace Monaco completion-related types with LSP types (`typefox.dev/lsp`) across `internal/pkgindex`.
   - `internal/pkgindex/docutil/types.go`
@@ -52,6 +54,28 @@
   - `go test ./internal/pkgindex/...`
   - `go test ./tools/pkgindexer/...`
 
-## TypeScript changes (follow-up)
+### TypeScript changes (follow-up)
 
 - Update `web/src/workers/language/language.worker.ts` version gate to accept index version `2`.
+
+## analyzer
+
+### Go code changes (analyzer)
+
+- Replace Monaco marker types with LSP diagnostic types in analyzer package.
+  - `internal/analyzer/check/marker.go`
+    - `[]monaco.MarkerData` -> `[]lsp.Diagnostic`.
+    - `monaco.Error` severity -> `lsp.SeverityError`.
+    - line/column mapping -> LSP `Range` (`Position` is 0-based).
+    - `Result.Markers` type should use `[]lsp.Diagnostic`.
+- Confirm analyzer wasm worker JSON contract still matches updated payload shape.
+  - `cmd/wasm/analyzer/webworker.go`
+- Verify with:
+  - `go test ./internal/analyzer/...`
+
+### TypeScript changes (follow-up)
+
+- TODO: update analyzer worker/client types to consume LSP diagnostics and map them to Monaco markers where needed.
+  - `web/src/workers/analyzer/types.ts`
+  - `web/src/workers/analyzer/bootstrap.ts`
+  - `web/src/workers/analyzer/analyzer.worker.ts`
