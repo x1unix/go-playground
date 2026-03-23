@@ -20,6 +20,8 @@ interface State {
   pivotAnimation: string
 }
 
+type PivotLinkClickHandler = NonNullable<Props['onLinkClick']>
+
 const pivotStyles: Partial<IPivotStyles> = {
   itemContainer: {
     // Set height to highest of pivots. See: #371
@@ -61,7 +63,7 @@ export const AnimatedPivot: React.FC<Props> = ({ label, styles, onLinkClick, ...
     '--settings-pivot-animation': state.pivotAnimation,
   }
 
-  const handleTabChange = (item?: PivotItem, ev?: React.MouseEvent<HTMLElement>) => {
+  const handleTabChange: PivotLinkClickHandler = (item, ev) => {
     const pivotKey = getPivotItemKey(item)
     const oldKey = state.currentKey
     setState({

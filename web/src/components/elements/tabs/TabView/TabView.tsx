@@ -25,7 +25,7 @@ interface Props {
 const MAX_COMPACT_WIDTH = 480
 const RESIZE_DEBOUNCE_INTERVAL = 100
 
-export const TabView: React.FC<Props> = ({ children, responsive, disableContentShrink, ...props }) => {
+export const TabView = ({ children, responsive, disableContentShrink, ...props }: React.PropsWithChildren<Props>) => {
   const theme = useTheme()
   const containerRef = useRef<HTMLDivElement>(null)
   const [isCompact, setIsCompact] = useState(false)

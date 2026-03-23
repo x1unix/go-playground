@@ -13,7 +13,7 @@ interface Props extends IModalProps {
 /**
  * Dialog implements simple modal window template.
  */
-export const Dialog: React.FC<Props> = ({ label, disabled, canClose, children, ...modalProps }) => {
+export const Dialog: React.FC<Props> = ({ label, disabled, canClose = true, children, ...modalProps }) => {
   const titleId = useId('DialogTitle')
   const subtitleId = useId('DialogSubtitle')
 
@@ -45,8 +45,4 @@ export const Dialog: React.FC<Props> = ({ label, disabled, canClose, children, .
       </div>
     </Modal>
   )
-}
-
-Dialog.defaultProps = {
-  canClose: true,
 }

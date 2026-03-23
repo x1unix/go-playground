@@ -35,7 +35,7 @@ const getItemContents = ({ icon, iconOnly, imageSrc, title, children }) => (
   </>
 )
 
-export const StatusBarItem: React.FC<StatusBarItemProps> = ({
+export const StatusBarItem = ({
   title,
   className,
   icon,
@@ -47,7 +47,7 @@ export const StatusBarItem: React.FC<StatusBarItemProps> = ({
   children,
   hidden,
   ...props
-}) => {
+}: React.PropsWithChildren<StatusBarItemProps>) => {
   if (hidden) {
     return null
   }

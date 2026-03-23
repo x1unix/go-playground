@@ -74,7 +74,7 @@ const getIconColor = (type: PosterType, theme: ITheme) => {
   }
 }
 
-export const Poster: React.FC<Props> = ({
+export const Poster = ({
   textProps,
   label,
   message,
@@ -82,7 +82,7 @@ export const Poster: React.FC<Props> = ({
   type = 'default',
   horizontalContent,
   children,
-}) => {
+}: React.PropsWithChildren<Props>) => {
   const theme = useTheme()
   const { semanticColors } = theme
   const iconColor = getIconColor(type, theme)
