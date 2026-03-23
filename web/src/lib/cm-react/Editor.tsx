@@ -44,6 +44,7 @@ import { CMEditorRemote } from './remote'
 import type { BufferState } from './buffers/types'
 import { newAutocompleteExtensions } from './autocomplete'
 
+import '@vscode/codicons/dist/codicon.css'
 import classes from './Editor.module.css'
 
 const keyBindings = [indentWithTab, ...vscodeKeymap]

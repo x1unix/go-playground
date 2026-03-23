@@ -2538,6 +2538,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vscode/codicons@npm:^0.0.45":
+  version: 0.0.45
+  resolution: "@vscode/codicons@npm:0.0.45"
+  checksum: 10c0/652c435d8d8440fcc76f6d83f01caec24fc162217e26086caa098c1ea4a533d0e29c7b2a9dfb1c704ab2f386e54c8c6e141f239e6c8bd5ddf611f6998ef170ad
+  languageName: node
+  linkType: hard
+
 "@xterm/addon-canvas@npm:^0.6.0-beta.1":
   version: 0.6.0
   resolution: "@xterm/addon-canvas@npm:0.6.0"
@@ -8449,6 +8456,7 @@ __metadata:
     "@uiw/codemirror-theme-vscode": "npm:^4.25.4"
     "@vitejs/plugin-react-swc": "npm:^3.5.0"
     "@vitest/coverage-v8": "npm:^2.1.2"
+    "@vscode/codicons": "npm:^0.0.45"
     "@xterm/addon-canvas": "npm:^0.6.0-beta.1"
     "@xterm/addon-fit": "npm:^0.9.0-beta.1"
     "@xterm/addon-image": "npm:^0.7.0-beta.1"
