@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/x1unix/go-playground/internal/pkgindex/docutil"
-	"github.com/x1unix/go-playground/pkg/monaco"
+	"typefox.dev/lsp"
 )
 
 type PackageParseParams struct {
@@ -21,12 +21,12 @@ func (params PackageParseParams) PackagePath() string {
 	return filepath.Join(params.RootDir, params.ImportPath)
 }
 
-// ParseImportCompletionItem parses a Go package at a given GOROOT and constructs monaco CompletionItem from it.
-func ParseImportCompletionItem(ctx context.Context, params PackageParseParams) (result monaco.CompletionItem, error error) {
+// ParseImportCompletionItem parses a Go package at a given GOROOT and constructs an LSP completion item from it.
+func ParseImportCompletionItem(ctx context.Context, params PackageParseParams) (result lsp.CompletionItem, error error) {
 	pkgPath := params.PackagePath()
 
-	result = monaco.CompletionItem{
-		Kind:       monaco.Module,
+	result = lsp.CompletionItem{
+		Kind:       lsp.ModuleCompletion,
 		Detail:     params.ImportPath,
 		InsertText: params.ImportPath,
 	}
@@ -63,10 +63,10 @@ func ParseImportCompletionItem(ctx context.Context, params PackageParseParams) (
 		docString = docutil.EmptyPackageDoc(params.ImportPath)
 	}
 
-	result.Label.SetString(params.ImportPath)
-	result.Documentation.SetValue(&monaco.IMarkdownString{
-		Value:     docString,
-		IsTrusted: true,
-	})
+	result.Label = params.ImportPath
+	result.Documentation = &lsp.Or_CompletionItem_documentation{Value: lsp.MarkupContent{
+		Kind:  lsp.Markdown,
+		Value: docString,
+	}}
 	return result, nil
 }

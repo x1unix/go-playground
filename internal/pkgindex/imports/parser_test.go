@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/x1unix/go-playground/pkg/monaco"
+	"typefox.dev/lsp"
 )
 
 const goDocDomain = "pkg.go.dev"
@@ -21,41 +21,41 @@ func TestParseImportCompletionItem(t *testing.T) {
 		expectErr        string
 		filterInputFiles bool
 		getContext       func() context.Context
-		expect           func(importPath string) monaco.CompletionItem
-		compareFunc      func(t *testing.T, got monaco.CompletionItem)
+		expect           func(importPath string) lsp.CompletionItem
+		compareFunc      func(t *testing.T, got lsp.CompletionItem)
 	}{
 		"package with documentation": {
 			pkgName: "foopkg/pkgbar",
-			expect: func(importPath string) monaco.CompletionItem {
-				ret := monaco.CompletionItem{
+			expect: func(importPath string) lsp.CompletionItem {
+				ret := lsp.CompletionItem{
+					Label:      importPath,
 					InsertText: importPath,
-					Kind:       monaco.Module,
+					Kind:       lsp.ModuleCompletion,
 					Detail:     "pkgbar",
 				}
 
-				ret.Label.SetString(importPath)
-				ret.Documentation.SetValue(&monaco.IMarkdownString{
-					IsTrusted: true,
+				ret.Documentation = &lsp.Or_CompletionItem_documentation{Value: lsp.MarkupContent{
+					Kind: lsp.Markdown,
 					Value: "Package pkgbar is a stub package for a test.\n\n" +
 						fmt.Sprintf("[`%[2]s` on %[1]s](https://%[1]s/%[2]s)", goDocDomain, importPath),
-				})
+				}}
 				return ret
 			},
 		},
 		"package without any documentation": {
 			pkgName: "foopkg/emptypkg",
-			expect: func(importPath string) monaco.CompletionItem {
-				ret := monaco.CompletionItem{
+			expect: func(importPath string) lsp.CompletionItem {
+				ret := lsp.CompletionItem{
+					Label:      importPath,
 					InsertText: importPath,
-					Kind:       monaco.Module,
+					Kind:       lsp.ModuleCompletion,
 					Detail:     importPath,
 				}
 
-				ret.Label.SetString(importPath)
-				ret.Documentation.SetValue(&monaco.IMarkdownString{
-					IsTrusted: true,
-					Value:     fmt.Sprintf("[`%[2]s` on %[1]s](https://%[1]s/%[2]s)", goDocDomain, importPath),
-				})
+				ret.Documentation = &lsp.Or_CompletionItem_documentation{Value: lsp.MarkupContent{
+					Kind:  lsp.Markdown,
+					Value: fmt.Sprintf("[`%[2]s` on %[1]s](https://%[1]s/%[2]s)", goDocDomain, importPath),
+				}}
 				return ret
 			},
 		},
@@ -77,9 +77,13 @@ func TestParseImportCompletionItem(t *testing.T) {
 			customGoRoot:     mustGetGoRoot(t) + "/src",
 			pkgName:          "syscall",
 			filterInputFiles: true,
-			compareFunc: func(t *testing.T, got monaco.CompletionItem) {
+			compareFunc: func(t *testing.T, got lsp.CompletionItem) {
 				expectPfx := "Package syscall contains an interface to the low-level"
-				expectStartWith(t, got.Documentation.Value.Value, expectPfx)
+
+				require.NotNil(t, got.Documentation)
+				doc, ok := got.Documentation.Value.(lsp.MarkupContent)
+				require.True(t, ok)
+				expectStartWith(t, doc.Value, expectPfx)
 			},
 		},
 	}
