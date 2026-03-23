@@ -1,9 +1,9 @@
-import type { editor } from 'monaco-editor'
+import type { Diagnostic } from 'vscode-languageserver-protocol'
 import type { Position } from '../state'
 
 import { ActionType } from './actions'
 
-export const newMarkerAction = (fileName: string, markers?: editor.IMarkerData[]) => ({
+export const newMarkerAction = (fileName: string, markers?: Diagnostic[]) => ({
   type: ActionType.MARKER_CHANGE,
   payload: {
     fileName,
@@ -13,7 +13,7 @@ export const newMarkerAction = (fileName: string, markers?: editor.IMarkerData[]
 
 export interface MarkerChangePayload {
   fileName: string
-  markers?: editor.IMarkerData[] | null
+  markers?: Diagnostic[] | null
 }
 
 export const newCursorPositionAction = (position: Position) => ({

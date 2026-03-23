@@ -1,7 +1,7 @@
-import type { Diagnostic } from '@codemirror/lint'
+import type { Diagnostic as CMDiagnostic } from '@codemirror/lint'
 import type { Dispatch } from 'redux'
-import type * as monaco from 'monaco-editor'
 import type { Text } from '@codemirror/state'
+import { DiagnosticSeverity, type Diagnostic as LSPDiagnostic } from 'vscode-languageserver-protocol'
 import { Syntax, type DocumentState } from '~/lib/cm-react'
 import { type Disposable, type AnalyzerWorker, spawnAnalyzerWorker } from '~/workers/analyzer'
 import { newMarkerAction } from '~/store'
@@ -12,27 +12,27 @@ export interface SyntaxCheckOptions {
   warnAboutFakeDateTime?: boolean
 }
 
-type Severity = Diagnostic['severity']
-const mapSeverity: Record<monaco.MarkerSeverity, Severity> = {
-  1: 'hint',
-  2: 'info',
-  4: 'warning',
-  8: 'error',
+type Severity = CMDiagnostic['severity']
+const mapSeverity: Record<DiagnosticSeverity, Severity> = {
+  [DiagnosticSeverity.Hint]: 'hint',
+  [DiagnosticSeverity.Information]: 'info',
+  [DiagnosticSeverity.Warning]: 'warning',
+  [DiagnosticSeverity.Error]: 'error',
 }
 
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n))
 
-const lineColumnToOffset = (doc: Text, lineNumber: number, column: number): number => {
-  const safeLineNumber = clamp(lineNumber, 1, doc.lines)
-  const line = doc.line(safeLineNumber)
-  const safeColumn = clamp(column, 1, line.length + 1)
-  return line.from + safeColumn - 1
+const lineCharacterToOffset = (doc: Text, line: number, character: number): number => {
+  const safeLineNumber = clamp(line + 1, 1, doc.lines)
+  const safeLine = doc.line(safeLineNumber)
+  const safeCharacter = clamp(character, 0, safeLine.length)
+  return safeLine.from + safeCharacter
 }
 
-const markersToDiagnostics = (doc: Text, markers: monaco.editor.IMarkerData[]): Diagnostic[] => {
-  return markers.map((m): Diagnostic => {
-    const from = lineColumnToOffset(doc, m.startLineNumber, m.startColumn)
-    const to = lineColumnToOffset(doc, m.endLineNumber, m.endColumn)
+const markersToDiagnostics = (doc: Text, markers: LSPDiagnostic[]): CMDiagnostic[] => {
+  return markers.map((marker): CMDiagnostic => {
+    const from = lineCharacterToOffset(doc, marker.range.start.line, marker.range.start.character)
+    const to = lineCharacterToOffset(doc, marker.range.end.line, marker.range.end.character)
 
     const sortedFrom = Math.min(from, to)
     const sortedTo = Math.max(from, to)
@@ -40,8 +40,8 @@ const markersToDiagnostics = (doc: Text, markers: monaco.editor.IMarkerData[]): 
     return {
       from: sortedFrom,
       to: sortedTo,
-      severity: mapSeverity[m.severity] ?? 'error',
-      message: m.message,
+      severity: marker.severity ? (mapSeverity[marker.severity] ?? 'error') : 'error',
+      message: marker.message,
     }
   })
 }
@@ -60,12 +60,12 @@ export class GoSyntaxLinter implements Disposable {
     this.disposer.dispose()
   }
 
-  async check(doc: DocumentState, opts?: SyntaxCheckOptions): Promise<Diagnostic[]> {
+  async check(doc: DocumentState, opts?: SyntaxCheckOptions): Promise<CMDiagnostic[]> {
     if (doc.language !== Syntax.Go) {
       return []
     }
 
-    const markers: monaco.editor.IMarkerData[] = opts?.warnAboutFakeDateTime ? getTimeNowUsageMarkers(doc) : []
+    const markers: LSPDiagnostic[] = opts?.warnAboutFakeDateTime ? getTimeNowUsageMarkers(doc) : []
 
     try {
       const response = await this.worker.checkSyntaxErrors({

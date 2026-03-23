@@ -1,4 +1,4 @@
-import type { editor } from 'monaco-editor'
+import type { Diagnostic } from 'vscode-languageserver-protocol'
 import type { EvalEvent } from '~/services/api'
 import type { MonacoSettings, RunTargetConfig } from '~/services/config'
 import type { LayoutType } from '~/styles/layout'
@@ -24,7 +24,7 @@ export interface StatusState {
   dirty?: boolean
   lastError?: string | null
   events?: EvalEvent[]
-  markers?: Record<string, editor.IMarkerData[] | null>
+  markers?: Record<string, Diagnostic[] | null>
   cursorPosition?: Position
 }
 

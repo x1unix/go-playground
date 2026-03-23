@@ -1,4 +1,4 @@
-import type * as monaco from 'monaco-editor'
+import type { Diagnostic } from 'vscode-languageserver-protocol'
 
 export interface AnalyzeRequest {
   fileName: string
@@ -9,5 +9,5 @@ export interface AnalyzeRequest {
 export interface AnalyzeResponse {
   fileName: string
   modelVersionId: number
-  markers: monaco.editor.IMarkerData[] | null
+  markers: Diagnostic[] | null
 }

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { clsx } from 'clsx'
-import { type editor, MarkerSeverity } from 'monaco-editor'
+import { DiagnosticSeverity, type Diagnostic } from 'vscode-languageserver-protocol'
 import { VscDebugAlt } from 'react-icons/vsc'
 import { useSelector } from 'react-redux'
 import environment from '~/environment'
@@ -16,7 +16,7 @@ interface StateProps {
   loading?: boolean
   running?: boolean
   lastError?: string | null
-  markers?: Record<string, editor.IMarkerData[] | null>
+  markers?: Record<string, Diagnostic[] | null>
 }
 
 const countMarkers = (markers?: StateProps['markers']) => {
@@ -39,7 +39,7 @@ const countMarkers = (markers?: StateProps['markers']) => {
     )
 }
 
-const getMarkerCounters = (markers?: editor.IMarkerData[] | null) => {
+const getMarkerCounters = (markers?: Diagnostic[] | null) => {
   let errors = 0
   let warnings = 0
   if (!markers?.length) {
@@ -48,10 +48,10 @@ const getMarkerCounters = (markers?: editor.IMarkerData[] | null) => {
 
   for (const marker of markers) {
     switch (marker.severity) {
-      case MarkerSeverity.Warning:
+      case DiagnosticSeverity.Warning:
         warnings++
         break
-      case MarkerSeverity.Error:
+      case DiagnosticSeverity.Error:
         errors++
         break
       default:
