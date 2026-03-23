@@ -10,7 +10,7 @@ export interface HoverQuery {
   to: number
 }
 
-const identifierNodes = new Set(['VariableName', 'FieldName', 'TypeName', 'Bool', 'Nil'])
+const identifierNodes = new Set(['VariableName', 'FieldName', 'TypeName', 'Bool', 'Nil', 'make', 'new'])
 
 const isExported = (name: string) => name[0] === name[0]?.toUpperCase()
 

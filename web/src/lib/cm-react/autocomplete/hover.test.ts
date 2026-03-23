@@ -11,6 +11,32 @@ const newDoc = (source: string) => ({
 })
 
 describe('hover queryFromPosition', () => {
+  test('resolves builtin make query', () => {
+    const source = 'package main\n\nfunc main() {\n\tm := make(map[string]int)\n}\n'
+    const doc = newDoc(source)
+    const pos = source.indexOf('make') + 1
+
+    const query = queryFromPosition(doc, pos)
+    assert.deepEqual(query, {
+      value: 'make',
+      from: source.indexOf('make'),
+      to: source.indexOf('make') + 'make'.length,
+    })
+  })
+
+  test('resolves builtin new query', () => {
+    const source = 'package main\n\nfunc main() {\n\tv := new(int)\n\t_ = v\n}\n'
+    const doc = newDoc(source)
+    const pos = source.indexOf('new') + 1
+
+    const query = queryFromPosition(doc, pos)
+    assert.deepEqual(query, {
+      value: 'new',
+      from: source.indexOf('new'),
+      to: source.indexOf('new') + 'new'.length,
+    })
+  })
+
   test('resolves selector member package query', () => {
     const source = 'package main\n\nfunc main() {\n\tfmt.Println("x")\n}\n'
     const doc = newDoc(source)
