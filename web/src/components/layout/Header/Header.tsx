@@ -1,6 +1,6 @@
 import React from 'react'
 import { addDays } from 'date-fns'
-import { CommandBar, type ICommandBarItemProps, Stack } from '@fluentui/react'
+import { CommandBar, ICommandBarData, type ICommandBarItemProps, Stack } from '@fluentui/react'
 
 import type { Snippet } from '~/services/examples'
 import apiClient, { type VersionsInfo } from '~/services/api'
@@ -230,6 +230,26 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
     this.props.dispatch(dispatchLoadSnippet(snippet.id))
   }
 
+  private shrinkCount = 0
+
+  private onShrink({ farItems, primaryItems, ...data }: ICommandBarData): ICommandBarData | undefined {
+    if (this.shrinkCount >= 100) {
+      return
+    }
+    this.shrinkCount++
+
+    console.log('did shrink', this.shrinkCount)
+    return {
+      ...data,
+      farItems,
+      cacheKey: Date.now().toString(),
+      primaryItems: primaryItems.map((e) => ({
+        ...e,
+        iconOnly: true,
+      })),
+    }
+  }
+
   render() {
     const { showAbout, showSettings, showExamples } = this.state
     const { sharedSnippetName } = this.props
@@ -241,6 +261,7 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
           items={this.menuItems}
           farItems={this.asideItems.filter(({ hidden }) => !hidden)}
           ariaLabel="CodeEditor menu"
+          onReduceData={(data) => this.onShrink(data)}
         />
         <SharePopup
           visible={!!sharedSnippetName?.length}
