@@ -15,8 +15,7 @@ func Check(src string) (*Result, error) {
 		return &Result{HasErrors: false}, nil
 	}
 
-	var errList scanner.ErrorList
-	if errors.As(err, &errList) {
+	if errList, ok := errors.AsType[scanner.ErrorList](err); ok {
 		return &Result{HasErrors: true, Markers: errorsListToMarkers(errList)}, nil
 	}
 

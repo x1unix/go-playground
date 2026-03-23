@@ -1,10 +1,10 @@
 import * as Comlink from 'comlink'
 import type { WorkerHandler } from './language.worker'
-import type { IDisposable } from 'monaco-editor'
+import type { Disposable } from '../types'
 
 export type LanguageWorker = Comlink.Remote<WorkerHandler>
 
-export const spawnLanguageWorker = (): [LanguageWorker, IDisposable] => {
+export const spawnLanguageWorker = (): [LanguageWorker, Disposable] => {
   const worker = new Worker(new URL('./language.worker.ts', import.meta.url), {
     type: 'module',
   })

@@ -1,9 +1,8 @@
 import { parser } from '@lezer/go'
-import type * as monaco from 'monaco-editor'
 import type { Text } from '@codemirror/state'
+import { DiagnosticSeverity, type Diagnostic, type Position } from 'vscode-languageserver-protocol'
 import type { DocumentState } from '~/lib/cm-react'
 
-const warningSeverity = 4 as monaco.MarkerSeverity
 const timeNowUsageWarning =
   'Warning: `time.Now()` will always return fake time. ' +
   'Change current environment to WebAssembly to use real date and time.'
@@ -18,12 +17,12 @@ type GoTree = ReturnType<typeof parser.parse>
 
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n))
 
-const offsetToPosition = (doc: Text, offset: number) => {
+const offsetToPosition = (doc: Text, offset: number): Position => {
   const safeOffset = clamp(offset, 0, doc.length)
   const line = doc.lineAt(safeOffset)
   return {
-    lineNumber: line.number,
-    column: safeOffset - line.from + 1,
+    line: line.number - 1,
+    character: safeOffset - line.from,
   }
 }
 
@@ -78,7 +77,7 @@ const findTimeNowCallRanges = (tree: GoTree, code: string): OffsetRange[] => {
   return ranges
 }
 
-export const getTimeNowUsageMarkers = (doc: DocumentState): monaco.editor.IMarkerData[] => {
+export const getTimeNowUsageMarkers = (doc: DocumentState): Diagnostic[] => {
   const code = doc.text.toString()
   const tree = parser.parse(code)
 
@@ -96,12 +95,12 @@ export const getTimeNowUsageMarkers = (doc: DocumentState): monaco.editor.IMarke
     const end = offsetToPosition(doc.text, to)
 
     return {
-      severity: warningSeverity,
+      severity: DiagnosticSeverity.Warning,
       message: timeNowUsageWarning,
-      startLineNumber: start.lineNumber,
-      endLineNumber: end.lineNumber,
-      startColumn: start.column,
-      endColumn: end.column,
+      range: {
+        start,
+        end,
+      },
     }
   })
 }

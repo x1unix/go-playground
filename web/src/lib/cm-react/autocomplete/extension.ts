@@ -6,8 +6,7 @@ import {
   type CompletionContext,
   type CompletionResult as CMCompletionResult,
 } from '@codemirror/autocomplete'
-import type { Text } from '@codemirror/state'
-import { Compartment, Facet, type Extension } from '@codemirror/state'
+import { Compartment, Facet, type Extension, type Text } from '@codemirror/state'
 import { EditorView, hoverTooltip, type Tooltip } from '@codemirror/view'
 import { InsertTextFormat, type TextEdit } from 'vscode-languageserver-protocol'
 

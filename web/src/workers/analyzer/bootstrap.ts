@@ -1,4 +1,4 @@
-import type * as monaco from 'monaco-editor'
+import type { Diagnostic } from 'vscode-languageserver-protocol'
 import '~/lib/go/wasm_exec.js'
 import { getWasmUrl } from '~/services/api/resources'
 import { instantiateStreaming } from '~/lib/go/common'
@@ -13,7 +13,7 @@ interface GoModule {
 
 interface AnalyzeResult {
   hasErrors: boolean
-  markers: monaco.editor.IMarkerData[] | null
+  markers: Diagnostic[] | null
 }
 
 export interface WrappedGoModule {
