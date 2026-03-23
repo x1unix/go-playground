@@ -114,7 +114,27 @@
 
 ### TypeScript changes (follow-up)
 
-- TODO: update analyzer worker/client types to consume LSP diagnostics and map them to Monaco markers where needed.
-  - `web/src/workers/analyzer/types.ts`
-  - `web/src/workers/analyzer/bootstrap.ts`
-  - `web/src/workers/analyzer/analyzer.worker.ts`
+- Consume analyzer marker payload as LSP diagnostics (`Diagnostic`) instead of Monaco markers.
+  - `src/workers/analyzer/types.ts`
+    - `AnalyzeResponse.markers` should use `Diagnostic[] | null`.
+  - `src/workers/analyzer/bootstrap.ts`
+    - `AnalyzeResult.markers` should use `Diagnostic[] | null`.
+    - remove Monaco marker type imports.
+  - `src/workers/analyzer/analyzer.worker.ts`
+    - keep `modelVersionId` only at response level.
+    - do not append `modelVersionId` to each diagnostic item.
+
+- Update Redux marker state/action contracts to LSP diagnostics.
+  - `src/store/state.ts`
+    - `StatusState.markers` should use `Record<string, Diagnostic[] | null>`.
+  - `src/store/actions/editor.ts`
+    - `newMarkerAction` and `MarkerChangePayload.markers` should use `Diagnostic[] | null`.
+
+- Replace remaining `monaco.editor.IMarkerData` usages in CM editor path.
+  - `src/components/features/workspace/CMCodeEditor/syntax/linter.ts`
+    - use LSP `Diagnostic` / `DiagnosticSeverity` types.
+    - map LSP 0-based `Range` positions to CodeMirror offsets.
+  - `src/components/features/workspace/CMCodeEditor/syntax/time.ts`
+    - emit LSP diagnostics for synthetic `time.Now()` warning markers.
+  - `src/components/layout/StatusBar/StatusBar.tsx`
+    - count errors/warnings using LSP diagnostic severity values instead of Monaco `MarkerSeverity`.
