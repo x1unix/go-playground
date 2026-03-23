@@ -6,6 +6,8 @@ export interface IMarkdownString {
   readonly language?: string
 }
 
+// Types that represent either a plain-text string or markdown string.
+// Similar to Monaco and LSP types for completion and hover docs.
 export type MarkedString = string | IMarkdownString
 export type DocContent = IMarkdownString | MarkedString | MarkedString[]
 

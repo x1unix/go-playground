@@ -94,6 +94,7 @@
     "vite-plugin-svgr": "^4.2.0",
     "vite-tsconfig-paths": "^4.3.1",
     "vitest": "^2.1.9",
+    "vscode-languageserver-protocol": "^3.17.5",
     "web-vitals": "^2.1.4",
     "workbox-background-sync": "^6.5.4",
     "workbox-broadcast-update": "^6.5.4",
