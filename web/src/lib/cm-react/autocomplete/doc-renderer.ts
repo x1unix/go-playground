@@ -6,6 +6,8 @@ import type { DocContent } from '../types/autocomplete'
 
 import { classNames } from './styles'
 
+const MD_CODE_BLOCK = '```'
+
 interface NormalizedContent {
   isMarkdown: boolean
   value: string
@@ -25,9 +27,12 @@ const normalizeMarkupEntry = (entry: MarkupEntry): NormalizedContent => {
     return normalizeMarkupContentValue(entry)
   }
 
+  const lang = entry.language ?? ''
+  const value = `${MD_CODE_BLOCK}${lang}\n${entry.value}\n${MD_CODE_BLOCK}`
+
   return {
     isMarkdown: true,
-    value: entry.value,
+    value,
   }
 }
 
