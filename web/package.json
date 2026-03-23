@@ -74,7 +74,6 @@
     "jsdom": "^25.0.1",
     "markdown-it": "^14.1.1",
     "monaco-editor": "^0.45.0",
-    "monaco-vim": "^0.3.4",
     "prettier": "^3.2.4",
     "re-resizable": "^6.9.11",
     "react": "^17.0.2",

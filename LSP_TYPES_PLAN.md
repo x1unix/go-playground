@@ -90,20 +90,12 @@
     - replace Monaco-based completion item shape with LSP-based fields.
     - update documentation type to LSP-compatible markdown payload.
 
-- Update additional frontend area that consumes shared language worker contract (legacy Monaco editor path).
-  - `web/src/components/features/workspace/CodeEditor/autocomplete/base.ts`
-  - `web/src/components/features/workspace/CodeEditor/autocomplete/imports/provider.ts`
-  - `web/src/components/features/workspace/CodeEditor/autocomplete/symbols/provider.ts`
-  - `web/src/components/features/workspace/CodeEditor/autocomplete/hover/provider.ts`
-  - `web/src/components/features/workspace/CodeEditor/autocomplete/parser/imports.ts`
-  - `web/src/components/features/workspace/CodeEditor/autocomplete/symbols/snippets.ts`
-  - either adapt these providers at the boundary to convert LSP worker payloads to Monaco completion/hover types, or migrate this path to LSP-shaped internal contracts.
+- Scope only the remaining CodeMirror editor path (`CMCodeEditor`); legacy Monaco `CodeEditor` migration is out of scope.
 
 - Update tests for new contracts and enum semantics.
   - `web/src/lib/cm-react/autocomplete/converter.test.ts`
   - `web/src/lib/cm-react/autocomplete/go-source.test.ts`
   - `web/src/lib/cm-react/autocomplete/imports.test.ts`
-  - `web/src/components/features/workspace/CodeEditor/autocomplete/parser/imports.test.ts`
 
 ## analyzer
 

@@ -6403,15 +6403,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"monaco-vim@npm:^0.3.4":
-  version: 0.3.5
-  resolution: "monaco-vim@npm:0.3.5"
-  peerDependencies:
-    monaco-editor: "*"
-  checksum: 10c0/788bc197a600281270fc1c1f448df4f1075a11e61c420ccff3cb573e7df7862bdda5f81bb54f0406ff2f012c6b6d490999a2ed50df52edb769e72a29fa1059b5
-  languageName: node
-  linkType: hard
-
 "ms@npm:^2.1.1, ms@npm:^2.1.3":
   version: 2.1.3
   resolution: "ms@npm:2.1.3"
@@ -8526,7 +8517,6 @@ __metadata:
     jsdom: "npm:^25.0.1"
     markdown-it: "npm:^14.1.1"
     monaco-editor: "npm:^0.45.0"
-    monaco-vim: "npm:^0.3.4"
     prettier: "npm:^3.2.4"
     re-resizable: "npm:^6.9.11"
     react: "npm:^17.0.2"
