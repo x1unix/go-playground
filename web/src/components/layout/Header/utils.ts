@@ -17,16 +17,21 @@ const getDataCacheKey = (data: ICommandBarData) => {
 
 export const handleBarShrink = (data: ICommandBarData): ICommandBarData | undefined => {
   if (data.primaryItems.length > MIN_PRIMARY_ITEMS_COUNT) {
-    const nextPrimaryItems = data.primaryItems.slice(0, MIN_PRIMARY_ITEMS_COUNT)
-    const movedOverflowItems = data.primaryItems.slice(MIN_PRIMARY_ITEMS_COUNT).map((item) => ({
-      ...item,
-      renderedInOverflow: true,
-    }))
+    const movedItem = data.primaryItems[data.primaryItems.length - 1]
+    if (!movedItem) {
+      return undefined
+    }
 
     const nextData = {
       ...data,
-      primaryItems: nextPrimaryItems,
-      overflowItems: [...movedOverflowItems, ...data.overflowItems],
+      primaryItems: data.primaryItems.slice(0, -1),
+      overflowItems: [
+        {
+          ...movedItem,
+          renderedInOverflow: true,
+        },
+        ...data.overflowItems,
+      ],
     }
 
     return {
@@ -68,15 +73,21 @@ export const handleBarGrow = (data: ICommandBarData): ICommandBarData | undefine
 
   const movedItemsCount = data.overflowItems.length - data.minimumOverflowItems
   if (movedItemsCount > 0) {
-    const movedItems = data.overflowItems.slice(0, movedItemsCount).map((item) => ({
-      ...item,
-      renderedInOverflow: false,
-    }))
+    const movedItem = data.overflowItems[0]
+    if (!movedItem) {
+      return undefined
+    }
 
     const nextData = {
       ...data,
-      primaryItems: [...data.primaryItems, ...movedItems],
-      overflowItems: data.overflowItems.slice(movedItemsCount),
+      primaryItems: [
+        ...data.primaryItems,
+        {
+          ...movedItem,
+          renderedInOverflow: false,
+        },
+      ],
+      overflowItems: data.overflowItems.slice(1),
     }
 
     return {
