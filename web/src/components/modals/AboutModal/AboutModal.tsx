@@ -25,7 +25,7 @@ interface AboutModalProps {
   onTitleClick?: () => void
 }
 
-export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose, onTitleClick }) => {
+export const AboutModal: React.FC<AboutModalProps> = ({ isOpen = false, onClose, onTitleClick }) => {
   const theme = useTheme()
   const contentStyles = getContentStyles(theme)
   const iconButtonStyles = getIconButtonStyles(theme)
@@ -107,5 +107,3 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose, onTitle
     </Modal>
   )
 }
-
-AboutModal.defaultProps = { isOpen: false }

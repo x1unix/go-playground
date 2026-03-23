@@ -41,7 +41,7 @@ export const TabLabel: React.FC<Props> = ({
   disabled,
   onClick,
   onClose,
-  canClose,
+  canClose = true,
   icon,
   iconStyleOverride,
 }) => {
@@ -184,8 +184,4 @@ export const TabLabel: React.FC<Props> = ({
       ) : null}
     </Stack>
   )
-}
-
-TabLabel.defaultProps = {
-  canClose: true,
 }

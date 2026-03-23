@@ -11,7 +11,13 @@ interface Props {
   onDismiss?: () => void
 }
 
-export const SharePopup: FC<Props> = ({ visible, snippetId, originUrl, onDismiss, target }) => {
+export const SharePopup: FC<Props> = ({
+  visible,
+  snippetId,
+  originUrl = typeof window !== 'undefined' ? window.location.origin : '',
+  onDismiss,
+  target,
+}) => {
   const {
     semanticColors: { bodyBackground },
   } = useTheme()
@@ -62,8 +68,4 @@ export const SharePopup: FC<Props> = ({ visible, snippetId, originUrl, onDismiss
       </Link>
     </TeachingBubble>
   )
-}
-
-SharePopup.defaultProps = {
-  originUrl: window?.location?.origin,
 }
