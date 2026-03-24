@@ -29,7 +29,6 @@ import {
   runFileDispatcher,
   type StateDispatch,
 } from '~/store'
-import { handleBarGrow, handleBarShrink } from '~/components/layout/Header/utils'
 
 import './Header.css'
 
@@ -242,8 +241,6 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
           items={this.menuItems}
           farItems={this.asideItems.filter(({ hidden }) => !hidden)}
           ariaLabel="CodeEditor menu"
-          onReduceData={handleBarShrink}
-          onGrowData={handleBarGrow}
         />
         <SharePopup
           visible={!!sharedSnippetName?.length}
