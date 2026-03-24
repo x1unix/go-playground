@@ -22,6 +22,8 @@
 }
 
 @media only screen and (max-width: 600px) {
+
+  /* NOTE: .ms-CommandBar is a global style */
   .header__commandBar .ms-CommandBar {
     padding: 0 10px;
   }
