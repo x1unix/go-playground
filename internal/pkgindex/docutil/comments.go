@@ -237,7 +237,7 @@ func isSymbolRef(ref string) bool {
 		}
 
 		r, size := utf8.DecodeRuneInString(part)
-		if r == utf8.RuneError || !(unicode.IsLetter(r) || r == '_') {
+		if r == utf8.RuneError || (!unicode.IsLetter(r) && r != '_') {
 			return false
 		}
 
