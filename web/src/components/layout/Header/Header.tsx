@@ -54,6 +54,10 @@ export const Header: React.FC = () => {
   const isDisabled = useSelector(({ status }: State) => Boolean(status?.loading || status?.running))
   const hideThemeToggle = useSelector(({ settings }: State) => settings.useSystemTheme)
   const sharedSnippetName = useSelector(({ ui }: State) => (ui?.shareCreated ? ui?.snippetId : undefined))
+  // CommandBar keeps an internal cache for item rendering and may not re-apply
+  // mutable fields like `disabled` reliably on prop updates. `cacheKey` values
+  // force per-item cache invalidation without remounting the whole CommandBar.
+  const commandBarStateKey = isDisabled ? 'disabled' : 'enabled'
 
   useEffect(() => {
     let isMounted = true
@@ -119,6 +123,7 @@ export const Header: React.FC = () => {
   const menuItems: ICommandBarItemProps[] = [
     {
       key: 'run',
+      cacheKey: `run-${commandBarStateKey}`,
       text: 'Run',
       ariaLabel: 'Run program (Ctrl+Enter)',
       title: 'Run program (Ctrl+Enter)',
@@ -135,6 +140,7 @@ export const Header: React.FC = () => {
     },
     {
       key: 'share',
+      cacheKey: `share-${commandBarStateKey}`,
       text: 'Share',
       className: BTN_SHARE_CLASSNAME,
       iconProps: { iconName: 'Share' },
@@ -145,6 +151,7 @@ export const Header: React.FC = () => {
     },
     {
       key: 'format',
+      cacheKey: `format-${commandBarStateKey}`,
       text: 'Format',
       ariaLabel: 'Format Code (Alt+F)',
       disabled: isDisabled,
@@ -155,6 +162,7 @@ export const Header: React.FC = () => {
     },
     {
       key: 'explore',
+      cacheKey: `explore-${commandBarStateKey}`,
       text: 'Examples',
       iconProps: {
         iconName: 'TestExploreSolid',
@@ -166,6 +174,7 @@ export const Header: React.FC = () => {
     },
     {
       key: 'settings',
+      cacheKey: `settings-${commandBarStateKey}`,
       text: 'Settings',
       ariaLabel: 'Settings',
       iconProps: { iconName: 'Settings' },
@@ -188,6 +197,7 @@ export const Header: React.FC = () => {
   const asideItems: ICommandBarItemProps[] = [
     {
       key: 'selectEnvironment',
+      cacheKey: `selectEnvironment-${commandBarStateKey}`,
       commandBarButtonAs: () => {
         return (
           <Stack horizontal verticalAlign="center">
@@ -198,6 +208,7 @@ export const Header: React.FC = () => {
     },
     {
       key: 'toggleTheme',
+      cacheKey: `toggleTheme-${darkMode ? 'dark' : 'light'}-${hideThemeToggle ? 'hidden' : 'visible'}`,
       text: 'Toggle Dark Mode',
       ariaLabel: 'Toggle Dark Mode',
       iconOnly: true,
@@ -213,7 +224,6 @@ export const Header: React.FC = () => {
     <header className="header" style={{ backgroundColor: theme.palette.white }}>
       <img src="/go-logo-blue.svg" className="header__logo" alt="Golang Logo" />
       <CommandBar
-        key={isDisabled ? 'header-commandbar-disabled' : 'header-commandbar-enabled'}
         className="header__commandBar"
         items={menuItems}
         farItems={asideItems.filter(({ hidden }) => !hidden)}
