@@ -131,7 +131,6 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
         key: 'format',
         text: 'Format',
         ariaLabel: 'Format Code (Alt+F)',
-        iconOnly: true,
         disabled: this.isDisabled,
         iconProps: { iconName: 'code' },
         onClick: () => {
@@ -177,13 +176,7 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
         key: 'selectEnvironment',
         commandBarButtonAs: (_) => {
           return (
-            <Stack
-              horizontal
-              verticalAlign="center"
-              style={{
-                marginRight: '.5rem',
-              }}
-            >
+            <Stack horizontal verticalAlign="center">
               <RunTargetSelector responsive disabled={this.isDisabled} goVersions={this.state.goVersions} />
             </Stack>
           )
