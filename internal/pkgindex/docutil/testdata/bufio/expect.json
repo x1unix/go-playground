@@ -34,7 +34,7 @@
   },
   {
     "label": "NewReaderSize",
-    "documentation": "NewReaderSize returns a new \\[Reader] whose buffer has at least the specified size. If the argument io.Reader is already a \\[Reader] with large enough size, it returns the underlying \\[Reader].",
+    "documentation": "NewReaderSize returns a new `Reader` whose buffer has at least the specified size. If the argument io.Reader is already a `Reader` with large enough size, it returns the underlying `Reader`.",
     "detail": "func(rd io.Reader, size int) *Reader",
     "insertText": "NewReaderSize(${1:rd}, ${2:size})",
     "signature": "func NewReaderSize(rd io.Reader, size int) *Reader",

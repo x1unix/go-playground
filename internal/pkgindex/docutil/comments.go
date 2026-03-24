@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"go/ast"
 	"go/doc/comment"
+	"strconv"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 const (
@@ -65,14 +67,201 @@ func FormatCommentGroup(group *ast.CommentGroup) []byte {
 		parser  comment.Parser
 		printer = comment.Printer{
 			DocLinkBaseURL: goDocBaseUrl,
+			HeadingID:      func(*comment.Heading) string { return "" },
 		}
 	)
 
 	str := group.Text()
 	parsedDoc := parser.Parse(str)
+	replacements := replaceDocLinks(parsedDoc)
 	mdDoc := printer.Markdown(parsedDoc)
+	mdDoc = applyReplacements(mdDoc, replacements)
 	mdDoc = bytes.TrimSuffix(mdDoc, []byte("\n"))
 	return mdDoc
+}
+
+func replaceDocLinks(doc *comment.Doc) map[string]string {
+	if doc == nil || len(doc.Content) == 0 {
+		return nil
+	}
+
+	replacements := make(map[string]string)
+	nextID := 0
+	for i := range doc.Content {
+		doc.Content[i] = replaceDocLinksInBlock(doc.Content[i], replacements, &nextID)
+	}
+
+	return replacements
+}
+
+func replaceDocLinksInBlock(block comment.Block, replacements map[string]string, nextID *int) comment.Block {
+	switch block := block.(type) {
+	case *comment.Paragraph:
+		block.Text = replaceDocLinksInText(block.Text, replacements, nextID)
+	case *comment.Heading:
+		block.Text = replaceDocLinksInText(block.Text, replacements, nextID)
+	case *comment.List:
+		for _, item := range block.Items {
+			for i := range item.Content {
+				item.Content[i] = replaceDocLinksInBlock(item.Content[i], replacements, nextID)
+			}
+		}
+	}
+
+	return block
+}
+
+func replaceDocLinksInText(text []comment.Text, replacements map[string]string, nextID *int) []comment.Text {
+	out := make([]comment.Text, 0, len(text))
+	for _, t := range text {
+		switch t := t.(type) {
+		case *comment.DocLink:
+			token := "@@DOCUTILLINK" + strconv.Itoa(*nextID) + "@@"
+			*nextID = *nextID + 1
+			replacements[token] = "`" + extractText(t.Text) + "`"
+			out = append(out, comment.Plain(token))
+		case *comment.Link:
+			t.Text = replaceDocLinksInText(t.Text, replacements, nextID)
+			out = append(out, t)
+		case comment.Plain:
+			out = append(out, replacePlainSymbolRefs(string(t), replacements, nextID)...)
+		default:
+			out = append(out, t)
+		}
+	}
+
+	return out
+}
+
+func extractText(text []comment.Text) string {
+	var sb strings.Builder
+	for _, t := range text {
+		switch t := t.(type) {
+		case comment.Plain:
+			sb.WriteString(string(t))
+		case comment.Italic:
+			sb.WriteString(string(t))
+		case *comment.DocLink:
+			sb.WriteString(extractText(t.Text))
+		case *comment.Link:
+			sb.WriteString(extractText(t.Text))
+		}
+	}
+
+	return sb.String()
+}
+
+func replacePlainSymbolRefs(text string, replacements map[string]string, nextID *int) []comment.Text {
+	var out []comment.Text
+	start := 0
+	for i := 0; i < len(text); i++ {
+		if text[i] != '[' {
+			continue
+		}
+
+		end := strings.IndexByte(text[i+1:], ']')
+		if end == -1 {
+			break
+		}
+		end += i + 1
+		ref := text[i+1 : end]
+		if !isBoundaryBefore(text, i) || !isBoundaryAfter(text, end+1) || !isSymbolRef(ref) {
+			continue
+		}
+
+		if start < i {
+			out = append(out, comment.Plain(text[start:i]))
+		}
+
+		token := "@@DOCUTILLINK" + strconv.Itoa(*nextID) + "@@"
+		*nextID = *nextID + 1
+		replacements[token] = "`" + ref + "`"
+		out = append(out, comment.Plain(token))
+		start = end + 1
+		i = end
+	}
+
+	if start < len(text) {
+		out = append(out, comment.Plain(text[start:]))
+	}
+
+	if len(out) == 0 {
+		return []comment.Text{comment.Plain(text)}
+	}
+
+	return out
+}
+
+func isBoundaryBefore(text string, i int) bool {
+	if i <= 0 {
+		return true
+	}
+
+	r, _ := utf8.DecodeLastRuneInString(text[:i])
+	return unicode.IsSpace(r) || unicode.IsPunct(r)
+}
+
+func isBoundaryAfter(text string, i int) bool {
+	if i >= len(text) {
+		return true
+	}
+
+	r, _ := utf8.DecodeRuneInString(text[i:])
+	if r == '(' {
+		return false
+	}
+	return unicode.IsSpace(r) || unicode.IsPunct(r)
+}
+
+func isSymbolRef(ref string) bool {
+	if ref == "" {
+		return false
+	}
+
+	if strings.ContainsAny(ref, " \t\n") {
+		return false
+	}
+
+	if ref[0] == '*' {
+		if len(ref) == 1 {
+			return false
+		}
+		ref = ref[1:]
+	}
+
+	for _, part := range strings.FieldsFunc(ref, func(r rune) bool {
+		return r == '.' || r == '/'
+	}) {
+		if part == "" {
+			return false
+		}
+
+		r, size := utf8.DecodeRuneInString(part)
+		if r == utf8.RuneError || !(unicode.IsLetter(r) || r == '_') {
+			return false
+		}
+
+		for _, r := range part[size:] {
+			if !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '_' {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+func applyReplacements(mdDoc []byte, replacements map[string]string) []byte {
+	if len(replacements) == 0 {
+		return mdDoc
+	}
+
+	out := string(mdDoc)
+	for token, replacement := range replacements {
+		out = strings.ReplaceAll(out, token, replacement)
+	}
+
+	return []byte(out)
 }
 
 // IsPackageDoc returns whether top level comment is a valid package comment.

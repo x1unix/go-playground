@@ -80,3 +80,35 @@ func TestFormatCommentGroup(t *testing.T) {
 	got := FormatCommentGroup(input)
 	require.Equal(t, want, string(got))
 }
+
+func TestFormatCommentGroupDocLinks(t *testing.T) {
+	input := &ast.CommentGroup{
+		List: []*ast.Comment{
+			{Text: "// Package sync provides synchronization primitives."},
+			{Text: "//"},
+			{Text: "// # Usage"},
+			{Text: "//"},
+			{Text: "// Use [WaitGroup.Go] and [fmt.Println]."},
+		},
+	}
+
+	got := string(FormatCommentGroup(input))
+	require.Contains(t, got, "### Usage")
+	require.NotContains(t, got, "{#hdr-")
+	require.Contains(t, got, "`WaitGroup.Go`")
+	require.Contains(t, got, "`fmt.Println`")
+	require.NotContains(t, got, "https://pkg.go.dev/")
+}
+
+func TestFormatCommentGroupSymbolRefs(t *testing.T) {
+	input := &ast.CommentGroup{
+		List: []*ast.Comment{
+			{Text: "// See [panic] for details."},
+			{Text: "// Map access m[key] should not be converted."},
+		},
+	}
+
+	got := string(FormatCommentGroup(input))
+	require.Contains(t, got, "`panic`")
+	require.Contains(t, got, "m\\[key]")
+}

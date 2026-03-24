@@ -236,7 +236,7 @@
   },
   {
     "label": "max",
-    "documentation": "The max built-in function returns the largest value of a fixed number of arguments of [cmp.Ordered](https://pkg.go.dev/cmp/#Ordered) types. There must be at least one argument. If T is a floating-point type and any of the arguments are NaNs, max will return NaN.",
+    "documentation": "The max built-in function returns the largest value of a fixed number of arguments of `cmp.Ordered` types. There must be at least one argument. If T is a floating-point type and any of the arguments are NaNs, max will return NaN.",
     "detail": "func[T cmp.Ordered](x T, y ...T) T",
     "insertText": "max[${1:T}](${2:x}, ${3:y})",
     "signature": "func max[T cmp.Ordered](x T, y ...T) T",
@@ -245,7 +245,7 @@
   },
   {
     "label": "min",
-    "documentation": "The min built-in function returns the smallest value of a fixed number of arguments of [cmp.Ordered](https://pkg.go.dev/cmp/#Ordered) types. There must be at least one argument. If T is a floating-point type and any of the arguments are NaNs, min will return NaN.",
+    "documentation": "The min built-in function returns the smallest value of a fixed number of arguments of `cmp.Ordered` types. There must be at least one argument. If T is a floating-point type and any of the arguments are NaNs, min will return NaN.",
     "detail": "func[T cmp.Ordered](x T, y ...T) T",
     "insertText": "min[${1:T}](${2:x}, ${3:y})",
     "signature": "func min[T cmp.Ordered](x T, y ...T) T",
@@ -317,7 +317,7 @@
   },
   {
     "label": "recover",
-    "documentation": "The recover built-in function allows a program to manage behavior of a panicking goroutine. Executing a call to recover inside a deferred function (but not any function called by it) stops the panicking sequence by restoring normal execution and retrieves the error value passed to the call of panic. If recover is called outside the deferred function it will not stop a panicking sequence. In this case, or when the goroutine is not panicking, recover returns nil.\n\nPrior to Go 1.21, recover would also return nil if panic is called with a nil argument. See \\[panic] for details.",
+    "documentation": "The recover built-in function allows a program to manage behavior of a panicking goroutine. Executing a call to recover inside a deferred function (but not any function called by it) stops the panicking sequence by restoring normal execution and retrieves the error value passed to the call of panic. If recover is called outside the deferred function it will not stop a panicking sequence. In this case, or when the goroutine is not panicking, recover returns nil.\n\nPrior to Go 1.21, recover would also return nil if panic is called with a nil argument. See `panic` for details.",
     "detail": "func() any",
     "insertText": "recover()",
     "signature": "func recover() any",

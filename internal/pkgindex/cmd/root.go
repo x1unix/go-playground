@@ -41,7 +41,7 @@ func saveHeapProfile(outFile string) error {
 		return nil
 	}
 
-	f, err := os.OpenFile(outFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	f, err := os.OpenFile(outFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
 	if err != nil {
 		return fmt.Errorf("failed to create heap profile file: %w", err)
 	}
