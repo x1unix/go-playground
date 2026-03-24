@@ -32,5 +32,12 @@
       "url": "pull/572",
       "description": "Support JSON and text files"
     }
+  ],
+  "Go - Misc": [
+    {
+      "issueId": 582,
+      "url": "pull/582",
+      "description": "Fix hover documentation formatting"
+    }
   ]
 }
