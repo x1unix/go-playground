@@ -7,12 +7,23 @@ const getItemResizeKey = (item: { key: string | number; cacheKey?: string; iconO
   return `${String(itemKey)}:${item.iconOnly ? 'icon' : 'text'}`
 }
 
+const getDisabledKeyPrefix = (data: ICommandBarData) => {
+  // reduce/grow hook is called when items 'disabled' property changes by Header during load state changes.
+  // load state has to be considered in the cache key for cache invalidation.
+  const src = data.primaryItems.length ? data.primaryItems : data.overflowItems
+  if (!src.length) return '1'
+
+  // First item is 'Run' which is disabled during app loading
+  return src[0].disabled ? '0' : '1'
+}
+
 const getDataCacheKey = (data: ICommandBarData) => {
+  const pfx = getDisabledKeyPrefix(data)
   const primaryKey = data.primaryItems.map(getItemResizeKey).join('|')
   const overflowKey = data.overflowItems.map((item) => String(item.cacheKey ?? item.key)).join('|')
   const farKey = data.farItems?.map((item) => String(item.cacheKey ?? item.key)).join('|') ?? ''
 
-  return `${primaryKey}::${overflowKey}::${farKey}`
+  return `${pfx}-${primaryKey}::${overflowKey}::${farKey}`
 }
 
 export const handleBarShrink = (data: ICommandBarData): ICommandBarData | undefined => {
