@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useTheme } from '@fluentui/react'
 import { Resizable } from 're-resizable'
 import { clsx } from 'clsx'
@@ -12,8 +12,8 @@ import './InspectorPanel.css'
 const MIN_HEIGHT = 36
 const MIN_WIDTH = 120
 const handleClasses = {
-  top: 'InspectorPanel__handle--top',
-  left: 'InspectorPanel__handle--left',
+  top: 'InspectorPanel__handle InspectorPanel__handle--top',
+  left: 'InspectorPanel__handle InspectorPanel__handle--left',
 }
 
 export type SizeChanges = { height: number } | { width: number }
@@ -73,8 +73,11 @@ export const InspectorPanel: React.FC<Props> = ({
     palette: { accent },
     semanticColors: { buttonBorder },
   } = useTheme()
+
+  const [isResizing, setIsResizing] = useState(false)
   const handleResize = useCallback(
     (e, direction, ref, delta) => {
+      setIsResizing(false)
       const { height, width } = ref.getBoundingClientRect()
       switch (layout) {
         case LayoutType.Vertical:
@@ -86,7 +89,7 @@ export const InspectorPanel: React.FC<Props> = ({
         default:
       }
     },
-    [layout, onResize],
+    [layout, onResize, setIsResizing],
   )
 
   const size = {
@@ -109,10 +112,18 @@ export const InspectorPanel: React.FC<Props> = ({
   const isCollapsed = collapsed && layout === LayoutType.Vertical
   return (
     <Resizable
-      className={clsx('InspectorPanel', isCollapsed && 'InspectorPanel--collapsed', `InspectorPanel--${layout}`)}
+      className={clsx(
+        'InspectorPanel',
+        isCollapsed && 'InspectorPanel--collapsed',
+        isResizing && 'InspectorPanel--resizing',
+        `InspectorPanel--${layout}`,
+      )}
       handleClasses={handleClasses}
       size={size}
       enable={enabledCorners}
+      onResizeStart={() => {
+        setIsResizing(true)
+      }}
       onResizeStop={handleResize}
       minHeight={MIN_HEIGHT}
       minWidth={MIN_WIDTH}

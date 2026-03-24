@@ -29,6 +29,7 @@ import {
   runFileDispatcher,
   type StateDispatch,
 } from '~/store'
+import { handleBarGrow, handleBarShrink } from '~/components/layout/Header/utils'
 
 import './Header.css'
 
@@ -128,6 +129,17 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
         },
       },
       {
+        key: 'format',
+        text: 'Format',
+        ariaLabel: 'Format Code (Alt+F)',
+        iconOnly: true,
+        disabled: this.isDisabled,
+        iconProps: { iconName: 'code' },
+        onClick: () => {
+          this.props.dispatch(dispatchFormatFile())
+        },
+      },
+      {
         key: 'explore',
         text: 'Examples',
         iconProps: {
@@ -176,17 +188,6 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
               <RunTargetSelector responsive disabled={this.isDisabled} goVersions={this.state.goVersions} />
             </Stack>
           )
-        },
-      },
-      {
-        key: 'format',
-        text: 'Format Code',
-        ariaLabel: 'Format Code (Alt+F)',
-        iconOnly: true,
-        disabled: this.isDisabled,
-        iconProps: { iconName: 'code' },
-        onClick: () => {
-          this.props.dispatch(dispatchFormatFile())
         },
       },
       {
@@ -241,6 +242,8 @@ class HeaderContainer extends ThemeableComponent<Props, HeaderState> {
           items={this.menuItems}
           farItems={this.asideItems.filter(({ hidden }) => !hidden)}
           ariaLabel="CodeEditor menu"
+          onReduceData={handleBarShrink}
+          onGrowData={handleBarGrow}
         />
         <SharePopup
           visible={!!sharedSnippetName?.length}
