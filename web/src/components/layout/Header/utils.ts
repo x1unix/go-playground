@@ -1,6 +1,6 @@
 import type { ICommandBarData } from '@fluentui/react'
 
-const MIN_PRIMARY_ITEMS_COUNT = 2
+const MIN_PRIMARY_ITEMS_COUNT = 3
 
 const getItemResizeKey = (item: { key: string | number; cacheKey?: string; iconOnly?: boolean }) => {
   const itemKey = item.cacheKey ?? item.key
