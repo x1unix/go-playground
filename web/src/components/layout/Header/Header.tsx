@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { addDays } from 'date-fns'
 import { CommandBar, type ICommandBarItemProps, Stack, useTheme } from '@fluentui/react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -51,14 +51,9 @@ export const Header: React.FC = () => {
   const [goVersions, setGoVersions] = useState<VersionsInfo>()
 
   const darkMode = useSelector(({ settings }: State) => settings.darkMode)
-  const status = useSelector(({ status }: State) => status)
+  const isDisabled = useSelector(({ status }: State) => Boolean(status?.loading || status?.running))
   const hideThemeToggle = useSelector(({ settings }: State) => settings.useSystemTheme)
   const sharedSnippetName = useSelector(({ ui }: State) => (ui?.shareCreated ? ui?.snippetId : undefined))
-
-  const loading = status?.loading
-  const running = status?.running
-
-  const isDisabled = loading || running
 
   useEffect(() => {
     let isMounted = true
@@ -121,109 +116,104 @@ export const Header: React.FC = () => {
     [dispatch],
   )
 
-  const menuItems = useMemo<ICommandBarItemProps[]>(
-    () => [
-      {
-        key: 'run',
-        text: 'Run',
-        ariaLabel: 'Run program (Ctrl+Enter)',
-        title: 'Run program (Ctrl+Enter)',
-        iconProps: { iconName: 'IoMdPlay' },
-        disabled: isDisabled,
-        buttonStyles: {
-          icon: {
-            color: theme.palette.green,
-          },
-        },
-        onClick: () => {
-          dispatch(runFileDispatcher)
+  const menuItems: ICommandBarItemProps[] = [
+    {
+      key: 'run',
+      text: 'Run',
+      ariaLabel: 'Run program (Ctrl+Enter)',
+      title: 'Run program (Ctrl+Enter)',
+      iconProps: { iconName: 'IoMdPlay' },
+      disabled: isDisabled,
+      buttonStyles: {
+        icon: {
+          color: theme.palette.green,
         },
       },
-      {
-        key: 'share',
-        text: 'Share',
-        className: BTN_SHARE_CLASSNAME,
-        iconProps: { iconName: 'Share' },
-        disabled: isDisabled,
-        onClick: () => {
-          dispatch(dispatchShareSnippet())
-        },
+      onClick: () => {
+        dispatch(runFileDispatcher)
       },
-      {
-        key: 'format',
-        text: 'Format',
-        ariaLabel: 'Format Code (Alt+F)',
-        disabled: isDisabled,
-        iconProps: { iconName: 'code' },
-        onClick: () => {
-          dispatch(dispatchFormatFile())
-        },
+    },
+    {
+      key: 'share',
+      text: 'Share',
+      className: BTN_SHARE_CLASSNAME,
+      iconProps: { iconName: 'Share' },
+      disabled: isDisabled,
+      onClick: () => {
+        dispatch(dispatchShareSnippet())
       },
-      {
-        key: 'explore',
-        text: 'Examples',
-        iconProps: {
-          iconName: 'TestExploreSolid',
-        },
-        disabled: isDisabled,
-        onClick: () => {
-          setShowExamples(true)
-        },
+    },
+    {
+      key: 'format',
+      text: 'Format',
+      ariaLabel: 'Format Code (Alt+F)',
+      disabled: isDisabled,
+      iconProps: { iconName: 'code' },
+      onClick: () => {
+        dispatch(dispatchFormatFile())
       },
-      {
-        key: 'settings',
-        text: 'Settings',
-        ariaLabel: 'Settings',
-        iconProps: { iconName: 'Settings' },
-        disabled: isDisabled,
-        onClick: () => {
-          setShowSettings(true)
-        },
+    },
+    {
+      key: 'explore',
+      text: 'Examples',
+      iconProps: {
+        iconName: 'TestExploreSolid',
       },
-      {
-        key: 'about',
-        text: 'About',
-        ariaLabel: 'About',
-        iconProps: { iconName: 'Info' },
-        onClick: () => {
-          setShowAbout(true)
-        },
+      disabled: isDisabled,
+      onClick: () => {
+        setShowExamples(true)
       },
-    ],
-    [dispatch, isDisabled, theme.palette.green],
-  )
+    },
+    {
+      key: 'settings',
+      text: 'Settings',
+      ariaLabel: 'Settings',
+      iconProps: { iconName: 'Settings' },
+      disabled: isDisabled,
+      onClick: () => {
+        setShowSettings(true)
+      },
+    },
+    {
+      key: 'about',
+      text: 'About',
+      ariaLabel: 'About',
+      iconProps: { iconName: 'Info' },
+      onClick: () => {
+        setShowAbout(true)
+      },
+    },
+  ]
 
-  const asideItems = useMemo<ICommandBarItemProps[]>(
-    () => [
-      {
-        key: 'selectEnvironment',
-        commandBarButtonAs: () => {
-          return (
-            <Stack horizontal verticalAlign="center">
-              <RunTargetSelector responsive disabled={isDisabled} goVersions={goVersions} />
-            </Stack>
-          )
-        },
+  const asideItems: ICommandBarItemProps[] = [
+    {
+      key: 'selectEnvironment',
+      commandBarButtonAs: () => {
+        return (
+          <Stack horizontal verticalAlign="center">
+            <RunTargetSelector responsive disabled={isDisabled} goVersions={goVersions} />
+          </Stack>
+        )
       },
-      {
-        key: 'toggleTheme',
-        text: 'Toggle Dark Mode',
-        ariaLabel: 'Toggle Dark Mode',
-        iconOnly: true,
-        hidden: hideThemeToggle,
-        iconProps: { iconName: darkMode ? 'Brightness' : 'ClearNight' },
-        onClick: () => {
-          dispatch(dispatchToggleTheme)
-        },
+    },
+    {
+      key: 'toggleTheme',
+      text: 'Toggle Dark Mode',
+      ariaLabel: 'Toggle Dark Mode',
+      iconOnly: true,
+      hidden: hideThemeToggle,
+      iconProps: { iconName: darkMode ? 'Brightness' : 'ClearNight' },
+      onClick: () => {
+        dispatch(dispatchToggleTheme)
       },
-    ],
-    [darkMode, dispatch, goVersions, hideThemeToggle, isDisabled],
-  )
+    },
+  ]
 
   return (
     <header className="header" style={{ backgroundColor: theme.palette.white }}>
       <img src="/go-logo-blue.svg" className="header__logo" alt="Golang Logo" />
       <CommandBar
+        key={isDisabled ? 'header-commandbar-disabled' : 'header-commandbar-enabled'}
         className="header__commandBar"
         items={menuItems}
         farItems={asideItems.filter(({ hidden }) => !hidden)}
