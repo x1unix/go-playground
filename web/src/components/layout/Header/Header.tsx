@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState, useRef } from 'react'
+import { clsx } from 'clsx'
 import { addDays } from 'date-fns'
 import { useDispatch, useSelector } from 'react-redux'
 import { IContextualMenuItem, type IContextualMenuProps, useTheme } from '@fluentui/react'
@@ -6,13 +7,13 @@ import { TooltipHost, ITooltipHostStyles } from '@fluentui/react/lib/Tooltip'
 import { CommandBarButton, IconButton } from '@fluentui/react/lib/Button'
 import { useId } from '@fluentui/react-hooks'
 
+import { SharePopup } from '~/components/utils/SharePopup'
 import { RunTargetSelector } from '~/components/elements/inputs/RunTargetSelector'
 import { newAddNotificationAction, NotificationType } from '~/store/notifications'
 import { keyValue } from '~/services/storage'
 import apiClient, { type VersionsInfo } from '~/services/api'
 
 import classes from './Header.module.css'
-import { text } from 'node:stream/consumers'
 
 interface ToggleThemeButtonProps {
   hidden?: boolean
@@ -29,7 +30,7 @@ const ToggleThemeButton = ({ hidden, isDark }: ToggleThemeButtonProps) => {
   }
 
   return (
-    <TooltipHost content="Toggle Dark Mode" styles={tooltipStyles}>
+    <TooltipHost id={tooltipId} content="Toggle Dark Mode" styles={tooltipStyles}>
       <IconButton
         className={classes['Header--btn']}
         iconProps={{ iconName: isDark ? 'Brightness' : 'ClearNight' }}
@@ -40,6 +41,10 @@ const ToggleThemeButton = ({ hidden, isDark }: ToggleThemeButtonProps) => {
 }
 
 const HeaderSeparator = () => <div className={classes['Header--separator']} aria-hidden />
+
+// Class to map share popup to a button.
+// Used instead of `useRef` as CommandBarButton's "ref" is deprecated, but no viable alternative is provided.
+const BTN_SHARE_CLASS = 'Header--btn__share'
 
 const goVersionsCacheEntry = {
   key: 'api.go.versions',
@@ -66,6 +71,7 @@ export const Header = () => {
   const darkMode = false
   const isThemeToggleHidden = false
   const isDropdownVisible = false
+  const sharedSnippetName = ''
 
   const asideMenuItemProps: IContextualMenuProps = useMemo(() => {
     let items: IContextualMenuItem[] = [
@@ -140,7 +146,11 @@ export const Header = () => {
           text="Run"
         />
         <HeaderSeparator />
-        <CommandBarButton className={classes['Header--btn']} iconProps={{ iconName: 'Share' }} text="Share" />
+        <CommandBarButton
+          className={clsx(classes['Header--btn'], BTN_SHARE_CLASS)}
+          iconProps={{ iconName: 'Share' }}
+          text="Share"
+        />
         <CommandBarButton className={classes['Header--btn']} iconProps={{ iconName: 'Code' }} text="Format" />
         <CommandBarButton
           className={classes['Header--btn']}
@@ -173,6 +183,14 @@ export const Header = () => {
         <RunTargetSelector responsive disabled={isDisabled} goVersions={goVersions} />
         <ToggleThemeButton isDark={darkMode} hidden={isThemeToggleHidden || isDropdownVisible} />
       </div>
+      <SharePopup
+        visible={!!sharedSnippetName?.length}
+        target={`.${BTN_SHARE_CLASS}`}
+        snippetId={sharedSnippetName}
+        onDismiss={() => {
+          // dispatch(newUIStateChangeAction({ shareCreated: false }))
+        }}
+      />
     </header>
   )
 }
