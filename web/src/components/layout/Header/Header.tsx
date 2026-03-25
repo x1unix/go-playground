@@ -291,7 +291,7 @@ export const Header = () => {
             <IconButton
               key="dropdown"
               iconProps={{ iconName: 'More' }}
-              styles={{ menuIcon: { display: 'none' }, icon: { color: theme.semanticColors.infoIcon } }}
+              styles={{ menuIcon: { display: 'none' }, icon: { color: theme.semanticColors.bodyText } }}
               menuProps={{
                 items: asideMenuItems,
                 onItemClick: (_, item) => {
