@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useState, useRef } from 'react'
 import { clsx } from 'clsx'
 import { addDays } from 'date-fns'
 import { useDispatch, useSelector } from 'react-redux'
-import { IContextualMenuItem, type IContextualMenuProps, useTheme } from '@fluentui/react'
-import { TooltipHost, ITooltipHostStyles } from '@fluentui/react/lib/Tooltip'
-import { CommandBarButton, IconButton } from '@fluentui/react/lib/Button'
+import { IContextualMenuItem, useTheme } from '@fluentui/react'
+import { TooltipHost, type ITooltipHostStyles } from '@fluentui/react/lib/Tooltip'
+import { CommandBarButton, type IButtonProps, IconButton } from '@fluentui/react/lib/Button'
 import { useId } from '@fluentui/react-hooks'
 
 import { SharePopup } from '~/components/utils/SharePopup'
@@ -32,17 +32,9 @@ import apiClient, { type VersionsInfo } from '~/services/api'
 import classes from './Header.module.css'
 
 enum MenuActionType {
-  Run,
-  Share,
-  Format,
-  ShowExamples,
   ShowSettings,
   ShowAbout,
   ToggleTheme,
-}
-
-interface MenuItemData {
-  action: MenuActionType
 }
 
 interface ToggleThemeButtonProps {
@@ -67,9 +59,7 @@ const ToggleThemeButton = ({ hidden, isDark, onClick }: ToggleThemeButtonProps) 
         iconProps={{ iconName: isDark ? 'Brightness' : 'ClearNight' }}
         aria-label="Toggle Dark Mode"
         onClick={onClick}
-        data={{
-          action: MenuActionType.ToggleTheme,
-        }}
+        data={MenuActionType.ToggleTheme}
       />
     </TooltipHost>
   )
@@ -171,9 +161,7 @@ export const Header = () => {
         key: 'toggle-theme',
         text: 'Toggle Theme',
         iconProps: { iconName: 'ClearNight' },
-        data: {
-          action: MenuActionType.ToggleTheme,
-        },
+        data: MenuActionType.ToggleTheme,
 
         // Extra props to hide toggle when system color scheme is preferred or dropdown menu is hidden on large screens.
         showOnlyInDropdown: true,
@@ -184,22 +172,35 @@ export const Header = () => {
         text: 'Settings',
         iconProps: { iconName: 'Settings' },
         disabled: isDisabled,
-        data: {
-          action: MenuActionType.ShowSettings,
-        },
+        data: MenuActionType.ShowSettings,
       },
       {
         key: 'about',
         text: 'About',
         iconProps: { iconName: 'Info' },
-        data: {
-          action: MenuActionType.ShowAbout,
-        },
+        data: MenuActionType.ShowAbout,
       },
     ]
 
     return items.filter((e) => ('hidden' in e ? !e.hidden : true))
   }, [isDisabled, isThemeToggleHidden])
+
+  const onMenuItemClick = (cmd: MenuActionType) => {
+    switch (cmd) {
+      case MenuActionType.ToggleTheme: {
+        dispatch(dispatchToggleTheme)
+        return
+      }
+      case MenuActionType.ShowSettings: {
+        setModalStates({ showSettings: true })
+        return
+      }
+      case MenuActionType.ShowAbout: {
+        setModalStates({ showAbout: true })
+        return
+      }
+    }
+  }
 
   return (
     <header className={classes.Header} style={cssVars}>
@@ -215,6 +216,9 @@ export const Header = () => {
               color: theme.palette.green,
             },
           }}
+          onClick={() => {
+            dispatch(runFileDispatcher)
+          }}
         />
         <HeaderSeparator />
         <CommandBarButton
@@ -222,18 +226,27 @@ export const Header = () => {
           disabled={isDisabled}
           className={clsx(classes['Header--btn'], BTN_SHARE_CLASS)}
           iconProps={{ iconName: 'Share' }}
+          onClick={() => {
+            dispatch(dispatchShareSnippet())
+          }}
         />
         <CommandBarButton
           text="Format"
           className={classes['Header--btn']}
           iconProps={{ iconName: 'Code' }}
           disabled={isDisabled}
+          onClick={() => {
+            dispatch(dispatchFormatFile())
+          }}
         />
         <CommandBarButton
           text="Examples"
           disabled={isDisabled}
           className={classes['Header--btn']}
           iconProps={{ iconName: 'TestExploreSolid' }}
+          onClick={() => {
+            setModalStates({ showExamples: true })
+          }}
         />
         <HeaderSeparator />
         {isCompact ? (
@@ -243,10 +256,10 @@ export const Header = () => {
             styles={{ menuIcon: { display: 'none' }, icon: { color: theme.semanticColors.infoIcon } }}
             menuProps={{
               items: asideMenuItems,
-              onItemClick: (_, e) => {
-                if (!e?.data?.actionType) return
-                const actionType: MenuActionType = e.data.actionType
-                console.log(actionType)
+              onItemClick: (_, item) => {
+                if (item) {
+                  onMenuItemClick(item.data as MenuActionType)
+                }
               },
             }}
           />
@@ -261,6 +274,7 @@ export const Header = () => {
                 text={text}
                 disabled={disabled}
                 data={data}
+                onClick={() => onMenuItemClick(data as MenuActionType)}
               />
             ))
         )}
