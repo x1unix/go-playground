@@ -46,6 +46,9 @@ const HeaderSeparator = () => <div className={classes['Header--separator']} aria
 // Used instead of `useRef` as CommandBarButton's "ref" is deprecated, but no viable alternative is provided.
 const BTN_SHARE_CLASS = 'Header--btn__share'
 
+// Breakpoint in pixels to hide aside menu items into a dropdown.
+const COMPACT_MENU_BREAKPOINT_PX = 745
+
 const goVersionsCacheEntry = {
   key: 'api.go.versions',
   ttl: () => addDays(new Date(), 7),
@@ -55,7 +58,37 @@ const goVersionsCacheEntry = {
 export const Header = () => {
   const dispatch = useDispatch()
   const theme = useTheme()
+
+  // Fetch available Go versions
   const [goVersions, setGoVersions] = useState<VersionsInfo>()
+  useEffect(() => {
+    let isMounted = true
+
+    keyValue
+      .getOrInsert(goVersionsCacheEntry)
+      .then((rsp) => {
+        if (!isMounted) {
+          return
+        }
+
+        setGoVersions(rsp)
+      })
+      .catch((err) =>
+        dispatch(
+          newAddNotificationAction({
+            id: 'VERSIONS_FETCH_ERROR',
+            type: NotificationType.Error,
+            title: 'Failed to fetch Go version info',
+            description: err.toString(),
+            canDismiss: true,
+          }),
+        ),
+      )
+
+    return () => {
+      isMounted = false
+    }
+  }, [dispatch])
 
   const cssVars: Record<string, string> = useMemo(
     () => ({
@@ -66,11 +99,28 @@ export const Header = () => {
     [theme],
   )
 
+  // Window width listener to hide aside items into a dropdown.
+  const [isCompact, setIsCompact] = useState(window.innerWidth < COMPACT_MENU_BREAKPOINT_PX)
+  useEffect(() => {
+    let raf = 0
+    const onResize = () => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(() => {
+        setIsCompact(window.innerWidth < COMPACT_MENU_BREAKPOINT_PX)
+      })
+    }
+
+    window.addEventListener('resize', onResize)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [setIsCompact])
+
   // Note: move aside items into dropdown at max-width 740px
   const isDisabled = false
   const darkMode = false
   const isThemeToggleHidden = false
-  const isDropdownVisible = false
   const sharedSnippetName = ''
 
   const asideMenuItemProps: IContextualMenuProps = useMemo(() => {
@@ -102,35 +152,6 @@ export const Header = () => {
     }
   }, [isDisabled, isThemeToggleHidden])
 
-  useEffect(() => {
-    let isMounted = true
-
-    keyValue
-      .getOrInsert(goVersionsCacheEntry)
-      .then((rsp) => {
-        if (!isMounted) {
-          return
-        }
-
-        setGoVersions(rsp)
-      })
-      .catch((err) =>
-        dispatch(
-          newAddNotificationAction({
-            id: 'VERSIONS_FETCH_ERROR',
-            type: NotificationType.Error,
-            title: 'Failed to fetch Go version info',
-            description: err.toString(),
-            canDismiss: true,
-          }),
-        ),
-      )
-
-    return () => {
-      isMounted = false
-    }
-  }, [dispatch])
-
   return (
     <header className={classes.Header} style={cssVars}>
       <div className={classes['Header--left']}>
@@ -158,12 +179,12 @@ export const Header = () => {
           text="Examples"
         />
         <HeaderSeparator />
-        {isDropdownVisible ? (
+        {isCompact ? (
           <IconButton
             key="dropdown"
             iconProps={{ iconName: 'More' }}
             menuProps={asideMenuItemProps}
-            styles={{ menuIcon: { display: 'none' } }}
+            styles={{ menuIcon: { display: 'none' }, icon: { color: theme.semanticColors.infoIcon } }}
           />
         ) : (
           asideMenuItemProps.items
@@ -181,7 +202,7 @@ export const Header = () => {
       </div>
       <div className={classes['Header--right']}>
         <RunTargetSelector responsive disabled={isDisabled} goVersions={goVersions} />
-        <ToggleThemeButton isDark={darkMode} hidden={isThemeToggleHidden || isDropdownVisible} />
+        <ToggleThemeButton isDark={darkMode} hidden={isThemeToggleHidden || isCompact} />
       </div>
       <SharePopup
         visible={!!sharedSnippetName?.length}

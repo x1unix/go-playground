@@ -47,7 +47,7 @@
 }
 
 /* Mobile  */
-@media (max-width: 600px) {
+@media (max-width: 580px) {
   .Header--btn :global(.ms-Button-textContainer) {
     display: none;
   }
