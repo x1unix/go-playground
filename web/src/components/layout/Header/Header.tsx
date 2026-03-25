@@ -11,19 +11,50 @@ import { SharePopup } from '~/components/utils/SharePopup'
 import { RunTargetSelector } from '~/components/elements/inputs/RunTargetSelector'
 import { newAddNotificationAction, NotificationType } from '~/store/notifications'
 import { keyValue } from '~/services/storage'
+import { dispatchTerminalSettingsChange } from '~/store/terminal'
+import {
+  dispatchFormatFile,
+  dispatchLoadSnippet,
+  dispatchLoadSnippetFromSource,
+  dispatchShareSnippet,
+} from '~/store/workspace/dispatchers'
+import {
+  dispatchToggleTheme,
+  newMonacoParamsChangeDispatcher,
+  newSettingsChangeDispatcher,
+  newUIStateChangeAction,
+  runFileDispatcher,
+  type State,
+} from '~/store'
+
 import apiClient, { type VersionsInfo } from '~/services/api'
 
 import classes from './Header.module.css'
 
+enum MenuActionType {
+  Run,
+  Share,
+  Format,
+  ShowExamples,
+  ShowSettings,
+  ShowAbout,
+  ToggleTheme,
+}
+
+interface MenuItemData {
+  action: MenuActionType
+}
+
 interface ToggleThemeButtonProps {
   hidden?: boolean
   isDark: boolean
+  onClick?: () => void
 }
 
 const tooltipStyles: Partial<ITooltipHostStyles> = {
   root: { display: 'inline-block', height: '100%', marginLeft: 'var(--header-padding-x)' },
 }
-const ToggleThemeButton = ({ hidden, isDark }: ToggleThemeButtonProps) => {
+const ToggleThemeButton = ({ hidden, isDark, onClick }: ToggleThemeButtonProps) => {
   const tooltipId = useId('tooltip')
   if (hidden) {
     return null
@@ -35,6 +66,10 @@ const ToggleThemeButton = ({ hidden, isDark }: ToggleThemeButtonProps) => {
         className={classes['Header--btn']}
         iconProps={{ iconName: isDark ? 'Brightness' : 'ClearNight' }}
         aria-label="Toggle Dark Mode"
+        onClick={onClick}
+        data={{
+          action: MenuActionType.ToggleTheme,
+        }}
       />
     </TooltipHost>
   )
@@ -53,6 +88,12 @@ const goVersionsCacheEntry = {
   key: 'api.go.versions',
   ttl: () => addDays(new Date(), 7),
   getInitialValue: async () => await apiClient.getBackendVersions(),
+}
+
+interface ModalStates {
+  showSettings?: boolean
+  showAbout?: boolean
+  showExamples?: boolean
 }
 
 export const Header = () => {
@@ -117,18 +158,22 @@ export const Header = () => {
     }
   }, [setIsCompact])
 
-  // Note: move aside items into dropdown at max-width 740px
+  const [modalStates, setModalStates] = useState<ModalStates>({})
+
   const isDisabled = false
   const darkMode = false
   const isThemeToggleHidden = false
   const sharedSnippetName = ''
 
-  const asideMenuItemProps: IContextualMenuProps = useMemo(() => {
+  const asideMenuItems: IContextualMenuItem[] = useMemo(() => {
     let items: IContextualMenuItem[] = [
       {
         key: 'toggle-theme',
         text: 'Toggle Theme',
         iconProps: { iconName: 'ClearNight' },
+        data: {
+          action: MenuActionType.ToggleTheme,
+        },
 
         // Extra props to hide toggle when system color scheme is preferred or dropdown menu is hidden on large screens.
         showOnlyInDropdown: true,
@@ -139,17 +184,21 @@ export const Header = () => {
         text: 'Settings',
         iconProps: { iconName: 'Settings' },
         disabled: isDisabled,
+        data: {
+          action: MenuActionType.ShowSettings,
+        },
       },
       {
         key: 'about',
         text: 'About',
         iconProps: { iconName: 'Info' },
+        data: {
+          action: MenuActionType.ShowAbout,
+        },
       },
     ]
 
-    return {
-      items: items.filter((e) => ('hidden' in e ? !e.hidden : true)),
-    }
+    return items.filter((e) => ('hidden' in e ? !e.hidden : true))
   }, [isDisabled, isThemeToggleHidden])
 
   return (
@@ -157,6 +206,8 @@ export const Header = () => {
       <div className={classes['Header--left']}>
         <img src="/go-logo-blue.svg" className={classes['Header--logo']} alt="Golang Logo" />
         <CommandBarButton
+          text="Run"
+          disabled={isDisabled}
           className={classes['Header--btn']}
           iconProps={{ iconName: 'IoMdPlay' }}
           styles={{
@@ -164,52 +215,70 @@ export const Header = () => {
               color: theme.palette.green,
             },
           }}
-          text="Run"
         />
         <HeaderSeparator />
         <CommandBarButton
+          text="Share"
+          disabled={isDisabled}
           className={clsx(classes['Header--btn'], BTN_SHARE_CLASS)}
           iconProps={{ iconName: 'Share' }}
-          text="Share"
         />
-        <CommandBarButton className={classes['Header--btn']} iconProps={{ iconName: 'Code' }} text="Format" />
         <CommandBarButton
+          text="Format"
+          className={classes['Header--btn']}
+          iconProps={{ iconName: 'Code' }}
+          disabled={isDisabled}
+        />
+        <CommandBarButton
+          text="Examples"
+          disabled={isDisabled}
           className={classes['Header--btn']}
           iconProps={{ iconName: 'TestExploreSolid' }}
-          text="Examples"
         />
         <HeaderSeparator />
         {isCompact ? (
           <IconButton
             key="dropdown"
             iconProps={{ iconName: 'More' }}
-            menuProps={asideMenuItemProps}
             styles={{ menuIcon: { display: 'none' }, icon: { color: theme.semanticColors.infoIcon } }}
+            menuProps={{
+              items: asideMenuItems,
+              onItemClick: (_, e) => {
+                if (!e?.data?.actionType) return
+                const actionType: MenuActionType = e.data.actionType
+                console.log(actionType)
+              },
+            }}
           />
         ) : (
-          asideMenuItemProps.items
+          asideMenuItems
             .filter((e) => !('showOnlyInDropdown' in e))
-            .map(({ key, iconProps, text, disabled }) => (
+            .map(({ key, iconProps, text, disabled, data }) => (
               <CommandBarButton
                 key={key}
                 className={classes['Header--btn']}
                 iconProps={iconProps}
                 text={text}
                 disabled={disabled}
+                data={data}
               />
             ))
         )}
       </div>
       <div className={classes['Header--right']}>
         <RunTargetSelector responsive disabled={isDisabled} goVersions={goVersions} />
-        <ToggleThemeButton isDark={darkMode} hidden={isThemeToggleHidden || isCompact} />
+        <ToggleThemeButton
+          isDark={darkMode}
+          hidden={isThemeToggleHidden || isCompact}
+          onClick={() => dispatch(dispatchToggleTheme)}
+        />
       </div>
       <SharePopup
         visible={!!sharedSnippetName?.length}
         target={`.${BTN_SHARE_CLASS}`}
         snippetId={sharedSnippetName}
         onDismiss={() => {
-          // dispatch(newUIStateChangeAction({ shareCreated: false }))
+          dispatch(newUIStateChangeAction({ shareCreated: false }))
         }}
       />
     </header>
