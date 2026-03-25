@@ -1,17 +1,19 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState, useCallback } from 'react'
+import { clsx } from 'clsx'
 import { addDays } from 'date-fns'
-import { CommandBar, type ICommandBarItemProps, Stack, useTheme } from '@fluentui/react'
 import { useDispatch, useSelector } from 'react-redux'
+import { IContextualMenuItem, useTheme } from '@fluentui/react'
+import { TooltipHost, type ITooltipHostStyles } from '@fluentui/react/lib/Tooltip'
+import { CommandBarButton, type IButtonProps, IconButton } from '@fluentui/react/lib/Button'
+import { useId } from '@fluentui/react-hooks'
 
-import type { Snippet } from '~/services/examples'
-import apiClient, { type VersionsInfo } from '~/services/api'
-import { newAddNotificationAction, NotificationType } from '~/store/notifications'
+import { SharePopup } from '~/components/utils/SharePopup'
+import { RunTargetSelector } from '~/components/elements/inputs/RunTargetSelector'
 import { ConnectedSettingsModal, type SettingsChanges } from '~/components/features/settings/SettingsModal'
 import { AboutModal } from '~/components/modals/AboutModal'
 import { ExamplesModal } from '~/components/features/examples/ExamplesModal'
-import { RunTargetSelector } from '~/components/elements/inputs/RunTargetSelector'
-import { SharePopup } from '~/components/utils/SharePopup'
-
+import { newAddNotificationAction, NotificationType } from '~/store/notifications'
+import type { Snippet } from '~/services/examples'
 import { keyValue } from '~/services/storage'
 import { dispatchTerminalSettingsChange } from '~/store/terminal'
 import {
@@ -29,12 +31,52 @@ import {
   type State,
 } from '~/store'
 
-import './Header.css'
+import apiClient, { type VersionsInfo } from '~/services/api'
 
-/**
- * Unique class name for share button to use as popover target.
- */
-const BTN_SHARE_CLASSNAME = 'Header__btn--share'
+import classes from './Header.module.css'
+
+enum MenuActionType {
+  ShowSettings,
+  ShowAbout,
+  ToggleTheme,
+}
+
+interface ToggleThemeButtonProps {
+  hidden?: boolean
+  isDark: boolean
+  onClick?: () => void
+}
+
+const tooltipStyles: Partial<ITooltipHostStyles> = {
+  root: { display: 'inline-block', height: '100%', marginLeft: 'var(--header-padding-x)' },
+}
+const ToggleThemeButton = ({ hidden, isDark, onClick }: ToggleThemeButtonProps) => {
+  const tooltipId = useId('tooltip')
+  if (hidden) {
+    return null
+  }
+
+  return (
+    <TooltipHost id={tooltipId} content="Toggle Dark Mode" styles={tooltipStyles}>
+      <IconButton
+        className={classes['Header--btn']}
+        iconProps={{ iconName: isDark ? 'Brightness' : 'ClearNight' }}
+        aria-label="Toggle Dark Mode"
+        onClick={onClick}
+        data={MenuActionType.ToggleTheme}
+      />
+    </TooltipHost>
+  )
+}
+
+const HeaderSeparator = () => <div className={classes['Header--separator']} aria-hidden />
+
+// Class to map share popup to a button.
+// Used instead of `useRef` as CommandBarButton's "ref" is deprecated, but no viable alternative is provided.
+const BTN_SHARE_CLASS = 'Header--btn__share'
+
+// Breakpoint in pixels to hide aside menu items into a dropdown.
+const COMPACT_MENU_BREAKPOINT_PX = 745
 
 const goVersionsCacheEntry = {
   key: 'api.go.versions',
@@ -42,23 +84,18 @@ const goVersionsCacheEntry = {
   getInitialValue: async () => await apiClient.getBackendVersions(),
 }
 
-export const Header: React.FC = () => {
+interface ModalStates {
+  showSettings?: boolean
+  showAbout?: boolean
+  showExamples?: boolean
+}
+
+export const Header = () => {
   const dispatch = useDispatch()
   const theme = useTheme()
-  const [showSettings, setShowSettings] = useState(false)
-  const [showAbout, setShowAbout] = useState(false)
-  const [showExamples, setShowExamples] = useState(false)
+
+  // Fetch available Go versions
   const [goVersions, setGoVersions] = useState<VersionsInfo>()
-
-  const darkMode = useSelector(({ settings }: State) => settings.darkMode)
-  const isDisabled = useSelector(({ status }: State) => Boolean(status?.loading || status?.running))
-  const hideThemeToggle = useSelector(({ settings }: State) => settings.useSystemTheme)
-  const sharedSnippetName = useSelector(({ ui }: State) => (ui?.shareCreated ? ui?.snippetId : undefined))
-  // CommandBar keeps an internal cache for item rendering and may not re-apply
-  // mutable fields like `disabled` reliably on prop updates. `cacheKey` values
-  // force per-item cache invalidation without remounting the whole CommandBar.
-  const commandBarStateKey = isDisabled ? 'disabled' : 'enabled'
-
   useEffect(() => {
     let isMounted = true
 
@@ -88,6 +125,88 @@ export const Header: React.FC = () => {
     }
   }, [dispatch])
 
+  const cssVars: Record<string, string> = useMemo(
+    () => ({
+      '--header-bg': theme.semanticColors.bodyBackground,
+      '--header-fg': theme.semanticColors.bodyText,
+      '--header-separator-bg': theme.semanticColors.disabledBorder,
+    }),
+    [theme],
+  )
+
+  // Window width listener to hide aside items into a dropdown.
+  const [isCompact, setIsCompact] = useState(window.innerWidth < COMPACT_MENU_BREAKPOINT_PX)
+  useEffect(() => {
+    let raf = 0
+    const onResize = () => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(() => {
+        setIsCompact(window.innerWidth < COMPACT_MENU_BREAKPOINT_PX)
+      })
+    }
+
+    window.addEventListener('resize', onResize)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [setIsCompact])
+
+  const [modalStates, setModalStates] = useState<ModalStates>({})
+
+  const isDisabled = useSelector(({ status }: State) => Boolean(status?.loading || status?.running))
+  const darkMode = useSelector(({ settings }: State) => settings.darkMode)
+  const isThemeToggleHidden = useSelector(({ settings }: State) => settings.useSystemTheme)
+  const sharedSnippetName = useSelector(({ ui }: State) => (ui?.shareCreated ? ui?.snippetId : undefined))
+
+  const asideMenuItems: IContextualMenuItem[] = useMemo(() => {
+    let items: IContextualMenuItem[] = [
+      {
+        key: 'toggle-theme',
+        text: 'Toggle Theme',
+        iconProps: { iconName: 'ClearNight' },
+        data: MenuActionType.ToggleTheme,
+
+        // Extra props to hide toggle when system color scheme is preferred or dropdown menu is hidden on large screens.
+        showOnlyInDropdown: true,
+        hidden: isThemeToggleHidden,
+      },
+      {
+        key: 'settings',
+        text: 'Settings',
+        iconProps: { iconName: 'Settings' },
+        disabled: isDisabled,
+        data: MenuActionType.ShowSettings,
+      },
+      {
+        key: 'about',
+        text: 'About',
+        iconProps: { iconName: 'Info' },
+        data: MenuActionType.ShowAbout,
+      },
+    ]
+
+    return items.filter((e) => ('hidden' in e ? !e.hidden : true))
+  }, [isDisabled, isThemeToggleHidden])
+
+  const onMenuItemClick = (cmd: MenuActionType) => {
+    switch (cmd) {
+      case MenuActionType.ToggleTheme: {
+        dispatch(dispatchToggleTheme)
+        return
+      }
+      case MenuActionType.ShowSettings: {
+        setModalStates({ showSettings: true })
+        return
+      }
+      case MenuActionType.ShowAbout: {
+        setModalStates({ showAbout: true })
+        return
+      }
+    }
+  }
+
+  // Modal handlers
   const onSettingsClose = useCallback(
     (changes: SettingsChanges) => {
       if (changes.monaco) {
@@ -102,14 +221,14 @@ export const Header: React.FC = () => {
         dispatch(dispatchTerminalSettingsChange(changes.terminal))
       }
 
-      setShowSettings(false)
+      setModalStates({ showSettings: false })
     },
     [dispatch],
   )
 
   const onSnippetSelected = useCallback(
     (snippet: Snippet) => {
-      setShowExamples(false)
+      setModalStates({ showExamples: false })
       if (snippet.source) {
         dispatch(dispatchLoadSnippetFromSource(snippet.source))
         return
@@ -120,131 +239,111 @@ export const Header: React.FC = () => {
     [dispatch],
   )
 
-  const menuItems: ICommandBarItemProps[] = [
-    {
-      key: 'run',
-      cacheKey: `run-${commandBarStateKey}`,
-      text: 'Run',
-      ariaLabel: 'Run program (Ctrl+Enter)',
-      title: 'Run program (Ctrl+Enter)',
-      iconProps: { iconName: 'IoMdPlay' },
-      disabled: isDisabled,
-      buttonStyles: {
-        icon: {
-          color: theme.palette.green,
-        },
-      },
-      onClick: () => {
-        dispatch(runFileDispatcher)
-      },
-    },
-    {
-      key: 'share',
-      cacheKey: `share-${commandBarStateKey}`,
-      text: 'Share',
-      className: BTN_SHARE_CLASSNAME,
-      iconProps: { iconName: 'Share' },
-      disabled: isDisabled,
-      onClick: () => {
-        dispatch(dispatchShareSnippet())
-      },
-    },
-    {
-      key: 'format',
-      cacheKey: `format-${commandBarStateKey}`,
-      text: 'Format',
-      ariaLabel: 'Format Code (Alt+F)',
-      disabled: isDisabled,
-      iconProps: { iconName: 'code' },
-      onClick: () => {
-        dispatch(dispatchFormatFile())
-      },
-    },
-    {
-      key: 'explore',
-      cacheKey: `explore-${commandBarStateKey}`,
-      text: 'Examples',
-      iconProps: {
-        iconName: 'TestExploreSolid',
-      },
-      disabled: isDisabled,
-      onClick: () => {
-        setShowExamples(true)
-      },
-    },
-    {
-      key: 'settings',
-      cacheKey: `settings-${commandBarStateKey}`,
-      text: 'Settings',
-      ariaLabel: 'Settings',
-      iconProps: { iconName: 'Settings' },
-      disabled: isDisabled,
-      onClick: () => {
-        setShowSettings(true)
-      },
-    },
-    {
-      key: 'about',
-      text: 'About',
-      ariaLabel: 'About',
-      iconProps: { iconName: 'Info' },
-      onClick: () => {
-        setShowAbout(true)
-      },
-    },
-  ]
-
-  const asideItems: ICommandBarItemProps[] = [
-    {
-      key: 'selectEnvironment',
-      cacheKey: `selectEnvironment-${commandBarStateKey}`,
-      commandBarButtonAs: () => {
-        return (
-          <Stack horizontal verticalAlign="center">
-            <RunTargetSelector responsive disabled={isDisabled} goVersions={goVersions} />
-          </Stack>
-        )
-      },
-    },
-    {
-      key: 'toggleTheme',
-      cacheKey: `toggleTheme-${darkMode ? 'dark' : 'light'}-${hideThemeToggle ? 'hidden' : 'visible'}`,
-      text: 'Toggle Dark Mode',
-      ariaLabel: 'Toggle Dark Mode',
-      iconOnly: true,
-      hidden: hideThemeToggle,
-      iconProps: { iconName: darkMode ? 'Brightness' : 'ClearNight' },
-      onClick: () => {
-        dispatch(dispatchToggleTheme)
-      },
-    },
-  ]
-
   return (
-    <header className="header" style={{ backgroundColor: theme.palette.white }}>
-      <img src="/go-logo-blue.svg" className="header__logo" alt="Golang Logo" />
-      <CommandBar
-        className="header__commandBar"
-        items={menuItems}
-        farItems={asideItems.filter(({ hidden }) => !hidden)}
-        ariaLabel="CodeEditor menu"
-      />
+    <>
+      <header className={classes.Header} style={cssVars}>
+        <div className={classes['Header--left']}>
+          <img src="/go-logo-blue.svg" className={classes['Header--logo']} alt="Golang Logo" />
+          <CommandBarButton
+            text="Run"
+            disabled={isDisabled}
+            className={classes['Header--btn']}
+            iconProps={{ iconName: 'IoMdPlay' }}
+            styles={{
+              icon: {
+                color: theme.palette.green,
+              },
+            }}
+            onClick={() => {
+              dispatch(runFileDispatcher)
+            }}
+          />
+          <HeaderSeparator />
+          <CommandBarButton
+            text="Share"
+            disabled={isDisabled}
+            className={clsx(classes['Header--btn'], BTN_SHARE_CLASS)}
+            iconProps={{ iconName: 'Share' }}
+            onClick={() => {
+              dispatch(dispatchShareSnippet())
+            }}
+          />
+          <CommandBarButton
+            text="Format"
+            className={classes['Header--btn']}
+            iconProps={{ iconName: 'Code' }}
+            disabled={isDisabled}
+            onClick={() => {
+              dispatch(dispatchFormatFile())
+            }}
+          />
+          <CommandBarButton
+            text="Examples"
+            disabled={isDisabled}
+            className={classes['Header--btn']}
+            iconProps={{ iconName: 'TestExploreSolid' }}
+            onClick={() => {
+              setModalStates({ showExamples: true })
+            }}
+          />
+          <HeaderSeparator />
+          {isCompact ? (
+            <IconButton
+              key="dropdown"
+              iconProps={{ iconName: 'More' }}
+              styles={{ menuIcon: { display: 'none' }, icon: { color: theme.semanticColors.bodyText } }}
+              menuProps={{
+                items: asideMenuItems,
+                onItemClick: (_, item) => {
+                  if (item) {
+                    onMenuItemClick(item.data as MenuActionType)
+                  }
+                },
+              }}
+            />
+          ) : (
+            asideMenuItems
+              .filter((e) => !('showOnlyInDropdown' in e))
+              .map(({ key, iconProps, text, disabled, data }) => (
+                <CommandBarButton
+                  key={key}
+                  className={classes['Header--btn']}
+                  iconProps={iconProps}
+                  text={text}
+                  disabled={disabled}
+                  data={data}
+                  onClick={() => onMenuItemClick(data as MenuActionType)}
+                />
+              ))
+          )}
+        </div>
+        <div className={classes['Header--right']}>
+          <RunTargetSelector responsive disabled={isDisabled} goVersions={goVersions} />
+          <ToggleThemeButton
+            isDark={darkMode}
+            hidden={isThemeToggleHidden || isCompact}
+            onClick={() => dispatch(dispatchToggleTheme)}
+          />
+        </div>
+      </header>
+
       <SharePopup
         visible={!!sharedSnippetName?.length}
-        target={`.${BTN_SHARE_CLASSNAME}`}
+        target={`.${BTN_SHARE_CLASS}`}
         snippetId={sharedSnippetName}
         onDismiss={() => {
           dispatch(newUIStateChangeAction({ shareCreated: false }))
         }}
       />
-      <ConnectedSettingsModal onClose={onSettingsClose} isOpen={showSettings} />
+
+      <ConnectedSettingsModal onClose={onSettingsClose} isOpen={!!modalStates?.showSettings} />
       <AboutModal
-        isOpen={showAbout}
+        isOpen={!!modalStates?.showAbout}
         onClose={() => {
-          setShowAbout(false)
+          setModalStates({ showAbout: false })
         }}
         onTitleClick={() => {
-          setShowAbout(false)
+          setModalStates({ showAbout: false })
           onSnippetSelected({
             label: 'bad-apple',
             source: {
@@ -255,10 +354,10 @@ export const Header: React.FC = () => {
         }}
       />
       <ExamplesModal
-        isOpen={showExamples}
-        onDismiss={() => setShowExamples(false)}
+        isOpen={!!modalStates?.showExamples}
+        onDismiss={() => setModalStates({ showExamples: false })}
         onSelect={(s) => onSnippetSelected(s)}
       />
-    </header>
+    </>
   )
 }

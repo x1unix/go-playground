@@ -1,0 +1,56 @@
+.Header {
+  --header-padding-x: 10px;
+  --header-separator-margin: 0.25rem;
+
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+
+  background: var(--header-bg);
+  color: var(--header-fg);
+  padding: 0 var(--header-padding-x);
+  height: 44px;
+}
+
+.Header--left,
+.Header--right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 100%;
+}
+
+.Header--btn {
+  height: 100%;
+}
+
+.Header--separator {
+  border-left: 1px solid var(--header-separator-bg);
+  height: 50%;
+  margin: 0 var(--header-separator-margin);
+}
+
+.Header--logo {
+  display: inline-block;
+  height: 1.5em;
+  margin-right: var(--header-padding-x);
+}
+
+/* Mobile  */
+@media (max-width: 580px) {
+  .Header--btn :global(.ms-Button-textContainer) {
+    display: none;
+  }
+
+  .Header--logo {
+    height: 1em;
+  }
+
+  .Header {
+    --header-padding-x: 5px;
+    --header-separator-margin: 0.15rem;
+  }
+}
