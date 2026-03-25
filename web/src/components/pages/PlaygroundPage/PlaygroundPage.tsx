@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 
 import { dispatchLoadSnippet } from '~/store/workspace'
+// import { HeaderOld } from '~/components/layout/Header'
 import { Header } from '~/components/layout/Header'
 import { StatusBar } from '~/components/layout/StatusBar'
 
