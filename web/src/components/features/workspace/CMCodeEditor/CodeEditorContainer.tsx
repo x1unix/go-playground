@@ -149,18 +149,7 @@ export const CodeEditorContainer: React.FC<CodeEditorContainerProps> = ({ onMoun
   }, [workspace])
 
   const linterRef = useLazyRef(() => new GoSyntaxLinter(dispatch))
-  const autocompleteRef = useLazyRef(() => {
-    const [worker, disposer] = spawnLanguageWorker()
-    const source = newGoAutocompleteSource(worker)
-
-    return {
-      source,
-      dispose: () => {
-        source.dispose?.()
-        disposer.dispose()
-      },
-    }
-  })
+  const autocompleteRef = useLazyRef(() => newGoAutocompleteSource(spawnLanguageWorker()))
 
   useEffect(() => {
     const v = linterRef.current
@@ -182,7 +171,7 @@ export const CodeEditorContainer: React.FC<CodeEditorContainerProps> = ({ onMoun
         delay: 300,
         handler: (doc) => linterRef.current.check(doc, { warnAboutFakeDateTime: isServerRuntime }),
       }}
-      autocomplete={autocompleteRef.current.source}
+      autocomplete={autocompleteRef.current}
       onMount={onMount}
       onUnmount={onUnmount}
       onChange={({ path, text }) => {

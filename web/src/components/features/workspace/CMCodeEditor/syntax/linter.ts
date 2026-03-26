@@ -3,7 +3,8 @@ import type { Dispatch } from 'redux'
 import type { Text } from '@codemirror/state'
 import { DiagnosticSeverity, type Diagnostic as LSPDiagnostic } from 'vscode-languageserver-protocol'
 import { Syntax, type DocumentState } from '~/lib/cm-react'
-import { type Disposable, type AnalyzerWorker, spawnAnalyzerWorker } from '~/workers/analyzer'
+import type { Disposable } from '~/workers/types'
+import { type AnalyzerWorkerRef, spawnAnalyzerWorker } from '~/workers/analyzer'
 import { newMarkerAction } from '~/store'
 import { stripSlash } from './utils'
 import { getTimeNowUsageMarkers } from './time'
@@ -47,17 +48,14 @@ const markersToDiagnostics = (doc: Text, markers: LSPDiagnostic[]): CMDiagnostic
 }
 
 export class GoSyntaxLinter implements Disposable {
-  private readonly disposer: Disposable
-  private readonly worker: AnalyzerWorker
+  private readonly workerRef: AnalyzerWorkerRef
 
   constructor(private readonly dispatcher: Dispatch) {
-    const [worker, disposer] = spawnAnalyzerWorker()
-    this.worker = worker
-    this.disposer = disposer
+    this.workerRef = spawnAnalyzerWorker()
   }
 
   dispose() {
-    this.disposer.dispose()
+    this.workerRef.dispose()
   }
 
   async check(doc: DocumentState, opts?: SyntaxCheckOptions): Promise<CMDiagnostic[]> {
@@ -68,10 +66,12 @@ export class GoSyntaxLinter implements Disposable {
     const markers: LSPDiagnostic[] = opts?.warnAboutFakeDateTime ? getTimeNowUsageMarkers(doc) : []
 
     try {
-      const response = await this.worker.checkSyntaxErrors({
-        fileName: doc.path,
-        modelVersionId: 1,
-        contents: doc.text.toString(),
+      const response = await this.workerRef.acquire(async (worker) => {
+        return await worker.checkSyntaxErrors({
+          fileName: doc.path,
+          modelVersionId: 1,
+          contents: doc.text.toString(),
+        })
       })
 
       if (response.fileName === doc.path && response.markers) {

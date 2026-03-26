@@ -49,10 +49,14 @@ const hoverAtOffset = async (source: GoAutocompleteSource, doc: DocumentState, o
   })
 }
 
+const withWorkerRef = (worker: any) => ({
+  acquire: async <TResult>(callback: (value: any) => Promise<TResult> | TResult) => await callback(worker),
+})
+
 describe('GoAutocompleteSource', () => {
   test('supports only Go syntax', () => {
     const worker = {} as any
-    const source = new GoAutocompleteSource(worker)
+    const source = new GoAutocompleteSource(withWorkerRef(worker) as any)
 
     assert.isTrue(source.supportsSyntax(Syntax.Go))
     assert.isFalse(source.supportsSyntax(Syntax.GoMod))
@@ -84,7 +88,7 @@ describe('GoAutocompleteSource', () => {
       getHoverValue: async () => null,
     } as any
 
-    const source = new GoAutocompleteSource(worker)
+    const source = new GoAutocompleteSource(withWorkerRef(worker) as any)
     const doc = newDocument('package main\n\nfunc main(){\n\tos\n}\n')
     const offset = doc.text.toString().indexOf('os') + 'os'.length
     const result = await completeAtOffset(source, doc, offset)
@@ -117,7 +121,7 @@ describe('GoAutocompleteSource', () => {
       getHoverValue: async () => null,
     } as any
 
-    const source = new GoAutocompleteSource(worker)
+    const source = new GoAutocompleteSource(withWorkerRef(worker) as any)
     const doc = newDocument('package main\n\nfunc main(){\n\tos.En\n}\n')
     const offset = doc.text.toString().indexOf('os.En') + 'os.En'.length
     const result = await completeAtOffset(source, doc, offset)
@@ -149,7 +153,7 @@ describe('GoAutocompleteSource', () => {
       getHoverValue: async () => null,
     } as any
 
-    const source = new GoAutocompleteSource(worker)
+    const source = new GoAutocompleteSource(withWorkerRef(worker) as any)
     const doc = newDocument(
       ['package main', 'import (', '\tb64 "encoding/base64"', ')', '', 'func main() {', '\tb64.St', '}', ''].join('\n'),
     )
@@ -178,7 +182,7 @@ describe('GoAutocompleteSource', () => {
       },
     } as any
 
-    const source = new GoAutocompleteSource(worker)
+    const source = new GoAutocompleteSource(withWorkerRef(worker) as any)
     const doc = newDocument(
       [
         'package main',
