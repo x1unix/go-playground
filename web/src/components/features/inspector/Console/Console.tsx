@@ -89,8 +89,12 @@ export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, 
   const theme = useXtermTheme()
   const [offset, setOffset] = useState(0)
   const [isFocused, setIsFocused] = useState(false)
+  const [xterm, setXterm] = useState<XTerm | null>(null)
 
-  const xtermRef = useRef<XTerm>(null)
+  const xtermRefCallback = useCallback((instance: XTerm | null) => {
+    setXterm(instance)
+  }, [])
+
   const fitAddonRef = useRef(new FitAddon())
   const imageAddonRef = useRef(new ImageAddon(imageAddonConfig))
 
@@ -104,8 +108,8 @@ export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, 
 
   const isClean = !status?.dirty
   const events = status?.events
-  const terminal = xtermRef.current?.terminal
-  const elemRef = xtermRef?.current?.terminalRef
+  const terminal = xterm?.terminal
+  const elemRef = xterm?.terminalRef
 
   const copySelection = useCallback(() => {
     if (!terminal) {
@@ -127,12 +131,10 @@ export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, 
   // Track output events
   useEffect(() => {
     if (!terminal) {
-      console.log('no terminal, cant render', { offset, events })
       return
     }
 
     if (!events?.length) {
-      console.log('no events', { events, offset, terminal })
       setOffset(0)
       terminal?.clear()
       terminal?.reset()
@@ -140,14 +142,12 @@ export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, 
     }
 
     if (offset === 0) {
-      console.log('zero offset', { events, offset })
       terminal?.clear()
       terminal?.reset()
     }
 
     const batch = events?.slice(offset)
     if (!batch) {
-      console.log('no batch', { events, offset })
       return
     }
 
@@ -155,7 +155,6 @@ export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, 
       terminal?.write(msg)
     })
     terminal?.scrollToBottom()
-    console.log('write', { batch, offset, newOffset: offset + batch.length, events })
     setOffset(offset + batch.length)
   }, [terminal, offset, events])
 
@@ -238,7 +237,7 @@ export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, 
     <div className="app-Console" style={{ '--terminal-bg': theme.background } as any}>
       <CopyButton hidden={!isFocused} onClick={copySelection} />
       <XTerm
-        ref={xtermRef}
+        ref={xtermRefCallback}
         className="app-Console__xterm"
         addons={[fitAddonRef.current, imageAddonRef.current]}
         options={{
