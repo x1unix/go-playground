@@ -35,7 +35,7 @@ App is written in TypeScript and uses following libraries and tools:
 
 - React
 - Redux
-- [Monaco editor](https://microsoft.github.io/monaco-editor/)
+- [CodeMirror](https://codemirror.net/)
 - [Fluent UI React](https://developer.microsoft.com/en-us/fluentui#/controls/web) components library.
 - [Vite](https://vitejs.dev/)
 
