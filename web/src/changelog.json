@@ -4,6 +4,11 @@
       "issueId": 567,
       "url": "pull/567",
       "description": "Render cursor position in the status bar"
+    },
+    {
+      "issueId": 586,
+      "url": "pull/586",
+      "description": "Improve user experience on smaller screens"
     }
   ],
   "Interface - Editor": [
@@ -25,7 +30,7 @@
     {
       "issueId": 565,
       "url": "pull/565",
-      "description": "Handle import aliases for package symbols autocomplete"
+      "description": "Handle import aliases for package autocomplete"
     },
     {
       "issueId": 572,
