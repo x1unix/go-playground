@@ -13,12 +13,29 @@
   <link rel="manifest" href="/manifest.json" />
   <title>Better Go Playground</title>
   <style>
+    body {
+      --app-bg: #fff;
+      --app-preloader-bg: #fff;
+      --app-preloader-fg: #323130;
+      --app-preloader-progress: #ccc;
+      background: var(--app-bg);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        --app-bg: #1f1f1f;
+        --app-preloader-bg: #1f1f1f;
+        --app-preloader-fg: #f4f4f4;
+        --app-preloader-progress: #333;
+      }
+    }
+
     .app-preloader {
       display: block;
       position: absolute;
       inset: 0;
-      background: #1f1f1f;
-      color: #f4f4f4;
+      background: var(--app-preloader-bg);
+      color: var(--app-preloader-fg);
       font: 11pt system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif;
     }
 
@@ -66,7 +83,7 @@
     }
 
     .app-preloader-progress {
-      background: #333;
+      background: var(--app-preloader-progress);
       height: 4px;
       position: relative;
       overflow: hidden;
@@ -85,17 +102,6 @@
       width: 32%;
       transition: all 0.5s ease-out 0s;
       animation: progress-bar-animation 2.3s infinite;
-    }
-
-    @media (prefers-color-scheme: light) {
-      .app-preloader {
-        background: #fff;
-        color: #323130;
-      }
-
-      .app-preloader-progress {
-        background: #ccc;
-      }
     }
   </style>
 </head>
