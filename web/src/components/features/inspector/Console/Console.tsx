@@ -126,7 +126,13 @@ export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, 
 
   // Track output events
   useEffect(() => {
-    if (!events?.length || !terminal) {
+    if (!terminal) {
+      console.log('no terminal, cant render', { offset, events })
+      return
+    }
+
+    if (!events?.length) {
+      console.log('no events', { events, offset, terminal })
       setOffset(0)
       terminal?.clear()
       terminal?.reset()
@@ -134,12 +140,14 @@ export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, 
     }
 
     if (offset === 0) {
+      console.log('zero offset', { events, offset })
       terminal?.clear()
       terminal?.reset()
     }
 
     const batch = events?.slice(offset)
     if (!batch) {
+      console.log('no batch', { events, offset })
       return
     }
 
@@ -147,6 +155,7 @@ export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, 
       terminal?.write(msg)
     })
     terminal?.scrollToBottom()
+    console.log('write', { batch, offset, newOffset: offset + batch.length, events })
     setOffset(offset + batch.length)
   }, [terminal, offset, events])
 
