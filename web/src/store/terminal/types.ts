@@ -11,6 +11,6 @@ export interface TerminalSettings {
 }
 
 export const defaultTerminalSettings: TerminalSettings = {
-  renderingBackend: RenderingBackend.Canvas,
+  renderingBackend: RenderingBackend.DOM,
   fontSize: 14,
 }
