@@ -1,7 +1,7 @@
 import type { CompletionItem as LSPCompletionItem, Range, TextEdit } from 'vscode-languageserver-protocol'
 
 import { Syntax, type DocumentState } from '../types/common'
-import type { LanguageWorker } from '~/workers/language'
+import type { LanguageWorkerRef } from '~/workers/language'
 import {
   ImportClauseType,
   type HoverQuery,
@@ -127,14 +127,13 @@ const packagePathFromData = (item: LSPCompletionItem) => {
 
 export class GoAutocompleteSource implements EditorAutocompleteSource {
   private readonly metadataCache = new DocumentMetadataCache()
-  private readonly getSuggestions = asyncDebounce(
-    async (query: SuggestionQuery) => await this.langWorker.getSymbolSuggestions(query),
-    SUGGESTIONS_DEBOUNCE_DELAY,
-  )
+  private readonly getSuggestions = asyncDebounce(async (query: SuggestionQuery) => {
+    return await this.langWorkerRef.acquire(async (worker) => await worker.getSymbolSuggestions(query))
+  }, SUGGESTIONS_DEBOUNCE_DELAY)
   private isCacheReady = false
   private builtins?: Set<string>
 
-  constructor(private readonly langWorker: LanguageWorker) {}
+  constructor(private readonly langWorkerRef: LanguageWorkerRef) {}
 
   supportsSyntax(syntax: Syntax) {
     return syntax === Syntax.Go
@@ -145,7 +144,7 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
       return true
     }
 
-    this.isCacheReady = await this.langWorker.isWarmUp()
+    this.isCacheReady = await this.langWorkerRef.acquire(async (worker) => await worker.isWarmUp())
     return this.isCacheReady
   }
 
@@ -159,6 +158,7 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
 
   dispose() {
     this.metadataCache.flush()
+    this.langWorkerRef.dispose()
   }
 
   async complete(req: CompletionRequest): Promise<CompletionResult | null> {
@@ -196,7 +196,8 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
     const isLiteral = !('packageName' in query)
     if (isLiteral) {
       if (!this.builtins) {
-        this.builtins = new Set(await this.langWorker.getBuiltinNames())
+        const builtins = await this.langWorkerRef.acquire(async (worker) => await worker.getBuiltinNames())
+        this.builtins = new Set(builtins)
       }
 
       if (!this.builtins.has(query.value)) {
@@ -218,7 +219,7 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
       },
     }
 
-    const hoverValue = await this.langWorker.getHoverValue(workerQuery)
+    const hoverValue = await this.langWorkerRef.acquire(async (worker) => await worker.getHoverValue(workerQuery))
     if (!hoverValue) {
       return null
     }
@@ -238,7 +239,7 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
     }
 
     try {
-      const suggestions = await this.langWorker.getImportSuggestions()
+      const suggestions = await this.langWorkerRef.acquire(async (worker) => await worker.getImportSuggestions())
       this.isCacheReady = true
       return {
         from: fallbackRange.from,
@@ -388,4 +389,4 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
   }
 }
 
-export const newGoAutocompleteSource = (langWorker: LanguageWorker) => new GoAutocompleteSource(langWorker)
+export const newGoAutocompleteSource = (langWorkerRef: LanguageWorkerRef) => new GoAutocompleteSource(langWorkerRef)
