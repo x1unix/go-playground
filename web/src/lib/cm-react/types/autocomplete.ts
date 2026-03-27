@@ -4,6 +4,7 @@ import type {
   Range,
   TextEdit,
 } from 'vscode-languageserver-protocol'
+import type { Tree } from '@lezer/common'
 import type { DocumentState, Syntax } from './common'
 
 export type CompletionDoc = NonNullable<LSPCompletionItem['documentation']>
@@ -39,6 +40,7 @@ export interface CompletionRequest {
   document: DocumentState
   cursor: CursorPosition
   explicit: boolean
+  tree?: Tree | null
 }
 
 export interface HoverRequest {

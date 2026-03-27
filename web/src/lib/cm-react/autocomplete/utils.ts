@@ -1,8 +1,10 @@
 import type { Text } from '@codemirror/state'
+import type { Tree } from '@lezer/common'
 
 import type { CursorPosition } from '../types/autocomplete'
 
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n))
+const nonCodeContextNodes = new Set(['LineComment', 'BlockComment', 'String', 'RawString', 'Rune'])
 
 export const cursorFromOffset = (doc: Text, offset: number): CursorPosition => {
   const safeOffset = clamp(offset, 0, doc.length)
@@ -43,6 +45,20 @@ export const wordRangeAtOffset = (doc: Text, offset: number) => {
     startColumn: start + 1,
     endColumn: end + 1,
   }
+}
+
+export const isInsideNonCodeContext = (tree: Tree, offset: number) => {
+  const safeOffset = clamp(offset, 0, tree.length)
+  let node: ReturnType<Tree['resolveInner']> | null = tree.resolveInner(safeOffset, -1)
+  while (node) {
+    if (nonCodeContextNodes.has(node.type.name)) {
+      return true
+    }
+
+    node = node.parent
+  }
+
+  return false
 }
 
 export const stripSlash = (str: string) => (str[0] === '/' ? str.slice(1) : str)

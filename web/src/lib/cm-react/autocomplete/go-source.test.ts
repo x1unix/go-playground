@@ -1,5 +1,6 @@
+import { parser } from '@lezer/go'
 import { Text } from '@codemirror/state'
-import { assert, describe, test } from 'vitest'
+import { assert, describe, test, vi } from 'vitest'
 import {
   CompletionItemKind,
   type CompletionItem as LSPCompletionItem,
@@ -39,6 +40,7 @@ const completeAtOffset = async (
     document: doc,
     cursor: cursorFromOffset(doc.text, offset),
     explicit: true,
+    tree: parser.parse(doc.text.toString()),
   })
 }
 
@@ -62,6 +64,125 @@ describe('GoAutocompleteSource', () => {
     assert.isFalse(source.supportsSyntax(Syntax.GoMod))
     assert.isFalse(source.supportsSyntax(Syntax.JSON))
     assert.isFalse(source.supportsSyntax(Syntax.PlainText))
+  })
+
+  test('skips symbol completion inside comments and strings', async () => {
+    let symbolQueryCount = 0
+
+    const worker = {
+      isWarmUp: async () => true,
+      getSymbolSuggestions: async () => {
+        symbolQueryCount++
+        return [
+          {
+            label: 'Exec',
+            kind: CompletionItemKind.Function,
+            insertText: 'Exec',
+            detail: 'func Exec(name string, arg ...string) error',
+          },
+        ] as LSPCompletionItem[]
+      },
+      getImportSuggestions: async () => [] as LSPCompletionItem[],
+      getBuiltinNames: async () => [] as string[],
+      getHoverValue: async () => null,
+    } as any
+
+    const source = new GoAutocompleteSource(withWorkerRef(worker) as any)
+    const cases = [
+      {
+        content: ['package main', '', 'func main(){', '\t// os.Ex', '}', ''].join('\n'),
+        marker: 'os.Ex',
+      },
+      {
+        content: ['package main', '', 'func main(){', '\t/* os.Ex */', '}', ''].join('\n'),
+        marker: 'os.Ex',
+      },
+      {
+        content: ['package main', '', 'func main(){', '\t_ = "os.Ex"', '}', ''].join('\n'),
+        marker: 'os.Ex',
+      },
+      {
+        content: ['package main', '', 'func main(){', '\t_ = `os.Ex`', '}', ''].join('\n'),
+        marker: 'os.Ex',
+      },
+    ]
+
+    for (const item of cases) {
+      const doc = newDocument(item.content)
+      const offset = doc.text.toString().indexOf(item.marker) + item.marker.length
+      const result = await completeAtOffset(source, doc, offset)
+      assert.isNull(result)
+    }
+
+    assert.equal(symbolQueryCount, 0)
+  })
+
+  test('keeps symbol completion in code after comment line', async () => {
+    const worker = {
+      isWarmUp: async () => true,
+      getSymbolSuggestions: async () => {
+        return [
+          {
+            label: 'Environ',
+            kind: CompletionItemKind.Function,
+            insertText: 'Environ',
+            detail: 'func Environ() []string',
+          },
+        ] as LSPCompletionItem[]
+      },
+      getImportSuggestions: async () => [] as LSPCompletionItem[],
+      getBuiltinNames: async () => [] as string[],
+      getHoverValue: async () => null,
+    } as any
+
+    const source = new GoAutocompleteSource(withWorkerRef(worker) as any)
+    const doc = newDocument(['package main', '', 'func main(){', '\t// comment', '\tos.En', '}', ''].join('\n'))
+    const offset = doc.text.toString().indexOf('os.En') + 'os.En'.length
+    const result = await completeAtOffset(source, doc, offset)
+
+    assert.isNotNull(result)
+    assert.equal(result?.options[0]?.label, 'Environ')
+  })
+
+  test('warns and skips symbol completion when syntax tree is missing', async () => {
+    let symbolQueryCount = 0
+    const worker = {
+      isWarmUp: async () => true,
+      getSymbolSuggestions: async () => {
+        symbolQueryCount++
+        return [
+          {
+            label: 'Environ',
+            kind: CompletionItemKind.Function,
+            insertText: 'Environ',
+            detail: 'func Environ() []string',
+          },
+        ] as LSPCompletionItem[]
+      },
+      getImportSuggestions: async () => [] as LSPCompletionItem[],
+      getBuiltinNames: async () => [] as string[],
+      getHoverValue: async () => null,
+    } as any
+
+    const source = new GoAutocompleteSource(withWorkerRef(worker) as any)
+    const doc = newDocument(['package main', '', 'func main(){', '\tos.En', '}', ''].join('\n'))
+    const offset = doc.text.toString().indexOf('os.En') + 'os.En'.length
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    try {
+      const result = await source.complete({
+        document: doc,
+        cursor: cursorFromOffset(doc.text, offset),
+        explicit: true,
+      })
+
+      assert.isNull(result)
+      assert.equal(symbolQueryCount, 0)
+      assert.equal(warn.mock.calls.length, 1)
+      assert.match(String(warn.mock.calls[0]?.[0] ?? ''), /syntax tree/i)
+    } finally {
+      warn.mockRestore()
+    }
   })
 
   test('keeps package suggestion for full literal prefix', async () => {

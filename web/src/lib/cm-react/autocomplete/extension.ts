@@ -6,6 +6,7 @@ import {
   type CompletionContext,
   type CompletionResult as CMCompletionResult,
 } from '@codemirror/autocomplete'
+import { syntaxTree } from '@codemirror/language'
 import { Compartment, Facet, type Extension, type Text } from '@codemirror/state'
 import { EditorView, hoverTooltip, type Tooltip } from '@codemirror/view'
 import { InsertTextFormat, type TextEdit } from 'vscode-languageserver-protocol'
@@ -188,6 +189,7 @@ class AutocompletePlugin {
           document: doc,
           cursor,
           explicit: context.explicit,
+          tree: syntaxTree(context.state),
         })
 
         if (!isCurrentPath(requestPath)) {
