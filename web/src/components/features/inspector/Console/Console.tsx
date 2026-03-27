@@ -6,8 +6,7 @@ import { DefaultButton, useTheme } from '@fluentui/react'
 import type { ITerminalAddon, ITerminalOptions } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import { ImageAddon } from '@xterm/addon-image'
-import { CanvasAddon } from '@xterm/addon-canvas'
-import { WebglAddon } from '@xterm/addon-webgl'
+import { LazyCanvasAddon, LazyWebglAddon } from './backends'
 
 import type { StatusState } from '~/store'
 import { RenderingBackend } from '~/store/terminal'
@@ -41,9 +40,9 @@ export interface ConsoleProps {
 const getAddonFromBackend = (backend: RenderingBackend): ITerminalAddon | null => {
   switch (backend) {
     case RenderingBackend.WebGL:
-      return new WebglAddon()
+      return new LazyWebglAddon()
     case RenderingBackend.Canvas:
-      return new CanvasAddon()
+      return new LazyCanvasAddon()
     default:
       return null
   }
