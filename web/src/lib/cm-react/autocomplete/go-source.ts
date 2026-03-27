@@ -25,7 +25,7 @@ import type {
   HoverRequest,
   HoverResult,
 } from '../types/autocomplete'
-import { wordRangeAtOffset } from './utils'
+import { isInsideNonCodeContext, wordRangeAtOffset } from './utils'
 
 const SUGGESTIONS_DEBOUNCE_DELAY = 500
 
@@ -252,6 +252,15 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
   }
 
   private async completeSymbols(req: CompletionRequest): Promise<CompletionResult | null> {
+    if (!req.tree) {
+      console.warn('GoAutocompleteSource.completeSymbols: syntax tree not available, skipping symbol completions')
+      return null
+    }
+
+    if (isInsideNonCodeContext(req.tree, req.cursor.offset)) {
+      return null
+    }
+
     const line = req.document.text.line(req.cursor.lineNumber)
     const localOffset = req.cursor.offset - line.from
     const expression = line.text.slice(0, localOffset).trim()
