@@ -9,6 +9,16 @@
       "issueId": 586,
       "url": "pull/586",
       "description": "Improve user experience on smaller screens"
+    },
+    {
+      "issueId": 591,
+      "url": "pull/591",
+      "description": "Fix page behavior on iOS Safari"
+    },
+    {
+      "issueId": 590,
+      "url": "pull/590",
+      "description": "Lazy load xterm.js backends"
     }
   ],
   "Interface - Editor": [
