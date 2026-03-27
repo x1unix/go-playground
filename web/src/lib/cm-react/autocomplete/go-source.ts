@@ -188,7 +188,7 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
       return null
     }
 
-    const query = queryFromPosition(req.document, req.cursor.offset)
+    const query = queryFromPosition(req.document, req.cursor.offset, req.tree)
     if (!query) {
       return null
     }

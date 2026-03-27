@@ -46,6 +46,7 @@ export interface CompletionRequest {
 export interface HoverRequest {
   document: DocumentState
   cursor: CursorPosition
+  tree?: Tree | null
 }
 
 export interface DocumentUpdate {

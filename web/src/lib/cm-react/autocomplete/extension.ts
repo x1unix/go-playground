@@ -236,6 +236,7 @@ class AutocompletePlugin {
         const result = await currentSource.hover({
           document: doc,
           cursor: cursorFromOffset(doc.text, pos),
+          tree: syntaxTree(view.state),
         })
 
         if (!result || !isCurrentPath(requestPath)) {
