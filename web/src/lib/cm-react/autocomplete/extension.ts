@@ -179,10 +179,6 @@ class AutocompletePlugin {
 
       const requestPath = doc.path
       const cursor = cursorFromOffset(doc.text, context.pos)
-      const warmUp = await currentSource.isWarmUp()
-      if (!warmUp) {
-        onStatus?.(LoadState.Loading)
-      }
 
       try {
         const result = await currentSource.complete({
@@ -194,10 +190,6 @@ class AutocompletePlugin {
 
         if (!isCurrentPath(requestPath)) {
           return null
-        }
-
-        if (!warmUp) {
-          onStatus?.(LoadState.Loaded)
         }
 
         return this.toCompletionResult(result, context.state.facet(rendererFacet))

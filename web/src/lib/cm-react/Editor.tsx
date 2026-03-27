@@ -174,6 +174,10 @@ export class Editor extends React.Component<EditorProps, State> {
       newThemeCompartment(preferences),
       changeHandlerExt,
     ]
+
+    this.props.autocomplete?.setStatusCallback?.((status, error) => {
+      this.emitCompletionSourceStatus(status, error)
+    })
   }
 
   private getInitialEditorState() {

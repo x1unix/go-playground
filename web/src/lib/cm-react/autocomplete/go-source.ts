@@ -1,6 +1,7 @@
 import type { CompletionItem as LSPCompletionItem, Range, TextEdit } from 'vscode-languageserver-protocol'
 
 import { Syntax, type DocumentState } from '../types/common'
+import { LoadState } from '../types/events'
 import type { LanguageWorkerRef } from '~/workers/language'
 import {
   ImportClauseType,
@@ -24,6 +25,7 @@ import type {
   EditorAutocompleteSource,
   HoverRequest,
   HoverResult,
+  StatusCallback,
 } from '../types/autocomplete'
 import { isInsideNonCodeContext, wordRangeAtOffset } from './utils'
 
@@ -132,8 +134,13 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
   }, SUGGESTIONS_DEBOUNCE_DELAY)
   private isCacheReady = false
   private builtins?: Set<string>
+  private statusCallback?: StatusCallback
 
   constructor(private readonly langWorkerRef: LanguageWorkerRef) {}
+
+  setStatusCallback(cb: StatusCallback) {
+    this.statusCallback = cb
+  }
 
   supportsSyntax(syntax: Syntax) {
     return syntax === Syntax.Go
@@ -238,9 +245,19 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
       to: wordRange.to,
     }
 
+    const warmUp = await this.isWarmUp()
+    if (!warmUp) {
+      this.statusCallback?.(LoadState.Loading)
+    }
+
     try {
       const suggestions = await this.langWorkerRef.acquire(async (worker) => await worker.getImportSuggestions())
       this.isCacheReady = true
+
+      if (!warmUp) {
+        this.statusCallback?.(LoadState.Loaded)
+      }
+
       return {
         from: fallbackRange.from,
         to: fallbackRange.to,
@@ -307,10 +324,20 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
 
     const fallbackSuggestions = this.getFallbackSuggestions(query)
 
+    const warmUp = await this.isWarmUp()
+    if (!warmUp) {
+      this.statusCallback?.(LoadState.Loading)
+    }
+
     let results: LSPCompletionItem[]
     try {
       const workerResult = await this.getSuggestions(suggestionQuery)
       this.isCacheReady = true
+
+      if (!warmUp) {
+        this.statusCallback?.(LoadState.Loaded)
+      }
+
       results = workerResult?.length ? workerResult : []
     } catch (err) {
       throw normalizeError(err)

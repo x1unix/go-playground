@@ -6,6 +6,9 @@ import type {
 } from 'vscode-languageserver-protocol'
 import type { Tree } from '@lezer/common'
 import type { DocumentState, Syntax } from './common'
+import type { LoadState } from './events'
+
+export type StatusCallback = (status: LoadState, error?: string) => void
 
 export type CompletionDoc = NonNullable<LSPCompletionItem['documentation']>
 export type HoverContent = LSPHover['contents']
@@ -95,4 +98,7 @@ export interface EditorAutocompleteSource {
 
   /** Releases resources held by the source instance. */
   dispose?: () => void
+
+  /** Sets callback to report loading status changes. */
+  setStatusCallback?: (cb: StatusCallback) => void
 }
