@@ -1,5 +1,6 @@
+import { parser } from '@lezer/go'
 import { Text } from '@codemirror/state'
-import { assert, describe, test } from 'vitest'
+import { assert, describe, test, vi } from 'vitest'
 
 import { Syntax } from '../types/common'
 import { queryFromPosition } from './hover'
@@ -77,5 +78,66 @@ describe('hover queryFromPosition', () => {
       from: source.indexOf('math.Pi'),
       to: source.indexOf('math.Pi') + 'math.Pi'.length,
     })
+  })
+
+  test('uses provided tree without reparsing', () => {
+    const source = 'package main\n\nfunc main() {\n\tfmt.Println("x")\n}\n'
+    const doc = newDoc(source)
+    const pos = source.indexOf('Println') + 1
+    const tree = parser.parse(source)
+    const parseSpy = vi.spyOn(parser, 'parse')
+
+    try {
+      const query = queryFromPosition(doc, pos, tree)
+      assert.deepEqual(query, {
+        packageName: 'fmt',
+        value: 'Println',
+        from: source.indexOf('fmt'),
+        to: source.indexOf('Println') + 'Println'.length,
+      })
+      assert.equal(parseSpy.mock.calls.length, 0)
+    } finally {
+      parseSpy.mockRestore()
+    }
+  })
+
+  test('falls back to parsing when tree is null', () => {
+    const source = 'package main\n\nfunc main() {\n\tfmt.Println("x")\n}\n'
+    const doc = newDoc(source)
+    const pos = source.indexOf('Println') + 1
+    const parseSpy = vi.spyOn(parser, 'parse')
+
+    try {
+      const query = queryFromPosition(doc, pos, null)
+      assert.deepEqual(query, {
+        packageName: 'fmt',
+        value: 'Println',
+        from: source.indexOf('fmt'),
+        to: source.indexOf('Println') + 'Println'.length,
+      })
+      assert.equal(parseSpy.mock.calls.length, 1)
+    } finally {
+      parseSpy.mockRestore()
+    }
+  })
+
+  test('falls back to parsing when tree is undefined', () => {
+    const source = 'package main\n\nfunc main() {\n\tfmt.Println("x")\n}\n'
+    const doc = newDoc(source)
+    const pos = source.indexOf('Println') + 1
+    const parseSpy = vi.spyOn(parser, 'parse')
+
+    try {
+      const query = queryFromPosition(doc, pos)
+      assert.deepEqual(query, {
+        packageName: 'fmt',
+        value: 'Println',
+        from: source.indexOf('fmt'),
+        to: source.indexOf('Println') + 'Println'.length,
+      })
+      assert.equal(parseSpy.mock.calls.length, 1)
+    } finally {
+      parseSpy.mockRestore()
+    }
   })
 })
