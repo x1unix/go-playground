@@ -2,8 +2,8 @@ import React from 'react'
 import { clsx } from 'clsx'
 import { connect } from 'react-redux'
 import { SiVim } from 'react-icons/si'
-import { type State } from '~/store'
-import { type Nullable } from '~/utils/types'
+import type { State } from '~/store'
+import type { Nullable } from '~/utils/types'
 import { VimMode, type VimState, VimSubMode } from '~/store/vim/state'
 import { StatusBarItem } from '~/components/layout/StatusBar/StatusBarItem'
 import './VimStatusBarItem.css'
@@ -46,7 +46,8 @@ const VimStatusBarItemBase: React.FC<Props> = ({ vimState }) => {
   return (
     <StatusBarItem
       title="Vim Status"
-      icon={SiVim}
+      icon={SiVim as unknown as React.ComponentType<{}>}
+      mobileHidden="textonly"
       className={clsx({
         'VimStatusBarItem--error': isError,
       })}

@@ -5,13 +5,39 @@ import { type State } from '~/store'
 import { dispatchCreateFile, dispatchRemoveFile, dispatchImportFile, newFileSelectAction } from '~/store/workspace'
 
 import { TabView } from '~/components/elements/tabs/TabView'
-import type { TabBarAction, TabIconStyles } from '~/components/elements/tabs/types'
+import type { TabBarAction, TabIconStyle, TabIconStyles, TabInfo } from '~/components/elements/tabs/types'
+import type { EditorRemote } from '~/lib/cm-react/types/common'
 
 import { LazyCodeEditorContainer } from '../CMCodeEditor/LazyCodeEditorContainer'
 import { NewFileModal } from '../NewFileModal'
 import { ContentPlaceholder } from '../ContentPlaceholder'
 import { newEmptyFileContent } from './utils'
 import { useConfirmModal } from '~/components/modals/ConfirmModal'
+
+const customFileTypeIcons: Record<string, Partial<TabIconStyle>> = {
+  '.json': {
+    icon: 'Code',
+    color: '#d29200',
+  },
+  '.mod': {
+    icon: 'Package',
+    color: '#d29200',
+  },
+  '.txt': {
+    icon: 'TextDocument',
+    color: 'currentColor',
+  },
+}
+
+const getFileTypeIconStyle = (fileName: string): Partial<TabIconStyle> | undefined => {
+  const lower = fileName.toLowerCase()
+  const dot = lower.lastIndexOf('.')
+  if (dot === -1) {
+    return undefined
+  }
+
+  return customFileTypeIcons[lower.slice(dot)]
+}
 
 const Workspace: React.FC = () => {
   const dispatch = useDispatch()
@@ -20,6 +46,7 @@ const Workspace: React.FC = () => {
   const uploadRef = useRef<HTMLInputElement>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const { showConfirm } = useConfirmModal()
+  const editorRemoteRef = useRef<EditorRemote | null>(null)
 
   const tabIconStyles: TabIconStyles = {
     active: {
@@ -32,13 +59,18 @@ const Workspace: React.FC = () => {
     },
   }
 
-  const tabs = useMemo(
+  const tabs: TabInfo[] | null = useMemo(
     () =>
       files
-        ? Object.keys(files).map((key) => ({
-            key,
-            label: key,
-          }))
+        ? Object.keys(files).map((fileName) => {
+            const style = getFileTypeIconStyle(fileName)
+
+            return {
+              key: fileName,
+              label: fileName,
+              ...(style ? { style } : {}),
+            }
+          })
         : null,
     [files],
   )
@@ -50,6 +82,8 @@ const Workspace: React.FC = () => {
       confirmText: 'Delete',
     }).then((result) => {
       if (result) {
+        // Evict document from editor buffer cache.
+        editorRemoteRef.current?.forgetDocument(key)
         dispatch(dispatchRemoveFile(key))
       }
     })
@@ -70,7 +104,7 @@ const Workspace: React.FC = () => {
       },
       {
         label: 'Upload',
-        icon: { iconName: 'Upload' },
+        icon: { iconName: 'OpenFile' },
         onClick: () => uploadRef.current?.click(),
       },
     ],
@@ -86,12 +120,14 @@ const Workspace: React.FC = () => {
     dispatch(dispatchCreateFile(fileName, newEmptyFileContent(fileName)))
   }
 
-  const onFilePick = ({ target: { files } }: React.ChangeEvent<HTMLInputElement>) => {
+  const onFilePick = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = target
     if (!files?.length) {
       return
     }
 
     dispatch(dispatchImportFile(files))
+    target.value = ''
   }
 
   return (
@@ -108,7 +144,14 @@ const Workspace: React.FC = () => {
       disabled={(snippet?.loading ?? false) || !!snippet?.error}
     >
       {tabs?.length ? (
-        <LazyCodeEditorContainer />
+        <LazyCodeEditorContainer
+          onMount={(remote) => {
+            editorRemoteRef.current = remote
+          }}
+          onUnmount={() => {
+            editorRemoteRef.current = null
+          }}
+        />
       ) : (
         <ContentPlaceholder
           isLoading={snippet?.loading}
@@ -134,7 +177,7 @@ const Workspace: React.FC = () => {
         type="file"
         hidden
         multiple
-        accept=".go"
+        accept=".go,.mod,.txt,.json"
         style={{ display: 'none' }}
         onChange={onFilePick}
       />

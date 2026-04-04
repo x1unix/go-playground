@@ -9,6 +9,7 @@ export const defaultFontFamily = [
   'Menlo',
   'Monaco',
   'Consolas',
+  'ui-monospace',
   '"Andale Mono"',
   '"Ubuntu Mono"',
   '"Courier New"',

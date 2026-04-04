@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 
 import { dispatchLoadSnippet } from '~/store/workspace'
 import { Header } from '~/components/layout/Header'
-import { ConnectedStatusBar } from '~/components/layout/StatusBar'
+import { StatusBar } from '~/components/layout/StatusBar'
 
 import styles from './PlaygroundPage.module.css'
 import { SuspenseBoundary } from '~/components/elements/misc/SuspenseBoundary'
@@ -31,7 +31,7 @@ export const PlaygroundPage: React.FC = () => {
       <SuspenseBoundary errorLabel="Failed to load workspace" preloaderText="Loading workspace...">
         <LazyPlaygroundContent parentRef={containerRef} />
       </SuspenseBoundary>
-      <ConnectedStatusBar />
+      <StatusBar />
     </div>
   )
 }

@@ -29,11 +29,11 @@ export class DocumentMetadataCache {
 
     const { totalRange } = entry
     for (const change of changes) {
-      if (change.endLineNumber < totalRange.startLineNumber) {
+      if (change.end.line < totalRange.start.line) {
         continue
       }
 
-      if (change.startLineNumber > totalRange.endLineNumber) {
+      if (change.start.line > totalRange.end.line) {
         continue
       }
 
@@ -51,5 +51,10 @@ export class DocumentMetadataCache {
     const context = buildImportContext(doc)
     this.cache.set(doc.path, context)
     return context
+  }
+
+  resolveImportAlias(doc: DocumentState, value: string): string {
+    const metadata = this.getMetadata(doc)
+    return metadata.importAliases?.get(value) ?? value
   }
 }

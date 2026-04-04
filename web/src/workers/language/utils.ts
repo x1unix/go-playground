@@ -1,27 +1,28 @@
-import type * as monaco from 'monaco-editor'
+import {
+  CompletionItemKind,
+  MarkupKind,
+  type CompletionItem as LSPCompletionItem,
+  type MarkedString,
+  type MarkupContent,
+  type TextEdit,
+} from 'vscode-languageserver-protocol'
 import { ImportClauseType, type Packages, type SuggestionContext, type Symbols, SymbolSourceKey } from './types'
 import type { PackageIndexItem, SymbolIndexItem } from '~/services/storage/types'
 
-type CompletionItem = monaco.languages.CompletionItem
-
 const getPrefix = (str: string) => str[0]?.toLowerCase() ?? ''
 
-// Although monaco doesn't require actual range, it's defined as required in TS types.
-// This is a stub value to satisfy type checks.
-const stubRange = undefined as any as monaco.IRange
-
-const packageCompletionKind = 8
+const packageCompletionKind = CompletionItemKind.Module
 
 const discardIfEmpty = (str: string, defaults?: string | undefined) => (str.length ? str : defaults)
 
-const stringToMarkdown = (value: string): monaco.IMarkdownString | undefined => {
+const stringToMarkdown = (value: string): MarkupContent | undefined => {
   if (!value.length) {
     return undefined
   }
 
   return {
+    kind: MarkupKind.Markdown,
     value,
-    isTrusted: true,
   }
 }
 
@@ -50,28 +51,26 @@ export const constructSymbols = ({
     signature: signatures[i],
     kind: kinds[i],
     insertText: insertTexts[i],
-    insertTextRules: insertTextRules[i],
+    insertTextFormat: insertTextRules[i],
     prefix: getPrefix(name),
     packageName: packages[i][SymbolSourceKey.Name],
     packagePath: packages[i][SymbolSourceKey.Path],
     documentation: stringToMarkdown(docs[i]),
   }))
 
-export const importCompletionFromPackage = ({ importPath, name, documentation }: PackageIndexItem): CompletionItem => ({
+export const importCompletionFromPackage = ({
+  importPath,
+  name,
+  documentation,
+}: PackageIndexItem): LSPCompletionItem => ({
   label: importPath,
   documentation,
   detail: name,
   insertText: importPath,
   kind: packageCompletionKind,
-  range: stubRange,
 })
 
-type ISingleEditOperation = monaco.editor.ISingleEditOperation
-
-const importPackageTextEdit = (
-  importPath: string,
-  { imports }: SuggestionContext,
-): ISingleEditOperation[] | undefined => {
+const importPackageTextEdit = (importPath: string, { imports }: SuggestionContext): TextEdit[] | undefined => {
   if (!imports.range || imports.allPaths?.has(importPath)) {
     return undefined
   }
@@ -81,9 +80,8 @@ const importPackageTextEdit = (
       const text = `import "${importPath}"\n`
       return [
         {
-          text: imports.prependNewLine ? `\n${text}` : text,
+          newText: imports.prependNewLine ? `\n${text}` : text,
           range: imports.range,
-          forceMoveMarkers: true,
         },
       ]
     }
@@ -97,9 +95,8 @@ const importPackageTextEdit = (
 
       return [
         {
-          text: `import (\n${importLines}\n)`,
+          newText: `import (\n${importLines}\n)`,
           range: imports.range,
-          forceMoveMarkers: true,
         },
       ]
     }
@@ -109,25 +106,49 @@ const importPackageTextEdit = (
 export const completionFromPackage = (
   { importPath, name, documentation }: PackageIndexItem,
   ctx: SuggestionContext,
-): CompletionItem => ({
+): LSPCompletionItem => ({
   label: name,
   documentation,
   detail: importPath,
   insertText: name,
   kind: packageCompletionKind,
-  range: ctx.range,
+  textEdit: {
+    range: ctx.range,
+    newText: name,
+  },
   additionalTextEdits: importPackageTextEdit(importPath, ctx),
 })
 
 export const completionFromSymbol = (
-  { packagePath, ...completionItem }: SymbolIndexItem,
+  {
+    packagePath,
+    key: _key,
+    prefix: _prefix,
+    packageName: _packageName,
+    signature: _signature,
+    ...completionItem
+  }: SymbolIndexItem,
   ctx: SuggestionContext,
   textEdits: boolean,
-): CompletionItem => ({
-  ...completionItem,
-  range: ctx.range,
-  additionalTextEdits: textEdits ? importPackageTextEdit(packagePath, ctx) : undefined,
-})
+): LSPCompletionItem => {
+  const existingData =
+    completionItem.data && typeof completionItem.data === 'object'
+      ? (completionItem.data as Record<string, unknown>)
+      : {}
+
+  return {
+    ...completionItem,
+    textEdit: {
+      range: ctx.range,
+      newText: completionItem.insertText ?? completionItem.label,
+    },
+    additionalTextEdits: textEdits ? importPackageTextEdit(packagePath, ctx) : undefined,
+    data: {
+      ...existingData,
+      packagePath,
+    },
+  }
+}
 
 const pkgNameFromPath = (importPath: string) => {
   const slashPos = importPath.lastIndexOf('/')
@@ -161,25 +182,23 @@ export const symbolHoverDoc = ({
   packagePath,
   signature,
   documentation,
-}: SymbolIndexItem): monaco.IMarkdownString[] => {
-  const doc: monaco.IMarkdownString[] = []
+}: SymbolIndexItem): MarkedString[] => {
+  const doc: MarkedString[] = []
 
   if (signature) {
     doc.push({
-      value: '```go\n' + signature + '\n```',
+      language: 'go',
+      value: signature,
     })
   }
 
-  if (documentation) {
-    doc.push(documentation)
+  if (documentation?.value) {
+    doc.push(documentation.value)
   }
 
   const docLabel = packagePath === 'builtin' ? label : `${packageName}.${label}`
   const linkLabel = `\`${docLabel}\` on ${goDocDomain}`
-  doc.push({
-    value: `[${linkLabel}](https://${goDocDomain}/${packagePath}#${label})`,
-    isTrusted: true,
-  })
+  doc.push(`[${linkLabel}](https://${goDocDomain}/${packagePath}#${label})`)
 
   return doc
 }

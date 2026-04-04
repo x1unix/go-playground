@@ -355,6 +355,18 @@
       "id": "YRV64KEXJW1",
       "icon": "TriggerApproval",
       "iconColor": "#ff8c00"
+    },
+    {
+      "label": "Embedding files",
+      "icon": "ProjectCollection",
+      "iconColor": "#d29200",
+      "source": {
+        "basePath": "embedding",
+        "files": [
+          "main.go",
+          "data.json"
+        ]
+      }
     }
   ]
 }

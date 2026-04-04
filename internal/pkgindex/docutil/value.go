@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
+
+	"typefox.dev/lsp"
 )
 
 type TraverseContext struct {
@@ -30,11 +32,12 @@ func CollectValues(ctx TraverseContext, spec *ast.ValueSpec, collector Collector
 		}
 
 		item := Symbol{
-			Label:         val.Name,
-			Kind:          ctx.Block.Kind,
-			InsertText:    val.Name,
-			Signature:     sign,
-			Documentation: blockDoc,
+			Label:           val.Name,
+			Kind:            ctx.Block.Kind,
+			InsertTextRules: lsp.PlainTextTextFormat,
+			InsertText:      val.Name,
+			Signature:       sign,
+			Documentation:   blockDoc,
 		}
 
 		count++

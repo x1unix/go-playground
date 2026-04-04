@@ -1,3 +1,4 @@
+// Package goplay provides a client for the official Go Playground API.
 package goplay
 
 import (

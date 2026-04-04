@@ -1,7 +1,8 @@
-import type * as monaco from 'monaco-editor'
+import type { CompletionItem as LSPCompletionItem, Range, TextEdit } from 'vscode-languageserver-protocol'
 
 import { Syntax, type DocumentState } from '../types/common'
-import type { LanguageWorker } from '~/workers/language'
+import { LoadState } from '../types/events'
+import type { LanguageWorkerRef } from '~/workers/language'
 import {
   ImportClauseType,
   type HoverQuery,
@@ -10,7 +11,7 @@ import {
   type SuggestionQuery,
 } from '~/workers/language/types'
 
-import { completionFromMonacoItem, hoverFromMonaco } from './converter'
+import { completionFromLSPItem, hoverFromLSP } from './converter'
 import { DocumentMetadataCache } from './cache'
 import { queryFromPosition } from './hover'
 import { isWithinImportClause } from './imports'
@@ -24,8 +25,9 @@ import type {
   EditorAutocompleteSource,
   HoverRequest,
   HoverResult,
+  StatusCallback,
 } from '../types/autocomplete'
-import { wordRangeAtOffset } from './utils'
+import { isInsideNonCodeContext, wordRangeAtOffset } from './utils'
 
 const SUGGESTIONS_DEBOUNCE_DELAY = 500
 
@@ -51,15 +53,23 @@ const isPackageQuery = (query: ReturnType<typeof parseExpression>): query is Pac
   return !!query && 'packageName' in query
 }
 
-const rangeFromOffsets = (doc: DocumentState['text'], from: number, to: number): monaco.IRange => {
+const rangeFromOffsets = (doc: DocumentState['text'], from: number, to: number): Range => {
   const startLine = doc.lineAt(from)
   const endLine = doc.lineAt(to)
 
   return {
-    startLineNumber: startLine.number,
-    endLineNumber: endLine.number,
-    startColumn: from - startLine.from + 1,
-    endColumn: to - endLine.from + 1,
+    start: {
+      // CodeMirror lines are 1-based, but LSP `Position.line` is 0-based.
+      line: startLine.number - 1,
+      // Offset inside the line is already 0-based, which matches LSP `Position.character`.
+      character: from - startLine.from,
+    },
+    end: {
+      // CodeMirror lines are 1-based, but LSP `Position.line` is 0-based.
+      line: endLine.number - 1,
+      // Offset inside the line is already 0-based, which matches LSP `Position.character`.
+      character: to - endLine.from,
+    },
   }
 }
 
@@ -71,10 +81,7 @@ const normalizeError = (err: unknown) => {
   return new Error(String(err))
 }
 
-const importPackageTextEdit = (
-  importPath: string,
-  imports: ImportsContext,
-): monaco.editor.ISingleEditOperation[] | undefined => {
+const importPackageTextEdit = (importPath: string, imports: ImportsContext): TextEdit[] | undefined => {
   if (!imports.range || imports.allPaths?.has(importPath)) {
     return undefined
   }
@@ -84,9 +91,8 @@ const importPackageTextEdit = (
       const text = `import "${importPath}"\n`
       return [
         {
-          text: imports.prependNewLine ? `\n${text}` : text,
+          newText: imports.prependNewLine ? `\n${text}` : text,
           range: imports.range,
-          forceMoveMarkers: true,
         },
       ]
     }
@@ -100,32 +106,52 @@ const importPackageTextEdit = (
 
       return [
         {
-          text: `import (\n${importLines}\n)`,
+          newText: `import (\n${importLines}\n)`,
           range: imports.range,
-          forceMoveMarkers: true,
         },
       ]
     }
   }
 }
 
+const packagePathFromData = (item: LSPCompletionItem) => {
+  if (!item.data || typeof item.data !== 'object') {
+    return undefined
+  }
+
+  const packagePath = (item.data as Record<string, unknown>).packagePath
+  if (typeof packagePath !== 'string' || packagePath.length === 0) {
+    return undefined
+  }
+
+  return packagePath
+}
+
 export class GoAutocompleteSource implements EditorAutocompleteSource {
   private readonly metadataCache = new DocumentMetadataCache()
-  private readonly getSuggestions = asyncDebounce(
-    async (query: SuggestionQuery) => await this.langWorker.getSymbolSuggestions(query),
-    SUGGESTIONS_DEBOUNCE_DELAY,
-  )
+  private readonly getSuggestions = asyncDebounce(async (query: SuggestionQuery) => {
+    return await this.langWorkerRef.acquire(async (worker) => await worker.getSymbolSuggestions(query))
+  }, SUGGESTIONS_DEBOUNCE_DELAY)
   private isCacheReady = false
   private builtins?: Set<string>
+  private statusCallback?: StatusCallback
 
-  constructor(private readonly langWorker: LanguageWorker) {}
+  constructor(private readonly langWorkerRef: LanguageWorkerRef) {}
+
+  setStatusCallback(cb: StatusCallback) {
+    this.statusCallback = cb
+  }
+
+  supportsSyntax(syntax: Syntax) {
+    return syntax === Syntax.Go
+  }
 
   async isWarmUp() {
     if (this.isCacheReady) {
       return true
     }
 
-    this.isCacheReady = await this.langWorker.isWarmUp()
+    this.isCacheReady = await this.langWorkerRef.acquire(async (worker) => await worker.isWarmUp())
     return this.isCacheReady
   }
 
@@ -139,6 +165,7 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
 
   dispose() {
     this.metadataCache.flush()
+    this.langWorkerRef.dispose()
   }
 
   async complete(req: CompletionRequest): Promise<CompletionResult | null> {
@@ -168,7 +195,7 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
       return null
     }
 
-    const query = queryFromPosition(req.document, req.cursor.offset)
+    const query = queryFromPosition(req.document, req.cursor.offset, req.tree)
     if (!query) {
       return null
     }
@@ -176,7 +203,8 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
     const isLiteral = !('packageName' in query)
     if (isLiteral) {
       if (!this.builtins) {
-        this.builtins = new Set(await this.langWorker.getBuiltinNames())
+        const builtins = await this.langWorkerRef.acquire(async (worker) => await worker.getBuiltinNames())
+        this.builtins = new Set(builtins)
       }
 
       if (!this.builtins.has(query.value)) {
@@ -186,20 +214,24 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
 
     const imports = this.metadataCache.getMetadata(req.document)
     const hoverRange = rangeFromOffsets(req.document.text, query.from, query.to)
+    const packageName = query.packageName
+      ? this.metadataCache.resolveImportAlias(req.document, query.packageName)
+      : undefined
     const workerQuery: HoverQuery = {
       ...query,
+      ...(packageName ? { packageName } : {}),
       context: {
         imports,
         range: hoverRange,
       },
     }
 
-    const hoverValue = await this.langWorker.getHoverValue(workerQuery)
+    const hoverValue = await this.langWorkerRef.acquire(async (worker) => await worker.getHoverValue(workerQuery))
     if (!hoverValue) {
       return null
     }
 
-    return hoverFromMonaco(hoverValue, req.document.text)
+    return hoverFromLSP(hoverValue, req.document.text)
   }
 
   private async completeImports(req: CompletionRequest): Promise<CompletionResult | null> {
@@ -213,13 +245,23 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
       to: wordRange.to,
     }
 
+    const warmUp = await this.isWarmUp()
+    if (!warmUp) {
+      this.statusCallback?.(LoadState.Loading)
+    }
+
     try {
-      const suggestions = await this.langWorker.getImportSuggestions()
+      const suggestions = await this.langWorkerRef.acquire(async (worker) => await worker.getImportSuggestions())
       this.isCacheReady = true
+
+      if (!warmUp) {
+        this.statusCallback?.(LoadState.Loaded)
+      }
+
       return {
         from: fallbackRange.from,
         to: fallbackRange.to,
-        options: suggestions.map((item) => completionFromMonacoItem(req.document.text, item, fallbackRange)),
+        options: suggestions.map((item) => completionFromLSPItem(req.document.text, item, fallbackRange)),
       }
     } catch (err) {
       throw normalizeError(err)
@@ -227,6 +269,15 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
   }
 
   private async completeSymbols(req: CompletionRequest): Promise<CompletionResult | null> {
+    if (!req.tree) {
+      console.warn('GoAutocompleteSource.completeSymbols: syntax tree not available, skipping symbol completions')
+      return null
+    }
+
+    if (isInsideNonCodeContext(req.tree, req.cursor.offset)) {
+      return null
+    }
+
     const line = req.document.text.line(req.cursor.lineNumber)
     const localOffset = req.cursor.offset - line.from
     const expression = line.text.slice(0, localOffset).trim()
@@ -242,12 +293,19 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
     }
 
     const imports = this.metadataCache.getMetadata(req.document)
+    const packageName = isPackageQuery(query)
+      ? this.metadataCache.resolveImportAlias(req.document, query.packageName)
+      : undefined
     const context: SuggestionContext = {
       range: {
-        startLineNumber: req.cursor.lineNumber,
-        endLineNumber: req.cursor.lineNumber,
-        startColumn: wordRange.startColumn,
-        endColumn: wordRange.endColumn,
+        start: {
+          line: req.cursor.lineNumber - 1,
+          character: wordRange.startColumn - 1,
+        },
+        end: {
+          line: req.cursor.lineNumber - 1,
+          character: wordRange.endColumn - 1,
+        },
       },
       imports,
     }
@@ -255,7 +313,7 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
     const typedLiteral = 'value' in query ? (query.value ?? '') : ''
     const suggestionQuery: SuggestionQuery = isPackageQuery(query)
       ? {
-          packageName: query.packageName,
+          packageName: packageName ?? query.packageName,
           value: typedLiteral || undefined,
           context,
         }
@@ -266,10 +324,20 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
 
     const fallbackSuggestions = this.getFallbackSuggestions(query)
 
-    let results: monaco.languages.CompletionItem[]
+    const warmUp = await this.isWarmUp()
+    if (!warmUp) {
+      this.statusCallback?.(LoadState.Loading)
+    }
+
+    let results: LSPCompletionItem[]
     try {
       const workerResult = await this.getSuggestions(suggestionQuery)
       this.isCacheReady = true
+
+      if (!warmUp) {
+        this.statusCallback?.(LoadState.Loaded)
+      }
+
       results = workerResult?.length ? workerResult : []
     } catch (err) {
       throw normalizeError(err)
@@ -278,7 +346,7 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
     const suggestions = fallbackSuggestions.length ? fallbackSuggestions.concat(results) : results
     const completionItems = suggestions.map((item) => {
       const enriched = this.addMissingImportTextEdits(item, suggestionQuery, imports)
-      return completionFromMonacoItem(req.document.text, enriched, fallbackRange)
+      return completionFromLSPItem(req.document.text, enriched, fallbackRange)
     })
 
     const filteredOptions = isPackageQuery(query)
@@ -303,7 +371,7 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
     }
   }
 
-  private getFallbackSuggestions(query: ReturnType<typeof parseExpression>): monaco.languages.CompletionItem[] {
+  private getFallbackSuggestions(query: ReturnType<typeof parseExpression>): LSPCompletionItem[] {
     if (!query) {
       return []
     }
@@ -319,7 +387,8 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
   private isImportStatementRange(doc: DocumentState, pos: CursorPosition) {
     const meta = this.metadataCache.getMetadata(doc)
     if (meta.totalRange) {
-      const { startLineNumber: minLine, endLineNumber: maxLine } = meta.totalRange
+      const minLine = meta.totalRange.start.line + 1
+      const maxLine = meta.totalRange.end.line + 1
       return pos.lineNumber >= minLine && pos.lineNumber <= maxLine
     }
 
@@ -327,10 +396,10 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
   }
 
   private addMissingImportTextEdits(
-    item: monaco.languages.CompletionItem,
+    item: LSPCompletionItem,
     query: SuggestionQuery,
     imports: ImportsContext,
-  ): monaco.languages.CompletionItem {
+  ): LSPCompletionItem {
     if (!('packageName' in query)) {
       return item
     }
@@ -339,7 +408,7 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
       return item
     }
 
-    const packagePath = (item as monaco.languages.CompletionItem & { packagePath?: string }).packagePath
+    const packagePath = packagePathFromData(item)
     if (!packagePath) {
       return item
     }
@@ -356,4 +425,4 @@ export class GoAutocompleteSource implements EditorAutocompleteSource {
   }
 }
 
-export const newGoAutocompleteSource = (langWorker: LanguageWorker) => new GoAutocompleteSource(langWorker)
+export const newGoAutocompleteSource = (langWorkerRef: LanguageWorkerRef) => new GoAutocompleteSource(langWorkerRef)

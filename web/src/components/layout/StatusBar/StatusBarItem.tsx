@@ -1,7 +1,7 @@
 import React, { type CSSProperties, type MouseEventHandler } from 'react'
 import { FontIcon } from '@fluentui/react/lib/Icon'
 import { clsx } from 'clsx'
-import './StatusBarItem.css'
+import styles from './StatusBarItem.module.css'
 
 export interface StatusBarItemProps {
   icon?: string | React.ComponentType
@@ -11,7 +11,7 @@ export interface StatusBarItemProps {
   button?: boolean
   disabled?: boolean
   hidden?: boolean
-  hideTextOnMobile?: boolean
+  mobileHidden?: boolean | 'icononly' | 'textonly'
   href?: string
   title?: string
   onClick?: MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>
@@ -20,43 +20,48 @@ export interface StatusBarItemProps {
 
 const getIcon = (icon: string | React.ComponentType) =>
   typeof icon === 'string' ? (
-    <FontIcon iconName={icon} className="StatusBarItem__icon" />
+    <FontIcon iconName={icon} className={styles['StatusBarItem__icon']} />
   ) : (
     React.createElement<any>(icon, {
-      className: 'StatusBarItem__icon',
+      className: styles['StatusBarItem__icon'],
     })
   )
 
 const getItemContents = ({ icon, iconOnly, imageSrc, title, children }) => (
   <>
     {icon && getIcon(icon)}
-    {imageSrc && <img src={imageSrc} className="StatusBarItem__icon--image" alt={title} />}
-    {!iconOnly && <span className="StatusBarItem__label">{children}</span>}
+    {imageSrc && <img src={imageSrc} className={styles['StatusBarItem__icon--image']} alt={title} />}
+    {!iconOnly && <span className={styles['StatusBarItem__label']}>{children}</span>}
   </>
 )
 
-export const StatusBarItem: React.FC<StatusBarItemProps> = ({
+export const StatusBarItem = ({
   title,
   className,
   icon,
   iconOnly,
   imageSrc,
-  hideTextOnMobile,
+  mobileHidden,
   href,
   button,
   children,
   hidden,
   ...props
-}) => {
+}: React.PropsWithChildren<StatusBarItemProps>) => {
   if (hidden) {
     return null
   }
 
   const content = getItemContents({ icon, iconOnly, children, imageSrc, title })
-  const classValue = hideTextOnMobile ? 'StatusBarItem StatusBarItem--hideOnMobile' : 'StatusBarItem'
+  const classValue = clsx(
+    styles.StatusBarItem,
+    mobileHidden === true && styles['StatusBarItem--mobileHidden'],
+    mobileHidden === 'icononly' && styles['StatusBarItem--mobileIconOnly'],
+    mobileHidden === 'textonly' && styles['StatusBarItem--mobileTextOnly'],
+  )
   if (button) {
     return (
-      <button className={clsx(`${classValue} StatusBarItem--action`, className)} title={title} {...props}>
+      <button className={clsx(classValue, styles['StatusBarItem--action'], className)} title={title} {...props}>
         {content}
       </button>
     )
@@ -68,7 +73,7 @@ export const StatusBarItem: React.FC<StatusBarItemProps> = ({
         href={href}
         target="_blank"
         rel="noreferrer"
-        className={clsx(`${classValue} StatusBarItem--action`, className)}
+        className={clsx(classValue, styles['StatusBarItem--action'], className)}
         title={title}
         {...props}
       >
@@ -79,8 +84,24 @@ export const StatusBarItem: React.FC<StatusBarItemProps> = ({
 
   const { style } = props
   return (
-    <div className={clsx(`${classValue} StatusBarItem--text`, className)} title={title} style={style}>
+    <div className={clsx(classValue, styles['StatusBarItem--text'], className)} title={title} style={style}>
       {content}
     </div>
+  )
+}
+
+interface StatusBarItemCounterProps {
+  label: string
+  value: number
+}
+
+const pluralize = (count: number, label: string) => (count === 1 ? label : `${label}s`)
+
+export const StatusBarItemCounter: React.FC<StatusBarItemCounterProps> = ({ label, value }) => {
+  return (
+    <>
+      <span>{value}</span>
+      <span className={styles['StatusBarItem__counter__label']}>{pluralize(value, label)}</span>
+    </>
   )
 }

@@ -26,7 +26,7 @@ const goModLanguage = () =>
         return 'operator'
       }
 
-      if (stream.match(/^(go|module|replace|require)\s/)) {
+      if (stream.match(/^(go|module|replace|require|toolchain|exclude)\s/)) {
         return 'keyword'
       }
 

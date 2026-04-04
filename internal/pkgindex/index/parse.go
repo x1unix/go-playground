@@ -2,10 +2,10 @@ package index
 
 import (
 	"github.com/x1unix/go-playground/internal/pkgindex/docutil"
-	"github.com/x1unix/go-playground/pkg/monaco"
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"typefox.dev/lsp"
 )
 
 var ignoreBuiltins = docutil.NewIgnoreList(
@@ -62,7 +62,7 @@ func parseFile(fset *token.FileSet, fpath string, params fileParseParams) (*sour
 	opts := docutil.TraverseOpts{
 		FileSet:       fset,
 		Filter:        getFilter(params.importPath),
-		SnippetFormat: monaco.InsertAsSnippet,
+		SnippetFormat: lsp.SnippetTextFormat,
 	}
 
 	summary.symbolsCount, err = docutil.CollectSymbols(root.Decls, opts, collector)

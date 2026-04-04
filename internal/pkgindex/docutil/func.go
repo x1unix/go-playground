@@ -5,17 +5,17 @@ import (
 	"go/token"
 	"strings"
 
-	"github.com/x1unix/go-playground/pkg/monaco"
+	"typefox.dev/lsp"
 )
 
 // SymbolFromFunc constructs completion item from a function AST declaration.
 //
 // Function documentation is generated in Markdown format.
-func SymbolFromFunc(fset *token.FileSet, fn *ast.FuncDecl, snippetFormat monaco.CompletionItemInsertTextRule) (item Symbol, err error) {
-	isSnippet := snippetFormat == monaco.InsertAsSnippet
+func SymbolFromFunc(fset *token.FileSet, fn *ast.FuncDecl, snippetFormat lsp.InsertTextFormat) (item Symbol, err error) {
+	isSnippet := snippetFormat == lsp.SnippetTextFormat
 	item = Symbol{
 		Label:           fn.Name.String(),
-		Kind:            monaco.Function,
+		Kind:            lsp.FunctionCompletion,
 		InsertTextRules: snippetFormat,
 		InsertText:      buildFuncInsertStatement(fn, isSnippet),
 		Documentation:   string(FormatCommentGroup(fn.Doc)),

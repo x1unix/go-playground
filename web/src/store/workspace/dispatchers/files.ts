@@ -11,7 +11,21 @@ import {
 import { saveWorkspaceState } from '../config'
 import { WorkspaceAction, type FileUpdatePayload, type FilePayload } from '../actions'
 import { readFile, dedupFiles } from './utils'
-import { type WorkspaceState, defaultFiles } from '../state'
+import { type WorkspaceState, defaultFiles, newGenerationKey } from '../state'
+
+const IMPORTABLE_EXTENSIONS = new Set(['.go', '.txt', '.json'])
+
+export const isImportableWorkspaceFile = (name: string): boolean => {
+  const lower = name.toLowerCase()
+  if (lower === 'go.mod') {
+    return true
+  }
+  const dot = lower.lastIndexOf('.')
+  if (dot === -1) {
+    return false
+  }
+  return IMPORTABLE_EXTENSIONS.has(lower.slice(dot))
+}
 
 const AUTOSAVE_INTERVAL = 1000
 
@@ -62,9 +76,30 @@ export const dispatchImportFile = (files: FileList) => async (dispatch: Dispatch
   const filePayloads: FileUpdatePayload[] = []
   const errors: Notification[] = []
 
-  // We can't control if user won't select multiple files with identical names.
+  // User can select an unsupported file as input[accept] doesn't filter stuff on Android and Linux
+  let ignoredFiles = 0
+  const accepted: File[] = []
+  for (const file of files) {
+    if (!isImportableWorkspaceFile(file.name)) {
+      ignoredFiles++
+      continue
+    }
+    accepted.push(file)
+  }
+
+  if (ignoredFiles > 0) {
+    errors.push({
+      id: newNotificationId(),
+      type: NotificationType.Warning,
+      title: 'Unsupported files skipped',
+      description: `${ignoredFiles} file(s) can't be imported: file should be a Go source file.`,
+      canDismiss: true,
+    })
+  }
+
+  // Imports can conflict with workspace files.
   let dedupFailures = 0
-  const iter = dedupFiles(files, existingNames, () => dedupFailures++)
+  const iter = dedupFiles(accepted, existingNames, () => dedupFailures++)
   for (const file of iter) {
     try {
       filePayloads.push(await readFile(file))
@@ -151,6 +186,7 @@ export const dispatchImportSource = (files: Record<string, string>) => (dispatch
   dispatch<WorkspaceState>({
     type: WorkspaceAction.WORKSPACE_IMPORT,
     payload: {
+      generation: newGenerationKey(),
       selectedFile,
       files,
     },

@@ -1,6 +1,6 @@
-import type * as monaco from 'monaco-editor'
 import * as Comlink from 'comlink'
 import { addDays } from 'date-fns'
+import type { Hover } from 'vscode-languageserver-protocol'
 import { db, keyValue } from '~/services/storage'
 import type { GoIndexFile, HoverQuery, LiteralQuery, PackageSymbolQuery, SuggestionQuery } from './types'
 import {
@@ -14,7 +14,7 @@ import {
 } from './utils'
 import type { SymbolIndexItem } from '~/services/storage/types'
 
-const completionVersionKey = 'completionItems.version'
+const completionVersionKey = 'completionItems.v2'
 
 const TTL_DAYS = 7
 
@@ -78,7 +78,7 @@ export class WorkerHandler {
   /**
    * Returns hover documentation for a symbol.
    */
-  async getHoverValue(query: HoverQuery): Promise<monaco.languages.Hover | null> {
+  async getHoverValue(query: HoverQuery): Promise<Hover | null> {
     await this.checkCacheReady()
     const filter = this.buildHoverFilter(query)
     const entry = await this.db.symbolIndex.where(filter).first()
@@ -186,7 +186,7 @@ export class WorkerHandler {
         }
 
         const data: GoIndexFile = await rsp.json()
-        if (data.version > 1) {
+        if (data.version !== 2) {
           console.warn(`unsupported symbol index version: ${data.version}, skip update.`)
           return
         }

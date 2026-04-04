@@ -234,7 +234,7 @@ export function getFontFamily(fontName: string): string {
   }
 
   loadFont(fontName)
-  return `${font.family},${fallbackFonts}`
+  return `'${font.family}',${fallbackFonts}`
 }
 
 /**

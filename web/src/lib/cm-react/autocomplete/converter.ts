@@ -1,110 +1,120 @@
-import type * as monaco from 'monaco-editor'
 import type { Text } from '@codemirror/state'
+import {
+  CompletionItemKind,
+  type CompletionItem as LSPCompletionItem,
+  type Hover,
+  type InsertReplaceEdit,
+  type Position,
+  type Range,
+} from 'vscode-languageserver-protocol'
 
-import type { CompletionItem, CompletionItemKind, CompletionTextEdit, HoverResult } from '../types/autocomplete'
+import type { CompletionItem, HoverResult } from '../types/autocomplete'
 import { offsetFromLineColumn } from './utils'
 
-const SNIPPET_RULE = 4
+export type CMCompletionType =
+  | 'method'
+  | 'function'
+  | 'constructor'
+  | 'field'
+  | 'variable'
+  | 'class'
+  | 'struct'
+  | 'interface'
+  | 'module'
+  | 'property'
+  | 'event'
+  | 'operator'
+  | 'unit'
+  | 'value'
+  | 'constant'
+  | 'enum'
+  | 'enumMember'
+  | 'keyword'
+  | 'text'
+  | 'color'
+  | 'file'
+  | 'reference'
+  | 'folder'
+  | 'typeParameter'
+  | 'snippet'
 
-const completionTypeByKind: Record<number, CompletionItemKind | undefined> = {
-  0: 'method',
-  1: 'function',
-  2: 'constructor',
-  3: 'field',
-  4: 'variable',
-  5: 'class',
-  6: 'struct',
-  7: 'interface',
-  8: 'module',
-  9: 'property',
-  10: 'event',
-  11: 'operator',
-  12: 'unit',
-  13: 'value',
-  14: 'constant',
-  15: 'enum',
-  16: 'enumMember',
-  17: 'keyword',
-  18: 'text',
-  19: 'color',
-  20: 'file',
-  21: 'reference',
-  23: 'folder',
-  24: 'typeParameter',
-  27: 'snippet',
+const completionTypeByKind: Record<number, CMCompletionType | undefined> = {
+  [CompletionItemKind.Method]: 'method',
+  [CompletionItemKind.Function]: 'function',
+  [CompletionItemKind.Constructor]: 'constructor',
+  [CompletionItemKind.Field]: 'field',
+  [CompletionItemKind.Variable]: 'variable',
+  [CompletionItemKind.Class]: 'class',
+  [CompletionItemKind.Struct]: 'struct',
+  [CompletionItemKind.Interface]: 'interface',
+  [CompletionItemKind.Module]: 'module',
+  [CompletionItemKind.Property]: 'property',
+  [CompletionItemKind.Event]: 'event',
+  [CompletionItemKind.Operator]: 'operator',
+  [CompletionItemKind.Unit]: 'unit',
+  [CompletionItemKind.Value]: 'value',
+  [CompletionItemKind.Constant]: 'constant',
+  [CompletionItemKind.Enum]: 'enum',
+  [CompletionItemKind.EnumMember]: 'enumMember',
+  [CompletionItemKind.Keyword]: 'keyword',
+  [CompletionItemKind.Text]: 'text',
+  [CompletionItemKind.Color]: 'color',
+  [CompletionItemKind.File]: 'file',
+  [CompletionItemKind.Reference]: 'reference',
+  [CompletionItemKind.Folder]: 'folder',
+  [CompletionItemKind.TypeParameter]: 'typeParameter',
+  [CompletionItemKind.Snippet]: 'snippet',
 }
 
-type MonacoRange = monaco.IRange
-type MonacoCompletionItem = monaco.languages.CompletionItem
+export const completionTypeFromKind = (kind?: number) =>
+  typeof kind === 'number' ? completionTypeByKind[kind] : undefined
 
-const isCompletionRangePair = (
-  range: MonacoCompletionItem['range'],
-): range is monaco.languages.CompletionItemRanges => {
-  return typeof range === 'object' && range !== null && 'insert' in range && 'replace' in range
+const isInsertReplaceEdit = (edit: LSPCompletionItem['textEdit']): edit is InsertReplaceEdit => {
+  return typeof edit === 'object' && edit !== null && 'insert' in edit && 'replace' in edit
 }
 
-const labelToString = (label: MonacoCompletionItem['label']) => {
-  if (typeof label === 'string') {
-    return label
-  }
-
-  return label.label
+const positionToOffset = (doc: Text, position: Position) => {
+  // LSP positions are zero-based (line/character), while CodeMirror helpers use one-based
+  // line/column numbers, so we shift both values by +1 during conversion.
+  return offsetFromLineColumn(doc, position.line + 1, position.character + 1)
 }
 
-const rangeToOffsets = (doc: Text, range: MonacoRange) => ({
-  from: offsetFromLineColumn(doc, range.startLineNumber, range.startColumn),
-  to: offsetFromLineColumn(doc, range.endLineNumber, range.endColumn),
+const rangeToOffsets = (doc: Text, range: Range) => ({
+  from: positionToOffset(doc, range.start),
+  to: positionToOffset(doc, range.end),
 })
 
-const textEditFromOperation = (doc: Text, edit: monaco.editor.ISingleEditOperation): CompletionTextEdit | null => {
-  if (!edit.range) {
-    return null
-  }
-
-  const { from, to } = rangeToOffsets(doc, edit.range)
-  return {
-    from,
-    to,
-    insert: edit.text ?? '',
-  }
-}
-
-export const completionFromMonacoItem = (
+export const completionFromLSPItem = (
   doc: Text,
-  item: MonacoCompletionItem,
+  item: LSPCompletionItem,
   fallbackRange: { from: number; to: number },
 ): CompletionItem => {
   let replaceFrom = fallbackRange.from
   let replaceTo = fallbackRange.to
 
-  if (item.range) {
-    const range = isCompletionRangePair(item.range) ? item.range.replace : item.range
+  if (item.textEdit) {
+    const range = isInsertReplaceEdit(item.textEdit) ? item.textEdit.replace : item.textEdit.range
     const offsets = rangeToOffsets(doc, range)
     replaceFrom = offsets.from
     replaceTo = offsets.to
   }
 
   const additionalTextEdits = item.additionalTextEdits
-    ?.map((edit) => textEditFromOperation(doc, edit))
-    .filter((edit): edit is CompletionTextEdit => !!edit)
+
+  const insertText = item.insertText ?? (item.textEdit ? item.textEdit.newText : item.label)
 
   return {
-    label: labelToString(item.label),
-    detail: item.detail,
-    documentation: item.documentation,
-    type: completionTypeByKind[item.kind],
-    sortText: item.sortText,
-    filterText: item.filterText,
-    insertText: item.insertText,
-    isSnippet: !!(item.insertTextRules && (item.insertTextRules & SNIPPET_RULE) === SNIPPET_RULE),
+    ...item,
+    insertText,
+    insertTextFormat: item.insertTextFormat,
     replaceFrom,
     replaceTo,
     additionalTextEdits: additionalTextEdits?.length ? additionalTextEdits : undefined,
   }
 }
 
-export const hoverFromMonaco = (hover: monaco.languages.Hover, doc: Text): HoverResult | null => {
-  if (!hover.contents.length || !hover.range) {
+export const hoverFromLSP = (hover: Hover, doc: Text): HoverResult | null => {
+  if (!hover.range || hover.contents === '' || (Array.isArray(hover.contents) && hover.contents.length === 0)) {
     return null
   }
 

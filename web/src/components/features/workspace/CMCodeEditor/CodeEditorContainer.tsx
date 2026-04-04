@@ -22,7 +22,12 @@ import { dispatchFormatFile, dispatchShareSnippet, dispatchUpdateFile } from '~/
 import { GoSyntaxLinter } from './syntax/linter'
 import { TargetType } from '~/services/config'
 import { getDefaultFontFamily, getFontFamily } from '~/services/fonts'
-import { Dispatcher, newMonacoParamsChangeDispatcher, runFileDispatcher } from '~/store'
+import {
+  Dispatcher,
+  newCursorPositionChangeDispatcher,
+  newMonacoParamsChangeDispatcher,
+  runFileDispatcher,
+} from '~/store'
 import { useDebouncer } from '~/hooks/debounce'
 import { newAddNotificationAction, newRemoveNotificationAction, NotificationType } from '~/store/notifications'
 import { spawnLanguageWorker } from '~/workers/language'
@@ -75,8 +80,10 @@ const mapEventToAction = (e: EditorEvent): AnyAction | Dispatcher | undefined =>
           return
       }
     }
+    case EventType.CursorPositionChanged: {
+      return newCursorPositionChangeDispatcher(e.position)
+    }
     default:
-      // TODO: wire up cursor position events when it will be implemented on UI and store.
       break
   }
 }
@@ -97,10 +104,15 @@ const mapCommandToAction = (e: EditorCommand, rem: EditorRemote): AnyAction | Di
   }
 }
 
+export interface CodeEditorContainerProps {
+  onMount: (remote: EditorRemote) => void
+  onUnmount: () => void
+}
+
 /**
  * Connects CodeMirror code editor to the application store and business logic.
  */
-export const CodeEditorContainer: React.FC = () => {
+export const CodeEditorContainer: React.FC<CodeEditorContainerProps> = ({ onMount, onUnmount }) => {
   const dispatch = useDispatch()
   const saveDebouncer = useDebouncer(150)
 
@@ -137,18 +149,7 @@ export const CodeEditorContainer: React.FC = () => {
   }, [workspace])
 
   const linterRef = useLazyRef(() => new GoSyntaxLinter(dispatch))
-  const autocompleteRef = useLazyRef(() => {
-    const [worker, disposer] = spawnLanguageWorker()
-    const source = newGoAutocompleteSource(worker)
-
-    return {
-      source,
-      dispose: () => {
-        source.dispose?.()
-        disposer.dispose()
-      },
-    }
-  })
+  const autocompleteRef = useLazyRef(() => newGoAutocompleteSource(spawnLanguageWorker()))
 
   useEffect(() => {
     const v = linterRef.current
@@ -170,7 +171,9 @@ export const CodeEditorContainer: React.FC = () => {
         delay: 300,
         handler: (doc) => linterRef.current.check(doc, { warnAboutFakeDateTime: isServerRuntime }),
       }}
-      autocomplete={autocompleteRef.current.source}
+      autocomplete={autocompleteRef.current}
+      onMount={onMount}
+      onUnmount={onUnmount}
       onChange={({ path, text }) => {
         saveDebouncer(() => {
           dispatch(dispatchUpdateFile(path, text.toString()))

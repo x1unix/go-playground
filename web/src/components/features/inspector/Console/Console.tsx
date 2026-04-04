@@ -6,8 +6,7 @@ import { DefaultButton, useTheme } from '@fluentui/react'
 import type { ITerminalAddon, ITerminalOptions } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import { ImageAddon } from '@xterm/addon-image'
-import { CanvasAddon } from '@xterm/addon-canvas'
-import { WebglAddon } from '@xterm/addon-webgl'
+import { LazyCanvasAddon, LazyWebglAddon } from './backends'
 
 import type { StatusState } from '~/store'
 import { RenderingBackend } from '~/store/terminal'
@@ -41,9 +40,9 @@ export interface ConsoleProps {
 const getAddonFromBackend = (backend: RenderingBackend): ITerminalAddon | null => {
   switch (backend) {
     case RenderingBackend.WebGL:
-      return new WebglAddon()
+      return new LazyWebglAddon()
     case RenderingBackend.Canvas:
-      return new CanvasAddon()
+      return new LazyCanvasAddon()
     default:
       return null
   }
@@ -89,8 +88,12 @@ export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, 
   const theme = useXtermTheme()
   const [offset, setOffset] = useState(0)
   const [isFocused, setIsFocused] = useState(false)
+  const [xterm, setXterm] = useState<XTerm | null>(null)
 
-  const xtermRef = useRef<XTerm>(null)
+  const xtermRefCallback = useCallback((instance: XTerm | null) => {
+    setXterm(instance)
+  }, [])
+
   const fitAddonRef = useRef(new FitAddon())
   const imageAddonRef = useRef(new ImageAddon(imageAddonConfig))
 
@@ -104,8 +107,8 @@ export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, 
 
   const isClean = !status?.dirty
   const events = status?.events
-  const terminal = xtermRef.current?.terminal
-  const elemRef = xtermRef?.current?.terminalRef
+  const terminal = xterm?.terminal
+  const elemRef = xterm?.terminalRef
 
   const copySelection = useCallback(() => {
     if (!terminal) {
@@ -126,7 +129,11 @@ export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, 
 
   // Track output events
   useEffect(() => {
-    if (!events?.length || !terminal) {
+    if (!terminal) {
+      return
+    }
+
+    if (!events?.length) {
       setOffset(0)
       terminal?.clear()
       terminal?.reset()
@@ -229,7 +236,7 @@ export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, 
     <div className="app-Console" style={{ '--terminal-bg': theme.background } as any}>
       <CopyButton hidden={!isFocused} onClick={copySelection} />
       <XTerm
-        ref={xtermRef}
+        ref={xtermRefCallback}
         className="app-Console__xterm"
         addons={[fitAddonRef.current, imageAddonRef.current]}
         options={{

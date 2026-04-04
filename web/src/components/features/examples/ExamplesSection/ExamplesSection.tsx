@@ -22,32 +22,10 @@ interface Props {
 
 const fallbackIcon = 'TestExploreSolid'
 
-const placeholder = <div style={{ width: '100%', padding: DefaultSpacing.s1 }} />
-
 const stackStyles = {
   root: {
     margin: `0 -${DefaultSpacing.s1}`,
   },
-}
-
-const stackItemStyles: IStackItemProps['styles'] = {
-  root: mergeStyles({
-    flexGrow: 1,
-    display: 'flex',
-    boxSizing: 'border-box',
-    [getScreenSelector(0, 500)]: {
-      flexBasis: '100%',
-    },
-    [getScreenSelector(500, 640)]: {
-      flexBasis: '50%',
-    },
-    [getScreenSelector(640, 840)]: {
-      flexBasis: '33.3%',
-    },
-    [getScreenSelector(840, undefined)]: {
-      flexBasis: '25%',
-    },
-  }),
 }
 
 const renderButtonText = (props?: IButtonProps) => {
@@ -60,7 +38,27 @@ const renderButtonText = (props?: IButtonProps) => {
 
 export const ExamplesSection: React.FC<Props> = ({ label, snippets, onSelect }) => {
   const { semanticColors } = useTheme()
-  const needPlaceholder = snippets.length % 2 !== 0
+  const stackItemStyles: IStackItemProps['styles'] = {
+    root: mergeStyles({
+      flexGrow: snippets.length < 4 ? 1 : 0,
+      flexShrink: 0,
+      display: 'flex',
+      boxSizing: 'border-box',
+      [getScreenSelector(0, 500)]: {
+        flexBasis: '100%',
+      },
+      [getScreenSelector(500, 640)]: {
+        flexBasis: '50%',
+      },
+      [getScreenSelector(640, 840)]: {
+        flexBasis: '33.3%',
+      },
+      [getScreenSelector(840, undefined)]: {
+        flexBasis: '25%',
+      },
+    }),
+  }
+
   const textStyles = {
     root: {
       borderBottom: `1px solid ${semanticColors.bodyDivider}`,
@@ -127,11 +125,6 @@ export const ExamplesSection: React.FC<Props> = ({ label, snippets, onSelect }) 
             />
           </Stack.Item>
         ))}
-        {needPlaceholder && (
-          <Stack.Item key="$placeholder" styles={stackItemStyles}>
-            {placeholder}
-          </Stack.Item>
-        )}
       </Stack>
     </div>
   )

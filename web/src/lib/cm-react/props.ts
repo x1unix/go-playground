@@ -138,6 +138,11 @@ export interface EditorProps {
   onMount?: (r: EditorRemote) => void
 
   /**
+   * Component unmount hook.
+   */
+  onUnmount?: () => void
+
+  /**
    * Editor event handler.
    */
   onEvent?: (e: EditorEvent) => void

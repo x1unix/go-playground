@@ -1,4 +1,4 @@
-import type * as monaco from 'monaco-editor'
+import type { CompletionItemKind, InsertTextFormat } from 'vscode-languageserver-protocol'
 
 export enum SymbolSourceKey {
   Name = 0,
@@ -16,8 +16,8 @@ export interface Symbols {
   details: string[]
   signatures: string[]
   insertTexts: string[]
-  insertTextRules: monaco.languages.CompletionItemInsertTextRule[]
-  kinds: monaco.languages.CompletionItemKind[]
+  insertTextRules: InsertTextFormat[]
+  kinds: CompletionItemKind[]
   packages: SymbolSource[]
 }
 

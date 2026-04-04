@@ -14,7 +14,7 @@ const stackTokens: IStackTokens = {
 /**
  * Implements dialog footer with action buttons.
  */
-export const DialogActions: React.FC = ({ children }) => {
+export const DialogActions = ({ children }: React.PropsWithChildren<{}>) => {
   return (
     <Stack
       grow

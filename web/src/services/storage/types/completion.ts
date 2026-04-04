@@ -1,14 +1,14 @@
-import type * as monaco from 'monaco-editor'
+import type { CompletionItem as LSPCompletionItem, MarkupContent } from 'vscode-languageserver-protocol'
 
-export type CompletionItem = monaco.languages.CompletionItem
-export type CompletionItems = monaco.languages.CompletionItem[]
+export type CompletionItem = LSPCompletionItem
+export type CompletionItems = LSPCompletionItem[]
 
 /**
- * Normalized version of CompletionItem that contains fixed types instead of union (e.g. Foo | Bar)
+ * Normalized version of CompletionItem with stable markdown docs shape.
  */
-export interface NormalizedCompletionItem extends Omit<monaco.languages.CompletionItem, 'label' | 'range'> {
+export interface NormalizedCompletionItem extends Omit<LSPCompletionItem, 'documentation'> {
   label: string
-  documentation?: monaco.IMarkdownString
+  documentation?: MarkupContent
 }
 
 /**
@@ -26,14 +26,14 @@ export interface PackageIndexItem {
   name: string
 
   /**
-   * Prefix for search by first letter supplied by Monaco.
+   * Prefix for search by first letter.
    */
   prefix: string
 
   /**
-   * Inherited from CompletionItem.
+   * Package docs in markdown format.
    */
-  documentation?: monaco.IMarkdownString
+  documentation?: MarkupContent
 }
 
 /**
@@ -48,7 +48,7 @@ export interface SymbolIndexItem extends NormalizedCompletionItem {
   key: string
 
   /**
-   * Prefix for search by first letter supplied by Monaco.
+   * Prefix for search by first letter.
    */
   prefix: string
 

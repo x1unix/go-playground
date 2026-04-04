@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/x1unix/go-playground/pkg/monaco"
+	"typefox.dev/lsp"
 )
 
 const defaultStringBuffSize = 64
@@ -18,17 +18,17 @@ const BuiltinPackage = "builtin"
 
 var (
 	astDocFields     = []string{"Doc", "Comment"}
-	commentBlockType = reflect.TypeOf((*ast.CommentGroup)(nil))
+	commentBlockType = reflect.TypeFor[*ast.CommentGroup]()
 
-	token2KindMapping = map[token.Token]monaco.CompletionItemKind{
-		token.VAR:   monaco.Variable,
-		token.CONST: monaco.Constant,
-		token.TYPE:  monaco.Class,
+	token2KindMapping = map[token.Token]lsp.CompletionItemKind{
+		token.VAR:   lsp.VariableCompletion,
+		token.CONST: lsp.ConstantCompletion,
+		token.TYPE:  lsp.ClassCompletion,
 	}
 )
 
-// TokenToCompletionItemKind maps Go AST token to monaco's completion item kind.
-func TokenToCompletionItemKind(tok token.Token) (monaco.CompletionItemKind, bool) {
+// TokenToCompletionItemKind maps Go AST token to LSP completion item kind.
+func TokenToCompletionItemKind(tok token.Token) (lsp.CompletionItemKind, bool) {
 	k, ok := token2KindMapping[tok]
 	return k, ok
 }

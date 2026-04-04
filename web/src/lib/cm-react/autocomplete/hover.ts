@@ -1,5 +1,5 @@
 import { parser } from '@lezer/go'
-import type { SyntaxNode } from '@lezer/common'
+import type { SyntaxNode, Tree } from '@lezer/common'
 
 import type { DocumentState } from '../types/common'
 
@@ -10,7 +10,7 @@ export interface HoverQuery {
   to: number
 }
 
-const identifierNodes = new Set(['VariableName', 'FieldName', 'TypeName', 'Bool', 'Nil'])
+const identifierNodes = new Set(['VariableName', 'FieldName', 'TypeName', 'Bool', 'Nil', 'make', 'new'])
 
 const isExported = (name: string) => name[0] === name[0]?.toUpperCase()
 
@@ -35,8 +35,8 @@ const rightMostIdentifier = (node: SyntaxNode | null): SyntaxNode | null => {
   return null
 }
 
-const getNodeAtOffset = (source: string, offset: number) => {
-  const tree = parser.parse(source)
+const getNodeAtOffset = (source: string, offset: number, existingTree?: Tree | null) => {
+  const tree = existingTree ?? parser.parse(source)
 
   const tryResolve = (pos: number, side: -1 | 1) => {
     if (pos < 0 || pos > source.length) {
@@ -66,9 +66,9 @@ const getNodeAtOffset = (source: string, offset: number) => {
   return null
 }
 
-export const queryFromPosition = (doc: DocumentState, offset: number): HoverQuery | null => {
+export const queryFromPosition = (doc: DocumentState, offset: number, tree?: Tree | null): HoverQuery | null => {
   const source = doc.text.toString()
-  const node = getNodeAtOffset(source, offset)
+  const node = getNodeAtOffset(source, offset, tree)
   if (!node) {
     return null
   }

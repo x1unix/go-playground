@@ -10,8 +10,10 @@ export type ColorScheme = 'dark' | 'light'
 export type Callback<T> = (arg: T) => void
 
 export enum Syntax {
+  PlainText,
   Go,
   GoMod,
+  JSON,
 }
 
 export interface DocumentState {
@@ -48,6 +50,11 @@ export interface EditorRemote {
    * Triggers editor to explicitly update document contents and diagnostics.
    */
   invalidateDocument: (path: string) => void
+
+  /**
+   * Remove document from editor state.
+   */
+  forgetDocument: (path: string) => void
 
   /**
    * Focuses editor instance.

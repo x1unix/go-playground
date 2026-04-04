@@ -1,7 +1,7 @@
 import { mergeStyles, useTheme } from '@fluentui/react'
 import React from 'react'
 
-export const Kbd: React.FC = ({ children }) => {
+export const Kbd = ({ children }: React.PropsWithChildren<{}>) => {
   const { semanticColors } = useTheme()
 
   const style = mergeStyles({

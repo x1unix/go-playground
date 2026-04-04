@@ -14,8 +14,6 @@ export enum ActionType {
 
 /**
  * VimModeChangeArgs represents current selected mode and sub-mode.
- *
- * @see monaco-vim/lib/statusbar.js
  */
 export type VimModeChangeArgs = Pick<VimState, 'mode' | 'subMode'>
 

@@ -3,148 +3,148 @@
     "label": "bool",
     "documentation": "bool is the set of boolean values, true and false.",
     "insertText": "bool",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "true",
     "insertText": "true",
     "signature": "const true = 0 == 0",
-    "kind": 14,
-    "insertTextRules": 0
+    "kind": 21,
+    "insertTextRules": 1
   },
   {
     "label": "false",
     "insertText": "false",
     "signature": "const false = 0 != 0",
-    "kind": 14,
-    "insertTextRules": 0
+    "kind": 21,
+    "insertTextRules": 1
   },
   {
     "label": "uint8",
     "documentation": "uint8 is the set of all unsigned 8-bit integers. Range: 0 through 255.",
     "insertText": "uint8",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "uint16",
     "documentation": "uint16 is the set of all unsigned 16-bit integers. Range: 0 through 65535.",
     "insertText": "uint16",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "uint32",
     "documentation": "uint32 is the set of all unsigned 32-bit integers. Range: 0 through 4294967295.",
     "insertText": "uint32",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "uint64",
     "documentation": "uint64 is the set of all unsigned 64-bit integers. Range: 0 through 18446744073709551615.",
     "insertText": "uint64",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "int8",
     "documentation": "int8 is the set of all signed 8-bit integers. Range: -128 through 127.",
     "insertText": "int8",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "int16",
     "documentation": "int16 is the set of all signed 16-bit integers. Range: -32768 through 32767.",
     "insertText": "int16",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "int32",
     "documentation": "int32 is the set of all signed 32-bit integers. Range: -2147483648 through 2147483647.",
     "insertText": "int32",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "int64",
     "documentation": "int64 is the set of all signed 64-bit integers. Range: -9223372036854775808 through 9223372036854775807.",
     "insertText": "int64",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "float32",
     "documentation": "float32 is the set of all IEEE 754 32-bit floating-point numbers.",
     "insertText": "float32",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "float64",
     "documentation": "float64 is the set of all IEEE 754 64-bit floating-point numbers.",
     "insertText": "float64",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "complex64",
     "documentation": "complex64 is the set of all complex numbers with float32 real and imaginary parts.",
     "insertText": "complex64",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "complex128",
     "documentation": "complex128 is the set of all complex numbers with float64 real and imaginary parts.",
     "insertText": "complex128",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "string",
     "documentation": "string is the set of all strings of 8-bit bytes, conventionally but not necessarily representing UTF-8-encoded text. A string may be empty, but not nil. Values of string type are immutable.",
     "insertText": "string",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "int",
     "documentation": "int is a signed integer type that is at least 32 bits in size. It is a distinct type, however, and not an alias for, say, int32.",
     "insertText": "int",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "uint",
     "documentation": "uint is an unsigned integer type that is at least 32 bits in size. It is a distinct type, however, and not an alias for, say, uint32.",
     "insertText": "uint",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "uintptr",
     "documentation": "uintptr is an integer type that is large enough to hold the bit pattern of any pointer.",
     "insertText": "uintptr",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "byte",
     "documentation": "byte is an alias for uint8 and is equivalent to uint8 in all ways. It is used, by convention, to distinguish byte values from 8-bit unsigned integer values.",
     "insertText": "byte",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "rune",
     "documentation": "rune is an alias for int32 and is equivalent to int32 in all ways. It is used, by convention, to distinguish character values from integer values.",
     "insertText": "rune",
-    "kind": 5,
-    "insertTextRules": 0
+    "kind": 7,
+    "insertTextRules": 1
   },
   {
     "label": "any",
@@ -152,8 +152,8 @@
     "detail": "interface{...}",
     "insertText": "any",
     "signature": "type any = interface{}",
-    "kind": 7,
-    "insertTextRules": 0
+    "kind": 8,
+    "insertTextRules": 1
   },
   {
     "label": "comparable",
@@ -161,24 +161,24 @@
     "detail": "interface{...}",
     "insertText": "comparable",
     "signature": "type comparable interface{ comparable }",
-    "kind": 7,
-    "insertTextRules": 0
+    "kind": 8,
+    "insertTextRules": 1
   },
   {
     "label": "iota",
     "documentation": "iota is a predeclared identifier representing the untyped integer ordinal number of the current const specification in a (usually parenthesized) const declaration. It is zero-indexed.",
     "insertText": "iota",
     "signature": "const iota = 0",
-    "kind": 14,
-    "insertTextRules": 0
+    "kind": 21,
+    "insertTextRules": 1
   },
   {
     "label": "nil",
     "documentation": "nil is a predeclared identifier representing the zero value for a pointer, channel, func, interface, map, or slice type.",
     "insertText": "nil",
     "signature": "var nil Type",
-    "kind": 4,
-    "insertTextRules": 0
+    "kind": 6,
+    "insertTextRules": 1
   },
   {
     "label": "append",
@@ -186,8 +186,8 @@
     "detail": "func(slice []Type, elems ...Type) []Type",
     "insertText": "append(${1:slice}, ${2:elems})",
     "signature": "func append(slice []Type, elems ...Type) []Type",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "copy",
@@ -195,8 +195,8 @@
     "detail": "func(dst, src []Type) int",
     "insertText": "copy(${1:dst}, ${2:src})",
     "signature": "func copy(dst, src []Type) int",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "delete",
@@ -204,8 +204,8 @@
     "detail": "func(m map[Type]Type1, key Type)",
     "insertText": "delete(${1:m}, ${2:key})",
     "signature": "func delete(m map[Type]Type1, key Type)",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "len",
@@ -213,8 +213,8 @@
     "detail": "func(v Type) int",
     "insertText": "len(${1:v})",
     "signature": "func len(v Type) int",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "cap",
@@ -222,8 +222,8 @@
     "detail": "func(v Type) int",
     "insertText": "cap(${1:v})",
     "signature": "func cap(v Type) int",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "make",
@@ -231,26 +231,26 @@
     "detail": "func(t Type, size ...IntegerType) Type",
     "insertText": "make(${1:t}, ${2:size})",
     "signature": "func make(t Type, size ...IntegerType) Type",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "max",
-    "documentation": "The max built-in function returns the largest value of a fixed number of arguments of [cmp.Ordered](https://pkg.go.dev/cmp/#Ordered) types. There must be at least one argument. If T is a floating-point type and any of the arguments are NaNs, max will return NaN.",
+    "documentation": "The max built-in function returns the largest value of a fixed number of arguments of `cmp.Ordered` types. There must be at least one argument. If T is a floating-point type and any of the arguments are NaNs, max will return NaN.",
     "detail": "func[T cmp.Ordered](x T, y ...T) T",
     "insertText": "max[${1:T}](${2:x}, ${3:y})",
     "signature": "func max[T cmp.Ordered](x T, y ...T) T",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "min",
-    "documentation": "The min built-in function returns the smallest value of a fixed number of arguments of [cmp.Ordered](https://pkg.go.dev/cmp/#Ordered) types. There must be at least one argument. If T is a floating-point type and any of the arguments are NaNs, min will return NaN.",
+    "documentation": "The min built-in function returns the smallest value of a fixed number of arguments of `cmp.Ordered` types. There must be at least one argument. If T is a floating-point type and any of the arguments are NaNs, min will return NaN.",
     "detail": "func[T cmp.Ordered](x T, y ...T) T",
     "insertText": "min[${1:T}](${2:x}, ${3:y})",
     "signature": "func min[T cmp.Ordered](x T, y ...T) T",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "new",
@@ -258,8 +258,8 @@
     "detail": "func(Type) *Type",
     "insertText": "new()",
     "signature": "func new(Type) *Type",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "complex",
@@ -267,8 +267,8 @@
     "detail": "func(r, i FloatType) ComplexType",
     "insertText": "complex(${1:r}, ${2:i})",
     "signature": "func complex(r, i FloatType) ComplexType",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "real",
@@ -276,8 +276,8 @@
     "detail": "func(c ComplexType) FloatType",
     "insertText": "real(${1:c})",
     "signature": "func real(c ComplexType) FloatType",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "imag",
@@ -285,8 +285,8 @@
     "detail": "func(c ComplexType) FloatType",
     "insertText": "imag(${1:c})",
     "signature": "func imag(c ComplexType) FloatType",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "clear",
@@ -294,17 +294,17 @@
     "detail": "func[T ~[]Type | ~map[Type]Type1](t T)",
     "insertText": "clear[${1:T}](${2:t})",
     "signature": "func clear[T ~[]Type | ~map[Type]Type1](t T)",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "close",
-    "documentation": "The close built-in function closes a channel, which must be either bidirectional or send-only. It should be executed only by the sender, never the receiver, and has the effect of shutting down the channel after the last sent value is received. After the last value has been received from a closed channel c, any receive from c will succeed without blocking, returning the zero value for the channel element. The form\n\n\tx, ok := \u003c-c\n\nwill also set ok to false for a closed and empty channel.",
-    "detail": "func(c chan\u003c- Type)",
+    "documentation": "The close built-in function closes a channel, which must be either bidirectional or send-only. It should be executed only by the sender, never the receiver, and has the effect of shutting down the channel after the last sent value is received. After the last value has been received from a closed channel c, any receive from c will succeed without blocking, returning the zero value for the channel element. The form\n\n\tx, ok := <-c\n\nwill also set ok to false for a closed and empty channel.",
+    "detail": "func(c chan<- Type)",
     "insertText": "close(${1:c})",
-    "signature": "func close(c chan\u003c- Type)",
-    "kind": 1,
-    "insertTextRules": 4
+    "signature": "func close(c chan<- Type)",
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "panic",
@@ -312,17 +312,17 @@
     "detail": "func(v any)",
     "insertText": "panic(${1:v})",
     "signature": "func panic(v any)",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "recover",
-    "documentation": "The recover built-in function allows a program to manage behavior of a panicking goroutine. Executing a call to recover inside a deferred function (but not any function called by it) stops the panicking sequence by restoring normal execution and retrieves the error value passed to the call of panic. If recover is called outside the deferred function it will not stop a panicking sequence. In this case, or when the goroutine is not panicking, recover returns nil.\n\nPrior to Go 1.21, recover would also return nil if panic is called with a nil argument. See \\[panic] for details.",
+    "documentation": "The recover built-in function allows a program to manage behavior of a panicking goroutine. Executing a call to recover inside a deferred function (but not any function called by it) stops the panicking sequence by restoring normal execution and retrieves the error value passed to the call of panic. If recover is called outside the deferred function it will not stop a panicking sequence. In this case, or when the goroutine is not panicking, recover returns nil.\n\nPrior to Go 1.21, recover would also return nil if panic is called with a nil argument. See `panic` for details.",
     "detail": "func() any",
     "insertText": "recover()",
     "signature": "func recover() any",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "print",
@@ -330,8 +330,8 @@
     "detail": "func(args ...Type)",
     "insertText": "print(${1:args})",
     "signature": "func print(args ...Type)",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "println",
@@ -339,8 +339,8 @@
     "detail": "func(args ...Type)",
     "insertText": "println(${1:args})",
     "signature": "func println(args ...Type)",
-    "kind": 1,
-    "insertTextRules": 4
+    "kind": 3,
+    "insertTextRules": 2
   },
   {
     "label": "error",
@@ -348,7 +348,7 @@
     "detail": "interface{...}",
     "insertText": "error",
     "signature": "type error interface {\n\tError() string\n}",
-    "kind": 7,
-    "insertTextRules": 0
+    "kind": 8,
+    "insertTextRules": 1
   }
 ]

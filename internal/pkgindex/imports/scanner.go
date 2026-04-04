@@ -1,4 +1,4 @@
-// Package imports implements functionality for generating Monaco code completion data
+// Package imports implements functionality for generating LSP completion data
 // from documentation and symbols extracted from Go source files.
 package imports
 
@@ -13,7 +13,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/x1unix/go-playground/pkg/monaco"
+	"typefox.dev/lsp"
 )
 
 const (
@@ -27,7 +27,7 @@ var buildContraintRegex = regexp.MustCompile(`(?m)^([\S]+)_(freebsd|darwin|plan9
 
 type scanResult struct {
 	hasPkg   bool
-	item     monaco.CompletionItem
+	item     lsp.CompletionItem
 	children []string
 }
 
@@ -59,7 +59,7 @@ func (s *GoRootScanner) Scan() (*GoRootSummary, error) {
 	}, nil
 }
 
-func (s *GoRootScanner) start() ([]monaco.CompletionItem, error) {
+func (s *GoRootScanner) start() ([]lsp.CompletionItem, error) {
 	rootDir := filepath.Join(s.goRoot, "src")
 	entries, err := os.ReadDir(rootDir)
 	if err != nil {
@@ -80,7 +80,7 @@ func (s *GoRootScanner) start() ([]monaco.CompletionItem, error) {
 		q.Add(pkgName)
 	}
 
-	results := make([]monaco.CompletionItem, 0, resultsInitSize)
+	results := make([]lsp.CompletionItem, 0, resultsInitSize)
 	for q.Occupied() {
 		pkgName, ok := q.Pop()
 		if !ok {

@@ -41,14 +41,24 @@ describe('buildImportContext', () => {
         blockPaths: ['fmt'],
         blockType: ImportClauseType.Block,
         range: {
-          startLineNumber: 3,
-          startColumn: 1,
-          endLineNumber: 5,
-          endColumn: 2,
+          start: {
+            line: 2,
+            character: 0,
+          },
+          end: {
+            line: 4,
+            character: 1,
+          },
         },
         totalRange: {
-          startLineNumber: 1,
-          endLineNumber: 5,
+          start: {
+            line: 0,
+            character: 0,
+          },
+          end: {
+            line: 4,
+            character: 0,
+          },
         },
       },
     })
@@ -63,14 +73,24 @@ describe('buildImportContext', () => {
         blockPaths: ['fmt'],
         blockType: ImportClauseType.Single,
         range: {
-          startLineNumber: 3,
-          startColumn: 1,
-          endLineNumber: 3,
-          endColumn: 13,
+          start: {
+            line: 2,
+            character: 0,
+          },
+          end: {
+            line: 2,
+            character: 12,
+          },
         },
         totalRange: {
-          startLineNumber: 1,
-          endLineNumber: 3,
+          start: {
+            line: 0,
+            character: 0,
+          },
+          end: {
+            line: 2,
+            character: 0,
+          },
         },
       },
     })
@@ -85,14 +105,24 @@ describe('buildImportContext', () => {
         blockPaths: ['fmt', 'bar'],
         blockType: ImportClauseType.Block,
         range: {
-          startLineNumber: 3,
-          startColumn: 1,
-          endLineNumber: 6,
-          endColumn: 2,
+          start: {
+            line: 2,
+            character: 0,
+          },
+          end: {
+            line: 5,
+            character: 1,
+          },
         },
         totalRange: {
-          startLineNumber: 1,
-          endLineNumber: 6,
+          start: {
+            line: 0,
+            character: 0,
+          },
+          end: {
+            line: 5,
+            character: 0,
+          },
         },
       },
     })
@@ -104,17 +134,28 @@ describe('buildImportContext', () => {
       want: {
         hasError: false,
         allPaths: new Set(['fmt', 'bar', 'baz']),
+        importAliases: new Map([['alias', 'baz']]),
         blockPaths: ['baz'],
         blockType: ImportClauseType.Single,
         range: {
-          startLineNumber: 8,
-          startColumn: 1,
-          endLineNumber: 8,
-          endColumn: 19,
+          start: {
+            line: 7,
+            character: 0,
+          },
+          end: {
+            line: 7,
+            character: 18,
+          },
         },
         totalRange: {
-          startLineNumber: 1,
-          endLineNumber: 8,
+          start: {
+            line: 0,
+            character: 0,
+          },
+          end: {
+            line: 7,
+            character: 0,
+          },
         },
       },
     })
@@ -129,14 +170,24 @@ describe('buildImportContext', () => {
         blockPaths: ['fmt'],
         blockType: ImportClauseType.Single,
         range: {
-          startLineNumber: 3,
-          endLineNumber: 3,
-          startColumn: 1,
-          endColumn: 13,
+          start: {
+            line: 2,
+            character: 0,
+          },
+          end: {
+            line: 2,
+            character: 12,
+          },
         },
         totalRange: {
-          startLineNumber: 1,
-          endLineNumber: 3,
+          start: {
+            line: 0,
+            character: 0,
+          },
+          end: {
+            line: 2,
+            character: 0,
+          },
         },
       },
     })

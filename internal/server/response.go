@@ -5,10 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"path/filepath"
 	"strings"
 
 	"go.uber.org/zap"
+
+	"github.com/x1unix/go-playground/pkg/goplay"
 )
 
 const maxFilesCount = 10
@@ -27,15 +28,24 @@ func (p FilesPayload) Validate() error {
 		return fmt.Errorf("too many files (max: %d)", maxFilesCount)
 	}
 
+	hasGoFiles := false
 	for name, src := range p.Files {
-		switch filepath.Ext(name) {
-		case ".go", ".mod":
-			if len(strings.TrimSpace(src)) == 0 {
-				return fmt.Errorf("empty file %q", name)
-			}
-		default:
-			return fmt.Errorf("invalid file type: %q", name)
+		isGoFile, err := goplay.ValidateFilePath(name, true)
+		if err != nil {
+			return err
 		}
+
+		if isGoFile {
+			hasGoFiles = true
+		}
+
+		if len(strings.TrimSpace(src)) == 0 {
+			return fmt.Errorf("empty file %q", name)
+		}
+	}
+
+	if !hasGoFiles {
+		return errNoGoFiles
 	}
 
 	return nil

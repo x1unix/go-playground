@@ -6,13 +6,13 @@ import (
 	"go/token"
 	"log"
 
-	"github.com/x1unix/go-playground/pkg/monaco"
+	"typefox.dev/lsp"
 )
 
 type TraverseOpts struct {
 	Filter        Filter
 	FileSet       *token.FileSet
-	SnippetFormat monaco.CompletionItemInsertTextRule
+	SnippetFormat lsp.InsertTextFormat
 }
 
 // CollectSymbols traverses root file declarations and transforms them into completion items.
@@ -32,7 +32,7 @@ func CollectSymbols(decls []ast.Decl, opts TraverseOpts, collector Collector) (c
 				continue
 			}
 
-			item, err := SymbolFromFunc(opts.FileSet, t, monaco.InsertAsSnippet)
+			item, err := SymbolFromFunc(opts.FileSet, t, opts.SnippetFormat)
 			if err != nil {
 				return count, fmt.Errorf(
 					"can't parse function %s: %w (pos: %s)",

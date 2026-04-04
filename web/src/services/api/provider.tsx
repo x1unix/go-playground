@@ -16,6 +16,6 @@ export const useApiClient = () => useContext<IAPIClient>(ApiClientContext)
  * @param children
  * @constructor
  */
-export const ApiClientProvider: React.FC = ({ children }) => (
+export const ApiClientProvider = ({ children }: React.PropsWithChildren<{}>) => (
   <ApiClientContext.Provider value={clientInstance}>{children}</ApiClientContext.Provider>
 )

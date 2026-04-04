@@ -1,13 +1,19 @@
 import { parser } from '@lezer/go'
 import type { SyntaxNode, Tree } from '@lezer/common'
+import type { Position, Range } from 'vscode-languageserver-protocol'
 
 import { ImportClauseType, type ImportsContext } from '~/workers/language/types'
 import type { DocumentState } from '../types/common'
 
 interface ImportBlock {
   range: NonNullable<ImportsContext['range']>
-  imports: string[]
+  imports: ImportSpec[]
   isMultiline: boolean
+}
+
+interface ImportSpec {
+  path: string
+  alias?: string
 }
 
 const commentNodes = new Set(['LineComment', 'BlockComment'])
@@ -26,12 +32,14 @@ const unquote = (str: string) => {
 
 const isBlankLine = (line: string) => line.trim().length === 0
 
-const offsetToPosition = (doc: DocumentState['text'], offset: number) => {
+const offsetToPosition = (doc: DocumentState['text'], offset: number): Position => {
   const safeOffset = Math.max(0, Math.min(offset, doc.length))
   const line = doc.lineAt(safeOffset)
   return {
-    lineNumber: line.number,
-    column: safeOffset - line.from + 1,
+    // CodeMirror uses 1-based line numbers; LSP Position uses 0-based lines.
+    line: line.number - 1,
+    // CodeMirror offsets are 0-based inside a line, which matches LSP character indexing.
+    character: safeOffset - line.from,
   }
 }
 
@@ -62,7 +70,7 @@ const parseImportDecl = (
     return null
   }
 
-  const imports: string[] = []
+  const imports: ImportSpec[] = []
   let invalidSpec = false
   tree.iterate({
     from: node.from,
@@ -80,7 +88,12 @@ const parseImportDecl = (
 
       const importPath = unquote(source.slice(pathNode.from, pathNode.to).trim())
       if (importPath.length > 0) {
-        imports.push(importPath)
+        const aliasNode = cursor.node.getChild('DefName')
+        const alias = aliasNode ? source.slice(aliasNode.from, aliasNode.to).trim() : undefined
+        imports.push({
+          path: importPath,
+          alias,
+        })
       }
 
       return false
@@ -94,15 +107,19 @@ const parseImportDecl = (
   const isMultiline = !!node.getChild('SpecList')
   const start = offsetToPosition(doc, node.from)
   if (!isMultiline) {
-    const line = doc.line(start.lineNumber)
+    const line = doc.line(start.line + 1)
     return {
       isMultiline,
       imports,
       range: {
-        startLineNumber: start.lineNumber,
-        endLineNumber: start.lineNumber,
-        startColumn: 1,
-        endColumn: line.length + 1,
+        start: {
+          line: start.line,
+          character: 0,
+        },
+        end: {
+          line: start.line,
+          character: line.length,
+        },
       },
     }
   }
@@ -112,10 +129,11 @@ const parseImportDecl = (
     isMultiline,
     imports,
     range: {
-      startLineNumber: start.lineNumber,
-      endLineNumber: end.lineNumber,
-      startColumn: 1,
-      endColumn: end.column,
+      start: {
+        line: start.line,
+        character: 0,
+      },
+      end,
     },
   }
 }
@@ -190,15 +208,22 @@ export const buildImportContext = (document: DocumentState): ImportsContext => {
   }
 
   const packageLine = document.text.lineAt(topNodes[pkgIndex].from).number
-  const packageEndCol = document.text.line(packageLine).length + 1
-  const fallbackRange = {
-    startLineNumber: packageLine,
-    endLineNumber: packageLine,
-    startColumn: packageEndCol,
-    endColumn: packageEndCol,
+  // Convert package line from CodeMirror's 1-based numbering to LSP's 0-based numbering.
+  const packageLineIndex = packageLine - 1
+  const packageEndChar = document.text.line(packageLine).length
+  const fallbackRange: Range = {
+    start: {
+      line: packageLineIndex,
+      character: packageEndChar,
+    },
+    end: {
+      line: packageLineIndex,
+      character: packageEndChar,
+    },
   }
 
   const allImports: string[] = []
+  const importAliases = new Map<string, string>()
   let hasError = false
   let lastImportBlock: ImportBlock | null = null
 
@@ -219,19 +244,34 @@ export const buildImportContext = (document: DocumentState): ImportsContext => {
     }
 
     lastImportBlock = importBlock
-    allImports.push(...importBlock.imports)
+    allImports.push(...importBlock.imports.map(({ path }) => path))
+
+    for (const { alias, path } of importBlock.imports) {
+      if (!alias || alias === '_') {
+        continue
+      }
+
+      importAliases.set(alias, path)
+    }
   }
 
   if (lastImportBlock) {
     return {
       hasError,
       allPaths: new Set(allImports),
-      blockPaths: lastImportBlock.imports,
+      ...(importAliases.size ? { importAliases } : {}),
+      blockPaths: lastImportBlock.imports.map(({ path }) => path),
       blockType: lastImportBlock.isMultiline ? ImportClauseType.Block : ImportClauseType.Single,
       range: lastImportBlock.range,
       totalRange: {
-        startLineNumber: packageLine,
-        endLineNumber: lastImportBlock.range.endLineNumber,
+        start: {
+          line: packageLineIndex,
+          character: 0,
+        },
+        end: {
+          line: lastImportBlock.range.end.line,
+          character: 0,
+        },
       },
     }
   }
@@ -248,8 +288,14 @@ export const buildImportContext = (document: DocumentState): ImportsContext => {
     range: fallbackRange,
     prependNewLine: true,
     totalRange: {
-      startLineNumber: packageLine,
-      endLineNumber: packageLine + 1,
+      start: {
+        line: packageLineIndex,
+        character: 0,
+      },
+      end: {
+        line: packageLine,
+        character: 0,
+      },
     },
   }
 
@@ -259,10 +305,16 @@ export const buildImportContext = (document: DocumentState): ImportsContext => {
       const next = document.text.line(packageLine + 1)
       importCtx.prependNewLine = false
       importCtx.range = {
-        startLineNumber: next.number,
-        endLineNumber: next.number,
-        startColumn: next.length + 1,
-        endColumn: next.length + 1,
+        start: {
+          // Convert CodeMirror's 1-based line to LSP's 0-based line.
+          line: next.number - 1,
+          character: next.length,
+        },
+        end: {
+          // Convert CodeMirror's 1-based line to LSP's 0-based line.
+          line: next.number - 1,
+          character: next.length,
+        },
       }
     }
   }

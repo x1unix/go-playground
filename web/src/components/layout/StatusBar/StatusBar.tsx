@@ -1,28 +1,23 @@
 import React, { useMemo } from 'react'
 import { clsx } from 'clsx'
-import { type editor, MarkerSeverity } from 'monaco-editor'
+import { DiagnosticSeverity, type Diagnostic } from 'vscode-languageserver-protocol'
 import { VscDebugAlt } from 'react-icons/vsc'
+import { useSelector } from 'react-redux'
 import environment from '~/environment'
-import { type StateDispatch, connect } from '~/store'
+import type { State } from '~/store'
 
 import { EllipsisText } from '~/components/utils/EllipsisText'
-import { StatusBarItem } from '~/components/layout/StatusBar/StatusBarItem'
-import { VimStatusBarItem } from '~/plugins/vim/VimStatusBarItem'
+import { StatusBarItem, StatusBarItemCounter } from '~/components/layout/StatusBar/StatusBarItem'
+import { VimStatusBarItem } from './VimStatusBarItem'
 
-import './StatusBar.css'
+import styles from './StatusBar.module.css'
 
 interface StateProps {
   loading?: boolean
   running?: boolean
   lastError?: string | null
-  markers?: Record<string, editor.IMarkerData[] | null>
+  markers?: Record<string, Diagnostic[] | null>
 }
-
-interface Props extends StateProps {
-  dispatch: StateDispatch
-}
-
-const pluralize = (count: number, label: string) => (count === 1 ? `${count} ${label}` : `${count} ${label}s`)
 
 const countMarkers = (markers?: StateProps['markers']) => {
   if (!markers) {
@@ -44,7 +39,7 @@ const countMarkers = (markers?: StateProps['markers']) => {
     )
 }
 
-const getMarkerCounters = (markers?: editor.IMarkerData[] | null) => {
+const getMarkerCounters = (markers?: Diagnostic[] | null) => {
   let errors = 0
   let warnings = 0
   if (!markers?.length) {
@@ -53,10 +48,10 @@ const getMarkerCounters = (markers?: editor.IMarkerData[] | null) => {
 
   for (const marker of markers) {
     switch (marker.severity) {
-      case MarkerSeverity.Warning:
+      case DiagnosticSeverity.Warning:
         warnings++
         break
-      case MarkerSeverity.Error:
+      case DiagnosticSeverity.Error:
         errors++
         break
       default:
@@ -86,7 +81,7 @@ const getStatusItem = ({ loading, running, lastError }: StateProps) => {
 
   if (lastError) {
     return (
-      <StatusBarItem icon="NotExecuted" hideTextOnMobile disabled>
+      <StatusBarItem icon="NotExecuted" disabled>
         Build failed
       </StatusBarItem>
     )
@@ -94,22 +89,32 @@ const getStatusItem = ({ loading, running, lastError }: StateProps) => {
   return null
 }
 
-const StatusBar: React.FC<Props> = ({ loading, running, lastError, markers }) => {
+export const StatusBar: React.FC = () => {
+  const status = useSelector(({ status }: State) => status)
+  const tabSize = useSelector(({ monaco }: State) => monaco.tabSize)
+  const loading = status?.loading
+  const running = status?.running
+  const lastError = status?.lastError
+  const markers = status?.markers
+  const cursorPosition = status?.cursorPosition
+  const line = cursorPosition?.line ?? 1
+  const column = cursorPosition?.column ?? 1
+
   const { warnings, errors } = useMemo(() => countMarkers(markers), [markers])
   return (
     <>
       <div
-        className={clsx('StatusBar', {
-          'StatusBar--busy': loading || running,
+        className={clsx(styles.StatusBar, {
+          [styles['StatusBar--busy']]: loading || running,
         })}
       >
-        <div className="StatusBar__side-left">
+        <div className={styles['StatusBar__side-left']}>
           <StatusBarItem icon="ErrorBadge" button>
-            {pluralize(errors, 'Error')}
+            <StatusBarItemCounter label="Error" value={errors} />
           </StatusBarItem>
           {warnings > 0 ? (
             <StatusBarItem icon="Warning" button>
-              {pluralize(warnings, 'Warning')}
+              <StatusBarItemCounter label="Warning" value={warnings} />
             </StatusBarItem>
           ) : null}
           <VimStatusBarItem />
@@ -119,16 +124,15 @@ const StatusBar: React.FC<Props> = ({ loading, running, lastError, markers }) =>
             lastError,
           })}
         </div>
-        <div className="StatusBar__side-right">
-          <StatusBarItem icon="Feedback" title="Send feedback" href={environment.urls.issue} iconOnly />
-          <StatusBarItem icon="VscGithubInverted" title="GitHub" href={environment.urls.github} iconOnly />
+        <div className={styles['StatusBar__side-right']}>
+          <StatusBarItem>
+            Ln {line}, Col {column}
+          </StatusBarItem>
+          <StatusBarItem mobileHidden>Tab Size: {tabSize}</StatusBarItem>
+          <StatusBarItem icon="Feedback" title="Send feedback" href={environment.urls.issue} iconOnly mobileHidden />
+          <StatusBarItem icon="VscGithubInverted" title="GitHub" href={environment.urls.github} iconOnly mobileHidden />
         </div>
       </div>
     </>
   )
 }
-
-export const ConnectedStatusBar = connect<StateProps, {}>(({ status }) => {
-  const { loading, lastError, running, markers } = status!
-  return { loading, lastError, running, markers }
-})(StatusBar)

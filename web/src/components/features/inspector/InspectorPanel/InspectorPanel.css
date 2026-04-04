@@ -10,7 +10,7 @@
   overflow: auto;
 }
 
-.InspectorPanel__container > * {
+.InspectorPanel__container>* {
   flex: 1 1 auto;
 }
 
@@ -72,7 +72,8 @@
   width: 3px;
 }
 
-@media (hover: none), (pointer: coarse) {
+@media (hover: none),
+(pointer: coarse) {
   .InspectorPanel__handle--left {
     background: black;
     display: flex;
@@ -80,12 +81,6 @@
     align-items: center;
     justify-content: center;
     color: #999;
-  }
-
-  .InspectorPanel__handle--left:hover,
-  .InspectorPanel__handle--left:active {
-    background: black;
-    color: white;
   }
 
   .InspectorPanel__handle--left:before {
@@ -101,6 +96,13 @@
     border-radius: 4px;
     align-self: center;
     transition: color 0.15s ease 0s;
+  }
+
+  .InspectorPanel .InspectorPanel__handle:hover,
+  .InspectorPanel .InspectorPanel__handle:active,
+  .InspectorPanel--resizing .InspectorPanel__handle {
+    background: black;
+    color: white;
   }
 }
 
@@ -126,7 +128,8 @@
   height: 3px;
 }
 
-@media (hover: none), (pointer: coarse) {
+@media (hover: none),
+(pointer: coarse) {
   .InspectorPanel__handle--top {
     background: black;
     display: flex;

@@ -15,6 +15,7 @@ import {
   VscGithubInverted,
 } from 'react-icons/vsc'
 import { BsFillDice3Fill } from 'react-icons/bs'
+import { IoMdPlay } from 'react-icons/io'
 
 const toJsxElement = (Icon: unknown) => React.createElement(Icon as React.ComponentType) as JSXElement
 
@@ -33,6 +34,7 @@ export const initializeIcons = () => {
       VscPulse: toJsxElement(VscPulse),
       VscGithubInverted: toJsxElement(VscGithubInverted),
       VscSymbolArray: toJsxElement(VscSymbolArray),
+      IoMdPlay: toJsxElement(IoMdPlay),
     },
   })
 }

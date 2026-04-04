@@ -1,13 +1,18 @@
-import type { DocumentState } from './common'
+import type {
+  CompletionItem as LSPCompletionItem,
+  Hover as LSPHover,
+  Range,
+  TextEdit,
+} from 'vscode-languageserver-protocol'
+import type { Tree } from '@lezer/common'
+import type { DocumentState, Syntax } from './common'
+import type { LoadState } from './events'
 
-// Ported from monaco.IMarkdownString
-export interface IMarkdownString {
-  readonly value: string
-  readonly language?: string
-}
+export type StatusCallback = (status: LoadState, error?: string) => void
 
-export type MarkedString = string | IMarkdownString
-export type DocContent = IMarkdownString | MarkedString | MarkedString[]
+export type CompletionDoc = NonNullable<LSPCompletionItem['documentation']>
+export type HoverContent = LSPHover['contents']
+export type DocContent = CompletionDoc | HoverContent
 
 export interface CursorPosition {
   lineNumber: number
@@ -15,51 +20,11 @@ export interface CursorPosition {
   offset: number
 }
 
-export interface CompletionTextEdit {
-  from: number
-  to: number
-  insert: string
-}
-
-export type CompletionItemKind =
-  | 'method'
-  | 'function'
-  | 'constructor'
-  | 'field'
-  | 'variable'
-  | 'class'
-  | 'struct'
-  | 'interface'
-  | 'module'
-  | 'property'
-  | 'event'
-  | 'operator'
-  | 'unit'
-  | 'value'
-  | 'constant'
-  | 'enum'
-  | 'enumMember'
-  | 'keyword'
-  | 'text'
-  | 'color'
-  | 'file'
-  | 'reference'
-  | 'folder'
-  | 'typeParameter'
-  | 'snippet'
-
-export interface CompletionItem {
-  label: string
-  detail?: string
-  documentation?: DocContent
-  type?: CompletionItemKind
-  sortText?: string
-  filterText?: string
+export interface CompletionItem extends Omit<LSPCompletionItem, 'additionalTextEdits'> {
   insertText: string
-  isSnippet?: boolean
   replaceFrom: number
   replaceTo: number
-  additionalTextEdits?: CompletionTextEdit[]
+  additionalTextEdits?: TextEdit[]
 }
 
 export interface CompletionResult {
@@ -78,29 +43,62 @@ export interface CompletionRequest {
   document: DocumentState
   cursor: CursorPosition
   explicit: boolean
+  tree?: Tree | null
 }
 
 export interface HoverRequest {
   document: DocumentState
   cursor: CursorPosition
-}
-
-export interface DocumentEditChange {
-  startLineNumber: number
-  endLineNumber: number
+  tree?: Tree | null
 }
 
 export interface DocumentUpdate {
   path: string
-  changes: DocumentEditChange[]
+  changes: Range[]
   isFlush?: boolean
 }
 
+/**
+ * Adapter contract used by the CodeMirror autocomplete extension.
+ *
+ * Implementations bridge editor-level requests (offsets, buffer updates)
+ * and completion/hover providers (worker, index, or remote services).
+ */
 export interface EditorAutocompleteSource {
+  /** Returns whether this source can provide results for the given syntax. */
+  supportsSyntax: (syntax: Syntax) => boolean
+
+  /**
+   * Ensures underlying completion data is ready.
+   * Returns `true` when warm-up is complete and queries can run immediately.
+   */
   isWarmUp: () => Promise<boolean>
+
+  /**
+   * Produces completion candidates for the current cursor position.
+   * Returns `null` when no completions should be shown.
+   */
   complete: (req: CompletionRequest) => Promise<CompletionResult | null>
+
+  /**
+   * Produces hover content for the current cursor position.
+   * Returns `null` when no hover tooltip should be shown.
+   */
   hover: (req: HoverRequest) => Promise<HoverResult | null>
+
+  /**
+   * Notifies the source about document edits so it can invalidate/update caches.
+   */
   handleDocumentUpdate: (update: DocumentUpdate) => void
+
+  /**
+   * Clears cached data for one document or the full source state.
+   */
   clear: (path?: string) => void
+
+  /** Releases resources held by the source instance. */
   dispose?: () => void
+
+  /** Sets callback to report loading status changes. */
+  setStatusCallback?: (cb: StatusCallback) => void
 }

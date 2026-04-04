@@ -6,10 +6,16 @@ import (
 	"fmt"
 	"path"
 	"regexp"
+	"slices"
 	"strings"
 )
 
 var delimiterRegEx = regexp.MustCompile(`(?i)^-- (.*) --$`)
+
+// supportedFileExtensions is a list of supported extensions except ".go" files.
+var supportedFileExtensions = []string{
+	".txt", ".json",
+}
 
 func cleanPath(pathname string) string {
 	// path.Clean don't clean dots for non-abs paths
@@ -17,39 +23,40 @@ func cleanPath(pathname string) string {
 	return strings.TrimPrefix(s, "/")
 }
 
-func validateFileName(name string) bool {
-	if name == "go.mod" {
-		return true
-	}
-
-	ext := path.Ext(name)
-	return ext == ".go"
-}
-
-func ValidateFilePath(name string, strict bool) error {
+// ValidateFilePath validates a given file path contains a supported file.
+//
+// Filters out files that are not go.mod, *.go, *.txt or *.json files.
+func ValidateFilePath(name string, strict bool) (isGoFile bool, err error) {
 	name = strings.TrimSpace(name)
 	if name == "" {
-		return errors.New("file name cannot be empty")
+		return false, errors.New("file name cannot be empty")
 	}
 
-	if !strict {
-		return nil
+	if strict {
+		if strings.HasPrefix(name, "/") {
+			return false, errors.New("file path cannot start with a slash")
+		}
+
+		if cleanPath(name) != name {
+			return false, fmt.Errorf("invalid file name %q", name)
+		}
 	}
 
-	if strings.HasPrefix(name, "/") {
-		return errors.New("file path cannot start with a slash")
+	basename := path.Base(name)
+	if basename == "go.mod" {
+		return false, nil
 	}
 
-	if cleanPath(name) != name {
-		return fmt.Errorf("invalid file name %q", name)
+	ext := path.Ext(basename)
+	if ext == ".go" {
+		return true, nil
 	}
 
-	fileName := path.Base(name)
-	if !validateFileName(fileName) {
-		return fmt.Errorf("invalid file name %q", name)
+	if slices.Contains(supportedFileExtensions, ext) {
+		return false, nil
 	}
 
-	return nil
+	return false, fmt.Errorf("invalid file name %q", name)
 }
 
 func isSeparatorLine(line string) (string, bool) {
@@ -113,7 +120,8 @@ func SplitFileSet(src string, opts SplitFileOpts) (map[string]string, error) {
 			continue
 		}
 
-		if err := ValidateFilePath(fileName, opts.CheckPaths); err != nil {
+		_, err := ValidateFilePath(fileName, opts.CheckPaths)
+		if err != nil {
 			return nil, err
 		}
 

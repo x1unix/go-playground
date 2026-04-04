@@ -5,6 +5,7 @@ import { EditorState, type Extension, type StateEffect } from '@codemirror/state
 import { EditorView, keymap, type ViewUpdate } from '@codemirror/view'
 import { vscodeKeymap } from '@replit/codemirror-vscode-keymap'
 import { getCM } from '@replit/codemirror-vim'
+import type { Range } from 'vscode-languageserver-protocol'
 
 import { basicSetup } from './extensions/basic'
 import { highlightField } from './extensions/highlight'
@@ -43,6 +44,7 @@ import { CMEditorRemote } from './remote'
 import type { BufferState } from './buffers/types'
 import { newAutocompleteExtensions } from './autocomplete'
 
+import '@vscode/codicons/dist/codicon.css'
 import classes from './Editor.module.css'
 
 const keyBindings = [indentWithTab, ...vscodeKeymap]
@@ -83,7 +85,7 @@ export class Editor extends React.Component<EditorProps, State> {
     })
 
     // Preinit remote as it is a dependency for extensions.
-    this.remote = new CMEditorRemote(this.props.formatter)
+    this.remote = new CMEditorRemote(this.buffMgr, this.props.formatter)
 
     // Create hotkey handler and register custom commands.
     const docCmdHandler: DocumentCommandHandler = (cmd, doc) => {
@@ -129,7 +131,8 @@ export class Editor extends React.Component<EditorProps, State> {
             }
             const cursorLine = state.doc.lineAt(state.selection.asSingle().ranges[0].to).number
             if (lineNo === cursorLine) {
-              return '0'
+              // Vim shows real line number for a current line.
+              return lineNo.toString()
             }
 
             return Math.abs(cursorLine - lineNo).toString()
@@ -140,7 +143,7 @@ export class Editor extends React.Component<EditorProps, State> {
                 type: EventType.GutterClick,
                 position: {
                   line: view.state.doc.lineAt(line.from).number,
-                  column: 0,
+                  column: 1,
                 },
               })
               return true
@@ -171,6 +174,10 @@ export class Editor extends React.Component<EditorProps, State> {
       newThemeCompartment(preferences),
       changeHandlerExt,
     ]
+
+    this.props.autocomplete?.setStatusCallback?.((status, error) => {
+      this.emitCompletionSourceStatus(status, error)
+    })
   }
 
   private getInitialEditorState() {
@@ -239,6 +246,12 @@ export class Editor extends React.Component<EditorProps, State> {
     this.editor?.focus()
   }
 
+  componentWillUnmount() {
+    this.editor?.destroy()
+    this.buffMgr.clear()
+    this.props.onUnmount?.()
+  }
+
   /**
    * Applies updates on EditorState based on prop changes.
    */
@@ -272,7 +285,11 @@ export class Editor extends React.Component<EditorProps, State> {
       // Ignore persist of previous state, if it's a default editor state (not from a file).
       // E.g. when made using getInitialEditorState().
       if (hasBufferState(this.editor.state)) {
-        this.buffMgr.setState(prevFile.path, state)
+        // Skip persist previous document was marked for cache eviction.
+        // Happens during delete of current file and switch to a new one.
+        if (!this.buffMgr.unevict(prevFile.path)) {
+          this.buffMgr.setState(prevFile.path, state)
+        }
       }
     }
 
@@ -339,7 +356,7 @@ export class Editor extends React.Component<EditorProps, State> {
       return
     }
 
-    const lineChanges: Array<{ startLineNumber: number; endLineNumber: number }> = []
+    const lineChanges: Range[] = []
     let changesCount = 0
     let isFullReplace = false
     const prevDoc = startState.doc
@@ -350,9 +367,17 @@ export class Editor extends React.Component<EditorProps, State> {
       }
 
       const safeTo = Math.min(Math.max(fromA, toA), prevDoc.length)
+      const startLine = prevDoc.lineAt(fromA)
+      const endLine = prevDoc.lineAt(safeTo)
       lineChanges.push({
-        startLineNumber: prevDoc.lineAt(fromA).number,
-        endLineNumber: prevDoc.lineAt(safeTo).number,
+        start: {
+          line: startLine.number - 1,
+          character: fromA - startLine.from,
+        },
+        end: {
+          line: endLine.number - 1,
+          character: safeTo - endLine.from,
+        },
       })
     })
 
@@ -422,7 +447,7 @@ export class Editor extends React.Component<EditorProps, State> {
 
       position = {
         line: cursor.number,
-        column: selection.main.head - cursor.from,
+        column: selection.main.head - cursor.from + 1, // Column should start at line 1
       }
     }
 
