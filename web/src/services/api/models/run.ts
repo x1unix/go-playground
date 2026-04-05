@@ -43,6 +43,7 @@ export interface FilesPayload {
 
 export interface BuildResponse {
   fileName: string
+  compilerOutput?: string
   isTest?: boolean
   hasBenchmark?: boolean
   hasFuzz?: boolean

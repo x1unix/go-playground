@@ -80,7 +80,7 @@ export const RunOutput: React.FC = () => {
             backend={renderingBackend}
             disableTerminal={terminal.settings.disableTerminalEmulation}
           />
-        )}ssss
+        )}
       </div>
     </div>
   )

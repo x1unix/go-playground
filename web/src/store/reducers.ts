@@ -31,6 +31,7 @@ const initialSettingsState: SettingsState = {
   autoSave: config.autoSave,
   darkMode: config.darkThemeEnabled,
   autoFormat: true,
+  enableCompilerOptions: config.enableCompilerOptions,
   useSystemTheme: config.useSystemTheme,
   enableVimMode: config.enableVimMode,
   goProxyUrl: config.goProxyUrl,
@@ -92,13 +93,21 @@ const reducers = {
         dirty: true,
         events: [],
       }),
-      [ActionType.EVAL_EVENT]: (s: StatusState, a: Action<EvalEvent>) => ({
-        lastError: null,
-        loading: false,
-        dirty: true,
-        running: s.running,
-        events: s.events ? s.events.concat(a.payload) : [a.payload],
-      }),
+      [ActionType.EVAL_EVENT]: (s: StatusState, a: Action<EvalEvent>) => {
+        // if (a.payload.Kind === 'stderr') {
+        //   // Temporary breakpoint for compiler output debugging.
+        //   // eslint-disable-next-line no-debugger
+        //   debugger
+        // }
+
+        return {
+          lastError: null,
+          loading: false,
+          dirty: true,
+          running: s.running,
+          events: s.events ? s.events.concat(a.payload) : [a.payload],
+        }
+      },
       [ActionType.EVAL_FINISH]: (s: StatusState, _: Action) => ({
         ...s,
         loading: false,

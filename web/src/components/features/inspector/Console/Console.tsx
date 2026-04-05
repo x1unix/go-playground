@@ -3,7 +3,7 @@ import copy from 'copy-to-clipboard'
 
 import { DefaultButton, useTheme } from '@fluentui/react'
 
-import type { ITerminalAddon, ITerminalOptions } from '@xterm/xterm'
+import type { ITerminalAddon, ITerminalOptions, Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import { ImageAddon } from '@xterm/addon-image'
 import { LazyCanvasAddon, LazyWebglAddon } from './backends'
@@ -13,7 +13,7 @@ import { RenderingBackend } from '~/store/terminal'
 import { useXtermTheme, XTerm } from '~/components/utils/XTerm'
 
 import { formatEvalEvent } from './format'
-import { createDebounceResizeObserver } from './utils'
+import { createDebounceResizeObserver, isEventPrefix } from './utils'
 
 import './Console.css'
 
@@ -86,9 +86,10 @@ const CopyButton: React.FC<{
  */
 export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, backend }) => {
   const theme = useXtermTheme()
-  const [offset, setOffset] = useState(0)
   const [isFocused, setIsFocused] = useState(false)
   const [xterm, setXterm] = useState<XTerm | null>(null)
+  const renderedEventsRef = useRef(status?.events ?? [])
+  const renderedTerminalRef = useRef<Terminal | null>(null)
 
   const xtermRefCallback = useCallback((instance: XTerm | null) => {
     setXterm(instance)
@@ -105,7 +106,6 @@ export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, 
     [fitAddonRef],
   )
 
-  const isClean = !status?.dirty
   const events = status?.events
   const terminal = xterm?.terminal
   const elemRef = xterm?.terminalRef
@@ -133,36 +133,46 @@ export const Console: React.FC<ConsoleProps> = ({ fontFamily, fontSize, status, 
       return
     }
 
-    if (!events?.length) {
-      setOffset(0)
-      terminal?.clear()
-      terminal?.reset()
+    const currentEvents = events ?? []
+    const renderedEvents = renderedEventsRef.current
+    const terminalChanged = renderedTerminalRef.current !== terminal
+
+    if (currentEvents.length === 0) {
+      terminal.clear()
+      terminal.reset()
+      renderedEventsRef.current = []
+      renderedTerminalRef.current = terminal
       return
     }
 
-    if (offset === 0) {
-      terminal?.clear()
-      terminal?.reset()
-    }
-
-    const batch = events?.slice(offset)
-    if (!batch) {
+    if (terminalChanged || !isEventPrefix(renderedEvents, currentEvents)) {
+      terminal.clear()
+      terminal.reset()
+      currentEvents.map(formatEvalEvent).forEach((msg) => {
+        terminal.write(msg)
+      })
+      terminal.scrollToBottom()
+      renderedEventsRef.current = currentEvents.slice()
+      renderedTerminalRef.current = terminal
       return
     }
 
-    batch.map(formatEvalEvent).forEach((msg) => {
-      terminal?.write(msg)
-    })
-    terminal?.scrollToBottom()
-    setOffset(offset + batch.length)
-  }, [terminal, offset, events])
-
-  // Reset output offset on clean
-  useEffect(() => {
-    if (isClean) {
-      setOffset(0)
+    if (renderedEvents.length === currentEvents.length) {
+      renderedTerminalRef.current = terminal
+      return
     }
-  }, [isClean])
+
+    currentEvents
+      .slice(renderedEvents.length)
+      .map(formatEvalEvent)
+      .forEach((msg) => {
+        terminal.write(msg)
+      })
+
+    terminal.scrollToBottom()
+    renderedEventsRef.current = currentEvents.slice()
+    renderedTerminalRef.current = terminal
+  }, [terminal, events])
 
   // Track terminal resize
   useEffect(() => {

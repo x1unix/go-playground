@@ -196,13 +196,20 @@ func (h *APIv2Handler) HandleCompile(w http.ResponseWriter, r *http.Request) err
 
 	h.logger.Debug("handling compile request")
 	h.logger.Debug("parsing compile parameters from query", zap.Any("query", r))
-	files, err := buildFilesFromRequest(r)
+	files, compilerOptions, err := buildFilesFromRequest(r)
 	if err != nil {
 		return err
 	}
 
 	h.logger.Debug("built files", zap.Any("files", files))
-	result, err := h.cfg.Builder.Build(ctx, files)
+	parsedCompilerOptions, err := builder.ParseCompilerOptions(compilerOptions)
+	if err != nil {
+		return NewBadRequestError(err)
+	}
+
+	result, err := h.cfg.Builder.Build(ctx, files, builder.BuildOptions{
+		CompilerOptions: parsedCompilerOptions,
+	})
 	if err != nil {
 		if builder.IsBuildError(err) || errors.Is(err, context.Canceled) {
 			return NewHTTPError(http.StatusBadRequest, err)
@@ -213,10 +220,11 @@ func (h *APIv2Handler) HandleCompile(w http.ResponseWriter, r *http.Request) err
 	h.logger.Debug("build result", zap.Any("result", result))
 
 	WriteJSON(w, BuildResponseV2{
-		FileName:     result.FileName,
-		IsTest:       result.IsTest,
-		HasBenchmark: result.HasBenchmark,
-		HasFuzz:      result.HasFuzz,
+		FileName:       result.FileName,
+		CompilerOutput: result.CompilerOutput,
+		IsTest:         result.IsTest,
+		HasBenchmark:   result.HasBenchmark,
+		HasFuzz:        result.HasFuzz,
 	})
 	return nil
 }

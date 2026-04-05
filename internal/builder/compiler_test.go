@@ -3,8 +3,10 @@ package builder
 import (
 	"context"
 	"errors"
+	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"strings"
 	"syscall"
 	"testing"
@@ -106,9 +108,10 @@ func TestBuildService_Build(t *testing.T) {
 	cases := map[string]struct {
 		skip         bool
 		files        map[string][]byte
+		options      BuildOptions
 		cmdRunner    func(t *testing.T, ctrl *gomock.Controller) CommandRunner
 		wantErr      string
-		wantResult   func(files map[string][]byte) *Result
+		wantResult   func(files map[string][]byte, options BuildOptions) *Result
 		beforeRun    func(t *testing.T)
 		onErrorCheck func(t *testing.T, err error)
 		store        func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error)
@@ -130,15 +133,15 @@ func TestBuildService_Build(t *testing.T) {
 			files: map[string][]byte{
 				"file.go": []byte("test"),
 			},
-			wantResult: func(files map[string][]byte) *Result {
+			wantResult: func(files map[string][]byte, _ BuildOptions) *Result {
 				return &Result{
-					FileName: mustArtifactID(t, files).String() + ".wasm",
+					FileName: mustArtifactID(t, files, BuildOptions{}).String() + ".wasm",
 				}
 			},
 			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
 				return testStorage{
 					hasItem: func(id storage.ArtifactID) (bool, error) {
-						w := mustArtifactID(t, files)
+						w := mustArtifactID(t, files, BuildOptions{})
 						require.Equal(t, w, id)
 						return true, nil
 					},
@@ -160,6 +163,74 @@ func TestBuildService_Build(t *testing.T) {
 			onErrorCheck: func(t *testing.T, err error) {
 				_, ok := err.(*BuildError)
 				require.True(t, ok, "expected compiler error")
+			},
+		},
+		"program build exposes compiler output": {
+			files: map[string][]byte{
+				"main.go": []byte("package main\nfunc main() {}\n"),
+				"go.mod":  []byte("module foo"),
+			},
+			options: BuildOptions{
+				CompilerOptions: []string{"-gcflags", "all=-N -l", "-trimpath"},
+			},
+			store: func(t *testing.T, _ map[string][]byte) (storage.StoreProvider, func() error) {
+				return testStorage{
+					hasItem: func(id storage.ArtifactID) (bool, error) {
+						return false, nil
+					},
+					createWorkspace: func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error) {
+						return &storage.Workspace{
+							WorkDir:    "/tmp",
+							BinaryPath: "test.wasm",
+							Files:      nil,
+						}, nil
+					},
+				}, nil
+			},
+			cmdRunner: func(t *testing.T, ctrl *gomock.Controller) CommandRunner {
+				m := NewMockCommandRunner(ctrl)
+				m.EXPECT().RunCommand(testutil.MatchCommand("go", "mod", "tidy")).Return(nil)
+				m.EXPECT().
+					RunCommand(testutil.MatchCommand("go", "build", "-gcflags", "all=-N -l", "-trimpath", "-o", "test.wasm", ".")).
+					DoAndReturn(func(cmd *exec.Cmd) error {
+						_, err := io.WriteString(cmd.Stderr, "compiler diagnostics\n")
+						return err
+					})
+				return m
+			},
+			wantResult: func(files map[string][]byte, options BuildOptions) *Result {
+				return &Result{
+					FileName:       mustArtifactID(t, files, options).String() + ".wasm",
+					CompilerOutput: "compiler diagnostics\n",
+				}
+			},
+		},
+		"compiler options use cache when available": {
+			files: map[string][]byte{
+				"main.go": []byte("package main\nfunc main() {}\n"),
+				"go.mod":  []byte("module foo"),
+			},
+			options: BuildOptions{
+				CompilerOptions: []string{"-gcflags", "-m"},
+			},
+			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
+				return testStorage{
+					hasItem: func(id storage.ArtifactID) (bool, error) {
+						w := mustArtifactID(t, files, BuildOptions{
+							CompilerOptions: []string{"-gcflags", "-m"},
+						})
+						require.Equal(t, w, id)
+						return true, nil
+					},
+				}, nil
+			},
+			cmdRunner: func(t *testing.T, ctrl *gomock.Controller) CommandRunner {
+				return NewMockCommandRunner(ctrl)
+			},
+			wantResult: func(files map[string][]byte, options BuildOptions) *Result {
+				return &Result{
+					FileName: mustArtifactID(t, files, options).String() + ".wasm",
+				}
 			},
 		},
 		"bad environment": {
@@ -293,9 +364,9 @@ func TestBuildService_Build(t *testing.T) {
 				m.EXPECT().RunCommand(testutil.MatchCommand("go", "test", "-c", "-o", "test.wasm")).Return(nil)
 				return m
 			},
-			wantResult: func(files map[string][]byte) *Result {
+			wantResult: func(files map[string][]byte, _ BuildOptions) *Result {
 				return &Result{
-					FileName: mustArtifactID(t, files).String() + ".wasm",
+					FileName: mustArtifactID(t, files, BuildOptions{}).String() + ".wasm",
 					IsTest:   true,
 				}
 			},
@@ -330,9 +401,9 @@ func TestBuildService_Build(t *testing.T) {
 				m.EXPECT().RunCommand(testutil.MatchCommand("go", "test", "-bench=.", "-fuzz=.", "-c", "-o", "test.wasm")).Return(nil)
 				return m
 			},
-			wantResult: func(files map[string][]byte) *Result {
+			wantResult: func(files map[string][]byte, _ BuildOptions) *Result {
 				return &Result{
-					FileName:     mustArtifactID(t, files).String() + ".wasm",
+					FileName:     mustArtifactID(t, files, BuildOptions{}).String() + ".wasm",
 					IsTest:       true,
 					HasBenchmark: true,
 					HasFuzz:      true,
@@ -367,7 +438,7 @@ func TestBuildService_Build(t *testing.T) {
 				bs.cmdRunner = c.cmdRunner(t, ctrl)
 			}
 
-			got, err := bs.Build(context.TODO(), c.files)
+			got, err := bs.Build(context.TODO(), c.files, c.options)
 			if c.wantErr != "" {
 				if c.onErrorCheck != nil {
 					c.onErrorCheck(t, err)
@@ -378,7 +449,7 @@ func TestBuildService_Build(t *testing.T) {
 			}
 			require.NoError(t, err)
 			require.NotNil(t, got)
-			require.Equal(t, c.wantResult(c.files), got)
+			require.Equal(t, c.wantResult(c.files, c.options), got)
 		})
 	}
 }
@@ -419,9 +490,9 @@ func TestBuildService_getEnvironmentVariables(t *testing.T) {
 	}
 }
 
-func mustArtifactID(t *testing.T, files map[string][]byte) storage.ArtifactID {
+func mustArtifactID(t *testing.T, files map[string][]byte, opts BuildOptions) storage.ArtifactID {
 	t.Helper()
-	a, err := storage.GetArtifactID(files)
+	a, err := getArtifactID(files, opts)
 	require.NoError(t, err)
 	return a
 }
