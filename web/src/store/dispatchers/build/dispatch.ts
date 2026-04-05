@@ -85,7 +85,7 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
     const {
       settings,
       workspace,
-      runTarget: { target: selectedTarget, backend },
+      runTarget: { target: selectedTarget, backend, opts },
     } = getState()
 
     let { files, selectedFile } = workspace
@@ -124,11 +124,26 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
         break
       }
       case TargetType.WebAssembly: {
-        const buildResponse = await client.build(files)
+        const compilerOptions = settings.enableCompilerOptions ? opts?.compilerOptions?.trim() || undefined : undefined
+        const buildResponse = await client.build(files, compilerOptions)
+        const hasCompilerOutput = Boolean(buildResponse.compilerOutput?.trim().length)
+
+        if (hasCompilerOutput) {
+          dispatch(newProgramStartAction())
+          dispatch(
+            newProgramWriteAction({
+              Kind: EvalEventKind.Stderr,
+              Message: buildResponse.compilerOutput!,
+              Delay: 0,
+            }),
+          )
+        }
 
         const buff = await fetchWasmWithProgress(dispatch, buildResponse.fileName)
         dispatch(newRemoveNotificationAction(NotificationIDs.WASMAppDownload))
-        dispatch(newProgramStartAction())
+        if (!hasCompilerOutput) {
+          dispatch(newProgramStartAction())
+        }
 
         const args = buildGoTestFlags(buildResponse)
         const stdio = createStdio(newStdoutHandler(dispatch))

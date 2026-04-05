@@ -30,7 +30,7 @@ export const ChangeLog: React.FC<Props> = ({ className, ...props }) => {
         </div>
       ))}
       <p>
-        <span>Full release notes are available </span>
+        <span>Full release notes are available maharshi </span>
         <Link href={`${environment.urls.github}/releases/tag/v${environment.appVersion}`} target="_blank">
           here
         </Link>

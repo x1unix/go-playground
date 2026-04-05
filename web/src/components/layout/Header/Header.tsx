@@ -36,6 +36,8 @@ import apiClient, { type VersionsInfo } from '~/services/api'
 import classes from './Header.module.css'
 
 enum MenuActionType {
+  Format,
+  ShowExamples,
   ShowSettings,
   ShowAbout,
   ToggleTheme,
@@ -77,6 +79,7 @@ const BTN_SHARE_CLASS = 'Header--btn__share'
 
 // Breakpoint in pixels to hide aside menu items into a dropdown.
 const COMPACT_MENU_BREAKPOINT_PX = 745
+const VERY_COMPACT_MENU_BREAKPOINT_PX = 520
 
 const goVersionsCacheEntry = {
   key: 'api.go.versions',
@@ -136,12 +139,14 @@ export const Header = () => {
 
   // Window width listener to hide aside items into a dropdown.
   const [isCompact, setIsCompact] = useState(window.innerWidth < COMPACT_MENU_BREAKPOINT_PX)
+  const [isVeryCompact, setIsVeryCompact] = useState(window.innerWidth < VERY_COMPACT_MENU_BREAKPOINT_PX)
   useEffect(() => {
     let raf = 0
     const onResize = () => {
       cancelAnimationFrame(raf)
       raf = requestAnimationFrame(() => {
         setIsCompact(window.innerWidth < COMPACT_MENU_BREAKPOINT_PX)
+        setIsVeryCompact(window.innerWidth < VERY_COMPACT_MENU_BREAKPOINT_PX)
       })
     }
 
@@ -150,7 +155,7 @@ export const Header = () => {
       cancelAnimationFrame(raf)
       window.removeEventListener('resize', onResize)
     }
-  }, [setIsCompact])
+  }, [setIsCompact, setIsVeryCompact])
 
   const [modalStates, setModalStates] = useState<ModalStates>({})
 
@@ -191,6 +196,14 @@ export const Header = () => {
 
   const onMenuItemClick = (cmd: MenuActionType) => {
     switch (cmd) {
+      case MenuActionType.Format: {
+        dispatch(dispatchFormatFile())
+        return
+      }
+      case MenuActionType.ShowExamples: {
+        setModalStates({ showExamples: true })
+        return
+      }
       case MenuActionType.ToggleTheme: {
         dispatch(dispatchToggleTheme)
         return
@@ -205,6 +218,31 @@ export const Header = () => {
       }
     }
   }
+
+  const compactMenuItems: IContextualMenuItem[] = useMemo(() => {
+    const items = [...asideMenuItems]
+
+    if (isVeryCompact) {
+      items.unshift(
+        {
+          key: 'examples',
+          text: 'Examples',
+          iconProps: { iconName: 'TestExploreSolid' },
+          disabled: isDisabled,
+          data: MenuActionType.ShowExamples,
+        },
+        {
+          key: 'format',
+          text: 'Format',
+          iconProps: { iconName: 'Code' },
+          disabled: isDisabled,
+          data: MenuActionType.Format,
+        },
+      )
+    }
+
+    return items
+  }, [asideMenuItems, isDisabled, isVeryCompact])
 
   // Modal handlers
   const onSettingsClose = useCallback(
@@ -273,6 +311,7 @@ export const Header = () => {
             className={classes['Header--btn']}
             iconProps={{ iconName: 'Code' }}
             disabled={isDisabled}
+            hidden={isVeryCompact}
             onClick={() => {
               dispatch(dispatchFormatFile())
             }}
@@ -282,6 +321,7 @@ export const Header = () => {
             disabled={isDisabled}
             className={classes['Header--btn']}
             iconProps={{ iconName: 'TestExploreSolid' }}
+            hidden={isVeryCompact}
             onClick={() => {
               setModalStates({ showExamples: true })
             }}
@@ -293,7 +333,7 @@ export const Header = () => {
               iconProps={{ iconName: 'More' }}
               styles={{ menuIcon: { display: 'none' }, icon: { color: theme.semanticColors.bodyText } }}
               menuProps={{
-                items: asideMenuItems,
+                items: compactMenuItems,
                 onItemClick: (_, item) => {
                   if (item) {
                     onMenuItemClick(item.data as MenuActionType)

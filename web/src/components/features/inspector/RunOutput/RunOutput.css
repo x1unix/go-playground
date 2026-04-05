@@ -3,6 +3,7 @@
   overflow: auto;
   display: flex;
   flex-direction: column;
+  overscroll-behavior-y: contain;
 }
 
 .RunOutput__content {
@@ -23,6 +24,9 @@
   overflow: auto;
   position: static;
   display: block;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 /** Errors & Messages */

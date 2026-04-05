@@ -205,6 +205,19 @@ class SettingsModal extends ThemeableComponent<Props, SettingsModalState> {
               }
             />
             <SettingsProperty
+              key="enableCompilerOptions"
+              title="Enable WASM Compiler Options"
+              control={
+                <Checkbox
+                  label="Enables custom compiler flags for WebAssembly builds"
+                  defaultChecked={this.props.settings?.enableCompilerOptions}
+                  onChange={(_, val) => {
+                    this.touchSettingsProperty({ enableCompilerOptions: val })
+                  }}
+                />
+              }
+            />
+            <SettingsProperty
               key="enableVimMode"
               title="Enable Vim Mode"
               control={

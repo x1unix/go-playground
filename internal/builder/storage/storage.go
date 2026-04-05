@@ -37,6 +37,12 @@ type StoreProvider interface {
 	// GetItem returns item by id
 	GetItem(id ArtifactID) (ReadCloseSizer, error)
 
+	// GetCompilerOutput returns cached compiler stderr for an artifact, if available.
+	GetCompilerOutput(id ArtifactID) (string, error)
+
+	// SetCompilerOutput stores compiler stderr for an artifact.
+	SetCompilerOutput(id ArtifactID, output string) error
+
 	// CreateWorkspace creates workspace entry in storage
 	CreateWorkspace(id ArtifactID, files map[string][]byte) (*Workspace, error)
 

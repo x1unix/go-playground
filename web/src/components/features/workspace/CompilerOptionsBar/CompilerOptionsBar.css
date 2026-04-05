@@ -1,0 +1,34 @@
+.CompilerOptionsBar {
+  border-bottom: 1px solid var(--compiler-options-border, #e1dfdd);
+  background: var(--compiler-options-bg, #f8f8f8);
+  padding: 0.35rem 0.75rem 0.45rem;
+  flex: 0 0 auto;
+}
+
+.CompilerOptionsBar__row {
+  width: 100%;
+}
+
+.CompilerOptionsBar__label {
+  flex: 0 0 auto;
+  color: var(--compiler-options-fg, #605e5c);
+  white-space: nowrap;
+  line-height: 1.1;
+}
+
+.CompilerOptionsBar__field {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .CompilerOptionsBar__row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .CompilerOptionsBar__label {
+    white-space: normal;
+  }
+}
