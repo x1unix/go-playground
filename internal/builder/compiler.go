@@ -116,8 +116,19 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte, opts B
 	}
 
 	if isCached {
-		s.log.Debug("build cached, returning cached file", zap.Stringer("artifact", aid))
-		return result, nil
+		compilerOutput, err := s.storage.GetCompilerOutput(aid)
+		if err != nil && !errors.Is(err, storage.ErrNotExists) {
+			s.log.Error("failed to read cached compiler output", zap.Stringer("artifact", aid), zap.Error(err))
+			return nil, err
+		}
+		if errors.Is(err, storage.ErrNotExists) && len(opts.CompilerOptions) > 0 {
+			s.log.Debug("cached artifact missing compiler output sidecar, rebuilding", zap.Stringer("artifact", aid))
+		} else {
+			result.CompilerOutput = compilerOutput
+			s.log.Debug("build cached, returning cached file", zap.Stringer("artifact", aid))
+			return result, nil
+		}
+
 	}
 
 	workspace, err := s.storage.CreateWorkspace(aid, files)
@@ -130,6 +141,15 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte, opts B
 	}
 
 	result.CompilerOutput, err = s.buildSource(ctx, projInfo, workspace, opts)
+	if err != nil {
+		return result, err
+	}
+
+	if err := s.storage.SetCompilerOutput(aid, result.CompilerOutput); err != nil {
+		s.log.Error("failed to store compiler output", zap.Stringer("artifact", aid), zap.Error(err))
+		return nil, err
+	}
+
 	return result, err
 }
 

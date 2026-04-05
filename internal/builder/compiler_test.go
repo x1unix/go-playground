@@ -30,6 +30,8 @@ func (ts *testReadCloser) Close() error {
 type testStorage struct {
 	hasItem         func(id storage.ArtifactID) (bool, error)
 	getItem         func(id storage.ArtifactID) (storage.ReadCloseSizer, error)
+	getCompilerOut  func(id storage.ArtifactID) (string, error)
+	setCompilerOut  func(id storage.ArtifactID, output string) error
 	createWorkspace func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error)
 	clean           func(ctx context.Context) error
 }
@@ -40,6 +42,22 @@ func (ts testStorage) HasItem(id storage.ArtifactID) (bool, error) {
 
 func (ts testStorage) GetItem(id storage.ArtifactID) (storage.ReadCloseSizer, error) {
 	return ts.getItem(id)
+}
+
+func (ts testStorage) GetCompilerOutput(id storage.ArtifactID) (string, error) {
+	if ts.getCompilerOut != nil {
+		return ts.getCompilerOut(id)
+	}
+
+	return "", storage.ErrNotExists
+}
+
+func (ts testStorage) SetCompilerOutput(id storage.ArtifactID, output string) error {
+	if ts.setCompilerOut != nil {
+		return ts.setCompilerOut(id, output)
+	}
+
+	return nil
 }
 
 func (ts testStorage) CreateWorkspace(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error) {
@@ -178,6 +196,10 @@ func TestBuildService_Build(t *testing.T) {
 					hasItem: func(id storage.ArtifactID) (bool, error) {
 						return false, nil
 					},
+					setCompilerOut: func(id storage.ArtifactID, output string) error {
+						require.Equal(t, "compiler diagnostics\n", output)
+						return nil
+					},
 					createWorkspace: func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error) {
 						return &storage.Workspace{
 							WorkDir:    "/tmp",
@@ -222,6 +244,13 @@ func TestBuildService_Build(t *testing.T) {
 						require.Equal(t, w, id)
 						return true, nil
 					},
+					getCompilerOut: func(id storage.ArtifactID) (string, error) {
+						w := mustArtifactID(t, files, BuildOptions{
+							CompilerOptions: []string{"-gcflags", "-m"},
+						})
+						require.Equal(t, w, id)
+						return "escape analysis\n", nil
+					},
 				}, nil
 			},
 			cmdRunner: func(t *testing.T, ctrl *gomock.Controller) CommandRunner {
@@ -229,7 +258,59 @@ func TestBuildService_Build(t *testing.T) {
 			},
 			wantResult: func(files map[string][]byte, options BuildOptions) *Result {
 				return &Result{
-					FileName: mustArtifactID(t, files, options).String() + ".wasm",
+					FileName:       mustArtifactID(t, files, options).String() + ".wasm",
+					CompilerOutput: "escape analysis\n",
+				}
+			},
+		},
+		"compiler options rebuild cached artifact when compiler output sidecar is missing": {
+			files: map[string][]byte{
+				"main.go": []byte("package main\nfunc main() {}\n"),
+				"go.mod":  []byte("module foo"),
+			},
+			options: BuildOptions{
+				CompilerOptions: []string{"-gcflags", "-m"},
+			},
+			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
+				return testStorage{
+					hasItem: func(id storage.ArtifactID) (bool, error) {
+						w := mustArtifactID(t, files, BuildOptions{
+							CompilerOptions: []string{"-gcflags", "-m"},
+						})
+						require.Equal(t, w, id)
+						return true, nil
+					},
+					getCompilerOut: func(id storage.ArtifactID) (string, error) {
+						return "", storage.ErrNotExists
+					},
+					setCompilerOut: func(id storage.ArtifactID, output string) error {
+						require.Equal(t, "escape analysis\n", output)
+						return nil
+					},
+					createWorkspace: func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error) {
+						return &storage.Workspace{
+							WorkDir:    "/tmp",
+							BinaryPath: "test.wasm",
+							Files:      nil,
+						}, nil
+					},
+				}, nil
+			},
+			cmdRunner: func(t *testing.T, ctrl *gomock.Controller) CommandRunner {
+				m := NewMockCommandRunner(ctrl)
+				m.EXPECT().RunCommand(testutil.MatchCommand("go", "mod", "tidy")).Return(nil)
+				m.EXPECT().
+					RunCommand(testutil.MatchCommand("go", "build", "-gcflags", "-m", "-o", "test.wasm", ".")).
+					DoAndReturn(func(cmd *exec.Cmd) error {
+						_, err := io.WriteString(cmd.Stderr, "escape analysis\n")
+						return err
+					})
+				return m
+			},
+			wantResult: func(files map[string][]byte, options BuildOptions) *Result {
+				return &Result{
+					FileName:       mustArtifactID(t, files, options).String() + ".wasm",
+					CompilerOutput: "escape analysis\n",
 				}
 			},
 		},
