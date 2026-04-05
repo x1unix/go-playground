@@ -94,12 +94,6 @@ const reducers = {
         events: [],
       }),
       [ActionType.EVAL_EVENT]: (s: StatusState, a: Action<EvalEvent>) => {
-        // if (a.payload.Kind === 'stderr') {
-        //   // Temporary breakpoint for compiler output debugging.
-        //   // eslint-disable-next-line no-debugger
-        //   debugger
-        // }
-
         return {
           lastError: null,
           loading: false,

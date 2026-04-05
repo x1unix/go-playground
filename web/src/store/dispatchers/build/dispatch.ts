@@ -124,7 +124,6 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
         break
       }
       case TargetType.WebAssembly: {
-        // debugger
         const compilerOptions = settings.enableCompilerOptions ? opts?.compilerOptions?.trim() || undefined : undefined
         const buildResponse = await client.build(files, compilerOptions)
         const hasCompilerOutput = Boolean(buildResponse.compilerOutput?.trim().length)
@@ -171,8 +170,6 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
               dispatch(newProgramFinishAction())
             })
           })
-
-        // debugger
         break
       }
       default:
