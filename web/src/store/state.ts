@@ -33,7 +33,6 @@ export interface SettingsState {
   useSystemTheme: boolean
   autoSave: boolean
   autoFormat: boolean
-  enableCompilerOptions: boolean
   enableVimMode: boolean
   goProxyUrl: string
 }

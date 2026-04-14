@@ -31,7 +31,6 @@ const initialSettingsState: SettingsState = {
   autoSave: config.autoSave,
   darkMode: config.darkThemeEnabled,
   autoFormat: true,
-  enableCompilerOptions: config.enableCompilerOptions,
   useSystemTheme: config.useSystemTheme,
   enableVimMode: config.enableVimMode,
   goProxyUrl: config.goProxyUrl,

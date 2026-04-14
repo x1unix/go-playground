@@ -33,16 +33,14 @@ export const CompilerOptionsBar: React.FC = () => {
   const dispatch = useDispatch()
   const theme = useTheme()
   const runTarget = useSelector(({ runTarget }: State) => runTarget)
-  const settings = useSelector(({ settings }: State) => settings)
   const status = useSelector(({ status }: State) => status)
 
   const isWasmMode = runTarget.target === TargetType.WebAssembly
-  const compilerOptionsEnabled = settings.enableCompilerOptions
   const compilerOptions = runTarget.opts?.compilerOptions ?? ''
 
   const textFieldStyles = useMemo(
-    () => createCompilerOptionsStyles(Boolean(status?.loading || status?.running || !compilerOptionsEnabled)),
-    [compilerOptionsEnabled, status?.loading, status?.running],
+    () => createCompilerOptionsStyles(Boolean(status?.loading || status?.running)),
+    [status?.loading, status?.running],
   )
 
   if (!isWasmMode) {
@@ -64,15 +62,12 @@ export const CompilerOptionsBar: React.FC = () => {
         <Text variant="small" className="CompilerOptionsBar__label">
           Compiler options
         </Text>
-        <div
-          className="CompilerOptionsBar__field"
-          title={compilerOptionsEnabled ? undefined : 'Enable Compiler Options in Settings to edit this field.'}
-        >
+        <div className="CompilerOptionsBar__field">
           <TextField
             value={compilerOptions}
-            disabled={Boolean(status?.loading || status?.running || !compilerOptionsEnabled)}
+            disabled={Boolean(status?.loading || status?.running)}
             styles={textFieldStyles}
-            placeholder={compilerOptionsEnabled ? `-gcflags='all=-N -l'` : `-gcflags='all=-N -l' (Enable in Settings)`}
+            placeholder={`-gcflags='all=-N -l'`}
             onChange={(_, value) => {
               dispatch(
                 newRunTargetChangeDispatcher({

@@ -124,7 +124,7 @@ export const runFileDispatcher: Dispatcher = async (dispatch: DispatchFn, getSta
         break
       }
       case TargetType.WebAssembly: {
-        const compilerOptions = settings.enableCompilerOptions ? opts?.compilerOptions?.trim() || undefined : undefined
+        const compilerOptions = opts?.compilerOptions?.trim() || undefined
         const buildResponse = await client.build(files, compilerOptions)
         const hasCompilerOutput = Boolean(buildResponse.compilerOutput?.trim().length)
 

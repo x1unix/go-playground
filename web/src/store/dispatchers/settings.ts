@@ -52,10 +52,6 @@ export const newSettingsChangeDispatcher =
       }
     }
 
-    if ('enableCompilerOptions' in changes) {
-      config.enableCompilerOptions = !!changes.enableCompilerOptions
-    }
-
     dispatch(newSettingsChangeAction(changes))
   }
 
