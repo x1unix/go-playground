@@ -21,6 +21,16 @@
   flex-direction: row;
   align-items: center;
   height: 100%;
+  min-width: 0;
+}
+
+.Header--left {
+  flex: 0 1 auto;
+}
+
+.Header--right {
+  flex: 1 1 auto;
+  justify-content: flex-end;
 }
 
 .Header--btn {
@@ -52,5 +62,9 @@
   .Header {
     --header-padding-x: 5px;
     --header-separator-margin: 0.15rem;
+  }
+
+  .Header--right {
+    overflow: hidden;
   }
 }

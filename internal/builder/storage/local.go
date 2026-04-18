@@ -99,6 +99,10 @@ func (s LocalStorage) getOutputLocation(id ArtifactID) string {
 	return filepath.Join(s.binDir, id.Ext(ExtWasm))
 }
 
+func (s LocalStorage) getCompilerOutputLocation(id ArtifactID) string {
+	return filepath.Join(s.binDir, id.Ext("stderr"))
+}
+
 // HasItem implements storage interface
 func (s LocalStorage) HasItem(id ArtifactID) (bool, error) {
 	s.useLock.Lock()
@@ -137,6 +141,41 @@ func (s LocalStorage) GetItem(id ArtifactID) (ReadCloseSizer, error) {
 		size:       stat.Size(),
 		useLock:    s.useLock,
 	}, err
+}
+
+// GetCompilerOutput implements storage interface
+func (s LocalStorage) GetCompilerOutput(id ArtifactID) (string, error) {
+	s.useLock.Lock()
+	defer s.useLock.Unlock()
+
+	data, err := os.ReadFile(s.getCompilerOutputLocation(id))
+	if os.IsNotExist(err) {
+		return "", ErrNotExists
+	}
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
+}
+
+// SetCompilerOutput implements storage interface
+func (s LocalStorage) SetCompilerOutput(id ArtifactID, output string) error {
+	s.useLock.Lock()
+	defer s.useLock.Unlock()
+
+	if err := os.MkdirAll(s.binDir, perm); err != nil && !os.IsExist(err) {
+		return fmt.Errorf("failed to create artifact directory: %w", err)
+	}
+
+	if output == "" {
+		if err := os.Remove(s.getCompilerOutputLocation(id)); err != nil && !os.IsNotExist(err) {
+			return err
+		}
+		return nil
+	}
+
+	return os.WriteFile(s.getCompilerOutputLocation(id), []byte(output), perm)
 }
 
 // CreateWorkspace implements storage interface

@@ -73,10 +73,10 @@ func fileSetFromRequest(r *http.Request) (*goplay.FileSet, []string, error) {
 	return payload, fileNames, nil
 }
 
-func buildFilesFromRequest(r *http.Request) (map[string][]byte, error) {
+func buildFilesFromRequest(r *http.Request) (map[string][]byte, string, error) {
 	body, err := filesPayloadFromRequest(r)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	files := make(map[string][]byte, len(body.Files))
@@ -84,7 +84,7 @@ func buildFilesFromRequest(r *http.Request) (map[string][]byte, error) {
 		files[name] = []byte(contents)
 	}
 
-	return files, nil
+	return files, body.CompilerOptions, nil
 }
 
 func filesPayloadFromRequest(r *http.Request) (*FilesPayload, error) {

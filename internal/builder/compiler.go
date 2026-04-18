@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"syscall"
 	"time"
 
@@ -30,6 +31,9 @@ var predefinedBuildVars = osutil.EnvironmentVariables{
 type Result struct {
 	// FileName is artifact file name
 	FileName string
+
+	// CompilerOutput is stderr output produced by the compiler.
+	CompilerOutput string
 
 	// IsTest indicates whether binary is a test file
 	IsTest bool
@@ -82,7 +86,7 @@ func (s BuildService) GetArtifact(id storage.ArtifactID) (storage.ReadCloseSizer
 }
 
 // Build compiles Go source to WASM and returns result
-func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Result, error) {
+func (s BuildService) Build(ctx context.Context, files map[string][]byte, opts BuildOptions) (*Result, error) {
 	projInfo, err := detectProjectType(files)
 	if err != nil {
 		return nil, err
@@ -93,7 +97,7 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Resu
 		files["go.mod"] = generateGoMod(defaultGoModName)
 	}
 
-	aid, err := storage.GetArtifactID(files)
+	aid, err := getArtifactID(files, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -112,9 +116,19 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Resu
 	}
 
 	if isCached {
-		// Just return precompiled result if data is cached already
-		s.log.Debug("build cached, returning cached file", zap.Stringer("artifact", aid))
-		return result, nil
+		compilerOutput, err := s.storage.GetCompilerOutput(aid)
+		if err != nil && !errors.Is(err, storage.ErrNotExists) {
+			s.log.Error("failed to read cached compiler output", zap.Stringer("artifact", aid), zap.Error(err))
+			return nil, err
+		}
+		if errors.Is(err, storage.ErrNotExists) && len(opts.CompilerOptions) > 0 {
+			s.log.Debug("cached artifact missing compiler output sidecar, rebuilding", zap.Stringer("artifact", aid))
+		} else {
+			result.CompilerOutput = compilerOutput
+			s.log.Debug("build cached, returning cached file", zap.Stringer("artifact", aid))
+			return result, nil
+		}
+
 	}
 
 	workspace, err := s.storage.CreateWorkspace(aid, files)
@@ -126,18 +140,30 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte) (*Resu
 		return nil, err
 	}
 
-	err = s.buildSource(ctx, projInfo, workspace)
+	result.CompilerOutput, err = s.buildSource(ctx, projInfo, workspace, opts)
+	if err != nil {
+		return result, err
+	}
+
+	if err := s.storage.SetCompilerOutput(aid, result.CompilerOutput); err != nil {
+		s.log.Error("failed to store compiler output", zap.Stringer("artifact", aid), zap.Error(err))
+		return nil, err
+	}
+
 	return result, err
 }
 
-func (s BuildService) buildSource(ctx context.Context, projInfo projectInfo, workspace *storage.Workspace) error {
+func (s BuildService) buildSource(ctx context.Context, projInfo projectInfo, workspace *storage.Workspace, opts BuildOptions) (string, error) {
 	// Populate go.mod and go.sum files.
-	if err := s.runGoTool(ctx, workspace.WorkDir, "mod", "tidy"); err != nil {
-		return err
+	if _, err := s.runGoTool(ctx, workspace.WorkDir, "mod", "tidy"); err != nil {
+		return "", err
 	}
 
 	if projInfo.projectType == projectTypeProgram {
-		return s.runGoTool(ctx, workspace.WorkDir, "build", "-o", workspace.BinaryPath, ".")
+		args := []string{"build"}
+		args = append(args, opts.CompilerOptions...)
+		args = append(args, "-o", workspace.BinaryPath, ".")
+		return s.runGoTool(ctx, workspace.WorkDir, args...)
 	}
 
 	args := []string{"test"}
@@ -148,8 +174,23 @@ func (s BuildService) buildSource(ctx context.Context, projInfo projectInfo, wor
 		args = append(args, "-fuzz=.")
 	}
 
+	args = append(args, opts.CompilerOptions...)
 	args = append(args, "-c", "-o", workspace.BinaryPath)
 	return s.runGoTool(ctx, workspace.WorkDir, args...)
+}
+
+func getArtifactID(files map[string][]byte, opts BuildOptions) (storage.ArtifactID, error) {
+	if len(opts.CompilerOptions) == 0 {
+		return storage.GetArtifactID(files)
+	}
+
+	entries := make(map[string][]byte, len(files)+1)
+	for name, contents := range files {
+		entries[name] = contents
+	}
+
+	entries[".goplay-compiler-options"] = []byte(strings.Join(opts.CompilerOptions, "\x00"))
+	return storage.GetArtifactID(entries)
 }
 
 func (s BuildService) handleNoSpaceLeft() {
@@ -165,16 +206,12 @@ func (s BuildService) handleNoSpaceLeft() {
 	}
 }
 
-func (s BuildService) runGoTool(ctx context.Context, workDir string, args ...string) error {
+func (s BuildService) runGoTool(ctx context.Context, workDir string, args ...string) (string, error) {
 	cmd := newGoToolCommand(ctx, args...)
 	cmd.Dir = workDir
 	cmd.Env = s.getEnvironmentVariables()
 	buff := &bytes.Buffer{}
 	cmd.Stderr = buff
-
-	s.log.Debug(
-		"starting go command", zap.Strings("command", cmd.Args), zap.Strings("env", cmd.Env),
-	)
 
 	if err := s.cmdRunner.RunCommand(cmd); err != nil {
 		s.log.Debug(
@@ -182,10 +219,10 @@ func (s BuildService) runGoTool(ctx context.Context, workDir string, args ...str
 			zap.Error(err), zap.Strings("cmd", cmd.Args), zap.Stringer("stderr", buff),
 		)
 
-		return formatBuildError(ctx, err, buff)
+		return "", formatBuildError(ctx, err, buff)
 	}
 
-	return nil
+	return buff.String(), nil
 }
 
 // CleanJobName implements' builder.Cleaner interface.

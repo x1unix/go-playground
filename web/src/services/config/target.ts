@@ -1,5 +1,9 @@
 import { type Backend } from '~/services/api'
 
+export interface RunTargetOptions {
+  compilerOptions?: string
+}
+
 /**
  * Go program run configuration
  */
@@ -15,9 +19,9 @@ export interface RunTargetConfig {
   backend?: Backend
 
   /**
-   * Additional options, currently unused
+   * Additional options for a selected execution target.
    */
-  opts?: any
+  opts?: RunTargetOptions
 }
 
 /**
