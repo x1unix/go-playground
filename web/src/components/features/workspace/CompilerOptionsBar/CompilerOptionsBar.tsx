@@ -1,14 +1,13 @@
-import React, { useMemo } from 'react'
-import { Stack, Text, TextField, getTheme, useTheme, type ITextFieldStyles } from '@fluentui/react'
+import React, { useMemo, useState } from 'react'
+import { Stack, Text, TextField, useTheme, type ITextFieldStyles, type ITheme } from '@fluentui/react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { TargetType } from '~/services/config'
 import { type State, newRunTargetChangeDispatcher } from '~/store'
+import { getStyles } from './styles'
 
-import './CompilerOptionsBar.css'
-
-const createCompilerOptionsStyles = (isDisabled: boolean): Partial<ITextFieldStyles> => {
-  const { palette } = getTheme()
+const createTextFieldStyles = (theme: ITheme, isDisabled: boolean): Partial<ITextFieldStyles> => {
+  const { palette } = theme
   return {
     root: {
       width: '100%',
@@ -36,45 +35,37 @@ export const CompilerOptionsBar: React.FC = () => {
   const status = useSelector(({ status }: State) => status)
 
   const isWasmMode = runTarget.target === TargetType.WebAssembly
-  const compilerOptions = runTarget.opts?.compilerOptions ?? ''
+  const isDisabled = Boolean(status?.loading || status?.running)
 
-  const textFieldStyles = useMemo(
-    () => createCompilerOptionsStyles(Boolean(status?.loading || status?.running)),
-    [status?.loading, status?.running],
-  )
+  const [compilerOptions, setCompilerOptions] = useState(runTarget.opts?.compilerOptions ?? '')
+
+  const styles = useMemo(() => getStyles(theme), [theme])
+  const textFieldStyles = useMemo(() => createTextFieldStyles(theme, isDisabled), [theme, isDisabled])
 
   if (!isWasmMode) {
     return null
   }
 
   return (
-    <div
-      className="CompilerOptionsBar"
-      style={
-        {
-          '--compiler-options-border': theme.semanticColors.disabledBorder,
-          '--compiler-options-bg': theme.palette.neutralLighterAlt,
-          '--compiler-options-fg': theme.semanticColors.bodySubtext,
-        } as React.CSSProperties
-      }
-    >
-      <Stack horizontal verticalAlign="center" tokens={{ childrenGap: '.5rem' }} className="CompilerOptionsBar__row">
-        <Text variant="small" className="CompilerOptionsBar__label">
+    <Stack className={styles.root}>
+      <Stack horizontal verticalAlign="center" tokens={{ childrenGap: '.5rem' }} className={styles.row}>
+        <Text variant="small" className={styles.label}>
           Compiler options
         </Text>
-        <div className="CompilerOptionsBar__field">
+        <div className={styles.field}>
           <TextField
             value={compilerOptions}
-            disabled={Boolean(status?.loading || status?.running)}
+            disabled={isDisabled}
             styles={textFieldStyles}
             placeholder={`-gcflags='all=-N -l'`}
-            onChange={(_, value) => {
+            onChange={(_, value) => setCompilerOptions(value ?? '')}
+            onBlur={() => {
               dispatch(
                 newRunTargetChangeDispatcher({
                   ...runTarget,
                   opts: {
                     ...runTarget.opts,
-                    compilerOptions: value ?? '',
+                    compilerOptions,
                   },
                 }),
               )
@@ -82,6 +73,6 @@ export const CompilerOptionsBar: React.FC = () => {
           />
         </div>
       </Stack>
-    </div>
+    </Stack>
   )
 }

@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strings"
 	"syscall"
 	"time"
 
@@ -97,7 +96,7 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte, opts B
 		files["go.mod"] = generateGoMod(defaultGoModName)
 	}
 
-	aid, err := getArtifactID(files, opts)
+	aid, err := storage.GetArtifactID(files, opts.CompilerOptions...)
 	if err != nil {
 		return nil, err
 	}
@@ -179,19 +178,6 @@ func (s BuildService) buildSource(ctx context.Context, projInfo projectInfo, wor
 	return s.runGoTool(ctx, workspace.WorkDir, args...)
 }
 
-func getArtifactID(files map[string][]byte, opts BuildOptions) (storage.ArtifactID, error) {
-	if len(opts.CompilerOptions) == 0 {
-		return storage.GetArtifactID(files)
-	}
-
-	entries := make(map[string][]byte, len(files)+1)
-	for name, contents := range files {
-		entries[name] = contents
-	}
-
-	entries[".goplay-compiler-options"] = []byte(strings.Join(opts.CompilerOptions, "\x00"))
-	return storage.GetArtifactID(entries)
-}
 
 func (s BuildService) handleNoSpaceLeft() {
 	s.log.Warn("no space left on device, immediate clean triggered!")

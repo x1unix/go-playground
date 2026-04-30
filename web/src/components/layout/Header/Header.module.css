@@ -63,8 +63,4 @@
     --header-padding-x: 5px;
     --header-separator-margin: 0.15rem;
   }
-
-  .Header--right {
-    overflow: hidden;
-  }
 }

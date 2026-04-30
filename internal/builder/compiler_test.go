@@ -573,7 +573,7 @@ func TestBuildService_getEnvironmentVariables(t *testing.T) {
 
 func mustArtifactID(t *testing.T, files map[string][]byte, opts BuildOptions) storage.ArtifactID {
 	t.Helper()
-	a, err := getArtifactID(files, opts)
+	a, err := storage.GetArtifactID(files, opts.CompilerOptions...)
 	require.NoError(t, err)
 	return a
 }
