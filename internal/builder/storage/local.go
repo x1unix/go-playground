@@ -103,21 +103,39 @@ func (s LocalStorage) getCompilerOutputLocation(id ArtifactID) string {
 	return filepath.Join(s.binDir, id.Ext("stderr"))
 }
 
-// HasItem implements storage interface
+// HasItem checks if an artifact binary exists.
 func (s LocalStorage) HasItem(id ArtifactID) (bool, error) {
-	s.useLock.Lock()
-	defer s.useLock.Unlock()
-	fPath := s.getOutputLocation(id)
-	_, err := os.Stat(fPath)
+	_, err := os.Stat(s.getOutputLocation(id))
 	if err != nil {
 		if os.IsNotExist(err) {
 			return false, nil
 		}
-
 		return false, err
 	}
-
 	return true, nil
+}
+
+// GetCachedArtifact implements storage interface.
+func (s LocalStorage) GetCachedArtifact(id ArtifactID) (string, bool, error) {
+	s.useLock.Lock()
+	defer s.useLock.Unlock()
+
+	if _, err := os.Stat(s.getOutputLocation(id)); err != nil {
+		if os.IsNotExist(err) {
+			return "", false, nil
+		}
+		return "", false, err
+	}
+
+	data, err := os.ReadFile(s.getCompilerOutputLocation(id))
+	if os.IsNotExist(err) {
+		return "", true, nil
+	}
+	if err != nil {
+		return "", false, err
+	}
+
+	return string(data), true, nil
 }
 
 // GetItem implements storage interface

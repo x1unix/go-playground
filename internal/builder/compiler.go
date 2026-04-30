@@ -108,26 +108,20 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte, opts B
 		HasFuzz:      projInfo.hasFuzz,
 	}
 
-	isCached, err := s.storage.HasItem(aid)
+	compilerOutput, isCached, err := s.storage.GetCachedArtifact(aid)
 	if err != nil {
 		s.log.Error("failed to check cache", zap.Stringer("artifact", aid), zap.Error(err))
 		return nil, err
 	}
 
 	if isCached {
-		compilerOutput, err := s.storage.GetCompilerOutput(aid)
-		if err != nil && !errors.Is(err, storage.ErrNotExists) {
-			s.log.Error("failed to read cached compiler output", zap.Stringer("artifact", aid), zap.Error(err))
-			return nil, err
-		}
-		if errors.Is(err, storage.ErrNotExists) && len(opts.CompilerOptions) > 0 {
+		if compilerOutput == "" && len(opts.CompilerOptions) > 0 {
 			s.log.Debug("cached artifact missing compiler output sidecar, rebuilding", zap.Stringer("artifact", aid))
 		} else {
 			result.CompilerOutput = compilerOutput
 			s.log.Debug("build cached, returning cached file", zap.Stringer("artifact", aid))
 			return result, nil
 		}
-
 	}
 
 	workspace, err := s.storage.CreateWorkspace(aid, files)

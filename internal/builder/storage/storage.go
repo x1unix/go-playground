@@ -31,14 +31,12 @@ type ReadCloseSizer interface {
 
 // StoreProvider is abstract artifact storage
 type StoreProvider interface {
-	// HasItem checks if item exists
-	HasItem(id ArtifactID) (bool, error)
+	// GetCachedArtifact checks if an artifact exists and returns its cached compiler output.
+	// Returns ("", false, nil) on cache miss; ("", true, nil) if cached but no compiler output sidecar.
+	GetCachedArtifact(id ArtifactID) (string, bool, error)
 
 	// GetItem returns item by id
 	GetItem(id ArtifactID) (ReadCloseSizer, error)
-
-	// GetCompilerOutput returns cached compiler stderr for an artifact, if available.
-	GetCompilerOutput(id ArtifactID) (string, error)
 
 	// SetCompilerOutput stores compiler stderr for an artifact.
 	SetCompilerOutput(id ArtifactID, output string) error
