@@ -9010,7 +9010,7 @@ __metadata:
     redux-thunk: "npm:^2.4.1"
     typescript: "npm:5.9.3"
     util: "npm:^0.12.4"
-    uuid: "npm:^3.4.0"
+    uuid: "npm:^14.0.0"
     vite: "npm:^6.4.2"
     vite-plugin-html: "npm:^3.2.2"
     vite-plugin-node-polyfills: "npm:^0.19.0"
@@ -9199,12 +9199,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^3.4.0":
-  version: 3.4.0
-  resolution: "uuid@npm:3.4.0"
+"uuid@npm:^14.0.0":
+  version: 14.0.0
+  resolution: "uuid@npm:14.0.0"
   bin:
-    uuid: ./bin/uuid
-  checksum: 10c0/1c13950df865c4f506ebfe0a24023571fa80edf2e62364297a537c80af09c618299797bbf2dbac6b1f8ae5ad182ba474b89db61e0e85839683991f7e08795347
+    uuid: dist-node/bin/uuid
+  checksum: 10c0/a57ae7794c45005c1a9208989196c5baf79a7679c30f43c1bee9033a2c4d113a2cea216fa6fcc9663b08b0d55635df1a7c6eb7e7f3d21c3e50688c698fa39a50
   languageName: node
   linkType: hard
 
