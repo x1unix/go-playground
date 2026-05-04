@@ -36,6 +36,8 @@ import apiClient, { type VersionsInfo } from '~/services/api'
 import classes from './Header.module.css'
 
 enum MenuActionType {
+  Format,
+  ShowExamples,
   ShowSettings,
   ShowAbout,
   ToggleTheme,
@@ -191,6 +193,14 @@ export const Header = () => {
 
   const onMenuItemClick = (cmd: MenuActionType) => {
     switch (cmd) {
+      case MenuActionType.Format: {
+        dispatch(dispatchFormatFile())
+        return
+      }
+      case MenuActionType.ShowExamples: {
+        setModalStates({ showExamples: true })
+        return
+      }
       case MenuActionType.ToggleTheme: {
         dispatch(dispatchToggleTheme)
         return
@@ -205,6 +215,10 @@ export const Header = () => {
       }
     }
   }
+
+  const compactMenuItems: IContextualMenuItem[] = useMemo(() => {
+    return [...asideMenuItems]
+  }, [asideMenuItems])
 
   // Modal handlers
   const onSettingsClose = useCallback(
@@ -293,7 +307,7 @@ export const Header = () => {
               iconProps={{ iconName: 'More' }}
               styles={{ menuIcon: { display: 'none' }, icon: { color: theme.semanticColors.bodyText } }}
               menuProps={{
-                items: asideMenuItems,
+                items: compactMenuItems,
                 onItemClick: (_, item) => {
                   if (item) {
                     onMenuItemClick(item.data as MenuActionType)
