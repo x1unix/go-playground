@@ -2,6 +2,7 @@
   flex: 1 1 auto;
   position: relative;
   box-sizing: border-box;
+  overscroll-behavior-y: contain;
 
   --terminal-padding-x: 15px;
 }
@@ -9,6 +10,12 @@
 .app-Console__xterm {
   position: absolute;
   inset: 0;
+}
+
+.app-Console .xterm-viewport {
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 /** Fix white background in viewport **/

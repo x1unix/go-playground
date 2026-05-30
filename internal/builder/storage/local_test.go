@@ -69,6 +69,7 @@ func TestLocalStorage_GetItem(t *testing.T) {
 
 	binData := []byte("TEST")
 	require.NoError(t, os.WriteFile(workspace.BinaryPath, binData, perm), "binary path not writable")
+	require.NoError(t, s.SetCompilerOutput(aid, "escape analysis\n"))
 
 	// Try to get item from storage
 	has, err := s.HasItem(aid)
@@ -82,11 +83,18 @@ func TestLocalStorage_GetItem(t *testing.T) {
 	require.NoError(t, err, "can't read back bin data")
 	r.Equal(binData, gotBinData, "bin data mismatch")
 
+	compilerOutput, err := s.GetCompilerOutput(aid)
+	require.NoError(t, err)
+	require.Equal(t, "escape analysis\n", compilerOutput)
+
 	// Trash collector should clean all our garbage after some time
 	require.NoError(t, s.Clean(ctx))
 	r.False(s.dirty.IsSet(), "storage is still dirty after cleanup")
 	_, err = s.GetItem(aid)
 	r.Error(err, "test item was not removed after cleanup")
+	r.EqualError(err, ErrNotExists.Error(), "should return ErrNotExists")
+	_, err = s.GetCompilerOutput(aid)
+	r.Error(err, "test compiler output was not removed after cleanup")
 	r.EqualError(err, ErrNotExists.Error(), "should return ErrNotExists")
 	cancelFunc()
 
