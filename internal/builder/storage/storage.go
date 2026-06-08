@@ -29,17 +29,20 @@ type ReadCloseSizer interface {
 	Size() int64
 }
 
+// Artifact is a cached build artifact containing the binary and compiler output.
+type Artifact struct {
+	Contents       ReadCloseSizer
+	CompilerOutput []byte
+}
+
 // StoreProvider is abstract artifact storage
 type StoreProvider interface {
-	// GetCachedArtifact checks if an artifact exists and returns its cached compiler output.
-	// Returns ("", false, nil) on cache miss; ("", true, nil) if cached but no compiler output sidecar.
-	GetCachedArtifact(id ArtifactID) (string, bool, error)
+	// GetArtifact returns a cached artifact by id.
+	// Returns ErrNotExists if the artifact is not in cache.
+	GetArtifact(id ArtifactID) (*Artifact, error)
 
-	// GetItem returns item by id
-	GetItem(id ArtifactID) (ReadCloseSizer, error)
-
-	// SetCompilerOutput stores compiler stderr for an artifact.
-	SetCompilerOutput(id ArtifactID, output string) error
+	// SetArtifact stores artifact metadata for an id.
+	SetArtifact(id ArtifactID, e *Artifact) error
 
 	// CreateWorkspace creates workspace entry in storage
 	CreateWorkspace(id ArtifactID, files map[string][]byte) (*Workspace, error)

@@ -103,49 +103,17 @@ func (s LocalStorage) getCompilerOutputLocation(id ArtifactID) string {
 	return filepath.Join(s.binDir, id.Ext("stderr"))
 }
 
-// HasItem checks if an artifact binary exists.
-func (s LocalStorage) HasItem(id ArtifactID) (bool, error) {
-	_, err := os.Stat(s.getOutputLocation(id))
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false, nil
-		}
-		return false, err
-	}
-	return true, nil
-}
-
-// GetCachedArtifact implements storage interface.
-func (s LocalStorage) GetCachedArtifact(id ArtifactID) (string, bool, error) {
+// GetArtifact implements StoreProvider interface.
+func (s LocalStorage) GetArtifact(id ArtifactID) (*Artifact, error) {
 	s.useLock.Lock()
 	defer s.useLock.Unlock()
 
-	if _, err := os.Stat(s.getOutputLocation(id)); err != nil {
-		if os.IsNotExist(err) {
-			return "", false, nil
-		}
-		return "", false, err
-	}
-
-	data, err := os.ReadFile(s.getCompilerOutputLocation(id))
-	if os.IsNotExist(err) {
-		return "", true, nil
-	}
-	if err != nil {
-		return "", false, err
-	}
-
-	return string(data), true, nil
-}
-
-// GetItem implements storage interface
-func (s LocalStorage) GetItem(id ArtifactID) (ReadCloseSizer, error) {
-	s.useLock.Lock()
-	defer s.useLock.Unlock()
-	fPath := s.getOutputLocation(id)
-	f, err := os.Open(fPath)
+	f, err := os.Open(s.getOutputLocation(id))
 	if os.IsNotExist(err) {
 		return nil, ErrNotExists
+	}
+	if err != nil {
+		return nil, err
 	}
 
 	stat, err := f.Stat()
@@ -154,31 +122,24 @@ func (s LocalStorage) GetItem(id ArtifactID) (ReadCloseSizer, error) {
 		return nil, err
 	}
 
-	return cachedFile{
-		ReadCloser: f,
-		size:       stat.Size(),
-		useLock:    s.useLock,
-	}, err
-}
-
-// GetCompilerOutput implements storage interface
-func (s LocalStorage) GetCompilerOutput(id ArtifactID) (string, error) {
-	s.useLock.Lock()
-	defer s.useLock.Unlock()
-
 	data, err := os.ReadFile(s.getCompilerOutputLocation(id))
-	if os.IsNotExist(err) {
-		return "", ErrNotExists
-	}
-	if err != nil {
-		return "", err
+	if err != nil && !os.IsNotExist(err) {
+		_ = f.Close()
+		return nil, err
 	}
 
-	return string(data), nil
+	return &Artifact{
+		Contents: cachedFile{
+			ReadCloser: f,
+			size:       stat.Size(),
+			useLock:    s.useLock,
+		},
+		CompilerOutput: data,
+	}, nil
 }
 
-// SetCompilerOutput implements storage interface
-func (s LocalStorage) SetCompilerOutput(id ArtifactID, output string) error {
+// SetArtifact implements StoreProvider interface.
+func (s LocalStorage) SetArtifact(id ArtifactID, e *Artifact) error {
 	s.useLock.Lock()
 	defer s.useLock.Unlock()
 
@@ -186,14 +147,14 @@ func (s LocalStorage) SetCompilerOutput(id ArtifactID, output string) error {
 		return fmt.Errorf("failed to create artifact directory: %w", err)
 	}
 
-	if output == "" {
+	if len(e.CompilerOutput) == 0 {
 		if err := os.Remove(s.getCompilerOutputLocation(id)); err != nil && !os.IsNotExist(err) {
 			return err
 		}
 		return nil
 	}
 
-	return os.WriteFile(s.getCompilerOutputLocation(id), []byte(output), perm)
+	return os.WriteFile(s.getCompilerOutputLocation(id), e.CompilerOutput, perm)
 }
 
 // CreateWorkspace implements storage interface

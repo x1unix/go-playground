@@ -81,7 +81,11 @@ func (s BuildService) getEnvironmentVariables() []string {
 
 // GetArtifact returns artifact by id
 func (s BuildService) GetArtifact(id storage.ArtifactID) (storage.ReadCloseSizer, error) {
-	return s.storage.GetItem(id)
+	artifact, err := s.storage.GetArtifact(id)
+	if err != nil {
+		return nil, err
+	}
+	return artifact.Contents, nil
 }
 
 // Build compiles Go source to WASM and returns result
@@ -108,13 +112,15 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte, opts B
 		HasFuzz:      projInfo.hasFuzz,
 	}
 
-	compilerOutput, isCached, err := s.storage.GetCachedArtifact(aid)
-	if err != nil {
+	cached, err := s.storage.GetArtifact(aid)
+	if err != nil && !errors.Is(err, storage.ErrNotExists) {
 		s.log.Error("failed to check cache", zap.Stringer("artifact", aid), zap.Error(err))
 		return nil, err
 	}
 
-	if isCached {
+	if cached != nil {
+		compilerOutput := string(cached.CompilerOutput)
+		_ = cached.Contents.Close()
 		if compilerOutput == "" && len(opts.CompilerOptions) > 0 {
 			s.log.Debug("cached artifact missing compiler output sidecar, rebuilding", zap.Stringer("artifact", aid))
 		} else {
@@ -138,7 +144,9 @@ func (s BuildService) Build(ctx context.Context, files map[string][]byte, opts B
 		return result, err
 	}
 
-	if err := s.storage.SetCompilerOutput(aid, result.CompilerOutput); err != nil {
+	if err := s.storage.SetArtifact(aid, &storage.Artifact{
+		CompilerOutput: []byte(result.CompilerOutput),
+	}); err != nil {
 		s.log.Error("failed to store compiler output", zap.Stringer("artifact", aid), zap.Error(err))
 		return nil, err
 	}

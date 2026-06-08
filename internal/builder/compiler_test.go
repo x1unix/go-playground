@@ -28,29 +28,23 @@ func (ts *testReadCloser) Close() error {
 }
 
 type testStorage struct {
-	getCachedArtifact func(id storage.ArtifactID) (string, bool, error)
-	getItem           func(id storage.ArtifactID) (storage.ReadCloseSizer, error)
-	setCompilerOut    func(id storage.ArtifactID, output string) error
-	createWorkspace   func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error)
-	clean             func(ctx context.Context) error
+	getArtifact     func(id storage.ArtifactID) (*storage.Artifact, error)
+	setArtifact     func(id storage.ArtifactID, e *storage.Artifact) error
+	createWorkspace func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error)
+	clean           func(ctx context.Context) error
 }
 
-func (ts testStorage) GetCachedArtifact(id storage.ArtifactID) (string, bool, error) {
-	if ts.getCachedArtifact != nil {
-		return ts.getCachedArtifact(id)
+func (ts testStorage) GetArtifact(id storage.ArtifactID) (*storage.Artifact, error) {
+	if ts.getArtifact != nil {
+		return ts.getArtifact(id)
 	}
-	return "", false, nil
+	return nil, storage.ErrNotExists
 }
 
-func (ts testStorage) GetItem(id storage.ArtifactID) (storage.ReadCloseSizer, error) {
-	return ts.getItem(id)
-}
-
-func (ts testStorage) SetCompilerOutput(id storage.ArtifactID, output string) error {
-	if ts.setCompilerOut != nil {
-		return ts.setCompilerOut(id, output)
+func (ts testStorage) SetArtifact(id storage.ArtifactID, e *storage.Artifact) error {
+	if ts.setArtifact != nil {
+		return ts.setArtifact(id, e)
 	}
-
 	return nil
 }
 
@@ -76,9 +70,9 @@ func TestBuildService_GetArtifact(t *testing.T) {
 			artifactID: "test",
 			beforeRun: func(t *testing.T) storage.StoreProvider {
 				return testStorage{
-					getItem: func(id storage.ArtifactID) (storage.ReadCloseSizer, error) {
+					getArtifact: func(id storage.ArtifactID) (*storage.Artifact, error) {
 						require.Equal(t, "test", string(id))
-						return &testReadCloser{}, nil
+						return &storage.Artifact{Contents: &testReadCloser{}}, nil
 					},
 				}
 			},
@@ -88,7 +82,7 @@ func TestBuildService_GetArtifact(t *testing.T) {
 			wantErr:    "test error",
 			beforeRun: func(t *testing.T) storage.StoreProvider {
 				return testStorage{
-					getItem: func(id storage.ArtifactID) (storage.ReadCloseSizer, error) {
+					getArtifact: func(id storage.ArtifactID) (*storage.Artifact, error) {
 						require.Equal(t, "foobar", string(id))
 						return nil, errors.New("test error")
 					},
@@ -135,8 +129,8 @@ func TestBuildService_Build(t *testing.T) {
 			},
 			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
 				return testStorage{
-					getCachedArtifact: func(id storage.ArtifactID) (string, bool, error) {
-						return "", false, errors.New("test error")
+					getArtifact: func(id storage.ArtifactID) (*storage.Artifact, error) {
+						return nil, errors.New("test error")
 					},
 				}, nil
 			},
@@ -152,10 +146,10 @@ func TestBuildService_Build(t *testing.T) {
 			},
 			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
 				return testStorage{
-					getCachedArtifact: func(id storage.ArtifactID) (string, bool, error) {
+					getArtifact: func(id storage.ArtifactID) (*storage.Artifact, error) {
 						w := mustArtifactID(t, files, BuildOptions{})
 						require.Equal(t, w, id)
-						return "", true, nil
+						return &storage.Artifact{Contents: &testReadCloser{}}, nil
 					},
 				}, nil
 			},
@@ -187,8 +181,8 @@ func TestBuildService_Build(t *testing.T) {
 			},
 			store: func(t *testing.T, _ map[string][]byte) (storage.StoreProvider, func() error) {
 				return testStorage{
-					setCompilerOut: func(id storage.ArtifactID, output string) error {
-						require.Equal(t, "compiler diagnostics\n", output)
+					setArtifact: func(id storage.ArtifactID, e *storage.Artifact) error {
+						require.Equal(t, "compiler diagnostics\n", string(e.CompilerOutput))
 						return nil
 					},
 					createWorkspace: func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error) {
@@ -228,12 +222,15 @@ func TestBuildService_Build(t *testing.T) {
 			},
 			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
 				return testStorage{
-					getCachedArtifact: func(id storage.ArtifactID) (string, bool, error) {
+					getArtifact: func(id storage.ArtifactID) (*storage.Artifact, error) {
 						w := mustArtifactID(t, files, BuildOptions{
 							CompilerOptions: []string{"-gcflags", "-m"},
 						})
 						require.Equal(t, w, id)
-						return "escape analysis\n", true, nil
+						return &storage.Artifact{
+							Contents:       &testReadCloser{},
+							CompilerOutput: []byte("escape analysis\n"),
+						}, nil
 					},
 				}, nil
 			},
@@ -257,15 +254,15 @@ func TestBuildService_Build(t *testing.T) {
 			},
 			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
 				return testStorage{
-					getCachedArtifact: func(id storage.ArtifactID) (string, bool, error) {
+					getArtifact: func(id storage.ArtifactID) (*storage.Artifact, error) {
 						w := mustArtifactID(t, files, BuildOptions{
 							CompilerOptions: []string{"-gcflags", "-m"},
 						})
 						require.Equal(t, w, id)
-						return "", true, nil
+						return &storage.Artifact{Contents: &testReadCloser{}}, nil
 					},
-					setCompilerOut: func(id storage.ArtifactID, output string) error {
-						require.Equal(t, "escape analysis\n", output)
+					setArtifact: func(id storage.ArtifactID, e *storage.Artifact) error {
+						require.Equal(t, "escape analysis\n", string(e.CompilerOutput))
 						return nil
 					},
 					createWorkspace: func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error) {
