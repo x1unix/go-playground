@@ -93,7 +93,7 @@
     "vite-plugin-static-copy": "^2.3.2",
     "vite-plugin-svgr": "^4.2.0",
     "vite-tsconfig-paths": "^4.3.1",
-    "vitest": "^2.1.9",
+    "vitest": "^3.2.6",
     "vscode-languageserver-protocol": "^3.17.5",
     "web-vitals": "^2.1.4",
     "workbox-background-sync": "^6.5.4",
