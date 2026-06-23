@@ -3,8 +3,10 @@ package builder
 import (
 	"context"
 	"errors"
+	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"strings"
 	"syscall"
 	"testing"
@@ -26,18 +28,24 @@ func (ts *testReadCloser) Close() error {
 }
 
 type testStorage struct {
-	hasItem         func(id storage.ArtifactID) (bool, error)
-	getItem         func(id storage.ArtifactID) (storage.ReadCloseSizer, error)
+	getArtifact     func(id storage.ArtifactID) (*storage.Artifact, error)
+	setArtifact     func(id storage.ArtifactID, e *storage.Artifact) error
 	createWorkspace func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error)
 	clean           func(ctx context.Context) error
 }
 
-func (ts testStorage) HasItem(id storage.ArtifactID) (bool, error) {
-	return ts.hasItem(id)
+func (ts testStorage) GetArtifact(id storage.ArtifactID) (*storage.Artifact, error) {
+	if ts.getArtifact != nil {
+		return ts.getArtifact(id)
+	}
+	return nil, storage.ErrNotExists
 }
 
-func (ts testStorage) GetItem(id storage.ArtifactID) (storage.ReadCloseSizer, error) {
-	return ts.getItem(id)
+func (ts testStorage) SetArtifact(id storage.ArtifactID, e *storage.Artifact) error {
+	if ts.setArtifact != nil {
+		return ts.setArtifact(id, e)
+	}
+	return nil
 }
 
 func (ts testStorage) CreateWorkspace(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error) {
@@ -62,9 +70,9 @@ func TestBuildService_GetArtifact(t *testing.T) {
 			artifactID: "test",
 			beforeRun: func(t *testing.T) storage.StoreProvider {
 				return testStorage{
-					getItem: func(id storage.ArtifactID) (storage.ReadCloseSizer, error) {
+					getArtifact: func(id storage.ArtifactID) (*storage.Artifact, error) {
 						require.Equal(t, "test", string(id))
-						return &testReadCloser{}, nil
+						return &storage.Artifact{Contents: &testReadCloser{}}, nil
 					},
 				}
 			},
@@ -74,7 +82,7 @@ func TestBuildService_GetArtifact(t *testing.T) {
 			wantErr:    "test error",
 			beforeRun: func(t *testing.T) storage.StoreProvider {
 				return testStorage{
-					getItem: func(id storage.ArtifactID) (storage.ReadCloseSizer, error) {
+					getArtifact: func(id storage.ArtifactID) (*storage.Artifact, error) {
 						require.Equal(t, "foobar", string(id))
 						return nil, errors.New("test error")
 					},
@@ -106,9 +114,10 @@ func TestBuildService_Build(t *testing.T) {
 	cases := map[string]struct {
 		skip         bool
 		files        map[string][]byte
+		options      BuildOptions
 		cmdRunner    func(t *testing.T, ctrl *gomock.Controller) CommandRunner
 		wantErr      string
-		wantResult   func(files map[string][]byte) *Result
+		wantResult   func(files map[string][]byte, options BuildOptions) *Result
 		beforeRun    func(t *testing.T)
 		onErrorCheck func(t *testing.T, err error)
 		store        func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error)
@@ -120,8 +129,8 @@ func TestBuildService_Build(t *testing.T) {
 			},
 			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
 				return testStorage{
-					hasItem: func(id storage.ArtifactID) (bool, error) {
-						return false, errors.New("test error")
+					getArtifact: func(id storage.ArtifactID) (*storage.Artifact, error) {
+						return nil, errors.New("test error")
 					},
 				}, nil
 			},
@@ -130,17 +139,17 @@ func TestBuildService_Build(t *testing.T) {
 			files: map[string][]byte{
 				"file.go": []byte("test"),
 			},
-			wantResult: func(files map[string][]byte) *Result {
+			wantResult: func(files map[string][]byte, _ BuildOptions) *Result {
 				return &Result{
-					FileName: mustArtifactID(t, files).String() + ".wasm",
+					FileName: mustArtifactID(t, files, BuildOptions{}).String() + ".wasm",
 				}
 			},
 			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
 				return testStorage{
-					hasItem: func(id storage.ArtifactID) (bool, error) {
-						w := mustArtifactID(t, files)
+					getArtifact: func(id storage.ArtifactID) (*storage.Artifact, error) {
+						w := mustArtifactID(t, files, BuildOptions{})
 						require.Equal(t, w, id)
-						return true, nil
+						return &storage.Artifact{Contents: &testReadCloser{}}, nil
 					},
 				}, nil
 			},
@@ -160,6 +169,127 @@ func TestBuildService_Build(t *testing.T) {
 			onErrorCheck: func(t *testing.T, err error) {
 				_, ok := err.(*BuildError)
 				require.True(t, ok, "expected compiler error")
+			},
+		},
+		"program build exposes compiler output": {
+			files: map[string][]byte{
+				"main.go": []byte("package main\nfunc main() {}\n"),
+				"go.mod":  []byte("module foo"),
+			},
+			options: BuildOptions{
+				CompilerOptions: []string{"-gcflags", "all=-N -l", "-trimpath"},
+			},
+			store: func(t *testing.T, _ map[string][]byte) (storage.StoreProvider, func() error) {
+				return testStorage{
+					setArtifact: func(id storage.ArtifactID, e *storage.Artifact) error {
+						require.Equal(t, "compiler diagnostics\n", string(e.CompilerOutput))
+						return nil
+					},
+					createWorkspace: func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error) {
+						return &storage.Workspace{
+							WorkDir:    "/tmp",
+							BinaryPath: "test.wasm",
+							Files:      nil,
+						}, nil
+					},
+				}, nil
+			},
+			cmdRunner: func(t *testing.T, ctrl *gomock.Controller) CommandRunner {
+				m := NewMockCommandRunner(ctrl)
+				m.EXPECT().RunCommand(testutil.MatchCommand("go", "mod", "tidy")).Return(nil)
+				m.EXPECT().
+					RunCommand(testutil.MatchCommand("go", "build", "-gcflags", "all=-N -l", "-trimpath", "-o", "test.wasm", ".")).
+					DoAndReturn(func(cmd *exec.Cmd) error {
+						_, err := io.WriteString(cmd.Stderr, "compiler diagnostics\n")
+						return err
+					})
+				return m
+			},
+			wantResult: func(files map[string][]byte, options BuildOptions) *Result {
+				return &Result{
+					FileName:       mustArtifactID(t, files, options).String() + ".wasm",
+					CompilerOutput: "compiler diagnostics\n",
+				}
+			},
+		},
+		"compiler options use cache when available": {
+			files: map[string][]byte{
+				"main.go": []byte("package main\nfunc main() {}\n"),
+				"go.mod":  []byte("module foo"),
+			},
+			options: BuildOptions{
+				CompilerOptions: []string{"-gcflags", "-m"},
+			},
+			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
+				return testStorage{
+					getArtifact: func(id storage.ArtifactID) (*storage.Artifact, error) {
+						w := mustArtifactID(t, files, BuildOptions{
+							CompilerOptions: []string{"-gcflags", "-m"},
+						})
+						require.Equal(t, w, id)
+						return &storage.Artifact{
+							Contents:       &testReadCloser{},
+							CompilerOutput: []byte("escape analysis\n"),
+						}, nil
+					},
+				}, nil
+			},
+			cmdRunner: func(t *testing.T, ctrl *gomock.Controller) CommandRunner {
+				return NewMockCommandRunner(ctrl)
+			},
+			wantResult: func(files map[string][]byte, options BuildOptions) *Result {
+				return &Result{
+					FileName:       mustArtifactID(t, files, options).String() + ".wasm",
+					CompilerOutput: "escape analysis\n",
+				}
+			},
+		},
+		"compiler options rebuild cached artifact when compiler output sidecar is missing": {
+			files: map[string][]byte{
+				"main.go": []byte("package main\nfunc main() {}\n"),
+				"go.mod":  []byte("module foo"),
+			},
+			options: BuildOptions{
+				CompilerOptions: []string{"-gcflags", "-m"},
+			},
+			store: func(t *testing.T, files map[string][]byte) (storage.StoreProvider, func() error) {
+				return testStorage{
+					getArtifact: func(id storage.ArtifactID) (*storage.Artifact, error) {
+						w := mustArtifactID(t, files, BuildOptions{
+							CompilerOptions: []string{"-gcflags", "-m"},
+						})
+						require.Equal(t, w, id)
+						return &storage.Artifact{Contents: &testReadCloser{}}, nil
+					},
+					setArtifact: func(id storage.ArtifactID, e *storage.Artifact) error {
+						require.Equal(t, "escape analysis\n", string(e.CompilerOutput))
+						return nil
+					},
+					createWorkspace: func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error) {
+						return &storage.Workspace{
+							WorkDir:    "/tmp",
+							BinaryPath: "test.wasm",
+							Files:      nil,
+						}, nil
+					},
+				}, nil
+			},
+			cmdRunner: func(t *testing.T, ctrl *gomock.Controller) CommandRunner {
+				m := NewMockCommandRunner(ctrl)
+				m.EXPECT().RunCommand(testutil.MatchCommand("go", "mod", "tidy")).Return(nil)
+				m.EXPECT().
+					RunCommand(testutil.MatchCommand("go", "build", "-gcflags", "-m", "-o", "test.wasm", ".")).
+					DoAndReturn(func(cmd *exec.Cmd) error {
+						_, err := io.WriteString(cmd.Stderr, "escape analysis\n")
+						return err
+					})
+				return m
+			},
+			wantResult: func(files map[string][]byte, options BuildOptions) *Result {
+				return &Result{
+					FileName:       mustArtifactID(t, files, options).String() + ".wasm",
+					CompilerOutput: "escape analysis\n",
+				}
 			},
 		},
 		"bad environment": {
@@ -246,9 +376,6 @@ func TestBuildService_Build(t *testing.T) {
 			},
 			store: func(t *testing.T, _ map[string][]byte) (storage.StoreProvider, func() error) {
 				return testStorage{
-					hasItem: func(id storage.ArtifactID) (bool, error) {
-						return false, nil
-					},
 					createWorkspace: func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error) {
 						return nil, &os.PathError{Err: syscall.ENOSPC, Op: "write"}
 					},
@@ -271,9 +398,6 @@ func TestBuildService_Build(t *testing.T) {
 			},
 			store: func(t *testing.T, _ map[string][]byte) (storage.StoreProvider, func() error) {
 				return testStorage{
-					hasItem: func(id storage.ArtifactID) (bool, error) {
-						return false, nil
-					},
 					createWorkspace: func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error) {
 						return &storage.Workspace{
 							WorkDir:    "/tmp",
@@ -293,9 +417,9 @@ func TestBuildService_Build(t *testing.T) {
 				m.EXPECT().RunCommand(testutil.MatchCommand("go", "test", "-c", "-o", "test.wasm")).Return(nil)
 				return m
 			},
-			wantResult: func(files map[string][]byte) *Result {
+			wantResult: func(files map[string][]byte, _ BuildOptions) *Result {
 				return &Result{
-					FileName: mustArtifactID(t, files).String() + ".wasm",
+					FileName: mustArtifactID(t, files, BuildOptions{}).String() + ".wasm",
 					IsTest:   true,
 				}
 			},
@@ -308,9 +432,6 @@ func TestBuildService_Build(t *testing.T) {
 			},
 			store: func(t *testing.T, _ map[string][]byte) (storage.StoreProvider, func() error) {
 				return testStorage{
-					hasItem: func(id storage.ArtifactID) (bool, error) {
-						return false, nil
-					},
 					createWorkspace: func(id storage.ArtifactID, entries map[string][]byte) (*storage.Workspace, error) {
 						return &storage.Workspace{
 							WorkDir:    "/tmp",
@@ -330,9 +451,9 @@ func TestBuildService_Build(t *testing.T) {
 				m.EXPECT().RunCommand(testutil.MatchCommand("go", "test", "-bench=.", "-fuzz=.", "-c", "-o", "test.wasm")).Return(nil)
 				return m
 			},
-			wantResult: func(files map[string][]byte) *Result {
+			wantResult: func(files map[string][]byte, _ BuildOptions) *Result {
 				return &Result{
-					FileName:     mustArtifactID(t, files).String() + ".wasm",
+					FileName:     mustArtifactID(t, files, BuildOptions{}).String() + ".wasm",
 					IsTest:       true,
 					HasBenchmark: true,
 					HasFuzz:      true,
@@ -367,7 +488,7 @@ func TestBuildService_Build(t *testing.T) {
 				bs.cmdRunner = c.cmdRunner(t, ctrl)
 			}
 
-			got, err := bs.Build(context.TODO(), c.files)
+			got, err := bs.Build(context.TODO(), c.files, c.options)
 			if c.wantErr != "" {
 				if c.onErrorCheck != nil {
 					c.onErrorCheck(t, err)
@@ -378,7 +499,7 @@ func TestBuildService_Build(t *testing.T) {
 			}
 			require.NoError(t, err)
 			require.NotNil(t, got)
-			require.Equal(t, c.wantResult(c.files), got)
+			require.Equal(t, c.wantResult(c.files, c.options), got)
 		})
 	}
 }
@@ -419,9 +540,9 @@ func TestBuildService_getEnvironmentVariables(t *testing.T) {
 	}
 }
 
-func mustArtifactID(t *testing.T, files map[string][]byte) storage.ArtifactID {
+func mustArtifactID(t *testing.T, files map[string][]byte, opts BuildOptions) storage.ArtifactID {
 	t.Helper()
-	a, err := storage.GetArtifactID(files)
+	a, err := storage.GetArtifactID(files, opts.CompilerOptions...)
 	require.NoError(t, err)
 	return a
 }

@@ -1,8 +1,16 @@
+.RunTargetSelector__Controls {
+  min-width: 0;
+}
+
 .RunTargetSelector__Icon {
   display: flex;
 }
 
 @media (max-width: 479px) {
+  .RunTargetSelector__Controls {
+    max-width: 100%;
+  }
+
   .RunTargetSelector--responsive .RunTargetSelector__Title {
     display: none;
   }

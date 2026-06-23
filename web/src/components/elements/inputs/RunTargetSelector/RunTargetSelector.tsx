@@ -1,6 +1,6 @@
 import { clsx } from 'clsx'
 import React, { useMemo } from 'react'
-import { Dropdown, type IDropdownStyles } from '@fluentui/react'
+import { Dropdown, Stack, type IDropdownStyles } from '@fluentui/react'
 import { type RunTargetConfig } from '~/services/config'
 import { type VersionsInfo } from '~/services/api'
 import { type StateDispatch, connect, newRunTargetChangeDispatcher } from '~/store'
@@ -52,31 +52,51 @@ const RunTargetSelectorBase: React.FC<Props> = ({ responsive, disabled, runTarge
     return goVersions ? dropdownOptionsFromResponse(goVersions) : createDropdownOptions()
   }, [goVersions])
 
-  return (
-    <Dropdown
-      className={clsx({
-        'RunTargetSelector--responsive': responsive,
-      })}
-      options={options}
-      selectedKey={selectedKey}
-      onRenderTitle={(opt) => onRenderTitle(opt, disabled)}
-      onRenderOption={onRenderOption}
-      disabled={disabled}
-      styles={dropdownStyles}
-      onChange={(_, opt) => {
-        if (!opt?.data) {
-          return
-        }
+  const updateRunTarget = (changes: Partial<RunTargetConfig>) => {
+    dispatch(
+      newRunTargetChangeDispatcher({
+        ...runTarget,
+        ...changes,
+        opts: {
+          ...runTarget.opts,
+          ...changes.opts,
+        },
+      }),
+    )
+  }
 
-        const { data } = opt as DropdownOption
-        dispatch(
-          newRunTargetChangeDispatcher({
+  return (
+    <Stack
+      horizontal
+      verticalAlign="center"
+      className="RunTargetSelector__Controls"
+      tokens={{
+        childrenGap: '.5rem',
+      }}
+    >
+      <Dropdown
+        className={clsx({
+          'RunTargetSelector--responsive': responsive,
+        })}
+        options={options}
+        selectedKey={selectedKey}
+        onRenderTitle={(opt) => onRenderTitle(opt, disabled)}
+        onRenderOption={onRenderOption}
+        disabled={disabled}
+        styles={dropdownStyles}
+        onChange={(_, opt) => {
+          if (!opt?.data) {
+            return
+          }
+
+          const { data } = opt as DropdownOption
+          updateRunTarget({
             target: data!.type,
             backend: data!.backend,
-          }),
-        )
-      }}
-    />
+          })
+        }}
+      />
+    </Stack>
   )
 }
 

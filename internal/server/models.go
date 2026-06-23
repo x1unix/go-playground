@@ -76,6 +76,9 @@ type BuildResponseV2 struct {
 	// FileName is file name
 	FileName string `json:"fileName,omitempty"`
 
+	// CompilerOutput contains stderr emitted by the compiler.
+	CompilerOutput string `json:"compilerOutput,omitempty"`
+
 	// IsUnitTest indicates whether payload is a Go test.
 	IsTest bool `json:"isTest,omitempty"`
 

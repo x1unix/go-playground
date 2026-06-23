@@ -15,7 +15,8 @@ import (
 const maxFilesCount = 10
 
 type FilesPayload struct {
-	Files map[string]string `json:"files"`
+	Files           map[string]string `json:"files"`
+	CompilerOptions string            `json:"compilerOptions,omitempty"`
 }
 
 // Validate checks file name and contents and returns error on validation failure.
