@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         env:
           cache-name: npm-cache
         with:
@@ -71,7 +71,7 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           cache: "yarn"
           node-version-file: ".nvmrc"
@@ -81,7 +81,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y make
 
       - name: Setup Go ${{ env.GO_VERSION }}
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version: ${{ env.GO_VERSION }}
           cache-dependency-path: |
