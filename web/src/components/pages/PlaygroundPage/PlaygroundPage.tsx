@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux'
 import { dispatchLoadSnippet } from '~/store/workspace'
 import { Header } from '~/components/layout/Header'
 import { StatusBar } from '~/components/layout/StatusBar'
+import { CompilerOptionsBar } from '~/components/features/workspace/CompilerOptionsBar'
 
 import styles from './PlaygroundPage.module.css'
 import { SuspenseBoundary } from '~/components/elements/misc/SuspenseBoundary'
@@ -28,6 +29,7 @@ export const PlaygroundPage: React.FC = () => {
     <div ref={containerRef} className={styles.Playground}>
       <LazyAnnouncementBanner />
       <Header />
+      <CompilerOptionsBar />
       <SuspenseBoundary errorLabel="Failed to load workspace" preloaderText="Loading workspace...">
         <LazyPlaygroundContent parentRef={containerRef} />
       </SuspenseBoundary>

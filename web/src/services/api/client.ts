@@ -26,8 +26,8 @@ export class Client implements IAPIClient {
    *
    * WASM file can be downloaded using {@link getArtifact} call.
    */
-  async build(files: Record<string, string>): Promise<BuildResponse> {
-    return await this.post<BuildResponse>(`/v2/compile`, { files })
+  async build(files: Record<string, string>, compilerOptions?: string): Promise<BuildResponse> {
+    return await this.post<BuildResponse>(`/v2/compile`, { files, compilerOptions })
   }
 
   /**

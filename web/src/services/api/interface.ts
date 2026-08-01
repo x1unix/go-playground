@@ -15,7 +15,7 @@ export interface IAPIClient {
 
   format: (files: Record<string, string>) => Promise<FilesPayload>
 
-  build: (files: Record<string, string>) => Promise<BuildResponse>
+  build: (files: Record<string, string>, compilerOptions?: string) => Promise<BuildResponse>
 
   getArtifact: (fileName: string) => Promise<Response>
 

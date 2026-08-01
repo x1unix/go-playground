@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"sort"
+	"strings"
 )
 
 const (
@@ -27,8 +28,8 @@ func (a ArtifactID) String() string {
 	return string(a)
 }
 
-// GetArtifactID generates new artifact ID from contents
-func GetArtifactID(entries map[string][]byte) (ArtifactID, error) {
+// GetArtifactID generates new artifact ID from contents and optional compiler options.
+func GetArtifactID(entries map[string][]byte, compilerOptions ...string) (ArtifactID, error) {
 	h := md5.New()
 
 	// Keys have to be sorted for constant hashing
@@ -48,6 +49,11 @@ func GetArtifactID(entries map[string][]byte) (ArtifactID, error) {
 		_, _ = h.Write([]byte(key))
 		_, _ = h.Write([]byte(" --\n"))
 		_, _ = h.Write(contents)
+	}
+
+	if len(compilerOptions) > 0 {
+		_, _ = h.Write([]byte("\n-- .goplay-compiler-options --\n"))
+		_, _ = h.Write([]byte(strings.Join(compilerOptions, "\x00")))
 	}
 
 	fName := hex.EncodeToString(h.Sum(nil))

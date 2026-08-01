@@ -99,31 +99,21 @@ func (s LocalStorage) getOutputLocation(id ArtifactID) string {
 	return filepath.Join(s.binDir, id.Ext(ExtWasm))
 }
 
-// HasItem implements storage interface
-func (s LocalStorage) HasItem(id ArtifactID) (bool, error) {
-	s.useLock.Lock()
-	defer s.useLock.Unlock()
-	fPath := s.getOutputLocation(id)
-	_, err := os.Stat(fPath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false, nil
-		}
-
-		return false, err
-	}
-
-	return true, nil
+func (s LocalStorage) getCompilerOutputLocation(id ArtifactID) string {
+	return filepath.Join(s.binDir, id.Ext("stderr"))
 }
 
-// GetItem implements storage interface
-func (s LocalStorage) GetItem(id ArtifactID) (ReadCloseSizer, error) {
+// GetArtifact implements StoreProvider interface.
+func (s LocalStorage) GetArtifact(id ArtifactID) (*Artifact, error) {
 	s.useLock.Lock()
 	defer s.useLock.Unlock()
-	fPath := s.getOutputLocation(id)
-	f, err := os.Open(fPath)
+
+	f, err := os.Open(s.getOutputLocation(id))
 	if os.IsNotExist(err) {
 		return nil, ErrNotExists
+	}
+	if err != nil {
+		return nil, err
 	}
 
 	stat, err := f.Stat()
@@ -132,11 +122,39 @@ func (s LocalStorage) GetItem(id ArtifactID) (ReadCloseSizer, error) {
 		return nil, err
 	}
 
-	return cachedFile{
-		ReadCloser: f,
-		size:       stat.Size(),
-		useLock:    s.useLock,
-	}, err
+	data, err := os.ReadFile(s.getCompilerOutputLocation(id))
+	if err != nil && !os.IsNotExist(err) {
+		_ = f.Close()
+		return nil, err
+	}
+
+	return &Artifact{
+		Contents: cachedFile{
+			ReadCloser: f,
+			size:       stat.Size(),
+			useLock:    s.useLock,
+		},
+		CompilerOutput: data,
+	}, nil
+}
+
+// SetArtifact implements StoreProvider interface.
+func (s LocalStorage) SetArtifact(id ArtifactID, e *Artifact) error {
+	s.useLock.Lock()
+	defer s.useLock.Unlock()
+
+	if err := os.MkdirAll(s.binDir, perm); err != nil && !os.IsExist(err) {
+		return fmt.Errorf("failed to create artifact directory: %w", err)
+	}
+
+	if len(e.CompilerOutput) == 0 {
+		if err := os.Remove(s.getCompilerOutputLocation(id)); err != nil && !os.IsNotExist(err) {
+			return err
+		}
+		return nil
+	}
+
+	return os.WriteFile(s.getCompilerOutputLocation(id), e.CompilerOutput, perm)
 }
 
 // CreateWorkspace implements storage interface
