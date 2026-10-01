@@ -14,6 +14,7 @@ export interface StatusBarItemProps {
   mobileHidden?: boolean | 'icononly' | 'textonly'
   href?: string
   title?: string
+  'aria-label'?: string
   onClick?: MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>
   style?: CSSProperties
 }
