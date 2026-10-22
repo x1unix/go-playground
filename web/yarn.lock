@@ -6617,9 +6617,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"markdown-it@npm:^14.3.1":
-  version: 14.3.1
-  resolution: "markdown-it@npm:14.3.1"
+"markdown-it@npm:^14.3.3":
+  version: 14.3.3
+  resolution: "markdown-it@npm:14.3.3"
   dependencies:
     argparse: "npm:^2.0.1"
     entities: "npm:^4.5.0"
@@ -6629,7 +6629,7 @@ __metadata:
     uc.micro: "npm:^2.1.0"
   bin:
     markdown-it: bin/markdown-it.mjs
-  checksum: 10c0/806f0f5f29f1ddd9fd465f905c1f2c54d64af9023095792dd5364e5807f77454f427ee75d66083b432d0900e21836f0fff940f94f5fc93c41b2f78970469874e
+  checksum: 10c0/d6075ad320731d7fb9f127e496677f4e36cbdba839d7387dabf1f0d07b5c02bdffb46fb3969033817c04e60017e05d4269e4aa74bee58cc0a562a17cc0b6b8ff
   languageName: node
   linkType: hard
 
@@ -9076,7 +9076,7 @@ __metadata:
     file-saver: "npm:^2.0.5"
     globals: "npm:^15.0.0"
     jsdom: "npm:^25.0.1"
-    markdown-it: "npm:^14.3.1"
+    markdown-it: "npm:^14.3.3"
     prettier: "npm:^3.2.4"
     re-resizable: "npm:^6.9.11"
     react: "npm:^18.3.1"
