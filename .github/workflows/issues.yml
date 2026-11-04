@@ -15,16 +15,16 @@ jobs:
           stale-issue-label: "stale"
           exempt-issue-labels: "unstale,override-stale,question,enhancement,bug,in-progress"
           exempt-pr-labels: "override-stale,in-progress"
-          days-before-issue-stale: 15
-          days-before-issue-close: 15
+          days-before-issue-stale: 30
+          days-before-issue-close: 180
           stale-issue-message: >
             This issue is stale because it has been open for 15 days with no activity.
             It will be closed if no further activity occurs. Thank you.
           close-issue-message: >
             This issue was closed because it has been inactive for 15 days since being marked as stale.
             Please reopen if you'd like to work on this further.
-          days-before-pr-stale: 15
-          days-before-pr-close: 15
+          days-before-pr-stale: 60
+          days-before-pr-close: 180
           stale-pr-message: "This PR is stale because it has been open for 30 days with no activity. It will be closed if no further activity occurs. Thank you."
           close-pr-message: "This PR was closed because it has been inactive for 30 days since being marked as stale. Please reopen if you'd like to work on this further."
           repo-token: ${{ secrets.GITHUB_TOKEN }}
