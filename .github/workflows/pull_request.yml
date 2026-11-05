@@ -30,13 +30,16 @@ jobs:
           node-version-file: ".nvmrc"
           cache-dependency-path: "web/yarn.lock"
       - name: Install modules
-        run: yarn
+        run: yarn install --immutable
+        working-directory: ./web
+      - name: Check TypeScript
+        run: yarn typecheck
         working-directory: ./web
       - name: Run ESLint
         run: yarn lint
         working-directory: ./web
       - name: Run vitest
-        run: yarn test
+        run: yarn test run --coverage
         working-directory: ./web
       - name: Setup Go
         uses: actions/setup-go@v7

@@ -1,11 +1,10 @@
 import { resolve, join } from 'path'
 import react from '@vitejs/plugin-react-swc'
-import { defineConfig, type UserConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import svgr from 'vite-plugin-svgr'
 import tsConfigPaths from 'vite-tsconfig-paths'
 import { createHtmlPlugin } from 'vite-plugin-html'
-import 'vitest/config'
 
 const { NODE_ENV = 'dev', VITE_WASM_BASE_URL = '/wasm/', VITE_WASM_API_VER = 'v3', VITE_BASE_URL = '' } = process.env
 

@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { Link, MessageBar, MessageBarType, useTheme } from '@fluentui/react'
 
 import { Console, type ConsoleProps } from '~/components/features/inspector/Console'
-import { FallbackOutput } from 'components/features/inspector/FallbackOutput'
+import { FallbackOutput } from '~/components/features/inspector/FallbackOutput'
 import { type State } from '~/store'
 import { DEFAULT_FONT, getDefaultFontFamily, getFontFamily } from '~/services/fonts'
 

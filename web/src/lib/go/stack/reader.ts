@@ -13,7 +13,7 @@ export class StackReader {
   private _offset = 0
   private _initialOffset = 0
   private _popCount = 0
-  private readonly _debug = false
+  private readonly _debug: boolean
   private _finished = false
   private readonly _mem: DataView
   private readonly _values: JSValuesTable
