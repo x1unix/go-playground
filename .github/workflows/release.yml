@@ -92,7 +92,7 @@ jobs:
 
       - name: Build frontend
         run: |
-          yarn install --silent && yarn build
+          yarn install --immutable && yarn build
         working-directory: ./web
         env:
           NODE_ENV: "production"
