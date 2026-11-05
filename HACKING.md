@@ -65,15 +65,31 @@ Project uses a set of Go programs to prepare assets necessary for a project.
 
 ## Development Environment Setup
 
-### Prerequisites
+### Nix development shell (recommended)
+
+With Nix installed and flakes enabled, enter the development environment from the repository root:
+
+```sh
+nix develop
+```
+
+The shell provides Go 1.26, Node.js 22, Corepack, Yarn, Make, Git, a C compiler, Mockgen, and Protobuf tools on x86_64/aarch64 Linux and Apple Silicon macOS. `flake.lock` pins the toolchain; the Yarn wrapper uses Corepack to run the version declared in `web/package.json`, including when invoked from the repository root. Corepack may download Yarn on first use. NVM and system-installed Go or Node.js are not required.
+
+Inside the shell, complete the **First-time setup** below, skipping `corepack enable` because the shell already provides Yarn. Enter the shell in each terminal used to run the project. You can also run individual commands with `nix develop -c make wasm`.
+
+To update the pinned toolchain, run `nix flake update` and commit the updated `flake.lock`.
+
+### Manual prerequisites
 
 Please ensure that you have installed:
 
 - GNU or BSD Make
 - Git
-- [Node Version Manager](https://github.com/nvm-sh/nvm) or Node.js 20 (`lts/iron`)
-- [Yarn](https://yarnpkg.com/) package manager.
-- Go 1.25+
+- Node.js 22 (see `.nvmrc` for the version used by CI; NVM is optional)
+- Corepack, which selects the Yarn version from `web/package.json`.
+- Go 1.26+
+- A C compiler for cgo.
+- [Mockgen](https://github.com/uber-go/mock) for `make gen`.
 - Protobuf:
   - [protoc](https://developers.google.com/protocol-buffers)
   - [Protobuf Go plugins](https://grpc.io/docs/languages/go/quickstart/)
@@ -81,6 +97,8 @@ Please ensure that you have installed:
 ### First-time setup
 
 Run following commands to configure a just cloned project:
+
+`make install` is reserved for installing a built project on a local machine; it is not a development setup command.
 
 | Command           | Purpose                                                                                                     |
 | ----------------- | ----------------------------------------------------------------------------------------------------------- |

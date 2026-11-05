@@ -49,7 +49,7 @@ check-yarn:
 .PHONY:preinstall
 preinstall:
 	@echo ":: Checking and installing dependencies..." && \
-	$(YARN) --cwd="$(UI)" install --silent
+	$(YARN) --cwd="$(UI)" install
 
 .PHONY:build-server
 build-server:
