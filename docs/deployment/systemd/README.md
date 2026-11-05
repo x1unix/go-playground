@@ -8,7 +8,7 @@
 * GNU or BSD Make
 * Git
 * Go 1.22+
-* [Node Version Manager](https://github.com/nvm-sh/nvm) or Node.js 20 (`lts/iron`)
+* [Node Version Manager](https://github.com/nvm-sh/nvm) or Node.js 22.22.0 (see `.nvmrc`)
 * [Yarn](https://yarnpkg.com/) package manager.
 
 ## Building

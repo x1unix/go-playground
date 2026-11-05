@@ -1,4 +1,4 @@
-ARG NODE_VERSION=20
+ARG NODE_VERSION=22.22.0
 ARG GO_VERSION=1.25
 ARG WASM_API_VER=v3
 ARG APP_VERSION=1.0.0
@@ -14,7 +14,7 @@ ARG GO_VERSION
 ARG PREV_GO_VERSION
 COPY web /tmp/web
 WORKDIR /tmp/web
-RUN yarn install --silent && \
+RUN corepack enable && yarn install --immutable && \
     VITE_VERSION=$APP_VERSION \
     NODE_ENV=production \
     VITE_GITHUB_URL=$GITHUB_URL \
