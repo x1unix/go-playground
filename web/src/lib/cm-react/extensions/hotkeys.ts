@@ -5,19 +5,7 @@ import { Vim } from '@replit/codemirror-vim'
 import type { DocumentState } from '../types/common'
 import { CommandType } from '../types/events'
 import { docStateFromEditor } from '../utils'
-
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
-const roundToTenth = (value: number) => Math.round(value * 10) / 10
-
-const FONT_MAX = 42
-const FONT_MIN = 7
-const FONT_SCALE_STEP = 1.4
-
-const arithmeticFontScale = (current: number, direction: number) => {
-  const stepped = current + direction * FONT_SCALE_STEP
-  const bounded = clamp(stepped, FONT_MIN, FONT_MAX)
-  return roundToTenth(bounded)
-}
+import { arithmeticFontScale } from './zoom'
 
 type DocumentCommand = CommandType.Run | CommandType.Format | CommandType.Share
 export type DocumentCommandHandler = (cmd: DocumentCommand, doc: DocumentState) => void

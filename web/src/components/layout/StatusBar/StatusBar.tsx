@@ -9,6 +9,7 @@ import type { State } from '~/store'
 import { EllipsisText } from '~/components/utils/EllipsisText'
 import { StatusBarItem, StatusBarItemCounter } from '~/components/layout/StatusBar/StatusBarItem'
 import { VimStatusBarItem } from './VimStatusBarItem'
+import { EditorZoomControls } from './EditorZoomControls'
 
 import styles from './StatusBar.module.css'
 
@@ -125,6 +126,7 @@ export const StatusBar: React.FC = () => {
           })}
         </div>
         <div className={styles['StatusBar__side-right']}>
+          <EditorZoomControls />
           <StatusBarItem>
             Ln {line}, Col {column}
           </StatusBarItem>

@@ -17,7 +17,7 @@ import { saveWorkspaceState, truncateWorkspaceState } from '../workspace/config'
 export function newMonacoParamsChangeDispatcher(changes: MonacoParamsChanges): Dispatcher {
   return (dispatch: DispatchFn, _: StateProvider) => {
     const current = config.monacoSettings
-    config.monacoSettings = Object.assign(current, changes)
+    config.monacoSettings = { ...current, ...changes }
     dispatch(newMonacoParamsChangeAction(changes))
   }
 }
