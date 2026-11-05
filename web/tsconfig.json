@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.paths.json",
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2022",
     "lib": [
       "dom",
       "dom.iterable",
@@ -23,11 +23,7 @@
     "noImplicitAny": false,
     "experimentalDecorators": true,
     "noFallthroughCasesInSwitch": true,
-    "downlevelIteration": true,
-    "typeRoots": [
-      "src/lib/go/@types",
-      "node_modules/@types"
-    ]
+    "types": ["node", "vitest/globals"]
   },
   "include": [
     "src"
