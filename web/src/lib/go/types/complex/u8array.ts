@@ -48,7 +48,9 @@ export class UInt8ArrayTypeSpec extends AbstractTypeSpec<Uint8Array> {
 
   write(view: DataView, addr: number, val: Uint8Array, buff: ArrayBufferLike) {
     if (!(val instanceof Uint8Array)) {
-      throw new Error(`${this.constructor.name}.write: value should be Uint8Array (got: ${val.constructor.name})`)
+      throw new Error(
+        `${this.constructor.name}.write: value should be Uint8Array (got: ${Object.prototype.toString.call(val)})`,
+      )
     }
 
     if (val.length > this._length) {

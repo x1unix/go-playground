@@ -42,7 +42,7 @@ const markersToDiagnostics = (doc: Text, markers: LSPDiagnostic[]): CMDiagnostic
       from: sortedFrom,
       to: sortedTo,
       severity: marker.severity ? (mapSeverity[marker.severity] ?? 'error') : 'error',
-      message: marker.message,
+      message: typeof marker.message === 'string' ? marker.message : marker.message.value,
     }
   })
 }

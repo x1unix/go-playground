@@ -1,7 +1,8 @@
 import type { Diagnostic } from '@codemirror/lint'
 
 import { defaultEditorPreferences, type EditorPreferences } from '../props'
-import { defaultSyntax, Syntax } from '../extensions/syntax'
+import { defaultSyntax } from '../extensions/syntax'
+import { Syntax } from '../types/common'
 
 /**
  * BufferState stores editor settings captured when a buffer is created.

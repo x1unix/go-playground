@@ -2,7 +2,10 @@ import { type Event, type Message, MessageType, type Request, type Response } fr
 
 const MSG_PING = 'WRPC_WORKER_PING'
 
-type WorkerInterface = MessagePort | Worker | DedicatedWorkerGlobalScope
+interface WorkerInterface {
+  addEventListener<K extends keyof WorkerEventMap>(type: K, listener: (event: WorkerEventMap[K]) => void): void
+  postMessage(message: unknown): void
+}
 
 interface Listener {
   resolver: Function
