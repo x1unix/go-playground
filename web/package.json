@@ -34,7 +34,6 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/file-saver": "^2.0.7",
-    "@types/jest": "^27.4.0",
     "@types/node": "^25.2.3",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
@@ -98,12 +97,12 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "npx vite --host",
-    "build": "npx vite build",
-    "serve": "npx vite preview",
-    "lint": "npx eslint .",
+    "start": "vite --host",
+    "build": "yarn typecheck && vite build",
+    "serve": "vite preview",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
-    "test": "npx vitest"
+    "test": "vitest"
   },
   "browserslist": {
     "production": [
