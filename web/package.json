@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "yarn@4.14.0",
+  "packageManager": "yarn@4.18.1",
   "resolutions": {
     "@codemirror/state": "6.7.6",
     "@codemirror/view": "6.43.15",
