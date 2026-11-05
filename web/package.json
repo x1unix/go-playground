@@ -102,6 +102,7 @@
     "build": "npx vite build",
     "serve": "npx vite preview",
     "lint": "npx eslint .",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
     "test": "npx vitest"
   },
   "browserslist": {
@@ -117,6 +118,7 @@
     ]
   },
   "devDependencies": {
-    "@types/markdown-it": "^14"
+    "@types/markdown-it": "^14",
+    "@typescript/native": "npm:typescript@7.0.2"
   }
 }
